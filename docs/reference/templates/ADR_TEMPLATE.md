@@ -1,113 +1,148 @@
-# ADR-XXX: [Որոշման անվանում]
+# ADR-XXX: [Decision Title]
 
-**Ստատուս.** Proposed | Accepted | Deprecated | Superseded by ADR-YYY
-**Ամսաթիվ.** YYYY-MM-DD
-**Հեղինակներ.** [Անուններ]
+> **Hippocrates.am — Version 1 (MVP) | Architecture Decision Record Template**
+>
+> When using this template, copy it to `docs/architecture/ADR-XXX-<slug>.md` and replace all placeholders.
+> A `Proposed` decision is not approved. Cursor must not independently implement it or change its status to `Accepted`.
 
----
-
-## Կոնտեքստ
-
-[Խնդրի կամ իրավիճակի նկարագրություն, որը պահանջում է որոշում]
-
-**Ինչ պետք է լուծվի.**
-- [Հարց 1]
-- [Հարց 2]
-
-**Սահմանափակումներ.**
-- [Սահմանափակում 1]
-- [Սահմանափակում 2]
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-YYY  
+**Date:** YYYY-MM-DD  
+**Authors:** [Names]  
+**Project phase:** Hippocrates.am V1  
+**Affected modules:** [Modules / user roles / organizations]  
+**Approver:** [Responsible project owner, once approved]
 
 ---
 
-## Լուծում
+## Context
 
-[Կայացված որոշման համառոտ նկարագրություն]
+[Describe the actual V1 problem and why a decision is needed now. Clearly distinguish approved requirements from assumptions.]
+
+**Requirement source:** [Approved BRIEF.md section / TECH_CARD.md / recorded decision]  
+**Scope boundaries:** [What belongs in V1 and what belongs in later phases. Do not include CT/PACS, Dental Chart, or comprehensive medical records in V1 unless the approved BRIEF explicitly requires them.]
+
+**Questions to resolve:**
+- [Question 1]
+- [Question 2]
+
+**Constraints:**
+- [Constraint 1]
+- [Constraint 2]
+- [When relevant: clinic/tenant data isolation and current membership/permission checks]
+- [When relevant: restricted access to personal/medical data, appropriate legal approval, and auditing]
+- [For scheduling decisions: protection against concurrent requests and double booking]
+
+---
+
+## Decision
+
+[Describe ONE decision precisely, including module ownership, interactions, and limitations. If the status is `Proposed`, describe the solution as a proposal rather than an approved choice.]
+
+**Module contracts:** [Public interfaces, APIs, events, or "None"]  
+**Data changes:** [New entities / migrations / "None"]  
+**Security impact:** [Required checks or "None"]
 
 ```
-[Կոդ, դիագրամ կամ սխեմա, անհրաժեշտության դեպքում]
+[Code, diagram, or schema, if needed]
 ```
 
 ---
 
-## Դիտարկված այլընտրանքներ
+## Alternatives Considered
 
-### Տարբերակ A: [Անվանում]
+### Option A: [Name]
 
-**Նկարագրություն.** [Ինչ է սա]
+**Description:** [What this option entails]
 
-**Դրական.**
-- [Դրական 1]
-- [Դրական 2]
+**Advantages:**
+- [Advantage 1]
+- [Advantage 2]
 
-**Բացասական.**
-- [Բացասական 1]
-- [Բացասական 2]
-
----
-
-### Տարբերակ B: [Անվանում] ✅ (ընտրված)
-
-**Նկարագրություն.** [Ինչ է սա]
-
-**Դրական.**
-- [Դրական 1]
-- [Դրական 2]
-
-**Բացասական.**
-- [Բացասական 1]
-- [Բացասական 2]
-
-**Ինչու ընտրվել է.** [Հիմնավորում]
+**Disadvantages:**
+- [Disadvantage 1]
+- [Disadvantage 2]
 
 ---
 
-### Տարբերակ C: [Անվանում]
+### Option B: [Name] [Mark as SELECTED only after approval]
 
-**Նկարագրություն.** [Ինչ է սա]
+**Description:** [What this option entails]
 
-**Դրական.**
-- [Դրական 1]
+**Advantages:**
+- [Advantage 1]
+- [Advantage 2]
 
-**Բացասական.**
-- [Բացասական 1]
+**Disadvantages:**
+- [Disadvantage 1]
+- [Disadvantage 2]
 
----
-
-## Հետևանքներ
-
-### Դրական
-- [Հետևանք 1]
-- [Հետևանք 2]
-
-### Բացասական
-- [Հետևանք 1]
-- [Կոմպենսացիա. ինչպես նվազագույնի հասցնել]
-
-### Չեզոք
-- [Փոփոխություն 1]
+**Selection rationale:** [Complete only after an option has actually been selected and approved. Explain why it fits V1.]
 
 ---
 
-## Իրականացում
+### Option C: [Name]
 
-### Քայլեր
-1. [Քայլ 1]
-2. [Քայլ 2]
-3. [Քայլ 3]
+**Description:** [What this option entails]
 
-### Փոփոխված ֆայլեր/մոդուլներ
+**Advantages:**
+- [Advantage 1]
+
+**Disadvantages:**
+- [Disadvantage 1]
+
+---
+
+## Consequences
+
+### Positive
+- [Consequence 1]
+- [Consequence 2]
+
+### Negative
+- [Consequence 1]
+- [Mitigation: how the impact will be reduced]
+- [When relevant: residual privacy, tenant-isolation, booking-correctness, or data-migration risks]
+
+### Neutral
+- [Change 1]
+- [Any impact on later clinical or diagnostic phases]
+
+---
+
+## Implementation
+
+### Steps
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+4. [Add appropriate unit and integration tests; where applicable, include concurrency, tenant-isolation, and privacy tests.]
+5. [Update related requirements and technical documentation only within the scope of the approved change.]
+
+### Changed Files / Modules
 - `path/to/file1`
 - `path/to/file2`
+- [Use actual repository paths. Do not create files merely because they appear in this template.]
 
 ---
 
-## Կապված որոշումներ
+## Related Decisions
 
-- [ADR-XXX: Անվանում](./ADR-XXX.md) — [Ինչպես է կապված]
+- [ADR-YYY: Related Decision](../ADR-YYY-<slug>.md) — [Dependency / extension / supersession]
+- [If none exist, write "None" and remove the example link above.]
 
 ---
 
-## Նշումներ
+## Notes
 
-[Լրացուցիչ տեղեկություն, հղումներ քննարկումներին, աղբյուրներ]
+[Additional details, discussion records, and requirement sources]
+
+**Verification and acceptance criteria:**
+- [How will the team verify that the decision was implemented correctly?]
+- [For production-impacting changes: rollback and recovery steps]
+
+**Cursor rule:** This file is a template, not an approved architectural decision. An incomplete or `Proposed` ADR does not authorize implementation, modification of real data, or production changes.
+
+**Related documents:**
+- [BRIEF.md](../../BRIEF.md) — V1 functional scope (when completed and approved)
+- [TECH_CARD.md](../../TECH_CARD.md) — technical decisions (when available and approved)
+- [DECISIONS.md](../../DECISIONS.md) — decision and approval history (if maintained)

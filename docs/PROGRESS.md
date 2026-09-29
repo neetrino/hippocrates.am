@@ -1,79 +1,76 @@
-# V1 Delivery Progress: Hippocrates.am
+# Delivery Plan — Hippocrates.am Minimum MVP
 
-> Planning checklist, **not a claim that any feature has been built**. Only mark items complete after checking the current repository, recorded tests and actual environment. Scope is limited to the approved product owner's V1; clinical/diagnostic extensions are not included.
+> **PLAN, not implementation status.** Date 2026-09-29. 23 user-selected functions. No feature should be marked implemented solely from these documents; only repository checks and recorded tests count as evidence.
 
-**Version:** 1.0-draft  
-**Target:** Version 1 / MVP  
-**Date:** 2026-09-28  
-**Status:** PLANNING  
-**Measured overall completion:** NOT VERIFIED. Do not manufacture percentages.
+**Verified implementation:** UNKNOWN — repository has not been audited for this revision.  
+**Product scope approval:** PENDING.  
+**Status terms:** `NOT_VERIFIED`, `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `VERIFIED`, `DEFERRED`.
 
-## Status meanings
+## Minimum delivery slices
 
-`NOT_STARTED` = not confirmed in repository; `IN_PROGRESS` = implementation observed; `BLOCKED` = unmet approved prerequisite; `VERIFIED` = tests/evidence available; `DEFERRED` = approved later phase. Documentation creation and implementation completion are different things.
+| Slice | Deliverable | MVP IDs | Current state | Definition of verified completion |
+| --- | --- | --- | --- | --- |
+| S0 | Repo audit and signed 23-feature scope, decisions, security/release prerequisites | all | IN_PROGRESS | Local product choices and stack are recorded. Production host, backups, and deploy owner are still open, so S0 is not verified |
+| S1 | Identity, roles, clinic/doctor basic records and independent verification | 08–12,23 | NOT_VERIFIED | Wrong-role and revoked-membership denial tests; platform approval flows |
+| S2 | Public pages, approved clinic/doctor profiles and service/price publication | 01–07 | NOT_VERIFIED | Hidden draft providers stay private; responsive public journey passes |
+| S3 | Doctor schedule and authoritative free-slot listing | 13–14 | NOT_VERIFIED | Doctor unavailability and existing bookings reflected in server slots |
+| S4 | Patient booking, clinic confirmation/cancellation, own patient/doctor/clinic lists | 15–19 | NOT_VERIFIED | Cross-role tests, simultaneous overlapping booking race tests, cancel slot release |
+| S5 | Basic booking notifications and review eligibility with native clinic ratings | 20–22 | NOT_VERIFIED | Delivery-safe notifications; only completed visit reviewed once; rating sort tests |
+| S6 | Minimal platform admin finishing, staging walkthrough, backups/security and release sign-off | 23 + all | NOT_VERIFIED | Role-by-role end-to-end acceptance, production-readiness and recovery evidence |
 
-## Delivery roadmap (suggested vertical slices)
+**Number ranges refer to `MVP-XX` IDs in `BRIEF.md`.** Slices can be subdivided without changing release scope. `MVP-23` has both early verification tooling in S1 and final overview in S6.
 
-| Slice | Scope | State | Evidence required |
-| --- | --- | --- | --- |
-| S0 — Discovery & approval | Approve BRIEF, TECH_CARD, V1 boundaries, initial schema and deployment policy; inspect repo | NOT_VERIFIED | Owner sign-off, recorded open decisions, repository audit |
-| S1 — Identity & tenancy | Accounts/sessions, patient/doctor identity, clinic membership and permission checks | NOT_STARTED | Session revoke and cross-tenant denial tests |
-| S2 — Clinic/doctor/catalog | Organization/doctor verification, branches, specialties, public profiles, service offerings | NOT_STARTED | Different self-reported vs verified fields, approved public projections |
-| S3 — Scheduling & booking | Affiliation schedules, exceptions, resources, holds, appointments and history | NOT_STARTED | PostgreSQL concurrency/cross-clinic conflict tests |
-| S4 — Discovery & portals | Search/filter, public SEO, clinic profiles, patient/doctor/clinic workspaces | NOT_STARTED | Safe projections and critical cross-role E2E |
-| S5 — Private messaging | Profile-initiated text chats, participant policy, retention/abuse reports | NOT_STARTED | No-booking chat test, no admin/other-patient chat leakage |
-| S6 — Public anonymous Q&A | Submission, moderation, verified doctor answers, safe searchable archive | NOT_STARTED | Identity-redaction tests across API, HTML, metadata and logs |
-| S7 — Reviews & notifications | Completed-visit native review checks, replies, booking and communication notifications | NOT_STARTED | Review proof, idempotent reminders, privacy-safe messages |
-| S8 — Platform admin & quality | Restricted verification/moderation, safe dashboards, accessibility/i18n, security and recovery | NOT_STARTED | Role matrix + restore rehearsal + monitoring and CI |
-| S9 — Release readiness | Staging end-to-end, stress and security testing, approved release with rollback | NOT_STARTED | Signed acceptance criteria, owners, backup/restore evidence |
+## Owner decisions blocking dependent coding
 
-## Phase 0: mandatory approval checklist
+- [x] Product owner formally signs off the 23-function BRIEF and deferred-feature list. Accepted in chat, 2026-09-29. Name not recorded.
+- [x] Confirm one location per clinic and one active clinic affiliation per doctor for this release. Accepted 2026-09-29.
+- [x] Confirm signup/login. Accepted 2026-09-29: email and password, 12-hour server session, login 10/minute/IP, register 5/10 minutes/IP, no email password reset.
+- [x] Confirm clinic-manual confirmation and cancellation. Accepted 2026-09-29: `REQUESTED` occupies the slot, the clinic confirms, no cutoff, no auto-expiry.
+- [x] Completion and reviews. Accepted 2026-09-29: one review per completed appointment, hidden review still consumes it, no public name or email.
+- [x] Rating sort. Accepted 2026-09-29: average, then count, then name. Unrated clinics last.
+- [x] Notifications channel: in-app only. Accepted 2026-09-29.
+- [x] Verification evidence stays private and is not auto-deleted. Interface language is Armenian. Accepted 2026-09-29.
+- [ ] Name the production host, region, backup owner, and deploy owner. Local Docker PostgreSQL is accepted and is not a production decision.
 
-- [ ] Inspect repository implementation and actual existing technology; do **not** infer implementation from `.env.example` or template README.
-- [ ] Review `BRIEF_V1_DRAFT.md` against the source Hippocrates Overview v2.0 and approve an authoritative `BRIEF.md`.
-- [ ] Decide online deposit/payment conflict, launch languages, authentication method, scheduling state policy, review verification and public ranking rules.
-- [ ] Review and approve `TECH_CARD.md` and architecture; only then pin compatible package versions.
-- [ ] Validate organization/patient/private Q&A data privacy strategy and regional hosting suitability.
-- [ ] Define who approves production changes and migrations; require staging + restore rehearsal.
+## Core acceptance checks
 
-## Definition of done for every implementation slice
+- [ ] Public clinic list, independent doctor directory, name/specialty search and published pages never show unapproved records.
+- [ ] Clinic admin can manage only own profile, doctor links, service/price and schedules.
+- [ ] Doctor can view only own appointments; patient only own appointments; platform admin has restricted verification/overview access.
+- [ ] Unavailable time is excluded and concurrent requests cannot create overlapping active appointments for one doctor.
+- [ ] Authorized confirmation and cancellation update availability/history and display current status in patient, doctor and clinic portals.
+- [ ] Booking notifications are delivered under chosen policy without determining appointment correctness.
+- [ ] Only genuine completed clinic visits permit a native review; duplicate or cross-patient review attempts fail.
+- [ ] Approved rating sort and unrated display are verified against known fixture data.
+- [ ] Staging E2E, negative authorization checks, database migration rehearsal, backup restore and monitoring reviewed before launch.
 
-1. Approved product acceptance criteria and API/DB contracts for the slice.
-2. No cross-module private-table shortcuts or new future-clinical scope.
-3. Positive, negative, authorization and privacy tests appropriate to the slice.
-4. Critical concurrency or retries tested against real test services where applicable.
-5. All affected existing checks pass (format, lint, types, tests, build); failures are reported, not hidden.
-6. Approved documentation updated (`03-STRUCTURE`, API, database, DECISIONS, TECH_CARD where appropriate).
-7. Owner review recorded. Do not equate code generation with acceptance or production readiness.
+## Implementation discipline
 
-## Essential end-to-end acceptance journeys
+For each slice: inspect current code → document gaps → approve affected choices → define API/DB/UX acceptance → implement smallest complete vertical slice → positive/negative tests → update affected docs → PR review. When old expanded-V1 code exists, **do not delete, disable or migrate it blindly**; propose safe plan and obtain explicit approval. No agent-originated production data mutation or deployment without explicit authority.
 
-- [ ] Public visitor finds a published doctor, views published prices and bookable time without receiving any private data.
-- [ ] One patient books at Clinic A and Clinic B under one identity; Clinic A cannot view Clinic B's private appointment details.
-- [ ] Same doctor at both clinics: simultaneous booking confirmations for overlapping times produce only one successful reservation.
-- [ ] A removed receptionist immediately loses further Clinic A access while separately permitted Clinic B access remains intact.
-- [ ] Patient starts private text chat with a doctor from the public profile **without a booking**; other patients and moderators cannot routinely read it.
-- [ ] Patient submits a public question; responding verified doctors and anonymous readers cannot determine author's identity via returned data, search, SEO or errors.
-- [ ] Authenticated verified doctor answers an approved question; author receives minimal private notification.
-- [ ] Completed appointment grants review eligibility according to approved policy; canceled/no-show appointments do not automatically qualify.
-- [ ] Email/SMS provider outage cannot roll back confirmed appointment; duplicates are bounded/reconciled.
-- [ ] Backup recovery, release rollback and incident contacts are verified before handling real bookings.
+## S0 repository audit (2026-09-29)
 
-## Blockers / open choices
+Inspected the working tree. This repository is still the Cursor/agent template. No Hippocrates application has been initialized, so there is no expanded-V1 code to de-scope.
 
-| Decision | Why it matters | Owner/status |
+| Check | Result |
+| --- | --- |
+| `package.json`, lockfile, `apps/`, `src/`, `prisma/` | Absent |
+| MVP-01 … MVP-23 in code | None |
+| Application CI | Absent. `.github/` has Dependabot and issue templates only |
+| Product docs | Present. Local scope and stack choices are accepted in `DECISIONS.md`. Production host is still open |
+| Governance | `.agents/` and `.cursor/` kept |
+| `.env.example` | Template placeholders for Upstash Redis, Resend and Cloudflare R2. Not an approved stack. Minimum MVP defers Redis; email and object storage stay conditional |
+
+**Ready for a later implementation task.** Size B with `apps/web` and `apps/api` is accepted on paper. No application folders, pages, or API are in the repository. The next implementation task starts from these documents. Production host, backups, and the deploy owner are still unnamed, so this is not a release approval.
+
+## Change log
+
+| Date | Documentation change | Evidence |
 | --- | --- | --- |
-| Approved BRIEF and TECH_CARD | Prevents building unapproved scope/providers | Product owner / PENDING |
-| Exact authentication and account recovery | Security architecture and notification contract | Product owner + security / PENDING |
-| Booking state machine and cancellation cutoffs | API transitions, reservations, reminder timing | Product owner / PENDING |
-| Provider and storage region, retention | Privacy/legal contracts and restore process | Product owner + legal/security / PENDING |
-| Deposit/payment contradiction | Affects booking and finance boundary | Product owner / PENDING |
-| Launch languages and exact UI design | Routing, content, accessibility and acceptance | Product owner / PENDING |
-
-## Change log and evidence
-
-| Date | Change | Evidence |
-| --- | --- | --- |
-| 2026-09-28 | Created V1 **planning** document from source product scope and drafted architecture/stack. | Documentation creation only; no implementation verification. |
-
-**Cursor operating rule:** Report to the owner in understandable Armenian or Russian and present concrete choice options; technical documents may remain in English. During a read-only repository audit do not change or cancel real data, production resources or access rights. Do not mark delivery progress as complete without actual checks.
+| 2026-09-29 | Drafted 23-function minimum-MVP replacement pack from user minimum-functionality file and prior reference documents | Documentation only; implementation not checked |
+| 2026-09-29 | Recorded S0 repository audit. No application code. S0 blocked on owner approval | Working-tree inspection; no tests, because there is no app |
+| 2026-09-29 | Recorded partial S0 approval: 23-function scope, Size B two-app layout, one location, one active doctor-clinic link | Owner selections in chat. Booking/notification choice was Other with no captured rule |
+| 2026-09-29 | Owner delegated the booking choice. Accepted clinic confirmation, no cutoff, no auto-expiry, in-app notices only | Recorded in DECISIONS HM-005, HM-006, HM-009. No application code |
+| 2026-09-29 | Owner delegated login. Accepted email/password and a revocable server session. No email password reset | Recorded in DECISIONS HM-010. No application code |
+| 2026-09-29 | Owner delegated the remaining local choices: reviews, ranking, Armenian UI, private evidence, 12-hour session, auth rate limits, local PostgreSQL | Recorded in DECISIONS. Production host remains open |
+| 2026-09-29 | Removed an unrequested application scaffold. The repository stays documentation-only | Owner asked for ready documents, not a website |

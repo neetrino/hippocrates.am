@@ -1,51 +1,36 @@
-# Decision Register: Hippocrates.am (V1)
+# Decision Register — Hippocrates.am Minimum MVP
 
-> An index of **proposals, open questions and approval records**. A row in this register is **not an accepted ADR**. Do not silently promote a proposal to an architectural invariant or implement it without the relevant approved task and technical sign-off.
+> **Status:** PARTIAL OWNER CONFIRMATION, 2026-09-29. Accepted rows below are explicit chat choices. Unlisted rows stay open. No person name was supplied. The old 46-feature V1 pack remains historical reference.
 
-**Version:** 1.0-draft  
-**Target:** V1 / MVP  
-**Date:** 2026-09-28  
-**Status:** DRAFT
+| ID | Decision / clarification | Current minimum-MVP position | Status |
+| --- | --- | --- | --- |
+| HM-001 | Narrow release to user-selected 23 functions | This pack contains only the provided minimum list; prior chat/Q&A/rescheduling/advanced operations deferred | **ACCEPTED 2026-09-29** |
+| HM-002 | Initial applications | Size B. `apps/web` Next.js 16, `apps/api` NestJS 12, PostgreSQL 17, Prisma 7. No `packages/*` layer until real reuse exists | **ACCEPTED 2026-09-29** for local development. Production database vendor is not chosen |
+| HM-003 | Doctor association | One active clinic per doctor. No multi-clinic scheduling UI in this release | **ACCEPTED 2026-09-29** |
+| HM-004 | Clinic locations | One operational location per clinic, no branch management UI | **ACCEPTED 2026-09-29** |
+| HM-005 | Booking confirmation | Patient creates slot-occupying `REQUESTED`; an authorized clinic user moves it to `CONFIRMED` | **ACCEPTED 2026-09-29.** Owner delegated the choice |
+| HM-006 | Booking cancellation | No time cutoff and no automatic expiry. Patient or clinic may cancel `REQUESTED` or `CONFIRMED`. Cancellation releases the slot in the same transaction. `COMPLETED` is not cancelled on this path | **ACCEPTED 2026-09-29.** Owner delegated the choice |
+| HM-007 | Completion and review | Clinic admin marks a real `CONFIRMED` visit `COMPLETED`. That patient may publish one clinic review for that appointment. A hidden review still uses up that one review. Public text shows no name and no email | **ACCEPTED 2026-09-29.** Owner delegated the choice |
+| HM-008 | Public ranking | Rated clinics first: average descending, then review count descending, then name ascending. Unrated clinics after them, by name. Show one decimal and the count. Never invent a rating | **ACCEPTED 2026-09-29.** Owner delegated the choice |
+| HM-009 | Notifications | In-app notices only for booking request, confirmation, and cancellation. No email provider and no reminder campaign in this release | **ACCEPTED 2026-09-29.** Owner delegated the choice |
+| HM-010 | Authentication | Email and password, argon2id, revocable server session, HttpOnly Secure SameSite=Lax cookie. Absolute session lifetime is 12 hours. Login is limited to 10 requests per minute per IP. Registration is limited to 5 requests per 10 minutes per IP. No email password reset. Admin cannot read or set a password | **ACCEPTED 2026-09-29.** Owner delegated the numbers. Production still needs a security review |
+| HM-011 | Provider verification | Clinic approval and doctor approval are independent. Evidence is private to platform admins, has no public URL, and is not deleted automatically | **ACCEPTED 2026-09-29.** Owner delegated the choice. Legal retention period is not invented |
+| HM-012 | Infrastructure | Local only: Node.js 24, pnpm 10, the versions in HM-002, PostgreSQL via Docker Compose. Production host, region, backups, and deploy owner are not chosen | **LOCAL ACCEPTED 2026-09-29.** Production remains open |
+| HM-013 | Launch language | Armenian (`hy`) is the only interface language in this release | **ACCEPTED 2026-09-29.** Owner delegated the choice |
+| HM-014 | Deferred features | No private chat, public Q&A, reschedule, reminder campaign, payment, EHR/CT or advanced branch management | **ACCEPTED 2026-09-29** with HM-001 |
 
-## Status definitions
+## Historical decision handling
 
-- **Source requirement:** Explicit product direction from Hippocrates Overview v2.0. Implementation details may still be unapproved.
-- **Proposed:** A technical approach recommended in the V1 architectural/stack drafts, not approved.
-- **Pending:** Material product/technical choice still needed.
-- **Accepted:** Recorded project-owner/authorized reviewer approval, with date and decision evidence.
-- **Superseded / Deprecated:** Preserve the prior decision, link to replacing ADR and note migration consequences.
+The earlier expanded-V1 draft `DECISIONS.md` contained chat/Q&A/realtime/outbox options and broad multi-clinic rules. **Do not delete existing accepted ADRs or history in a live repository.** On migration, append an accepted scope-change ADR and mark conflicting drafts as superseded for *Minimum MVP*, retaining historical version control. If an original item was already approved/implemented, the agent must report the conflict and request an explicit de-scope/data-migration decision; this pack alone is not permission to delete code or data.
 
-## V1 register
+## Proposed acceptance procedure
 
-| ID | Decision | Current position | Status | Approval/evidence needed |
-| --- | --- | --- | --- | --- |
-| H-001 | First release boundaries | Marketplace, operational clinic/doctor/patient interfaces, safe booking, text chat, anonymous Q&A, native reviews and notifications | Source requirement; formal V1 BRIEF pending | Product owner validates final BRIEF against source v2.0. |
-| H-002 | Initial architecture | Simple modular monolith, one Web, one API, one primary DB | Proposed | Architecture/TECH_CARD approval; repo compatibility review. |
-| H-003 | Tenant storage | Shared PostgreSQL with strict clinic-scoped authorization and referential integrity | Proposed | Threat model, DB constraint and restore reviews. |
-| H-004 | Identity/session strategy | Opaque revocable server-side sessions in PostgreSQL | Proposed | Credential flow, revocation policy, CSRF and security review. |
-| H-005 | Doctor cross-clinic scheduling | Independent doctor identity plus affiliation; prevent overlaps on global practitioner reservation key | Source need + proposed design | Detailed conflict SQL/locking algorithm, test plan and approved transition policy. |
-| H-006 | Durable notifications | Minimal PostgreSQL-backed worker/outbox only where V1 reminders require it | Proposed | Choose reminder channels/cadence, worker deployment and retry policy. |
-| H-007 | Chat eligibility | Patient can initiate text chat from doctor's profile without a prior booking | Source requirement | Abuse limits, clinic context/doctor availability, retention and complaint policy. |
-| H-008 | Public anonymous Q&A | Private author mapping; moderated public answers by verified doctors; independent searchable archive | Source requirement | Exact content moderation, anonymity and deletion/retention policy. |
-| H-009 | Native review verification | Distinguish reviews based on completed known visits | Source requirement | Define off-platform proof process or defer it from V1. |
-| H-010 | Online deposits/payments | No **mandatory** V1 gateway until ambiguity is resolved | Pending | Source mentions optional booking deposit but payment integration is listed in Phase 2. |
-| H-011 | Launch languages | Internationalization-ready but exact launch locales unselected | Pending | Approve languages, locale URLs, fallback and translated-content ownership. |
-| H-012 | Signup and login | Current-session checks required; exact auth providers and recovery flow TBD | Pending | Product/security approval. |
-| H-013 | Booking policies | Temporary holds and safe confirmation proposed | Pending | Request vs immediate confirmation, cutoff policies, slot length and no-show authorization. |
-| H-014 | Reviews/ranking policy | Native rating/source transparency; no assumed formula or undisclosed paid ranking | Pending | Explainable ranking and external source rights. |
-| H-015 | Hosting/provider choices | Vendor-neutral until approved TECH_CARD | Pending | Region/privacy agreements, backend/DB/worker and backup provider evaluation. |
-| H-016 | V1 clinical scope | No full EHR, Dental Chart, treatment plans, surgery records or CT/PACS in baseline V1 | Scope boundary from source roadmap | Any change requires new scope/medical/privacy ADR. |
-| H-017 | Public vs private file handling | Private verification evidence separate from published media | Proposed | Data minimization, storage approval, malware checks and retention. |
-| H-018 | Realtime and Redis | Polling and DB-backed jobs first; no default Redis/BullMQ/realtime gateway | Proposed | Add only when justified by approved UX/load/security requirements. |
+1. Product owner reviews the 23-function `BRIEF.md` and `SCOPE_CHANGE.md` and approves minimum-MVP scope, signing name/date.
+2. Resolve HM-003 to HM-011 before dependent implementation. Record selected alternatives and dates, avoiding implicit agreement.
+3. Audit repo to establish actual implementation and technical constraints before TECH_CARD/stack sign-off.
+4. Add `architecture/adrs/ADR-001-MINIMUM-MVP-SCOPE.md` as **Accepted** only after explicit approval; otherwise it remains Proposed.
+5. Each future scope change updates BRIEF first, its relevant API/DB/architecture contracts next, and PROGRESS last after verification.
 
-## How to record an accepted decision
-
-1. Create `docs/architecture/ADR-XXX-<slug>.md` using the tailored `docs/reference/templates/ADR_TEMPLATE.md`.
-2. Document context, 2+ realistic options where applicable, decision, privacy/tenant/concurrency implications, test gates and rollback.
-3. Record owner approval with approver and date; set ADR `Accepted` and update this register with a relative link.
-4. Align `BRIEF.md`, `TECH_CARD.md`, `ARCHITECTURE_TEMPLATE.md`, `02-TECH_STACK.md`, API/DB docs and PROGRESS where affected.
-5. If a decision changes, retain historical ADR and add a superseding ADR; avoid rewriting approval history as though the earlier choice never existed.
-
-## Source precedence
-
-The approved current product task and approved BRIEF/TECH_CARD outrank draft reference documents. The connected repository's `docs/BRIEF.md` was an unfilled template when checked; this pack supplies `BRIEF_V1_DRAFT.md` only for approval discussion. Repository `.agents/` and `.cursor/` agent rules are separate from product scope. No table row above authorizes production mutation or deployment.
+**Approver:** Product owner, this chat session. Legal name not recorded.  
+**Approval date:** 2026-09-29. The owner delegated the remaining product choices on this date.  
+**Scope status:** Local development choices are accepted, including booking, login, reviews, Armenian UI, and the pinned local stack. Production host, region, backup owner, and deploy owner stay open. No production deploy is authorized.

@@ -22,6 +22,7 @@
 | Payments and clinical systems | Later points P9 and P10. Not built early | Accepted |
 | Storage | Verification evidence stays private and is not auto-deleted. File vendor still open | Accepted as a rule |
 | Hosting | Local web, local API, local PostgreSQL in Docker Compose | Accepted for development. Production vendor and region open |
+| Environment | One root `.env` for web and API. No per-app env file | Accepted 2026-09-30 |
 | Interface language | Armenian default, plus Russian and English | Accepted 2026-09-30 |
 | Background worker | Added when point P5 needs reliable email delivery | Conditional |
 

@@ -2,10 +2,12 @@
 .DS_Store
 Thumbs.db
 
-# Env and secrets
+# Env and secrets. One root .env for the whole repository.
 .env
 .env.*
 !.env.example
+apps/**/.env
+apps/**/.env.*
 
 # Dependencies (if scripts use Node/npm)
 node_modules/

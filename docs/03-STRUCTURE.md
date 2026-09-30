@@ -39,7 +39,8 @@ hippocrates.am/
 │   └── architecture/adrs/
 ├── .agents/                          # keep existing project governance
 ├── .cursor/                          # keep existing Cursor rules
-└── .env.example                      # placeholders only
+├── .env                              # local only, gitignored; the single file for web and API
+└── .env.example                      # names only, no secrets
 ```
 
 The layout is a **minimal proposal**. No standalone worker/package is obligatory. Add a `worker` directory only if an approved external notification channel needs reliable async delivery; add shared packages only for genuine reuse.

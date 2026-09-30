@@ -30,7 +30,7 @@ Do not install Redis, BullMQ, a payment SDK, or a DICOM client on P0. Add a deli
 - API uses server-side DTO validation, safe error codes and current membership/record ownership on every protected request.
 - PostgreSQL enforces overlapping active doctor reservations under transaction-safe rules. Real DB concurrency tests are mandatory.
 - Store booking times in UTC and render against the clinic's approved time-zone value. Even one-clinic scheduling requires DST/offset correctness where applicable.
-- Keep login secrets, DB credentials, optional email keys and verification evidence access exclusively server-side; `.env.example` contains placeholders only.
+- One root `.env` serves both `apps/web` and `apps/api`. Do not add a second env file under `apps/`. `.env.example` lists the names only.
 
 ## Runtime proposal
 

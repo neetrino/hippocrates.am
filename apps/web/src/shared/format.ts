@@ -1,7 +1,8 @@
 const yerevan = "Asia/Yerevan";
 
 export function formatAmd(value: number): string {
-  return `${new Intl.NumberFormat("hy-AM").format(value)} դրամ`;
+  const grouped = String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return `${grouped} դրամ`;
 }
 
 export function formatWhen(iso: string): string {
@@ -13,9 +14,10 @@ export function formatWhen(iso: string): string {
 }
 
 export function formatTime(iso: string): string {
-  return new Intl.DateTimeFormat("hy-AM", {
+  return new Intl.DateTimeFormat("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
+    hourCycle: "h23",
     timeZone: yerevan,
   }).format(new Date(iso));
 }

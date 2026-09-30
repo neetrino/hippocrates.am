@@ -4,7 +4,7 @@
 
 **Verified implementation:** none.  
 **Scope:** `ADR-003`. **Env:** one root `.env`. Web `3000`, NestJS `4000`.  
-**Status terms:** `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `VERIFIED`.
+**Status terms:** `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `PAUSED`, `VERIFIED`.
 
 Do the points in order. Do not add empty modules for a later point.
 
@@ -13,12 +13,12 @@ Do the points in order. Do not add empty modules for a later point.
 | # | Point | Approximate contents | State | Done when |
 | --- | --- | --- | --- | --- |
 | 0 | Foundation | pnpm workspace, `apps/web` on 3000, `apps/api` on 4000, both read the root `.env`, Docker PostgreSQL, Prisma, health, lint, typecheck, test, build | NOT_STARTED | Both apps boot and the empty database migrates |
-| 1 | Identity | Register, login, logout, 12-hour session, rate limits, roles, `GET /me` | NOT_STARTED | A wrong role and a revoked membership are denied |
-| 2 | Organizations | Clinic, branches, staff, separate clinic and doctor verification | NOT_STARTED | An unpublished clinic stays private |
+| 1 | Registration | Roles `SUPER_ADMIN`, `ADMIN`, `DOCTOR`, `PATIENT`. Super Admin creates the clinic and its Admin. Admin creates that clinic's Doctors. Patient self-registers | NOT_STARTED | An Admin cannot create a doctor for another clinic |
+| 2 | Clinic profile | Branches, clinic data, and publication after the Admin account exists | NOT_STARTED | An unpublished clinic stays off the public pages |
 | 3 | Public catalog | Doctor profiles, services and prices, Armenian-first pages, filters | NOT_STARTED | Another clinic's patients are not visible |
 | 4 | Booking | Schedules, resources, free slots, hold, confirm, cancel, reschedule, attendance | NOT_STARTED | Two concurrent requests cannot take the same slot |
 | 5 | Portals | Patient, doctor, and clinic screens, email reminders, operational patient card, price totals | NOT_STARTED | A failed notice does not change the appointment |
-| 6 | Chat | Private text thread from the doctor profile | NOT_STARTED | A non-participant cannot read it |
+| 6 | Chat | Paused. Not in the current work | PAUSED | Do not build until the owner puts it back |
 | 7 | Questions | Anonymous public questions, moderation, searchable archive | NOT_STARTED | The author is absent from public responses |
 | 8 | Reviews | Review after a verified visit, reply, dispute, ranking only with an approved formula | NOT_STARTED | A review without a verified visit is rejected |
 | 9 | Finance | Invoices and card payments | NOT_STARTED | Starts only after a separate approval. No card capture before that |
@@ -35,7 +35,7 @@ Do the points in order. Do not add empty modules for a later point.
 6. `GET /health` on the API.
 7. Format, lint, typecheck, test, and build scripts.
 
-Point 1 starts after point 0 boots. Public pages start at point 3. Booking starts at point 4.
+Point 1 is registration and the four roles in `ADR-004`. Public pages start at point 3. Booking starts at point 4. Chat is paused.
 
 ## Still blocking release only
 

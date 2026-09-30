@@ -46,7 +46,7 @@ A worker exists **only when needed by an approved outbound notification channel*
 1. `PatientProfile` belongs to an identity used across the marketplace. Clinic appointments remain clinic-scoped; no clinic sees appointments of another clinic.
 2. Every protected clinic operation validates the server-side session, **current** authorized clinic membership, action permission and record clinic ID. Doctor operations additionally validate doctor ownership/assignment; patients see their own records only.
 3. Published projections use explicit DTO allowlists, never full ORM rows; approval status is independently checked for clinic and doctor publication.
-4. Platform administrator permissions are narrow: verification and aggregate platform counts. There is no blanket permission to read patient notes, private contact histories or future medical records.
+4. Super Admin registers clinics and their owner Admin. An Admin registers doctors for that clinic only. A Patient self-registers. There is no blanket permission to read patient notes, private contact histories, or future medical records.
 5. Revoking a clinic-admin membership prevents later operations; session alone does not grant stale clinic rights.
 6. A doctor user may hold a separate affiliation at each clinic. Each request checks the affiliation for that clinic. Accepted 2026-09-30, revised by ADR-003.
 

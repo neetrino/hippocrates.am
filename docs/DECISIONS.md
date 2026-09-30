@@ -19,11 +19,12 @@
 | HM-013 | Languages | Armenian only | **SUPERSEDED by HM-016.** Armenian is the default. Russian and English are in the product |
 | HM-014 | Deferred features | Chat, Q&A, reviews, reschedule, payments, and clinical systems removed | **SUPERSEDED by HM-016** |
 | HM-015 | Clinic operations | Dashboard, patient list, operational card, price totals | **ACCEPTED** as part of point P5. They do not replace the rest of the product |
-| HM-016 | Full product | Build the canonical specification point by point. No reduced first release. Finance and clinical work are later points of the same product | **ACCEPTED 2026-09-30** |
+| HM-016 | Full product | Build the canonical specification point by point. No reduced first release. Finance and clinical work are later points of the same product | **ACCEPTED 2026-09-30.** Chat timing revised by HM-017 |
+| HM-017 | Roles and registration | Four roles: `SUPER_ADMIN`, `ADMIN`, `DOCTOR`, `PATIENT`. Super Admin registers the clinic and its owner Admin. That Admin registers doctors for their clinic only. A Patient self-registers and can book any clinic from the home page. Chat is not in the current work | **ACCEPTED 2026-09-30.** See ADR-004 |
 
 ## How to read older rows
 
-`ADR-003` is the scope authority. `ADR-001` and `ADR-002` stay as history. Technical rows that are still marked ACCEPTED above remain in force.
+`ADR-004` is the current registration and role authority. `ADR-003` remains the product map except where HM-017 pauses chat.
 
 **Approver:** Product owner, this chat session. Legal name not recorded.  
 **Approval date:** 2026-09-30.  

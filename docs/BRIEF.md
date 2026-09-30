@@ -37,11 +37,22 @@ IDs are `FR-001` … `FR-017` in the canonical specification. Delivery order is 
 - **Finance point:** real online payments, refunds, invoices, and subscriptions. Booking does not pretend to take a card before this point is approved.
 - **Clinical point:** charts, notes, treatment plans, surgery workflows, and imaging exchange. Each of these needs its own acceptance spec. Do not invent clinical forms on an earlier point.
 
+## Current registration model
+
+Accepted 2026-09-30 in `ADR-004`. These four roles are the account model:
+
+- **Super Admin** registers a clinic. The clinic owner created with it is **Admin**.
+- **Admin** registers doctors for that clinic only.
+- **Doctor** is that clinic's doctor.
+- **Patient** registers on the public site and, from the home page, can book at any clinic.
+
+Private chat is not in the current work.
+
 ## Rules that still hold
 
-- Email and password, Argon2id, revocable server session, HttpOnly cookie. The doctor sets the password. Admins cannot read or set it.
+- Email and password, Argon2id, revocable server session, HttpOnly cookie. Passwords are stored as hashes and cannot be read back.
 - One web application, one API, one PostgreSQL database. Add a worker only on the point that needs reliable outbound delivery.
-- A doctor may work at more than one clinic. Each clinic sees only its own patients and bookings.
+- A Doctor belongs to the clinic whose Admin registered them. A Patient can book at any clinic and each clinic sees only its own bookings.
 - Public pages show published, approved records only. Verification files stay private.
 - Two concurrent requests cannot both take the same active slot.
 - Production host, region, backup owner, and deploy owner are still unnamed. No production deploy is authorized.

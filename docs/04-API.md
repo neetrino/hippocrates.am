@@ -84,7 +84,7 @@ A clinic-admin UI for doctor management does not grant authority to self-verify 
 | `GET /clinics/:clinicId/patients/:patientId` | Contact and appointments at this clinic | No diagnosis or other clinic's visits |
 | `GET /clinics/:clinicId/finance?from=&to=` | Sum fixed price snapshots for `REQUESTED`, `CONFIRMED`, and `COMPLETED` | `CANCELLED` adds nothing. Estimates are excluded from the money total. No payment capture |
 
-Review, chat, Q&A, branch, and reschedule routes are added on points P2, P4, P6, P7, and P8. Do not add them during P0.
+Review, Q&A, branch, and reschedule routes are added on their points. Chat is paused (`ADR-004`) and is not added in the current work. Do not add later-point routes during P0.
 
 ## Contract verification gates
 

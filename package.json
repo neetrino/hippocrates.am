@@ -11,8 +11,10 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm --filter @hippocrates/api test",
     "build": "pnpm -r --if-present build",
+    "ci:guard": "node scripts/ci/repo-guard.mjs",
     "db:migrate": "pnpm --filter @hippocrates/api db:migrate",
-    "db:seed": "pnpm --filter @hippocrates/api db:seed"
+    "db:seed": "pnpm --filter @hippocrates/api db:seed",
+    "db:validate": "pnpm --filter @hippocrates/api db:validate"
   },
   "devDependencies": {
     "eslint": "9.39.4",

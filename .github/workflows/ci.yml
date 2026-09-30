@@ -1,5 +1,5 @@
-# Quality CI — runs on every PR and push to main.
-# Template basis: docs/reference/workflows/ci-quality.yml.example
+# Pre-merge CI for Hippocrates.
+# Require the "CI passed" check in GitHub branch protection.
 
 name: CI
 
@@ -16,10 +16,24 @@ env:
   NODE_VERSION: "24"
 
 jobs:
+  repo-guard:
+    name: Repository guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Repository guards
+        run: node scripts/ci/repo-guard.mjs
+
   quality:
     name: Quality checks
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,8 +53,10 @@ jobs:
       - name: Prepare CI environment
         run: |
           cp .env.example .env
-          # Satisfies SESSION_SECRET length checks if any runtime path is exercised.
           sed -i 's/^SESSION_SECRET=""/SESSION_SECRET="ci-session-secret-at-least-32-chars"/' .env
+
+      - name: Validate Prisma schema
+        run: pnpm db:validate
 
       - name: Generate Prisma client
         run: pnpm --filter @hippocrates/api db:generate
@@ -60,7 +76,6 @@ jobs:
   audit:
     name: Security audit
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,6 +92,71 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Audit dependencies
+      # Informational until Prisma transitive highs are resolved upstream.
+      - name: Audit dependencies (high+)
         run: pnpm audit --audit-level=high
         continue-on-error: true
+
+      - name: Audit dependencies (critical)
+        run: pnpm audit --audit-level=critical
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Private repos without Advanced Security skip this gate instead of failing merge.
+      - name: Review dependency changes
+        id: review
+        continue-on-error: true
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
+      - name: Dependency review availability
+        run: |
+          if [ "${{ steps.review.outcome }}" = "failure" ]; then
+            echo "Dependency review reported issues or is unavailable on this repository plan."
+            echo "Treat actionable advisories before merge; do not ignore known high/critical findings."
+          fi
+
+  ci-passed:
+    name: CI passed
+    if: always()
+    needs: [repo-guard, quality, audit, dependency-review]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required jobs
+        run: |
+          echo "repo-guard: ${{ needs.repo-guard.result }}"
+          echo "quality: ${{ needs.quality.result }}"
+          echo "audit: ${{ needs.audit.result }}"
+          echo "dependency-review: ${{ needs.dependency-review.result }}"
+
+          if [ "${{ needs.repo-guard.result }}" != "success" ]; then
+            echo "Repository guard failed"
+            exit 1
+          fi
+          if [ "${{ needs.quality.result }}" != "success" ]; then
+            echo "Quality checks failed"
+            exit 1
+          fi
+          if [ "${{ needs.audit.result }}" != "success" ]; then
+            echo "Security audit job failed (critical findings or setup error)"
+            exit 1
+          fi
+
+          # dependency-review is skipped on push; soft on private plans without GHAS.
+          if [ "${{ needs.dependency-review.result }}" = "failure" ]; then
+            echo "Dependency review job failed unexpectedly"
+            exit 1
+          fi
+
+          echo "All required merge checks passed"

@@ -10,7 +10,9 @@ import { PrismaService } from "./prisma.service";
       provide: DATABASE_POOL,
       useFactory: (): ReturnType<typeof createDatabasePool> => {
         const connectionString = process.env.DATABASE_URL;
-        if (!connectionString) throw new Error("DATABASE_URL is required");
+        if (!connectionString) {
+          throw new Error("DATABASE_URL is required");
+        }
         return createDatabasePool(connectionString);
       },
     },

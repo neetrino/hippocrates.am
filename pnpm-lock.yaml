@@ -64,8 +64,8 @@ importers:
         specifier: 24.5.2
         version: 24.5.2
       '@types/pg':
-        specifier: 8.15.5
-        version: 8.15.5
+        specifier: 8.23.1
+        version: 8.23.1
       dotenv-cli:
         specifier: 10.0.0
         version: 10.0.0
@@ -1090,9 +1090,6 @@ packages:
 
   '@types/node@24.5.2':
     resolution: {integrity: sha512-FYxk1I7wPv3K2XBaoyH2cTnocQEu8AOZ60hPbsyukMPLv5/5qr7V1i8PLHdl6Zf87I+xZXFvPCXYjiTFq+YSDQ==}
-
-  '@types/pg@8.15.5':
-    resolution: {integrity: sha512-LF7lF6zWEKxuT3/OR8wAZGzkg4ENGXFNyiV/JeOt9z5B+0ZVwbql9McqX5c/WStFq1GaGso7H1AzP/qSzmlCKQ==}
 
   '@types/pg@8.23.1':
     resolution: {integrity: sha512-fKVHpikPdg4GKks3JuLEhvwSyvwzF23hnabPy6DD8ljVbC7+6J5dQzdv4arV6jqq57djnMgs1HKBxX4P8aBI3A==}
@@ -4894,12 +4891,6 @@ snapshots:
   '@types/node@24.5.2':
     dependencies:
       undici-types: 7.12.0
-
-  '@types/pg@8.15.5':
-    dependencies:
-      '@types/node': 24.5.2
-      pg-protocol: 1.16.0
-      pg-types: 2.2.0
 
   '@types/pg@8.23.1':
     dependencies:

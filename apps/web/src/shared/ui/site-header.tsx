@@ -1,6 +1,9 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { LocaleSwitch } from "@/shared/ui/locale-switch";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const t = await getTranslations("nav");
   return (
     <header className="site-header">
       <div className="shell bar">
@@ -9,14 +12,15 @@ export function SiteHeader() {
           Hippocrates
         </Link>
         <nav className="nav">
-          <Link href="/clinics">Կլինիկաներ</Link>
-          <Link href="/doctors">Բժիշկներ</Link>
-          <Link href="/questions">Հարցեր</Link>
+          <Link href="/clinics">{t("clinics")}</Link>
+          <Link href="/doctors">{t("doctors")}</Link>
+          <Link href="/questions">{t("questions")}</Link>
         </nav>
         <div className="nav-actions">
-          <Link href="/login">Մուտք</Link>
-          <Link href="/me">Իմ էջը</Link>
-          <Link href="/register" className="btn btn-small">Գրանցում</Link>
+          <LocaleSwitch />
+          <Link href="/login">{t("login")}</Link>
+          <Link href="/me">{t("me")}</Link>
+          <Link href="/register" className="btn btn-small">{t("register")}</Link>
         </div>
       </div>
     </header>

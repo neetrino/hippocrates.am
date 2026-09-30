@@ -19,8 +19,8 @@
     "title": "Find a clinic and book a visit",
     "lede": "Dental clinics, doctors, and open times on one calm page.",
     "clinicPlaceholder": "Clinic name",
-    "clinicStat": "{count, plural, one {# clinic} other {# clinics}}",
-    "doctorStat": "{count, plural, one {# doctor} other {# doctors}}",
+    "clinicStat": "{count, plural, one {<strong>#</strong> clinic} other {<strong>#</strong> clinics}}",
+    "doctorStat": "{count, plural, one {<strong>#</strong> doctor} other {<strong>#</strong> doctors}}",
     "allDoctors": "All doctors",
     "emptyClinics": "No published clinic yet.",
     "emptyDoctors": "No published doctor yet."
@@ -116,9 +116,9 @@
   "desk": {
     "denied": "This page is for the clinic admin.",
     "title": "Clinic desk",
-    "pending": "{count, plural, one {# waiting request} other {# waiting requests}}",
-    "today": "{count, plural, one {# today} other {# today}}",
-    "patients": "{count, plural, one {# patient} other {# patients}}",
+    "pending": "{count, plural, one {<strong>#</strong> waiting request} other {<strong>#</strong> waiting requests}}",
+    "today": "{count, plural, one {<strong>#</strong> today} other {<strong>#</strong> today}}",
+    "patients": "{count, plural, one {<strong>#</strong> patient} other {<strong>#</strong> patients}}",
     "visits": "Visits",
     "staff": "Doctors and prices",
     "newDoctor": "New doctor",

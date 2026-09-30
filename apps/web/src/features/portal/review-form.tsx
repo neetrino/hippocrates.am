@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 
 export function ReviewForm({ appointmentId }: { appointmentId: string }) {
   const [error, setError] = useState("");
+  const t = useTranslations("me");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -19,7 +21,7 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
       }),
     });
     if (!response.ok) {
-      setError("Կարծիքը չպահվեց");
+      setError(t("reviewFailed"));
       return;
     }
     window.location.reload();
@@ -28,7 +30,7 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
   return (
     <form className="stack" onSubmit={(event) => void onSubmit(event)}>
       <label className="field">
-        Գնահատական
+        {t("rating")}
         <select name="rating" defaultValue="5">
           <option value="5">5</option>
           <option value="4">4</option>
@@ -38,11 +40,11 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
         </select>
       </label>
       <label className="field">
-        Կարծիք
+        {t("review")}
         <textarea name="body" required />
       </label>
       {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-small" type="submit">Ուղարկել կարծիք</button>
+      <button className="btn btn-small" type="submit">{t("sendReview")}</button>
     </form>
   );
 }

@@ -19,8 +19,8 @@
     "title": "Найдите клинику и запишитесь на приём",
     "lede": "Клиники, врачи и свободное время на одной спокойной странице.",
     "clinicPlaceholder": "Название клиники",
-    "clinicStat": "{count, plural, one {# клиника} few {# клиники} many {# клиник} other {# клиники}}",
-    "doctorStat": "{count, plural, one {# врач} few {# врача} many {# врачей} other {# врача}}",
+    "clinicStat": "{count, plural, one {<strong>#</strong> клиника} few {<strong>#</strong> клиники} many {<strong>#</strong> клиник} other {<strong>#</strong> клиники}}",
+    "doctorStat": "{count, plural, one {<strong>#</strong> врач} few {<strong>#</strong> врача} many {<strong>#</strong> врачей} other {<strong>#</strong> врача}}",
     "allDoctors": "Все врачи",
     "emptyClinics": "Опубликованных клиник пока нет.",
     "emptyDoctors": "Опубликованных врачей пока нет."
@@ -116,9 +116,9 @@
   "desk": {
     "denied": "Эта страница для админа клиники.",
     "title": "Панель клиники",
-    "pending": "{count, plural, one {# ожидающая заявка} few {# ожидающие заявки} many {# ожидающих заявок} other {# ожидающей заявки}}",
-    "today": "{count, plural, one {# сегодня} other {# сегодня}}",
-    "patients": "{count, plural, one {# пациент} few {# пациента} many {# пациентов} other {# пациента}}",
+    "pending": "{count, plural, one {<strong>#</strong> ожидающая заявка} few {<strong>#</strong> ожидающие заявки} many {<strong>#</strong> ожидающих заявок} other {<strong>#</strong> ожидающей заявки}}",
+    "today": "{count, plural, one {<strong>#</strong> сегодня} other {<strong>#</strong> сегодня}}",
+    "patients": "{count, plural, one {<strong>#</strong> пациент} few {<strong>#</strong> пациента} many {<strong>#</strong> пациентов} other {<strong>#</strong> пациента}}",
     "visits": "Визиты",
     "staff": "Врачи и цены",
     "newDoctor": "Новый врач",

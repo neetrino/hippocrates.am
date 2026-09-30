@@ -1,13 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
+import { useRouter } from "@/i18n/navigation";
 
 type Field = { name: string; label: string; type?: string };
 
 export function JsonForm(props: { action: string; fields: Field[]; label: string; next: string }) {
   const [error, setError] = useState("");
   const router = useRouter();
+  const t = useTranslations("common");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -25,7 +27,7 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      setError("Գործողությունը չհաջողվեց");
+      setError(t("failed"));
       return;
     }
     router.push(props.next);

@@ -19,8 +19,8 @@
     "title": "Գտեք կլինիկա և գրանցվեք այցի",
     "lede": "Ատամնաբուժական կլինիկաներ, բժիշկներ և ազատ ժամեր մեկ հանգիստ էջում։",
     "clinicPlaceholder": "Կլինիկայի անուն",
-    "clinicStat": "{count, plural, one {# կլինիկա} other {# կլինիկա}}",
-    "doctorStat": "{count, plural, one {# բժիշկ} other {# բժիշկ}}",
+    "clinicStat": "{count, plural, one {<strong>#</strong> կլինիկա} other {<strong>#</strong> կլինիկա}}",
+    "doctorStat": "{count, plural, one {<strong>#</strong> բժիշկ} other {<strong>#</strong> բժիշկ}}",
     "allDoctors": "Բոլոր բժիշկները",
     "emptyClinics": "Հրապարակված կլինիկա դեռ չկա։",
     "emptyDoctors": "Հրապարակված բժիշկ դեռ չկա։"
@@ -116,9 +116,9 @@
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",
     "title": "Կլինիկայի վահանակ",
-    "pending": "{count, plural, one {# սպասող հայտ} other {# սպասող հայտ}}",
-    "today": "{count, plural, one {# այսօր} other {# այսօր}}",
-    "patients": "{count, plural, one {# պացիենտ} other {# պացիենտ}}",
+    "pending": "{count, plural, one {<strong>#</strong> սպասող հայտ} other {<strong>#</strong> սպասող հայտ}}",
+    "today": "{count, plural, one {<strong>#</strong> այսօր} other {<strong>#</strong> այսօր}}",
+    "patients": "{count, plural, one {<strong>#</strong> պացիենտ} other {<strong>#</strong> պացիենտ}}",
     "visits": "Այցեր",
     "staff": "Բժիշկներ և գներ",
     "newDoctor": "Նոր բժիշկ",

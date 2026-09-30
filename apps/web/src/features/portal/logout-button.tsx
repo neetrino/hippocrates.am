@@ -1,9 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 
 export function LogoutButton() {
   const router = useRouter();
+  const t = useTranslations("common");
 
   async function logout(): Promise<void> {
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`, {
@@ -14,5 +16,5 @@ export function LogoutButton() {
     router.refresh();
   }
 
-  return <button className="btn btn-ghost btn-small" type="button" onClick={() => void logout()}>Դուրս գալ</button>;
+  return <button className="btn btn-ghost btn-small" type="button" onClick={() => void logout()}>{t("logout")}</button>;
 }

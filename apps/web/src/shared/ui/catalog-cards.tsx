@@ -1,19 +1,13 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { ClinicCard, DoctorCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
 
-export function ClinicTile({
-  clinic,
-  loading,
-}: {
-  clinic: ClinicCard;
-  loading?: "eager" | "lazy";
-}) {
+export function ClinicTile({ clinic }: { clinic: ClinicCard }) {
   return (
     <article className="card">
       <Link href={`/clinics/${clinic.id}`}>
         <div className="media">
-          <Photo src={clinic.coverUrl} alt={clinic.name} loading={loading} />
+          <Photo src={clinic.coverUrl} alt={clinic.name} />
         </div>
         <div className="card-body">
           <h2>{clinic.name}</h2>

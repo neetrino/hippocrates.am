@@ -14,12 +14,20 @@ for (const line of readFileSync(new URL("../../../.env", import.meta.url), "utf8
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: env.DATABASE_URL }) });
 try {
-  const clinics = await prisma.clinic.findMany({
-    take: 3,
-    select: { name: true, district: true, coverKey: true },
+  const doctors = await prisma.doctorProfile.findMany({
+    where: { published: true, clinic: { published: true } },
+    orderBy: { user: { displayName: "asc" } },
+    take: 12,
+    select: {
+      id: true,
+      specialty: true,
+      bio: true,
+      photoKey: true,
+      user: { select: { displayName: true } },
+      clinic: { select: { id: true, name: true } },
+    },
   });
-  const doctors = await prisma.doctorProfile.count();
-  console.log(JSON.stringify({ clinics: clinics.map((item) => ({ name: item.name, district: item.district, hasCover: Boolean(item.coverKey) })), doctors }));
+  console.log(JSON.stringify({ doctors: doctors.length, photo: Boolean(doctors[0]?.photoKey) }));
 } catch (error) {
   console.error(error instanceof Error ? error.message : "query failed");
 } finally {

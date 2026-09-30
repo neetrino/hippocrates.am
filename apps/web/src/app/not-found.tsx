@@ -1,11 +1,13 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations("common");
   return (
     <div className="shell section">
-      <h1>Էջը չի գտնվել</h1>
-      <p className="lede">Այս հասցեն Hippocrates-ում չկա։</p>
-      <Link className="btn" href="/">Գլխավոր</Link>
+      <h1>{t("notFoundTitle")}</h1>
+      <p className="lede">{t("notFoundHint")}</p>
+      <Link className="btn" href="/">{t("homeLink")}</Link>
     </div>
   );
 }

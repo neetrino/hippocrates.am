@@ -29,7 +29,9 @@ export default async function ClinicsPage({
       </form>
       {clinics.length === 0 ? <EmptyState>{t("emptyClinicSearch")}</EmptyState> : null}
       <div className="grid-cards">
-        {clinics.map((clinic) => <ClinicTile key={clinic.id} clinic={clinic} />)}
+        {clinics.map((clinic, index) => (
+          <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
+        ))}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return { title: "Hippocrates" };
   const t = await getTranslations({ locale, namespace: "meta" });
   return {
     title: "Hippocrates",

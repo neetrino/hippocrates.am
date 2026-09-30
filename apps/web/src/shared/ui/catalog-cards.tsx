@@ -2,12 +2,18 @@ import { Link } from "@/i18n/navigation";
 import type { ClinicCard, DoctorCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
 
-export function ClinicTile({ clinic }: { clinic: ClinicCard }) {
+export function ClinicTile({
+  clinic,
+  loading,
+}: {
+  clinic: ClinicCard;
+  loading?: "eager" | "lazy";
+}) {
   return (
     <article className="card">
       <Link href={`/clinics/${clinic.id}`}>
         <div className="media">
-          <Photo src={clinic.coverUrl} alt={clinic.name} />
+          <Photo src={clinic.coverUrl} alt={clinic.name} loading={loading} />
         </div>
         <div className="card-body">
           <h2>{clinic.name}</h2>

@@ -1,33 +1,34 @@
 # Delivery Plan — Hippocrates.am Minimum MVP
 
-> **PLAN, not implementation status.** Date 2026-09-29. 23 user-selected functions. No feature should be marked implemented solely from these documents; only repository checks and recorded tests count as evidence.
+> **PLAN, not implementation status.** Revised 2026-09-30. No feature should be marked implemented solely from these documents.
 
-**Verified implementation:** UNKNOWN — repository has not been audited for this revision.  
-**Product scope approval:** PENDING.  
+**Verified implementation:** none. The repository has no application.  
+**Product scope approval:** local scope accepted 2026-09-30. Production host is still open.  
 **Status terms:** `NOT_VERIFIED`, `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `VERIFIED`, `DEFERRED`.
 
 ## Minimum delivery slices
 
 | Slice | Deliverable | MVP IDs | Current state | Definition of verified completion |
 | --- | --- | --- | --- | --- |
-| S0 | Repo audit and signed 23-feature scope, decisions, security/release prerequisites | all | IN_PROGRESS | Local product choices and stack are recorded. Production host, backups, and deploy owner are still open, so S0 is not verified |
+| S0 | Repo audit and the current scope, decisions, and release prerequisites | all | IN_PROGRESS | Local product choices are recorded, including the 2026-09-30 revision. Production host, backups, and deploy owner are still open |
 | S1 | Identity, roles, clinic/doctor basic records and independent verification | 08–12,23 | NOT_VERIFIED | Wrong-role and revoked-membership denial tests; platform approval flows |
 | S2 | Public pages, approved clinic/doctor profiles and service/price publication | 01–07 | NOT_VERIFIED | Hidden draft providers stay private; responsive public journey passes |
 | S3 | Doctor schedule and authoritative free-slot listing | 13–14 | NOT_VERIFIED | Doctor unavailability and existing bookings reflected in server slots |
 | S4 | Patient booking, clinic confirmation/cancellation, own patient/doctor/clinic lists | 15–19 | NOT_VERIFIED | Cross-role tests, simultaneous overlapping booking race tests, cancel slot release |
-| S5 | Basic booking notifications and review eligibility with native clinic ratings | 20–22 | NOT_VERIFIED | Delivery-safe notifications; only completed visit reviewed once; rating sort tests |
-| S6 | Minimal platform admin finishing, staging walkthrough, backups/security and release sign-off | 23 + all | NOT_VERIFIED | Role-by-role end-to-end acceptance, production-readiness and recovery evidence |
+| S5 | In-app booking notifications | 20 | NOT_VERIFIED | A failed notice does not change the appointment |
+| S6 | Clinic dashboard, patient list, client card, and booking-price totals | 24–27 | NOT_VERIFIED | Clinic A cannot read Clinic B patients, cards, or totals. The card has no clinical note. Totals match fixture prices |
+| S7 | Platform admin finishing, staging walkthrough, backups/security and release sign-off | 23 + all | NOT_VERIFIED | Role-by-role end-to-end acceptance, production-readiness and recovery evidence |
 
-**Number ranges refer to `MVP-XX` IDs in `BRIEF.md`.** Slices can be subdivided without changing release scope. `MVP-23` has both early verification tooling in S1 and final overview in S6.
+**Number ranges refer to `MVP-XX` IDs in `BRIEF.md`.** `MVP-21` and `MVP-22` are retired. `MVP-23` starts in S1 and is finished in S7.
 
 ## Owner decisions blocking dependent coding
 
-- [x] Product owner formally signs off the 23-function BRIEF and deferred-feature list. Accepted in chat, 2026-09-29. Name not recorded.
-- [x] Confirm one location per clinic and one active clinic affiliation per doctor for this release. Accepted 2026-09-29.
+- [x] Product owner signed the current scope. The 2026-09-29 23-function list was revised on 2026-09-30. Name not recorded.
+- [x] One location per clinic. One doctor account per clinic. Accepted 2026-09-30. A shared doctor account across clinics is not allowed.
 - [x] Confirm signup/login. Accepted 2026-09-29: email and password, 12-hour server session, login 10/minute/IP, register 5/10 minutes/IP, no email password reset.
 - [x] Confirm clinic-manual confirmation and cancellation. Accepted 2026-09-29: `REQUESTED` occupies the slot, the clinic confirms, no cutoff, no auto-expiry.
-- [x] Completion and reviews. Accepted 2026-09-29: one review per completed appointment, hidden review still consumes it, no public name or email.
-- [x] Rating sort. Accepted 2026-09-29: average, then count, then name. Unrated clinics last.
+- [x] Reviews and rating sort removed 2026-09-30. `COMPLETED` is attendance only.
+- [x] Dashboard, patient list, client card, and booking-price totals added 2026-09-30. Payment collection stays out.
 - [x] Notifications channel: in-app only. Accepted 2026-09-29.
 - [x] Verification evidence stays private and is not auto-deleted. Interface language is Armenian. Accepted 2026-09-29.
 - [ ] Name the production host, region, backup owner, and deploy owner. Local Docker PostgreSQL is accepted and is not a production decision.
@@ -40,8 +41,8 @@
 - [ ] Unavailable time is excluded and concurrent requests cannot create overlapping active appointments for one doctor.
 - [ ] Authorized confirmation and cancellation update availability/history and display current status in patient, doctor and clinic portals.
 - [ ] Booking notifications are delivered under chosen policy without determining appointment correctness.
-- [ ] Only genuine completed clinic visits permit a native review; duplicate or cross-patient review attempts fail.
-- [ ] Approved rating sort and unrated display are verified against known fixture data.
+- [ ] One doctor account cannot be attached to a second clinic.
+- [ ] Clinic patient list, client card, and financial totals show only that clinic's records. Public pages show no rating.
 - [ ] Staging E2E, negative authorization checks, database migration rehearsal, backup restore and monitoring reviewed before launch.
 
 ## Implementation discipline
@@ -74,3 +75,5 @@ Inspected the working tree. This repository is still the Cursor/agent template. 
 | 2026-09-29 | Owner delegated login. Accepted email/password and a revocable server session. No email password reset | Recorded in DECISIONS HM-010. No application code |
 | 2026-09-29 | Owner delegated the remaining local choices: reviews, ranking, Armenian UI, private evidence, 12-hour session, auth rate limits, local PostgreSQL | Recorded in DECISIONS. Production host remains open |
 | 2026-09-29 | Removed an unrequested application scaffold. The repository stays documentation-only | Owner asked for ready documents, not a website |
+| 2026-09-30 | Owner removed reviews and ratings, required one doctor account per clinic, and added dashboard, patient list, client card, and booking-price totals | Recorded in ADR-002, BRIEF, and DECISIONS. No application code |
+| 2026-09-30 | Reconciled stale 23-function, review, and “awaiting approval” statements with the accepted rules | Documentation only. No application code |

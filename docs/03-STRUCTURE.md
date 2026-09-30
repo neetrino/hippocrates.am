@@ -8,7 +8,7 @@ hippocrates.am/
 │   ├── web/
 │   │   └── src/
 │   │       ├── app/                  # public, patient, doctor, clinic, admin routes
-│   │       ├── features/             # discovery, booking, reviews, etc.
+│   │       ├── features/             # discovery, booking, patients, dashboard
 │   │       └── shared/               # API client, safe UI primitives
 │   └── api/
 │       └── src/
@@ -20,7 +20,7 @@ hippocrates.am/
 │           │   ├── scheduling/
 │           │   ├── appointments/
 │           │   ├── marketplace/
-│           │   ├── reviews/
+│           │   ├── clinic-operations/
 │           │   ├── notifications/
 │           │   └── platform-admin/
 │           └── infrastructure/       # db, security, logging adapters
@@ -46,8 +46,8 @@ The layout is a **minimal proposal**. No standalone worker/package is obligatory
 
 ## UI areas
 
-- Public: homepage, published clinic/doctor lists, simple name/specialty search, provider pages, offerings/prices and basic clinic rating sort.
-- Patient: registration/login, own appointments, permitted cancellation, review eligibility/form and booking notifications.
+- Public: homepage, published clinic and doctor lists, name/specialty search, provider pages, and prices. No rating sort.
+- Patient: registration/login, own appointments, permitted cancellation, and booking notifications.
 - Doctor: permitted profile/schedule view and own appointments.
 - Clinic: own public information, doctor/offering/price management, schedules and booking processing.
 - Platform: independent clinic/doctor approvals and minimal aggregate oversight.
@@ -56,7 +56,7 @@ The layout is a **minimal proposal**. No standalone worker/package is obligatory
 
 - Web consumes reviewed HTTP/DTO contracts, not Prisma-generated database models or private API repositories.
 - API modules own their writes. Other modules consume narrow application contracts/read DTOs; no private-table cross-writes.
-- Marketplace reads published projections only; review aggregation must not expose reviewer/appointment PII.
+- Marketplace reads published projections only. Clinic operations read that clinic's patients and prices only.
 - Scheduling reads occupancy through appointments' approved contract; appointment writes must transactionally validate/record actual capacity.
 - Shared infrastructure utilities must not become an authorization-bypassing business service.
 

@@ -13,20 +13,18 @@
 
 **Response envelope (proposed):** `{ "data": ..., "meta": { "requestId": "..." } }`; errors `{ "error": { "code": "...", "message": "..." }, "requestId": "..." }`.
 
-## Public discovery and basic search (`MVP-01`–`MVP-07`, `MVP-22`)
+## Public discovery and basic search (`MVP-01`–`MVP-07`)
 
 | Route | Purpose | Critical rule |
 | --- | --- | --- |
 | `GET /public/home` | Homepage summary and entry points | Only published content |
-| `GET /public/clinics?name=&sort=rating` | Clinic list, simple name search and rating sort | Published clinics only. Rated clinics: average desc, count desc, name asc. Unrated clinics last, by name |
-| `GET /public/clinics/:id` | Published clinic, its doctors, offerings/prices, native review summary | Safe allowlisted fields only |
+| `GET /public/clinics?name=` | Clinic list and simple name search | Published clinics only, ordered by name. No rating parameter |
+| `GET /public/clinics/:id` | Published clinic, its doctors, and offerings/prices | Safe allowlisted fields only. No rating |
 | `GET /public/doctors?name=&specialty=` | Independent published doctor directory and basic search | Published doctor AND associated clinic approved |
 | `GET /public/doctors/:id` | Published doctor profile | No internal credential attachments |
 | `GET /public/clinics/:id/services` | Published service/price list | Distinguish quoted estimate from fixed price where applicable |
 | `GET /public/availability?doctorId=&serviceId=&date=` | Genuine bookable slots for doctor/service | Advisory display only; booking rechecks in DB |
-| `GET /public/clinics/:id/reviews` | Published eligible native clinic reviews | Reviewer privacy, moderation/publication policy |
-
-Search does **not** promise geolocation, price ranges, complex recommendation algorithms or external review imports.
+Search does **not** promise geolocation, ratings, or external review imports.
 
 ## Identity, roles and own data (`MVP-08`, `MVP-09`, `MVP-17`)
 
@@ -49,7 +47,7 @@ Email and password is the accepted login. Do not add phone login, OAuth, or an e
 | `GET /clinics/:clinicId/profile` | Clinic admin reads own editable clinic info | Live membership + clinic scope |
 | `PATCH /clinics/:clinicId/profile` | Clinic admin edits own allowed fields | Material public changes may require reapproval |
 | `GET /clinics/:clinicId/doctors` | Own linked doctors | Clinic scope |
-| `POST /clinics/:clinicId/doctors` | Link/propose doctor profile to own clinic | Doctor identity/consent + one active affiliation assumption |
+| `POST /clinics/:clinicId/doctors` | Register a doctor bound to this clinic | The doctor sets the password. Reject the email if it is already a doctor at any clinic. Admins cannot set the password |
 | `PATCH /clinics/:clinicId/doctors/:doctorId` | Update clinic-authorized doctor info | Doctor verification may need re-review |
 | `GET /clinics/:clinicId/services` | Own offerings | Clinic scope |
 | `POST /clinics/:clinicId/services` | Create service/price offering | Approved doctor/clinic/service relationships |
@@ -58,7 +56,7 @@ Email and password is the accepted login. Do not add phone login, OAuth, or an e
 | `GET /doctors/me/appointments` | Doctor's assigned appointment list | Own doctor identity only |
 | `GET /admin/verification` | Platform admin lists pending clinics/doctors | Restricted verifier role |
 | `POST /admin/verification/:id/decision` | Approve/reject clinic OR doctor independently | Decision audit + no raw evidence exposure in public API |
-| `GET /admin/overview` | Basic clinic/doctor/booking counts | Minimal safe aggregates, role required |
+| `GET /admin/overview` | Counts of clinics, doctors, and bookings | Counts only. No patient contacts and no money totals |
 
 A clinic-admin UI for doctor management does not grant authority to self-verify a doctor's professional credentials.
 
@@ -70,21 +68,23 @@ A clinic-admin UI for doctor management does not grant authority to self-verify 
 | `GET /clinics/:clinicId/appointments` | Clinic-admin appointment queue/calendar | Own clinic only |
 | `POST /appointments/:id/confirm` | Clinic confirms pending request | Authorized clinic; valid transition |
 | `POST /appointments/:id/cancel` | Permitted patient/clinic cancellation | Policy validation, slot release and event in same transaction |
-| `POST /appointments/:id/complete` | Clinic records legitimately completed visit | Confirmed and attended only; enables review eligibility |
+| `POST /appointments/:id/complete` | Clinic records attendance | Confirmed visit only. Does not create a review |
 | `GET /me/appointments` | Patient's own appointment/history | Own records only |
 | `GET /doctors/me/appointments` | Doctor's own assigned appointments | Own records only |
 
-**Proposed states:** `REQUESTED -> CONFIRMED -> COMPLETED`; `REQUESTED/CONFIRMED -> CANCELLED`. A `REQUESTED` appointment already reserves the interval until disposition. No exposed generic `PATCH status` endpoint; no reschedule/check-in/no-show endpoints in the minimum API. Cancel cutoff and auto-expiration, if any, are owner decisions.
+**States:** `REQUESTED -> CONFIRMED -> COMPLETED`, or `REQUESTED`/`CONFIRMED -> CANCELLED`. A `REQUESTED` appointment reserves the interval. There is no cutoff and no automatic expiry. No reschedule endpoint.
 
-## Native clinic reviews and ranking (`MVP-21`, `MVP-22`)
+## Clinic operations (`MVP-24`–`MVP-27`)
 
 | Route | Purpose | Critical guard |
 | --- | --- | --- |
-| `POST /me/clinic-reviews` | Patient submits rating/text for own eligible completed appointment | One review per clinic appointment; clinic target must match appointment clinic |
-| `GET /public/clinics/:id/reviews` | Public native clinic reviews | Allowlisted published presentation only |
-| `GET /public/clinics?sort=rating` | Basic clinic-rating ordering | Approved formula, review count/unrated distinction |
+| `GET /clinics/:clinicId/dashboard` | Pending requests, today's appointments, patient count | That clinic only |
+| `GET /doctors/me/dashboard` | The signed-in doctor's upcoming appointments | That doctor account only |
+| `GET /clinics/:clinicId/patients` | Patients with an appointment at this clinic | No other clinic's patients |
+| `GET /clinics/:clinicId/patients/:patientId` | Contact and appointments at this clinic | No diagnosis or other clinic's visits |
+| `GET /clinics/:clinicId/finance?from=&to=` | Sum fixed price snapshots for `REQUESTED`, `CONFIRMED`, and `COMPLETED` | `CANCELLED` adds nothing. Estimates are excluded from the money total. No payment capture |
 
-Review correction/removal and content safety should comply with an approved minimal moderation policy; **no large replies/reports/moderation product suite** is in scope.
+`MVP-21` and `MVP-22` routes are not part of the API. Do not add review or rating endpoints.
 
 ## Contract verification gates
 
@@ -92,7 +92,8 @@ Review correction/removal and content safety should comply with an approved mini
 - Unauthorized patient/doctor/clinic/platform role requests are denied with no cross-clinic data leaks.
 - Concurrent `POST /appointments` for an overlapping doctor slot yields at most one active booking.
 - Cancellation immediately makes legitimately freed capacity available; retries cannot duplicate changes.
-- Only a legitimate completed appointment authorizes a native clinic review; exact one-per-appointment constraint tested.
+- A doctor account that already has a clinic is rejected for a second clinic.
+- Patient list, client card, and finance responses contain only the caller's clinic. Public responses contain no rating.
 - Booking notification failure never changes final appointment state.
 
 Each route is a draft candidate; generate OpenAPI/DTO and automate positive/negative tests when implementing its approved slice. Do not claim routes already exist.

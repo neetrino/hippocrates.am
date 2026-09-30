@@ -1,6 +1,6 @@
 # ADR-001: Minimum MVP Scope Reduction to 23 Functions
 
-**Status:** ACCEPTED for the 23-function boundary, deferred list, one location per clinic, and one active clinic per doctor. Booking confirmation and notifications are not part of this acceptance.  
+**Status:** ACCEPTED on 2026-09-29 for the then-current 23-function cut, one clinic location, booking confirmation, and in-app notices. **Partly superseded by ADR-002 on 2026-09-30:** reviews and rating sort are out, a doctor login belongs to one clinic, and `MVP-24`–`MVP-27` are in. Do not implement from this ADR where it disagrees with ADR-002.  
 **Date:** 2026-09-29  
 **Decision owner:** Product owner, chat confirmation 2026-09-29. Name not recorded.  
 **Affected docs:** BRIEF, TECH_CARD, 01-ARCHITECTURE, 02-TECH_STACK, 03-STRUCTURE, 04-API, 05-DATABASE, DECISIONS, PROGRESS
@@ -16,8 +16,8 @@ Treat the user's 23-item list as the **proposed minimum release boundary**. Reta
 ## Consequences
 
 - Reduced public and clinic operations and lower integration burden; no baseline chat/Q&A/reminder platform.
-- Confirmation, cancellation, visit completion and transaction-safe slot reservation remain necessary to make booking and post-visit reviews legitimate.
-- Doctor affiliation and clinic branch limits are **separate open decisions**; do not silently decide from the 23-item names alone.
+- Confirmation, cancellation, visit completion, and transaction-safe slot reservation remain. Visit completion does not create a review after ADR-002.
+- One clinic location and one doctor account per clinic are decided. ADR-002 is the doctor-account rule.
 - Any already-built removed feature must be inventoried and de-scoped through a separate approved migration plan, not deleted automatically.
 
 ## Alternatives

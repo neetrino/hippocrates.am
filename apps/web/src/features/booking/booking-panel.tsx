@@ -1,8 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { formatAmd, formatTime } from "@/shared/format";
+import { useRouter } from "@/i18n/navigation";
+import { formatAmount, formatTime } from "@/shared/format";
 import type { OfferingCard } from "@/shared/public-types";
 
 type SlotResponse = { data: { startsAt: string[] } };
@@ -12,11 +13,13 @@ function todayIso(): string {
 }
 
 export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingCard[]; initialSlots: string[] }) {
+  const t = useTranslations("booking");
+  const common = useTranslations("common");
   const [offeringId, setOfferingId] = useState(offerings[0]?.id ?? "");
   const [date, setDate] = useState(todayIso());
   const [slots, setSlots] = useState(initialSlots);
   const [selected, setSelected] = useState("");
-  const [message, setMessage] = useState(initialSlots.length === 0 ? "Այդ օրը ազատ ժամ չկա" : "");
+  const [message, setMessage] = useState(initialSlots.length === 0 ? t("noSlots") : "");
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const offering = offerings.find((item) => item.id === offeringId);
@@ -27,13 +30,13 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
     const params = new URLSearchParams({ doctorId: next.doctorId, offeringId: next.id, date: nextDate });
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/public/availability?${params}`);
     if (!response.ok) {
-      setMessage("Ազատ ժամերը չբեռնվեցին");
+      setMessage(t("slotsFailed"));
       return;
     }
     const body = (await response.json()) as SlotResponse;
     setSelected("");
     setSlots(body.data.startsAt);
-    setMessage(body.data.startsAt.length === 0 ? "Այդ օրը ազատ ժամ չկա" : "");
+    setMessage(body.data.startsAt.length === 0 ? t("noSlots") : "");
   }
 
   async function book(): Promise<void> {
@@ -48,24 +51,24 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
     });
     setPending(false);
     if (response.status === 401 || response.status === 403) {
-      setMessage("Ամրագրելու համար մուտք գործեք որպես պացիենտ");
+      setMessage(t("signIn"));
       return;
     }
     if (!response.ok) {
-      setMessage("Այդ ժամը ազատ չէ");
+      setMessage(t("taken"));
       return;
     }
     router.push("/me");
     router.refresh();
   }
 
-  if (!offering) return <p className="muted">Ծառայություն դեռ չկա։</p>;
+  if (!offering) return <p className="muted">{t("noService")}</p>;
 
   return (
     <div className="panel stack">
-      <h2>Ամրագրել այց</h2>
+      <h2>{t("title")}</h2>
       <label className="field">
-        Ծառայություն
+        {t("service")}
         <select
           value={offeringId}
           onChange={(event) => {
@@ -76,13 +79,13 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
           {offerings.map((item) => (
             <option key={item.id} value={item.id}>
               {item.doctor ? `${item.doctor.user.displayName} · ` : ""}
-              {item.name} · {formatAmd(item.priceAmd)}
+              {item.name} · {common("price", { amount: formatAmount(item.priceAmd) })}
             </option>
           ))}
         </select>
       </label>
       <label className="field">
-        Օր
+        {t("day")}
         <input
           type="date"
           value={date}
@@ -102,7 +105,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
       </div>
       {message ? <p className="muted">{message}</p> : null}
       <button className="btn" type="button" disabled={!selected || pending} onClick={() => void book()}>
-        Գրանցել
+        {t("book")}
       </button>
     </div>
   );

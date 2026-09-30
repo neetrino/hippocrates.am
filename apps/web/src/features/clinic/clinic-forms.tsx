@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 
 type DoctorOption = { id: string; name: string };
@@ -16,6 +17,10 @@ async function post(path: string, payload: Record<string, string | number>): Pro
 
 export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: DoctorOption[] }) {
   const [message, setMessage] = useState("");
+  const t = useTranslations("desk");
+  const auth = useTranslations("auth");
+  const common = useTranslations("common");
+  const catalog = useTranslations("catalog");
 
   async function onDoctor(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -27,7 +32,7 @@ export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: 
       specialty: String(form.get("specialty") ?? ""),
     });
     if (ok) window.location.reload();
-    else setMessage("Բժիշկը չգրանցվեց");
+    else setMessage(t("doctorFailed"));
   }
 
   async function onOffering(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -40,31 +45,31 @@ export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: 
       durationMinutes: Number(form.get("durationMinutes")),
     });
     if (ok) window.location.reload();
-    else setMessage("Ծառայությունը չպահվեց");
+    else setMessage(t("serviceFailed"));
   }
 
   return (
     <div className="split">
       <form className="panel stack" onSubmit={(event) => void onDoctor(event)}>
-        <h2>Նոր բժիշկ</h2>
-        <label className="field">Անուն<input name="displayName" required /></label>
-        <label className="field">Էլ. փոստ<input name="email" type="email" required /></label>
-        <label className="field">Գաղտնաբառ<input name="password" type="password" required /></label>
-        <label className="field">Մասնագիտություն<input name="specialty" required /></label>
-        <button className="btn" type="submit">Գրանցել</button>
+        <h2>{t("newDoctor")}</h2>
+        <label className="field">{common("name")}<input name="displayName" required /></label>
+        <label className="field">{auth("email")}<input name="email" type="email" required /></label>
+        <label className="field">{auth("password")}<input name="password" type="password" required /></label>
+        <label className="field">{catalog("specialty")}<input name="specialty" required /></label>
+        <button className="btn" type="submit">{t("saveDoctor")}</button>
       </form>
       <form className="panel stack" onSubmit={(event) => void onOffering(event)}>
-        <h2>Նոր ծառայություն</h2>
+        <h2>{t("newService")}</h2>
         <label className="field">
-          Բժիշկ
+          {t("doctor")}
           <select name="doctorId" required defaultValue={doctors[0]?.id ?? ""}>
             {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.name}</option>)}
           </select>
         </label>
-        <label className="field">Անուն<input name="name" required /></label>
-        <label className="field">Գին (դրամ)<input name="priceAmd" type="number" required /></label>
-        <label className="field">Րոպե<input name="durationMinutes" type="number" required /></label>
-        <button className="btn" type="submit">Ավելացնել</button>
+        <label className="field">{common("name")}<input name="name" required /></label>
+        <label className="field">{t("amd")}<input name="priceAmd" type="number" required /></label>
+        <label className="field">{t("duration")}<input name="durationMinutes" type="number" required /></label>
+        <button className="btn" type="submit">{t("add")}</button>
       </form>
       {message ? <p className="error">{message}</p> : null}
     </div>

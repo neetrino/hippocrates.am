@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
-import { hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { DocumentLang } from "@/shared/ui/document-lang";
+import { SiteFooter } from "@/shared/ui/site-footer";
+import { SiteHeader } from "@/shared/ui/site-header";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -28,5 +31,13 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  return children;
+  const messages = await getMessages();
+  return (
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <DocumentLang locale={locale} />
+      <SiteHeader />
+      <main>{children}</main>
+      <SiteFooter />
+    </NextIntlClientProvider>
+  );
 }

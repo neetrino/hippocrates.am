@@ -1,0 +1,17 @@
+{
+  "name": "hippocrates",
+  "private": true,
+  "packageManager": "pnpm@11.13.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @hippocrates/web --filter @hippocrates/api dev",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm --filter @hippocrates/api test",
+    "build": "pnpm -r --if-present build",
+    "db:migrate": "pnpm --filter @hippocrates/api db:migrate",
+    "db:seed": "pnpm --filter @hippocrates/api db:seed"
+  }
+}

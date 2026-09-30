@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+enum AppointmentStatus {
+  REQUESTED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum QuestionStatus {
+  PENDING
+  PUBLISHED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  role         Role
+  clinicId     String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  clinic       Clinic?  @relation("ClinicStaff", fields: [clinicId], references: [id])
+  ownedClinics Clinic[] @relation("ClinicOwner")
+  sessions     Session[]
+  doctorProfile DoctorProfile?
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  notifications Notification[]
+  questions    Question[]
+  reviews      Review[]
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Clinic {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  address     String   @default("")
+  phone       String   @default("")
+  timeZone    String   @default("Asia/Yerevan")
+  published   Boolean  @default(true)
+  ownerId     String
+  owner       User     @relation("ClinicOwner", fields: [ownerId], references: [id])
+  staff       User[]   @relation("ClinicStaff")
+  branches    Branch[]
+  doctors     DoctorProfile[]
+  offerings   ServiceOffering[]
+  appointments Appointment[]
+  reviews     Review[]
+  questions   Question[]
+}
+
+model Branch {
+  id       String @id @default(cuid())
+  clinicId String
+  name     String
+  address  String @default("")
+  clinic   Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+}
+
+model DoctorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  clinicId    String
+  specialty   String
+  bio         String   @default("")
+  published   Boolean  @default(true)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic      Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  offerings   ServiceOffering[]
+  windows     ScheduleWindow[]
+  exceptions  ScheduleException[]
+  appointments Appointment[]
+  answers     Answer[]
+  reviews     Review[]
+}
+
+model ServiceOffering {
+  id              String  @id @default(cuid())
+  clinicId        String
+  doctorId        String
+  name            String
+  priceAmd        Int
+  isEstimate      Boolean @default(false)
+  durationMinutes Int
+  published       Boolean @default(true)
+  clinic          Clinic  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  doctor          DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  appointments    Appointment[]
+}
+
+model ScheduleWindow {
+  id           String @id @default(cuid())
+  doctorId     String
+  weekday      Int
+  startMinute  Int
+  endMinute    Int
+  doctor       DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model ScheduleException {
+  id        String   @id @default(cuid())
+  doctorId  String
+  startsAt  DateTime
+  endsAt    DateTime
+  doctor    DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id            String            @id @default(cuid())
+  patientId     String
+  doctorId      String
+  clinicId      String
+  offeringId    String
+  startsAt      DateTime
+  endsAt        DateTime
+  status        AppointmentStatus @default(REQUESTED)
+  priceAmd      Int
+  isEstimate    Boolean
+  idempotencyKey String?
+  patient       User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor        DoctorProfile     @relation(fields: [doctorId], references: [id])
+  clinic        Clinic            @relation(fields: [clinicId], references: [id])
+  offering      ServiceOffering   @relation(fields: [offeringId], references: [id])
+  notifications Notification[]
+  review        Review?
+
+  @@unique([patientId, idempotencyKey])
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  userId        String
+  appointmentId String?
+  body          String
+  readAt        DateTime?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+}
+
+model Question {
+  id        String         @id @default(cuid())
+  authorId  String
+  clinicId  String?
+  title     String
+  body      String
+  category  String         @default("Ընդհանուր")
+  status    QuestionStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  author    User           @relation(fields: [authorId], references: [id])
+  clinic    Clinic?        @relation(fields: [clinicId], references: [id])
+  answers   Answer[]
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  questionId String
+  doctorId   String
+  body       String
+  published  Boolean  @default(false)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  doctor     DoctorProfile @relation(fields: [doctorId], references: [id])
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  patientId     String
+  clinicId      String
+  doctorId      String
+  rating        Int
+  body          String
+  reply         String?
+  createdAt     DateTime @default(now())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  patient       User     @relation(fields: [patientId], references: [id])
+  clinic        Clinic   @relation(fields: [clinicId], references: [id])
+  doctor        DoctorProfile @relation(fields: [doctorId], references: [id])
+}

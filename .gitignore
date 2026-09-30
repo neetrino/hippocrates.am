@@ -17,6 +17,7 @@ node_modules/
 dist/
 build/
 coverage/
+apps/api/src/generated/
 
 # Logs and temp
 *.log

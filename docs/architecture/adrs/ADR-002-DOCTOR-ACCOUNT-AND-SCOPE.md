@@ -1,6 +1,6 @@
 # ADR-002: One doctor account per clinic, no reviews
 
-**Status:** ACCEPTED  
+**Status:** SUPERSEDED by ADR-003 on 2026-09-30 for every rule that shrinks the product (no reviews, one clinic per doctor, reduced notices). The password rule remains: the doctor sets the password, and admins cannot read or set it.  
 **Date:** 2026-09-30  
 **Decision owner:** Product owner, this chat. Name not recorded.  
 **Supersedes for this release:** the review and rating parts of HM-007 and HM-008, and the “one active affiliation on a shared doctor account” reading of HM-003.
@@ -11,15 +11,16 @@ The 2026-09-29 minimum pack allowed one active clinic link on a doctor profile a
 
 ## Decision
 
+Withdrawn. The list below is not an instruction. `ADR-003` is the product.
+
 1. One email is one account. It may book as a patient at many clinics. A doctor role on that account belongs to exactly one clinic. A second clinic requires a second email. The doctor sets the password. Admins cannot read or set it. Two accounts for the same person are not checked against each other for overlapping appointments.
-2. Reviews, ratings, and rating sort are out of this release. `MVP-21` and `MVP-22` stay retired and must not be reused.
+2. The review ban in this ADR is withdrawn. Reviews return on point P8.
 3. Booking, in-app booking notifications, the public home page, and the public doctors pages stay.
 4. Add a clinic/doctor operations dashboard, a clinic patient list, a clinic client card, and financial totals calculated from appointment price snapshots.
 5. The client card is operational contact and appointment history at that clinic. It is not a medical record. Financial analysis does not collect payments.
 
 ## Consequences
 
-- Do not model a doctor as one user with many clinic memberships.
-- Do not add review tables, review routes, or public rating sort.
-- A patient may still book at more than one clinic. Each clinic sees only its own patients and appointments.
-- No application code existed when this decision was recorded, so nothing is deleted from a database.
+- A doctor may affiliate with more than one clinic. Each clinic sees only its own patients.
+- Reviews are point P8. Do not add them during P0.
+- Password handling stays: the doctor sets the password, and admins cannot read or set it.

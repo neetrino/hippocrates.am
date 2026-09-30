@@ -1,7 +1,7 @@
-# Expanded V1 drafts (superseded)
+# Canonical specification
 
-These files are the previous expanded Version 1 product drafts. They are kept as history only.
+This folder holds the active product specification: `HIPPOCRATES_MASTER_SPEC (1).md`.
 
-Current product scope is the Minimum MVP pack in `docs/` (2026-09-29): start with `README_HY.md`, then `FUNCTIONALITY_MINIMUM_HY.md`, `BRIEF.md`, and `SCOPE_CHANGE.md`.
+Start from `docs/README_HY.md`, then `docs/FUNCTIONALITY_HY.md`, `docs/BRIEF.md`, and `docs/architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md`.
 
-Do not treat files in this folder as the active brief, architecture, API, or database contract.
+The 2026-09-29 reduced pack is withdrawn. Build the specification one point at a time. Do not treat this folder as optional history.

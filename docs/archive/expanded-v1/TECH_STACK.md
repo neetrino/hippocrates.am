@@ -3,7 +3,7 @@
 > Hippocrates.am V1 is a multi-organization dental and oral/maxillofacial marketplace with clinic operations, appointments, private patient–doctor text chat, anonymous public Q&A, reviews, and basic administration. This document proposes a **small TypeScript stack** for the approved V1 scope. It is a technology decision draft, **not evidence of an implemented system or authorization to provision infrastructure**.
 
 **Project size:** C (product/domain complexity); simple initial runtime  
-**Current target:** Version 1 / MVP  
+**Current target:** Version 1  
 **Last updated:** 2026-09-28  
 **Document version:** 1.0-draft  
 **Status:** DRAFT — technology and vendor choices require the project owner's approval in `TECH_CARD.md`.  

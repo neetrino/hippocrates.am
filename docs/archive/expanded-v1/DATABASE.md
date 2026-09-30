@@ -3,7 +3,7 @@
 > **Conceptual schema proposal; no production migrations or live data changes.** Use this document to prepare a reviewed executable schema only after V1 product scope, architecture and TECH_CARD approval.
 
 **Version:** 1.0-draft  
-**Target:** Version 1 / MVP  
+**Target:** Version 1  
 **Date:** 2026-09-28  
 **Status:** PROPOSED
 

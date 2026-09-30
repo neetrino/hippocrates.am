@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "description": "A platform for dental clinics"
+  },
+  "nav": {
+    "clinics": "Clinics",
+    "doctors": "Doctors",
+    "questions": "Questions",
+    "login": "Sign in",
+    "me": "My page",
+    "register": "Register",
+    "language": "Language"
+  },
+  "footer": {
+    "tagline": "Dental clinics and doctors in Armenia."
+  },
+  "home": {
+    "eyebrow": "Armenia",
+    "title": "Find a clinic and book a visit",
+    "lede": "Dental clinics, doctors, and open times on one calm page.",
+    "clinicPlaceholder": "Clinic name",
+    "clinicStat": "{count, plural, one {<strong>#</strong> clinic} other {<strong>#</strong> clinics}}",
+    "doctorStat": "{count, plural, one {<strong>#</strong> doctor} other {<strong>#</strong> doctors}}",
+    "allDoctors": "All doctors",
+    "emptyClinics": "No published clinic yet.",
+    "emptyDoctors": "No published doctor yet."
+  },
+  "common": {
+    "search": "Search",
+    "seeAll": "See all",
+    "name": "Name",
+    "price": "{amount} AMD",
+    "estimate": "estimate",
+    "minutes": "{count, plural, one {# minute} other {# minutes}}",
+    "REQUESTED": "Waiting",
+    "CONFIRMED": "Confirmed",
+    "CANCELLED": "Cancelled",
+    "COMPLETED": "Completed",
+    "PATIENT": "Patient",
+    "DOCTOR": "Doctor",
+    "ADMIN": "Clinic admin",
+    "SUPER_ADMIN": "Platform admin",
+    "failed": "That action did not succeed",
+    "notFoundTitle": "Page not found",
+    "notFoundHint": "This address is not on Hippocrates.",
+    "homeLink": "Home",
+    "logout": "Sign out",
+    "confirm": "Confirm",
+    "complete": "Complete",
+    "cancel": "Cancel",
+    "send": "Send"
+  },
+  "catalog": {
+    "clinicsTitle": "Clinics",
+    "clinicName": "Clinic name",
+    "emptyClinicSearch": "No clinic matches this name.",
+    "doctorsTitle": "Doctors",
+    "doctorName": "Doctor name",
+    "specialty": "Specialty",
+    "emptyDoctorSearch": "No doctor matches this search."
+  },
+  "clinicPage": {
+    "branches": "Branches",
+    "doctors": "Doctors",
+    "prices": "Prices",
+    "reviews": "Reviews",
+    "noReviews": "No review yet.",
+    "reply": "Clinic. {reply}"
+  },
+  "booking": {
+    "title": "Book a visit",
+    "service": "Service",
+    "day": "Day",
+    "book": "Book",
+    "noService": "No service yet.",
+    "noSlots": "No open time that day",
+    "slotsFailed": "Open times did not load",
+    "signIn": "Sign in as a patient to book",
+    "taken": "That time is not open"
+  },
+  "questions": {
+    "title": "Public questions",
+    "lede": "The author stays hidden. A published doctor writes the answer.",
+    "empty": "No published question yet.",
+    "ask": "Ask a question",
+    "askTitle": "Title",
+    "askBody": "Question",
+    "askFailed": "The question was not sent",
+    "public": "Public questions",
+    "answer": "Answer",
+    "answerAction": "Reply",
+    "answerFailed": "The answer was not saved"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "enter": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "registerTitle": "Register",
+    "registerHint": "A patient account starts here.",
+    "registerAction": "Create account",
+    "displayName": "Name"
+  },
+  "me": {
+    "signIn": "Sign in to see your page.",
+    "openPlatform": "Register a clinic",
+    "openClinic": "Clinic desk",
+    "visits": "Visits",
+    "notices": "Notices",
+    "noNotices": "No notice yet.",
+    "rating": "Rating",
+    "review": "Review",
+    "sendReview": "Send review",
+    "reviewFailed": "The review was not saved"
+  },
+  "desk": {
+    "denied": "This page is for the clinic admin.",
+    "title": "Clinic desk",
+    "pending": "{count, plural, one {<strong>#</strong> waiting request} other {<strong>#</strong> waiting requests}}",
+    "today": "{count, plural, one {<strong>#</strong> today} other {<strong>#</strong> today}}",
+    "patients": "{count, plural, one {<strong>#</strong> patient} other {<strong>#</strong> patients}}",
+    "visits": "Visits",
+    "staff": "Doctors and prices",
+    "newDoctor": "New doctor",
+    "newService": "New service",
+    "doctor": "Doctor",
+    "add": "Add",
+    "saveDoctor": "Register",
+    "doctorFailed": "The doctor was not registered",
+    "serviceFailed": "The service was not saved",
+    "amd": "Price (AMD)",
+    "duration": "Minutes"
+  },
+  "platform": {
+    "title": "Register a clinic",
+    "hint": "Super Admin creates the clinic, and its owner becomes Admin.",
+    "submit": "Register clinic",
+    "clinicName": "Clinic name",
+    "address": "Address",
+    "phone": "Phone",
+    "adminName": "Admin name",
+    "adminEmail": "Admin email",
+    "adminPassword": "Admin password"
+  }
+}

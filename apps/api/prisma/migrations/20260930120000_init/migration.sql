@@ -267,5 +267,5 @@ CREATE EXTENSION IF NOT EXISTS btree_gist;
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_no_overlap"
 EXCLUDE USING gist (
   "doctorId" WITH =,
-  tstzrange("startsAt", "endsAt", '[)') WITH &&
+  tsrange("startsAt", "endsAt", '[)') WITH &&
 ) WHERE ("status" IN ('REQUESTED', 'CONFIRMED'));

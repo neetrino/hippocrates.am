@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
-import { APP_GUARD } from "@nestjs/core";
+import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AppointmentsController } from "./appointments/appointments.controller";
 import { CatalogController } from "./catalog/catalog.controller";
 import { ClinicsController } from "./clinics/clinics.controller";
 import { RequestIdMiddleware } from "./common/request-id.middleware";
+import { RequestLogInterceptor } from "./common/request-log.interceptor";
 import { DoctorsController } from "./doctors/doctors.controller";
 import { HealthController } from "./health.controller";
 import { AuthController } from "./identity/auth.controller";
@@ -38,6 +39,7 @@ import { SchedulingController } from "./scheduling/scheduling.controller";
     RateLimitService,
     NotificationsService,
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_INTERCEPTOR, useClass: RequestLogInterceptor },
   ],
 })
 export class AppModule implements NestModule {

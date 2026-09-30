@@ -1,6 +1,6 @@
-# Repository Layout — Hippocrates.am Minimum MVP
+# Repository layout — Hippocrates.am
 
-> **TARGET TREE ONLY; NOT A CLAIM ABOUT THE ACTUAL REPOSITORY.** 2026-09-29. Preserve the existing repository's `.agents/` and `.cursor/` instructions. Inspect present code before introducing or moving folders.
+> **TARGET TREE ONLY; NOT A CLAIM ABOUT THE ACTUAL REPOSITORY.** Revised 2026-09-30. Preserve `.agents/` and `.cursor/`. Add a feature folder when its point in `PROGRESS.md` starts.
 
 ```text
 hippocrates.am/
@@ -34,7 +34,7 @@ hippocrates.am/
 │   ├── 05-DATABASE.md
 │   ├── DECISIONS.md
 │   ├── PROGRESS.md
-│   ├── FUNCTIONALITY_MINIMUM_HY.md
+│   ├── FUNCTIONALITY_HY.md
 │   ├── SCOPE_CHANGE.md
 │   └── architecture/adrs/
 ├── .agents/                          # keep existing project governance
@@ -46,7 +46,7 @@ The layout is a **minimal proposal**. No standalone worker/package is obligatory
 
 ## UI areas
 
-- Public: homepage, published clinic and doctor lists, name/specialty search, provider pages, and prices. No rating sort.
+- Public: homepage, published clinic and doctor lists, search, provider pages, and prices. Rating sort arrives on point P8.
 - Patient: registration/login, own appointments, permitted cancellation, and booking notifications.
 - Doctor: permitted profile/schedule view and own appointments.
 - Clinic: own public information, doctor/offering/price management, schedules and booking processing.
@@ -62,7 +62,7 @@ The layout is a **minimal proposal**. No standalone worker/package is obligatory
 
 ## Excluded directories / source cleanup
 
-Do not create `messaging/`, `public-qa/`, `payments/`, `clinical/`, `imaging/`, `finance/`, `branches/` advanced workflows, realtime gateway or advanced reporting for minimum MVP. If such code **already exists**, do not delete it blindly: audit ownership/use, propose a guarded de-scoping plan and seek explicit approval before removal. Existing working features and data require safe migration/rollback rather than unilateral deletion.
+Create `branches`, `messaging`, `public-qa`, `reviews`, `finance`, and `clinical` when their points start. Do not add those folders during P0. Do not delete existing product files without an explicit owner request.
 
 ## Verification procedure
 

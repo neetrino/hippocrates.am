@@ -1,6 +1,6 @@
 # ADR-XXX: [Decision Title]
 
-> **Hippocrates.am — Version 1 (MVP) | Architecture Decision Record Template**
+> **Hippocrates.am — Architecture Decision Record Template**
 >
 > When using this template, copy it to `docs/architecture/ADR-XXX-<slug>.md` and replace all placeholders.
 > A `Proposed` decision is not approved. Cursor must not independently implement it or change its status to `Accepted`.

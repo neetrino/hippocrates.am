@@ -1,6 +1,6 @@
-# Technology Stack — Hippocrates.am Minimum MVP
+# Technology stack — Hippocrates.am
 
-> **Local versions are pinned in `TECH_CARD.md` on 2026-09-29.** Production host and region are not chosen. Follow `TECH_CARD.md` if this table differs.
+> **Local stack accepted.** Production host and region are not chosen. Follow `TECH_CARD.md` if this table differs. Product scope is the full specification, delivered point by point.
 
 | Area | Minimum suggested selection | Why / limit | Status |
 | --- | --- | --- | --- |
@@ -11,7 +11,7 @@
 | API | NestJS REST under `/api/v1` | Central role and clinic authorization; OpenAPI contracts | Proposed |
 | DB | One PostgreSQL primary | Scheduling correctness and strong relational constraints | Proposed |
 | ORM | Prisma with reviewed SQL migrations where needed | Typed queries; DB-level overlap constraints may need raw SQL | Proposed |
-| Sessions | Revocable opaque sessions in PostgreSQL + secure cookies | No additional Redis dependency for small MVP | Proposed |
+| Sessions | Revocable opaque sessions in PostgreSQL + secure cookies | No Redis required for sessions | Proposed |
 | Search | PostgreSQL indexed name/specialty queries | Only simple published-content search | Proposed |
 | Notifications | DB-backed in-app events; email adapter only if approved | No mandatory third-party service or reminder scheduler | Working assumption |
 | Public images | Existing approved image stack / object storage only if needed | Profile images only, separate from verification evidence | Conditional |
@@ -20,13 +20,13 @@
 | CI/CD | Existing protected PR pipeline, reproducible build and reviewed migrations | No auto-production changes by agent | Proposed |
 | Hosting | Any owner-approved compatible web/API/PostgreSQL environment | Provider and residency TBD | TBD |
 
-## Avoid unnecessary MVP dependencies
+## Dependencies by point
 
-Do not install Redis/BullMQ, separate scheduler, realtime gateway, Elasticsearch, payment SDK, DICOM/PACS client, chat transport, public Q&A search stack, financial analytics pipeline or multi-region services unless a separately approved scope/operational requirement demands them.
+Do not install Redis, BullMQ, a payment SDK, or a DICOM client on P0. Add a delivery worker when point P5 needs reliable email. Add chat and Q&A storage in PostgreSQL on P6 and P7. Payment and imaging clients wait for P9 and P10.
 
 ## Server and rendering boundaries
 
-- Public Next.js pages may be cached only for published clinics and doctors. Clinic, patient, and doctor pages are never shared across identities. There is no rating cache.
+- Public Next.js pages may be cached only for published clinics and doctors. Clinic, patient, and doctor pages are never shared across identities. Rating data is not cached until point P8 defines it.
 - API uses server-side DTO validation, safe error codes and current membership/record ownership on every protected request.
 - PostgreSQL enforces overlapping active doctor reservations under transaction-safe rules. Real DB concurrency tests are mandatory.
 - Store booking times in UTC and render against the clinic's approved time-zone value. Even one-clinic scheduling requires DST/offset correctness where applicable.
@@ -50,7 +50,7 @@ An optional worker can share the API's project/database contract without creatin
 - [ ] Verify selected Node/Next/React/Nest/Prisma versions are mutually supported; lock them reproducibly.
 - [ ] Confirm PostgreSQL version/provider/region, TLS and tested backup/restore.
 - [ ] Approve cookie/session design, CSRF/origin validation, password/OAuth decision, rate limits.
-- [ ] Approve whether MVP notifications are in-app only or also email; choose provider if needed.
+- [ ] Choose the email provider when point P5 starts. SMS stays blocked until a provider and consent exist.
 - [ ] Approve public image storage and isolated restricted evidence storage only if needed.
 - [ ] Check migration permissions, secrets management, error tracking redaction and deployment approvals.
 

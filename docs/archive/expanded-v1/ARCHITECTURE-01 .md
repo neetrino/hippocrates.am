@@ -1,9 +1,9 @@
 # Project Architecture: Hippocrates.am
 
-> Hippocrates.am is a multi-organization dental and oral/maxillofacial healthcare marketplace. **Version 1 (MVP)** connects patients, verified clinics, and doctors through public discovery, appointments, private text messaging, anonymous public Q&A, reviews, and simple clinic administration. This document uses the same section structure as the supplied Lobby architecture template; it describes a **proposed architecture, not an implemented system**.
+> Hippocrates.am is a multi-organization dental and oral/maxillofacial healthcare marketplace. **Version 1** connects patients, verified clinics, and doctors through public discovery, appointments, private text messaging, anonymous public Q&A, reviews, and simple clinic administration. This document uses the same section structure as the supplied Lobby architecture template; it describes a **proposed architecture, not an implemented system**.
 
 **Project size:** C (product complexity); simple initial deployment  
-**Current target:** Version 1 / MVP  
+**Current target:** Version 1  
 **Last updated:** 2026-09-28  
 **Version:** 1.0-draft  
 **Status:** DRAFT — validate against the actual repository and obtain owner approval for decisions marked `PENDING`.  
@@ -28,7 +28,7 @@ Provide a single public platform for finding dental and maxillofacial clinics an
 - **Separate anonymous public dental Q&A and searchable public archive**, with approved answers by verified doctors.
 - Verified-visit reviews, basic administrative/operational dashboards, reminders, and platform content moderation.
 
-**Scope control:** The module list describes ownership, not permission to implement future functionality. Version 1 follows the source v2.0 MVP scope. Online payment capture, automated external-review synchronization, advanced accounting, and clinical/diagnostic workflows are **not approved for V1**. The source mentions optional booking deposits but places real payment integration in Phase 2; default V1 behavior is booking **without mandatory online prepayment** until that discrepancy is resolved.
+**Scope control:** The module list describes ownership. Version 1 follows the source v2.0 product scope. Online payment capture, automated external-review synchronization, advanced accounting, and clinical/diagnostic workflows are later points. The source mentions optional booking deposits but places real payment integration on the finance point; booking does not require online prepayment before that point is approved.
 
 ### Users
 
@@ -393,7 +393,7 @@ This file records **proposed architectural positions**, not approvals. Add a dec
 
 | **Decision** | **Architectural position** | **Rationale** | **Status** | **ADR reference** |
 | --- | --- | --- | --- | --- |
-| V1 scope | Marketplace + booking + basic clinic workspaces + private text chat + anonymous public Q&A + internal reviews | Matches supplied v2.0 MVP rather than the later full medical ecosystem | Derived from source; approval/reconciliation pending | `DEC-001-v1-scope`, planned |
+| V1 scope | Marketplace + booking + basic clinic workspaces + private text chat + anonymous public Q&A + internal reviews | Matches supplied v2.0 rather than the later clinical ecosystem | Derived from source | `DEC-001-v1-scope`, planned |
 | Initial architecture | Simple modular monolith | Minimal deployment, explicit business boundaries | Proposed | `DEC-002-modular-monolith`, planned |
 | Data separation | Shared PostgreSQL with strict clinic-aware ownership and server authorization | Supports one patient account across organizations while isolating private records | Proposed; privacy review required | `DEC-003-tenancy`, planned |
 | Session management | Server-side revocable opaque sessions | Supports access revocation across multiple clinic memberships | Proposed; tech review required | `DEC-004-sessions`, planned |

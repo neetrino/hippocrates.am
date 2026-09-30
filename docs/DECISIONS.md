@@ -1,33 +1,30 @@
-# Decision Register — Hippocrates.am Minimum MVP
+# Decision register — Hippocrates.am
 
-> **Status:** LOCAL SCOPE ACCEPTED, revised 2026-09-30. Rows below are the current rules. `ADR-002` wins where an older row still mentions reviews or a shared doctor account. No person name was supplied. Production host remains open.
+> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. `ADR-003` wins where an older row shrinks the product to a reduced first release. No person name was supplied. Production host remains open. No application code exists.
 
-| ID | Decision / clarification | Current minimum-MVP position | Status |
+| ID | Decision | Position | Status |
 | --- | --- | --- | --- |
-| HM-001 | Release boundary | Started as the 23-function list. As of 2026-09-30, `MVP-21` and `MVP-22` are removed and `MVP-24`–`MVP-27` are added. Chat, Q&A, and rescheduling stay out | **ACCEPTED, revised 2026-09-30** |
-| HM-002 | Initial applications | Size B. `apps/web` Next.js 16, `apps/api` NestJS 12, PostgreSQL 17, Prisma 7. No `packages/*` layer until real reuse exists | **ACCEPTED 2026-09-29** for local development. Production database vendor is not chosen |
-| HM-003 | Doctor account | One email is one account. It may be a patient at many clinics. A doctor role on that account belongs to exactly one clinic. A second clinic needs a second email. The doctor sets the password. Admins cannot read or set it. Slot overlap is enforced per doctor account, not across two accounts of one person | **ACCEPTED 2026-09-30** |
-| HM-004 | Clinic locations | One operational location per clinic, no branch management UI | **ACCEPTED 2026-09-29** |
-| HM-005 | Booking confirmation | Patient creates slot-occupying `REQUESTED`; an authorized clinic user moves it to `CONFIRMED` | **ACCEPTED 2026-09-29.** Owner delegated the choice |
-| HM-006 | Booking cancellation | No time cutoff and no automatic expiry. Patient or clinic may cancel `REQUESTED` or `CONFIRMED`. Cancellation releases the slot in the same transaction. `COMPLETED` is not cancelled on this path | **ACCEPTED 2026-09-29.** Owner delegated the choice |
-| HM-007 | Visit completion | Clinic admin may mark a real `CONFIRMED` visit `COMPLETED`. That status is attendance only. It does not create a review | **ACCEPTED 2026-09-30.** Review half superseded |
-| HM-008 | Public clinic order | Clinics are listed by name. Rating sort is removed | **ACCEPTED 2026-09-30.** Supersedes the 2026-09-29 rating sort |
-| HM-009 | Notifications | In-app notices only for booking request, confirmation, and cancellation. No email provider and no reminder campaign in this release | **ACCEPTED 2026-09-29.** Owner delegated the choice |
-| HM-010 | Authentication | Email and password, argon2id, revocable server session, HttpOnly Secure SameSite=Lax cookie. Absolute session lifetime is 12 hours. Login is limited to 10 requests per minute per IP. Registration is limited to 5 requests per 10 minutes per IP. No email password reset. Admin cannot read or set a password | **ACCEPTED 2026-09-29.** Owner delegated the numbers. Production still needs a security review |
-| HM-011 | Provider verification | Clinic approval and doctor approval are independent. Evidence is private to platform admins, has no public URL, and is not deleted automatically | **ACCEPTED 2026-09-29.** Owner delegated the choice. Legal retention period is not invented |
-| HM-012 | Infrastructure | Local only: Node.js 24, pnpm 10, the versions in HM-002, PostgreSQL via Docker Compose. Production host, region, backups, and deploy owner are not chosen | **LOCAL ACCEPTED 2026-09-29.** Production remains open |
-| HM-013 | Launch language | Armenian (`hy`) is the only interface language in this release | **ACCEPTED 2026-09-29.** Owner delegated the choice |
-| HM-014 | Deferred features | No private chat, public Q&A, reschedule, reminder campaign, payment collection, EHR/CT, reviews, ratings, or one doctor account at many clinics | **ACCEPTED 2026-09-30** |
-| HM-015 | Clinic operations added | Dashboard, clinic patient list, and operational client card. Money totals use fixed price snapshots only, split into `REQUESTED`, `CONFIRMED`, and `COMPLETED`. `CANCELLED` adds nothing. Estimates are excluded from the money total. No medical notes and no payment collection | **ACCEPTED 2026-09-30** |
-
-## Historical decision handling
-
-The earlier expanded-V1 draft `DECISIONS.md` contained chat/Q&A/realtime/outbox options and broad multi-clinic rules. **Do not delete existing accepted ADRs or history in a live repository.** On migration, append an accepted scope-change ADR and mark conflicting drafts as superseded for *Minimum MVP*, retaining historical version control. If an original item was already approved/implemented, the agent must report the conflict and request an explicit de-scope/data-migration decision; this pack alone is not permission to delete code or data.
+| HM-001 | Release boundary | 23-function reduced pack, later revised on 2026-09-30 | **SUPERSEDED by HM-016** |
+| HM-002 | Applications | `apps/web` Next.js, `apps/api` NestJS, PostgreSQL, Prisma. No `packages/*` until real reuse | **ACCEPTED** for local development |
+| HM-003 | Doctor account | One email is one account. The doctor sets the password. Admins cannot read or set it. The same account may work at more than one clinic | **ACCEPTED, revised by HM-016.** The one-clinic limit is withdrawn |
+| HM-004 | Clinic locations | One location only | **SUPERSEDED by HM-016.** Branches are in the product, on point P2 |
+| HM-005 | Booking confirmation | Patient request, clinic confirmation | **ACCEPTED as the base.** Holds, reschedule, and no-show arrive on point P4 with the canonical specification |
+| HM-006 | Cancellation | Patient or clinic may cancel. Cancellation releases the slot in the same transaction | **ACCEPTED** |
+| HM-007 | Visit completion | Attendance is recorded. A verified visit can later receive a review on point P8 | **ACCEPTED, review ban withdrawn by HM-016** |
+| HM-008 | Public order | Name order only, no ratings | **SUPERSEDED by HM-016.** Ratings return on point P8 after an approved formula |
+| HM-009 | Notifications | In-app only | **SUPERSEDED by HM-016.** Email and reminders are point P5. SMS waits for a provider and consent |
+| HM-010 | Authentication | Email and password, Argon2id, revocable server session, HttpOnly Secure SameSite=Lax cookie, 12-hour absolute lifetime, login 10/minute/IP, registration 5/10 minutes/IP | **ACCEPTED.** Production still needs a security review |
+| HM-011 | Verification | Clinic approval and doctor approval are independent. Evidence is private and is not auto-deleted | **ACCEPTED.** Legal retention period is not invented |
+| HM-012 | Infrastructure | Local Node.js, pnpm, Docker Compose PostgreSQL | **ACCEPTED** for development. Production host remains open |
+| HM-013 | Languages | Armenian only | **SUPERSEDED by HM-016.** Armenian is the default. Russian and English are in the product |
+| HM-014 | Deferred features | Chat, Q&A, reviews, reschedule, payments, and clinical systems removed | **SUPERSEDED by HM-016** |
+| HM-015 | Clinic operations | Dashboard, patient list, operational card, price totals | **ACCEPTED** as part of point P5. They do not replace the rest of the product |
+| HM-016 | Full product | Build the canonical specification point by point. No reduced first release. Finance and clinical work are later points of the same product | **ACCEPTED 2026-09-30** |
 
 ## How to read older rows
 
-`ADR-002` supersedes review, rating, and shared-doctor wording in ADR-001. Each later scope change updates `BRIEF.md` first, then API and database, then `PROGRESS.md` after the code is actually verified. There is no application code yet.
+`ADR-003` is the scope authority. `ADR-001` and `ADR-002` stay as history. Technical rows that are still marked ACCEPTED above remain in force.
 
 **Approver:** Product owner, this chat session. Legal name not recorded.  
-**Approval date:** 2026-09-29, revised 2026-09-30.  
-**Scope status:** Revised 2026-09-30. One doctor account per clinic. Reviews and ratings are out. Dashboards, patient list, client card, and booking-price totals are in. Booking, notifications, home, and doctor pages stay. Production host, region, backup owner, and deploy owner stay open. No production deploy is authorized. See `ADR-002`.
+**Approval date:** 2026-09-30.  
+**Scope status:** Full product. Production host, region, backup owner, and deploy owner stay open. No production deploy is authorized.

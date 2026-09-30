@@ -1,10 +1,10 @@
-# Hippocrates.am — Minimum MVP Architecture
+# Hippocrates.am — Architecture
 
-> **Status: PROPOSED.** Date: 2026-09-29. Replaces the broader-V1 reference architecture **only for the minimum-MVP planning pack**. The repository must be audited before code changes or approval. Technology/provider specifics belong in `02-TECH_STACK.md`.
+> **Status: ACTIVE BASELINE.** Revised 2026-09-30. One web application, one API, and one database. Modules for later points are added when that point starts. Technology specifics belong in `02-TECH_STACK.md`. Product scope is `ADR-003`.
 
 ## Architectural goal and boundaries
 
-Provide the current BRIEF features with one web application, one API, and one database. Keep each clinic's patients, cards, and totals private. A doctor account belongs to one clinic. Do not build reviews, ratings, chat, Q&A, an EHR, or payment collection.
+Provide the full product with one web application, one API, and one database. Keep each clinic's patients private. A doctor account may work at more than one clinic. Chat, Q&A, reviews, branches, and reminders are later points. Finance capture and clinical records are later points of the same product and are not built early.
 
 ```text
 Public / Patient / Doctor / Clinic / Platform browser views
@@ -30,11 +30,11 @@ A worker exists **only when needed by an approved outbound notification channel*
 | --- | --- | --- |
 | `identity` | User, login/session, basic role identity | None |
 | `clinics` | Clinic record/publication, clinic-admin membership, clinic verification state | `identity` IDs only |
-| `doctors` | Doctor profile bound to exactly one clinic and one login | `identity`, that clinic's id |
+| `doctors` | Doctor profile and one affiliation per clinic on the same login | `identity`, clinic ids |
 | `catalog` | Named service and clinic offering/price | Published `clinics`, authorized `doctors` |
 | `scheduling` | Doctor working periods, basic unavailability, availability reads | Approved clinic/doctor, booking occupancy contract |
 | `appointments` | Appointment and status events; transactional occupied intervals | Doctor/schedule/offering/patient approved lookups |
-| `marketplace` | Public home, clinic list, doctor list, and profiles. Name order, no rating | Published clinic, doctor, and catalog fields only |
+| `marketplace` | Public home, clinic list, doctor list, profiles, and filters. Ratings arrive on point P8 | Published clinic, doctor, and catalog fields only |
 | `clinic-operations` | Dashboard, patient list, client card, booking-price totals | This clinic's appointments and patient contacts only |
 | `notifications` | Basic booking-event intents, in-app recipient visibility | Appointment events created in the same transaction |
 | `platform-admin` | Clinic and doctor approval and safe counts | No patient contacts and no booking amounts |
@@ -48,7 +48,7 @@ A worker exists **only when needed by an approved outbound notification channel*
 3. Published projections use explicit DTO allowlists, never full ORM rows; approval status is independently checked for clinic and doctor publication.
 4. Platform administrator permissions are narrow: verification and aggregate platform counts. There is no blanket permission to read patient notes, private contact histories or future medical records.
 5. Revoking a clinic-admin membership prevents later operations; session alone does not grant stale clinic rights.
-6. A doctor user has one clinic. Reject a second clinic membership on that user. Accepted 2026-09-30.
+6. A doctor user may hold a separate affiliation at each clinic. Each request checks the affiliation for that clinic. Accepted 2026-09-30, revised by ADR-003.
 
 ## Core flows
 
@@ -76,12 +76,12 @@ Booking events generate minimal recipient-specific notices. An in-app notice can
 
 One web runtime, one stateless API runtime, one PostgreSQL primary, optional media storage and optional small notification worker. Sessions stored in authoritative DB initially if approved. Shared state affecting authorization and booking correctness cannot reside solely in API memory. Development/staging/production separation, tested backups, health monitoring and controlled one-time migrations are mandatory operational practices.
 
-## Deferred architectural boundaries
+## Later points
 
-No modules for multi-branch operations, one doctor account at many clinics, reviews, ratings, room booking, rescheduling, messaging, anonymous Q&A, payment collection, an analytics warehouse, EHR, or imaging.
+Add branch, messaging, public Q&A, review, finance, and clinical modules on their points in `PROGRESS.md`. Do not scaffold empty modules before that point. A doctor affiliation is per clinic. Slot overlap is enforced per doctor, including across that doctor's clinics.
 
 ## Approval gates
 
-- Validate current repository and choose a compatible minimal topology instead of forcing an unnecessary rewrite.
-- Doctor accounts, booking, notifications, and the removed review scope are decided in `DECISIONS.md` and `ADR-002`. Production host is still open.
-- Prove access controls, appointment concurrency and restore in staging; record evidence in `PROGRESS.md`.
+- Local topology is one web app, one API, and one PostgreSQL database. `ADR-003` is the scope authority.
+- Production host is still open.
+- Prove access controls, appointment concurrency, and restore before release. Record evidence in `PROGRESS.md`.

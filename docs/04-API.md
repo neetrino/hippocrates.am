@@ -1,6 +1,6 @@
-# Minimum MVP API Contracts — Hippocrates.am
+# API contracts — Hippocrates.am
 
-> **CANDIDATE ROUTES, NOT EXISTING ENDPOINTS.** 2026-09-29. Apply the 23-feature `BRIEF.md`, current repo audit and approved identity/booking policies before implementation. Path prefix `/api/v1` is proposed.
+> **CANDIDATE ROUTES, NOT EXISTING ENDPOINTS.** Revised 2026-09-30. Path prefix `/api/v1`. The routes below are the early points. Chat, Q&A, reviews, branches, reschedule, and reminders are added on their points in `PROGRESS.md`. They are not banned. Product authority is `ADR-003` and the canonical specification.
 
 ## Shared API rules
 
@@ -13,20 +13,20 @@
 
 **Response envelope (proposed):** `{ "data": ..., "meta": { "requestId": "..." } }`; errors `{ "error": { "code": "...", "message": "..." }, "requestId": "..." }`.
 
-## Public discovery and basic search (`MVP-01`–`MVP-07`)
+## Public discovery (early points, FR-001–FR-005)
 
 | Route | Purpose | Critical rule |
 | --- | --- | --- |
 | `GET /public/home` | Homepage summary and entry points | Only published content |
-| `GET /public/clinics?name=` | Clinic list and simple name search | Published clinics only, ordered by name. No rating parameter |
-| `GET /public/clinics/:id` | Published clinic, its doctors, and offerings/prices | Safe allowlisted fields only. No rating |
+| `GET /public/clinics?name=` | Clinic list and name search | Published clinics only. Filters and ratings arrive on later points |
+| `GET /public/clinics/:id` | Published clinic, its doctors, and offerings/prices | Safe allowlisted fields only |
 | `GET /public/doctors?name=&specialty=` | Independent published doctor directory and basic search | Published doctor AND associated clinic approved |
 | `GET /public/doctors/:id` | Published doctor profile | No internal credential attachments |
 | `GET /public/clinics/:id/services` | Published service/price list | Distinguish quoted estimate from fixed price where applicable |
 | `GET /public/availability?doctorId=&serviceId=&date=` | Genuine bookable slots for doctor/service | Advisory display only; booking rechecks in DB |
-Search does **not** promise geolocation, ratings, or external review imports.
+Geolocation, ratings, and external review imports arrive only on their points. Do not import third-party reviews.
 
-## Identity, roles and own data (`MVP-08`, `MVP-09`, `MVP-17`)
+## Identity and own data (P1)
 
 | Route | Actor / purpose |
 | --- | --- |
@@ -39,7 +39,7 @@ Search does **not** promise geolocation, ratings, or external review imports.
 
 Email and password is the accepted login. Do not add phone login, OAuth, or an email password-reset route in this release.
 
-## Clinic/doctor approval and maintenance (`MVP-10`–`MVP-13`, `MVP-23`)
+## Clinic and doctor maintenance (P2–P3)
 
 | Route | Actor / purpose | Guard |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ Email and password is the accepted login. Do not add phone login, OAuth, or an e
 | `GET /clinics/:clinicId/profile` | Clinic admin reads own editable clinic info | Live membership + clinic scope |
 | `PATCH /clinics/:clinicId/profile` | Clinic admin edits own allowed fields | Material public changes may require reapproval |
 | `GET /clinics/:clinicId/doctors` | Own linked doctors | Clinic scope |
-| `POST /clinics/:clinicId/doctors` | Register a doctor bound to this clinic | The doctor sets the password. Reject the email if it is already a doctor at any clinic. Admins cannot set the password |
+| `POST /clinics/:clinicId/doctors` | Affiliate a doctor to this clinic | The doctor sets the password on a new account. Admins cannot set it. Reject a duplicate affiliation to this same clinic |
 | `PATCH /clinics/:clinicId/doctors/:doctorId` | Update clinic-authorized doctor info | Doctor verification may need re-review |
 | `GET /clinics/:clinicId/services` | Own offerings | Clinic scope |
 | `POST /clinics/:clinicId/services` | Create service/price offering | Approved doctor/clinic/service relationships |
@@ -60,7 +60,7 @@ Email and password is the accepted login. Do not add phone login, OAuth, or an e
 
 A clinic-admin UI for doctor management does not grant authority to self-verify a doctor's professional credentials.
 
-## Appointment flow (`MVP-14`–`MVP-20`)
+## Appointments (P4)
 
 | Route | Purpose | Mandatory behavior |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ A clinic-admin UI for doctor management does not grant authority to self-verify 
 
 **States:** `REQUESTED -> CONFIRMED -> COMPLETED`, or `REQUESTED`/`CONFIRMED -> CANCELLED`. A `REQUESTED` appointment reserves the interval. There is no cutoff and no automatic expiry. No reschedule endpoint.
 
-## Clinic operations (`MVP-24`–`MVP-27`)
+## Clinic operations (P5)
 
 | Route | Purpose | Critical guard |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ A clinic-admin UI for doctor management does not grant authority to self-verify 
 | `GET /clinics/:clinicId/patients/:patientId` | Contact and appointments at this clinic | No diagnosis or other clinic's visits |
 | `GET /clinics/:clinicId/finance?from=&to=` | Sum fixed price snapshots for `REQUESTED`, `CONFIRMED`, and `COMPLETED` | `CANCELLED` adds nothing. Estimates are excluded from the money total. No payment capture |
 
-`MVP-21` and `MVP-22` routes are not part of the API. Do not add review or rating endpoints.
+Review, chat, Q&A, branch, and reschedule routes are added on points P2, P4, P6, P7, and P8. Do not add them during P0.
 
 ## Contract verification gates
 
@@ -92,8 +92,8 @@ A clinic-admin UI for doctor management does not grant authority to self-verify 
 - Unauthorized patient/doctor/clinic/platform role requests are denied with no cross-clinic data leaks.
 - Concurrent `POST /appointments` for an overlapping doctor slot yields at most one active booking.
 - Cancellation immediately makes legitimately freed capacity available; retries cannot duplicate changes.
-- A doctor account that already has a clinic is rejected for a second clinic.
-- Patient list, client card, and finance responses contain only the caller's clinic. Public responses contain no rating.
+- A second clinic affiliation is allowed. That clinic still cannot read the other clinic's patients.
+- Patient list, client card, and finance responses contain only the caller's clinic.
 - Booking notification failure never changes final appointment state.
 
 Each route is a draft candidate; generate OpenAPI/DTO and automate positive/negative tests when implementing its approved slice. Do not claim routes already exist.

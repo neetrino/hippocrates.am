@@ -21,7 +21,7 @@ async function bootstrap(): Promise<void> {
   app.useGlobalInterceptors(new EnvelopeInterceptor());
   const port = Number(process.env.API_PORT ?? 4000);
   await app.listen(port);
-  Logger.log(`API-ն լսում է http://localhost:${port}`, "Bootstrap");
+  Logger.log(`API is listening on http://localhost:${port}`, "Bootstrap");
 }
 
 void bootstrap();

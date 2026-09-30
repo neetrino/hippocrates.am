@@ -19,11 +19,11 @@ export class DatabaseIdleService implements OnModuleInit, OnModuleDestroy {
     this.used = true;
     if (!this.announced) return;
     this.announced = false;
-    this.logger.log("Բազան նորից ակտիվ է");
+    this.logger.log("Database is active again");
   }
 
   onModuleInit(): void {
-    this.logger.log("API-ն աշխատում է. բազան կփակվի, եթե կայքը 5 րոպե չօգտագործվի");
+    this.logger.log("API is running. The database closes after 5 minutes without requests");
     this.timer = setInterval(() => this.releaseIfIdle(), CHECK_MS);
     this.timer.unref();
   }
@@ -43,6 +43,13 @@ export class DatabaseIdleService implements OnModuleInit, OnModuleDestroy {
   private idleBanner(): string {
     const line = `${RED}${BOLD}${"─".repeat(54)}${RESET}`;
     const row = (text: string): string => `${RED}${BOLD}  ${text}${RESET}`;
-    return ["", line, row("Բազան անջատված է"), row("Կայքը 5 րոպե չի օգտագործվել, կապը փակվել է։"), row("Neon-ում Active-ը կարող է դառնալ Idle։"), line].join("\n");
+    return [
+      "",
+      line,
+      row("Database disconnected"),
+      row("No requests for 5 minutes, so the connection was closed."),
+      row("Neon can leave Active and become Idle."),
+      line,
+    ].join("\n");
   }
 }

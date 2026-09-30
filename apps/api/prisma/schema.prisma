@@ -61,6 +61,9 @@ model Clinic {
   description String   @default("")
   address     String   @default("")
   phone       String   @default("")
+  district    String   @default("")
+  coverKey    String?
+  logoKey     String?
   timeZone    String   @default("Asia/Yerevan")
   published   Boolean  @default(true)
   ownerId     String
@@ -88,6 +91,7 @@ model DoctorProfile {
   clinicId    String
   specialty   String
   bio         String   @default("")
+  photoKey    String?
   published   Boolean  @default(true)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   clinic      Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)

@@ -2,7 +2,7 @@ import { JsonForm } from "@/shared/json-form";
 
 export default function LoginPage() {
   return (
-    <section>
+    <section className="auth-wrap panel">
       <h1>Մուտք</h1>
       <JsonForm
         action="/auth/login"

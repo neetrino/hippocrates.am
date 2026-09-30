@@ -2,8 +2,9 @@ import { JsonForm } from "@/shared/json-form";
 
 export default function RegisterPage() {
   return (
-    <section>
-      <h1>Պացիենտի գրանցում</h1>
+    <section className="auth-wrap panel">
+      <h1>Գրանցում</h1>
+      <p className="muted">Պացիենտի հաշիվը բացվում է այստեղից։</p>
       <JsonForm
         action="/auth/register"
         label="Գրանցվել"

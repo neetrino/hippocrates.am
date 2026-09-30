@@ -1,36 +1,71 @@
-import { cookies } from "next/headers";
 import Link from "next/link";
+import { AppointmentActions } from "@/features/portal/appointment-actions";
+import { LogoutButton } from "@/features/portal/logout-button";
+import { AnswerForm, AskQuestionForm } from "@/features/portal/question-forms";
+import { ReviewForm } from "@/features/portal/review-form";
+import { formatAmd, formatWhen, statusLabel } from "@/shared/format";
+import { publicGet } from "@/shared/public-api";
+import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
+import { sessionGet } from "@/shared/session-api";
 
-type Me = { role: string; displayName: string; clinicId: string | null };
-type Appointment = { id: string; startsAt: string; status: string; priceAmd: number };
+const roleLabel: Record<string, string> = {
+  PATIENT: "Պացիենտ",
+  DOCTOR: "Բժիշկ",
+  ADMIN: "Կլինիկայի ադմին",
+  SUPER_ADMIN: "Հարթակի ադմին",
+};
 
-async function load<T>(path: string): Promise<T | null> {
-  const jar = await cookies();
-  const response = await fetch(`${process.env.API_URL}/api/v1${path}`, {
-    headers: { cookie: jar.toString() },
-    cache: "no-store",
-  });
-  if (!response.ok) return null;
-  const body = (await response.json()) as { data: T };
-  return body.data;
-}
+type Notice = { id: string; body: string; createdAt: string };
 
 export default async function MePage() {
-  const me = await load<Me>("/auth/me");
-  const appointments = me ? await load<Appointment[]>("/appointments/mine") : null;
-  if (!me) return <p>Մուտք գործեք՝ ձեր էջը տեսնելու համար։</p>;
+  const me = await sessionGet<Me>("/auth/me");
+  if (!me) return <div className="shell section"><p>Մուտք գործեք՝ ձեր էջը տեսնելու համար։ <Link href="/login">Մուտք</Link></p></div>;
+  const appointments = await sessionGet<AppointmentCard[]>("/appointments/mine");
+  const notices = await sessionGet<Notice[]>("/me/notifications");
+  const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
   return (
-    <section className="grid">
-      <h1>{me.displayName}</h1>
-      <p className="muted">{me.role}</p>
-      {me.role === "SUPER_ADMIN" ? <Link href="/platform">Գրանցել կլինիկա</Link> : null}
-      {me.role === "ADMIN" ? <Link href="/clinic">Կլինիկայի վահանակ</Link> : null}
-      {(appointments ?? []).map((item) => (
-        <article className="card" key={item.id}>
-          <p>{new Date(item.startsAt).toLocaleString("hy-AM")}</p>
-          <p>{item.status} · {item.priceAmd} դրամ</p>
-        </article>
-      ))}
-    </section>
+    <div className="shell section stack">
+      <div className="section-head">
+        <div>
+          <p className="eyebrow">{roleLabel[me.role] ?? me.role}</p>
+          <h1>{me.displayName}</h1>
+        </div>
+        <LogoutButton />
+      </div>
+      {me.role === "SUPER_ADMIN" ? <Link className="btn" href="/platform">Գրանցել կլինիկա</Link> : null}
+      {me.role === "ADMIN" ? <Link className="btn" href="/clinic">Կլինիկայի վահանակ</Link> : null}
+      <section className="section">
+        <h2>Այցեր</h2>
+        <div className="list">
+          {(appointments ?? []).map((item) => (
+            <article className="panel" key={item.id}>
+              <strong>{item.offering.name}</strong>
+              <p className="muted">{me.role === "DOCTOR" ? item.patient.displayName : `${item.clinic.name} · ${item.doctor.user.displayName}`}</p>
+              <p>{formatWhen(item.startsAt)} · {statusLabel(item.status)} · {formatAmd(item.priceAmd)}</p>
+              {me.role === "PATIENT" ? <AppointmentActions id={item.id} status={item.status} mode="patient" /> : null}
+              {me.role === "PATIENT" && item.status === "COMPLETED" && !item.review ? <ReviewForm appointmentId={item.id} /> : null}
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="section">
+        <h2>Ծանուցումներ</h2>
+        {(notices ?? []).length === 0 ? <p className="muted">Ծանուցում չկա։</p> : null}
+        {(notices ?? []).map((notice) => <p className="row" key={notice.id}>{notice.body}</p>)}
+      </section>
+      {me.role === "PATIENT" ? <AskQuestionForm /> : null}
+      {me.role === "DOCTOR" ? (
+        <section className="section stack">
+          <h2>Հանրային հարցեր</h2>
+          {questions.map((question) => (
+            <article className="panel" key={question.id}>
+              <h3>{question.title}</h3>
+              <p>{question.body}</p>
+              <AnswerForm questionId={question.id} />
+            </article>
+          ))}
+        </section>
+      ) : null}
+    </div>
   );
 }

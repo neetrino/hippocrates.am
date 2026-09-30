@@ -1,15 +1,46 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
+import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
 
-const doctorCard = {
+const doctorSelect = {
   id: true,
   specialty: true,
   bio: true,
+  photoKey: true,
   user: { select: { displayName: true } },
   clinic: { select: { id: true, name: true } },
 } as const;
+
+const clinicSelect = {
+  id: true,
+  name: true,
+  address: true,
+  district: true,
+  phone: true,
+  description: true,
+  coverKey: true,
+  logoKey: true,
+} as const;
+
+type ClinicRow = {
+  coverKey: string | null;
+  logoKey: string | null;
+  district: string;
+};
+
+type DoctorRow = { photoKey: string | null };
+
+function clinicView<T extends ClinicRow>(clinic: T) {
+  const { coverKey, logoKey, ...rest } = clinic;
+  return { ...rest, coverUrl: publicAssetUrl(coverKey), logoUrl: publicAssetUrl(logoKey) };
+}
+
+function doctorView<T extends DoctorRow>(doctor: T) {
+  const { photoKey, ...rest } = doctor;
+  return { ...rest, photoUrl: publicAssetUrl(photoKey) };
+}
 
 @Controller("public")
 export class MarketplaceController {
@@ -23,29 +54,30 @@ export class MarketplaceController {
         where: { published: true },
         orderBy: { name: "asc" },
         take: 12,
-        select: { id: true, name: true, address: true, phone: true },
+        select: clinicSelect,
       }),
       this.prisma.doctorProfile.findMany({
         where: { published: true, clinic: { published: true } },
         orderBy: { user: { displayName: "asc" } },
         take: 12,
-        select: doctorCard,
+        select: doctorSelect,
       }),
     ]);
-    return { clinics, doctors };
+    return { clinics: clinics.map(clinicView), doctors: doctors.map(doctorView) };
   }
 
   @Public()
   @Get("clinics")
   async clinics(@Query("name") name?: string) {
-    return this.prisma.clinic.findMany({
+    const rows = await this.prisma.clinic.findMany({
       where: {
         published: true,
         name: name ? { contains: name, mode: "insensitive" } : undefined,
       },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, address: true, phone: true, description: true },
+      select: clinicSelect,
     });
+    return rows.map(clinicView);
   }
 
   @Public()
@@ -54,19 +86,20 @@ export class MarketplaceController {
     const clinic = await this.prisma.clinic.findFirst({
       where: { id, published: true },
       select: {
-        id: true,
-        name: true,
-        description: true,
-        address: true,
-        phone: true,
+        ...clinicSelect,
         branches: { select: { id: true, name: true, address: true } },
-        doctors: {
-          where: { published: true },
-          select: doctorCard,
-        },
+        doctors: { where: { published: true }, select: doctorSelect },
         offerings: {
           where: { published: true },
-          select: { id: true, name: true, priceAmd: true, isEstimate: true, durationMinutes: true, doctorId: true },
+          select: {
+            id: true,
+            name: true,
+            priceAmd: true,
+            isEstimate: true,
+            durationMinutes: true,
+            doctorId: true,
+            doctor: { select: { user: { select: { displayName: true } } } },
+          },
         },
         reviews: {
           orderBy: { createdAt: "desc" },
@@ -76,13 +109,16 @@ export class MarketplaceController {
       },
     });
     if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
-    return clinic;
+    return {
+      ...clinicView(clinic),
+      doctors: clinic.doctors.map(doctorView),
+    };
   }
 
   @Public()
   @Get("doctors")
   async doctors(@Query("name") name?: string, @Query("specialty") specialty?: string) {
-    return this.prisma.doctorProfile.findMany({
+    const rows = await this.prisma.doctorProfile.findMany({
       where: {
         published: true,
         clinic: { published: true },
@@ -90,8 +126,9 @@ export class MarketplaceController {
         user: name ? { displayName: { contains: name, mode: "insensitive" } } : undefined,
       },
       orderBy: { user: { displayName: "asc" } },
-      select: doctorCard,
+      select: doctorSelect,
     });
+    return rows.map(doctorView);
   }
 
   @Public()
@@ -100,14 +137,14 @@ export class MarketplaceController {
     const doctor = await this.prisma.doctorProfile.findFirst({
       where: { id, published: true, clinic: { published: true } },
       select: {
-        ...doctorCard,
+        ...doctorSelect,
         offerings: {
           where: { published: true },
-          select: { id: true, name: true, priceAmd: true, isEstimate: true, durationMinutes: true },
+          select: { id: true, name: true, priceAmd: true, isEstimate: true, durationMinutes: true, doctorId: true },
         },
       },
     });
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
-    return doctor;
+    return doctorView(doctor);
   }
 }

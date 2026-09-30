@@ -1,29 +1,51 @@
 import Link from "next/link";
 import { publicGet } from "@/shared/public-api";
+import type { ClinicCard, DoctorCard } from "@/shared/public-types";
+import { ClinicTile, DoctorTile } from "@/shared/ui/catalog-cards";
+import { EmptyState } from "@/shared/ui/empty-state";
 
-type HomeData = {
-  clinics: { id: string; name: string; address: string }[];
-  doctors: { id: string; specialty: string; user: { displayName: string } }[];
-};
+type HomeData = { clinics: ClinicCard[]; doctors: DoctorCard[] };
 
 export default async function HomePage() {
   const data = await publicGet<HomeData>("/public/home");
   return (
-    <section className="grid">
-      <h1>Կլինիկաներ և բժիշկներ</h1>
-      <p className="muted">Գրանցվեք որպես պացիենտ և home-ից ընտրեք ցանկացած կլինիկա։</p>
-      {data.clinics.map((clinic) => (
-        <article className="card" key={clinic.id}>
-          <Link href={`/clinics/${clinic.id}`}>{clinic.name}</Link>
-          <p className="muted">{clinic.address}</p>
-        </article>
-      ))}
-      {data.doctors.map((doctor) => (
-        <article className="card" key={doctor.id}>
-          <strong>{doctor.user.displayName}</strong>
-          <p className="muted">{doctor.specialty}</p>
-        </article>
-      ))}
-    </section>
+    <div className="shell">
+      <section className="hero">
+        <div className="hero-copy">
+          <p className="eyebrow">Հայաստան</p>
+          <h1>Գտեք կլինիկա և գրանցվեք այցի</h1>
+          <p className="lede">Ատամնաբուժական կլինիկաներ, բժիշկներ և ազատ ժամեր մեկ հանգիստ էջում։</p>
+          <form className="search" action="/clinics">
+            <input name="name" placeholder="Կլինիկայի անուն" aria-label="Կլինիկայի անուն" />
+            <button className="btn" type="submit">Փնտրել</button>
+          </form>
+        </div>
+        <div className="stats">
+          <p><strong>{data.clinics.length}</strong> կլինիկա</p>
+          <p><strong>{data.doctors.length}</strong> բժիշկ</p>
+          <p><Link href="/doctors">Բոլոր բժիշկները</Link></p>
+        </div>
+      </section>
+      <section className="section">
+        <div className="section-head">
+          <h2>Կլինիկաներ</h2>
+          <Link href="/clinics">Տեսնել բոլորը</Link>
+        </div>
+        {data.clinics.length === 0 ? <EmptyState>Հրապարակված կլինիկա դեռ չկա։</EmptyState> : null}
+        <div className="grid-cards">
+          {data.clinics.map((clinic) => <ClinicTile key={clinic.id} clinic={clinic} />)}
+        </div>
+      </section>
+      <section className="section">
+        <div className="section-head">
+          <h2>Բժիշկներ</h2>
+          <Link href="/doctors">Տեսնել բոլորը</Link>
+        </div>
+        {data.doctors.length === 0 ? <EmptyState>Հրապարակված բժիշկ դեռ չկա։</EmptyState> : null}
+        <div className="grid-cards">
+          {data.doctors.map((doctor) => <DoctorTile key={doctor.id} doctor={doctor} />)}
+        </div>
+      </section>
+    </div>
   );
 }

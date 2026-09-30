@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 
+type DoctorOption = { id: string; name: string };
+
 async function post(path: string, payload: Record<string, string | number>): Promise<boolean> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1${path}`, {
     method: "POST",
@@ -12,56 +14,59 @@ async function post(path: string, payload: Record<string, string | number>): Pro
   return response.ok;
 }
 
-export function ClinicForms() {
+export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: DoctorOption[] }) {
   const [message, setMessage] = useState("");
 
   async function onDoctor(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const clinicId = String(form.get("clinicId") ?? "");
     const ok = await post(`/clinics/${clinicId}/doctors`, {
       displayName: String(form.get("displayName") ?? ""),
       email: String(form.get("email") ?? ""),
       password: String(form.get("password") ?? ""),
       specialty: String(form.get("specialty") ?? ""),
     });
-    setMessage(ok ? "Բժիշկը գրանցվեց" : "Չհաջողվեց");
+    if (ok) window.location.reload();
+    else setMessage("Բժիշկը չգրանցվեց");
   }
 
   async function onOffering(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const clinicId = String(form.get("clinicId") ?? "");
     const ok = await post(`/clinics/${clinicId}/offerings`, {
       doctorId: String(form.get("doctorId") ?? ""),
       name: String(form.get("name") ?? ""),
       priceAmd: Number(form.get("priceAmd")),
       durationMinutes: Number(form.get("durationMinutes")),
     });
-    setMessage(ok ? "Ծառայությունը պահվեց" : "Չհաջողվեց");
+    if (ok) window.location.reload();
+    else setMessage("Ծառայությունը չպահվեց");
   }
 
   return (
-    <div className="grid">
-      <form onSubmit={(event) => void onDoctor(event)}>
-        <h2>Բժիշկ</h2>
-        <label>Կլինիկայի id<input name="clinicId" required /></label>
-        <label>Անուն<input name="displayName" required /></label>
-        <label>Էլ. փոստ<input name="email" type="email" required /></label>
-        <label>Գաղտնաբառ<input name="password" type="password" required /></label>
-        <label>Մասնագիտություն<input name="specialty" required /></label>
-        <button type="submit">Գրանցել բժիշկ</button>
+    <div className="split">
+      <form className="panel stack" onSubmit={(event) => void onDoctor(event)}>
+        <h2>Նոր բժիշկ</h2>
+        <label className="field">Անուն<input name="displayName" required /></label>
+        <label className="field">Էլ. փոստ<input name="email" type="email" required /></label>
+        <label className="field">Գաղտնաբառ<input name="password" type="password" required /></label>
+        <label className="field">Մասնագիտություն<input name="specialty" required /></label>
+        <button className="btn" type="submit">Գրանցել</button>
       </form>
-      <form onSubmit={(event) => void onOffering(event)}>
-        <h2>Ծառայություն</h2>
-        <label>Կլինիկայի id<input name="clinicId" required /></label>
-        <label>Բժշկի id<input name="doctorId" required /></label>
-        <label>Անուն<input name="name" required /></label>
-        <label>Գին (դրամ)<input name="priceAmd" type="number" required /></label>
-        <label>Րոպե<input name="durationMinutes" type="number" required /></label>
-        <button type="submit">Ավելացնել</button>
+      <form className="panel stack" onSubmit={(event) => void onOffering(event)}>
+        <h2>Նոր ծառայություն</h2>
+        <label className="field">
+          Բժիշկ
+          <select name="doctorId" required defaultValue={doctors[0]?.id ?? ""}>
+            {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.name}</option>)}
+          </select>
+        </label>
+        <label className="field">Անուն<input name="name" required /></label>
+        <label className="field">Գին (դրամ)<input name="priceAmd" type="number" required /></label>
+        <label className="field">Րոպե<input name="durationMinutes" type="number" required /></label>
+        <button className="btn" type="submit">Ավելացնել</button>
       </form>
-      {message ? <p>{message}</p> : null}
+      {message ? <p className="error">{message}</p> : null}
     </div>
   );
 }

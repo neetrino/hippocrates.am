@@ -9,6 +9,19 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { bookableStarts } from "../scheduling/slots";
 import { Prisma } from "../generated/prisma/client";
 
+const appointmentCard = {
+  id: true,
+  startsAt: true,
+  status: true,
+  priceAmd: true,
+  isEstimate: true,
+  offering: { select: { name: true } },
+  clinic: { select: { name: true } },
+  doctor: { select: { user: { select: { displayName: true } } } },
+  patient: { select: { displayName: true } },
+  review: { select: { id: true } },
+} as const;
+
 @Controller("appointments")
 export class AppointmentsController {
   constructor(
@@ -99,15 +112,27 @@ export class AppointmentsController {
   @Get("mine")
   async mine(@CurrentActor() actor: Actor) {
     if (actor.role === "PATIENT") {
-      return this.prisma.appointment.findMany({ where: { patientId: actor.id }, orderBy: { startsAt: "desc" } });
+      return this.prisma.appointment.findMany({
+        where: { patientId: actor.id },
+        orderBy: { startsAt: "desc" },
+        select: appointmentCard,
+      });
     }
     if (actor.role === "DOCTOR") {
       const doctor = await this.prisma.doctorProfile.findUnique({ where: { userId: actor.id } });
       if (!doctor) return [];
-      return this.prisma.appointment.findMany({ where: { doctorId: doctor.id }, orderBy: { startsAt: "asc" } });
+      return this.prisma.appointment.findMany({
+        where: { doctorId: doctor.id },
+        orderBy: { startsAt: "asc" },
+        select: appointmentCard,
+      });
     }
     if (actor.role === "ADMIN" && actor.clinicId) {
-      return this.prisma.appointment.findMany({ where: { clinicId: actor.clinicId }, orderBy: { startsAt: "asc" } });
+      return this.prisma.appointment.findMany({
+        where: { clinicId: actor.clinicId },
+        orderBy: { startsAt: "asc" },
+        select: appointmentCard,
+      });
     }
     throw new AppError("FORBIDDEN", 403, "Այս գործողությունը թույլատրված չէ");
   }

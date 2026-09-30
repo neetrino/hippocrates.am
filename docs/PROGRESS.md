@@ -1,29 +1,41 @@
 # Delivery plan — Hippocrates.am
 
-> **PLAN, not implementation status.** Revised 2026-09-30. The reduced first release is withdrawn. No feature is implemented until code and tests exist.
+> **Ready to start.** Revised 2026-09-30. Full product, one point at a time. Nothing below is implemented until code and tests exist.
 
-**Verified implementation:** none. The repository has no application.  
-**Product scope:** full product, `ADR-003`. Production host is still open.  
+**Verified implementation:** none.  
+**Scope:** `ADR-003`. **Env:** one root `.env`. Web `3000`, NestJS `4000`.  
 **Status terms:** `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `VERIFIED`.
 
-## Points
+Do the points in order. Do not add empty modules for a later point.
 
-Do the points in order. Do not add empty modules for a point that has not started.
+## Numbered points
 
-| Point | Deliverable | Requirements | State | Verified when |
+| # | Point | Approximate contents | State | Done when |
 | --- | --- | --- | --- | --- |
-| P0 | Workspace, local PostgreSQL, CI, health | foundation | NOT_STARTED | Both apps boot, the empty database migrates, checks pass |
-| P1 | Identity, sessions, roles, membership | FR-001 login, FR-017 start | NOT_STARTED | Wrong-role and revoked-membership requests are denied |
-| P2 | Organizations, branches, separate verification | FR-003, FR-015, FR-016, FR-017 | NOT_STARTED | Unpublished organizations stay private. Clinic and doctor approval are separate |
-| P3 | Practitioners, catalog, public pages and filters | FR-002, FR-003, FR-004, FR-005 | NOT_STARTED | A doctor can be published at more than one clinic without leaking the other clinic's patients |
-| P4 | Schedules, resources, booking | FR-006, FR-007 | NOT_STARTED | Concurrent requests cannot double-book. Reschedule and cancel keep history |
-| P5 | Portals, reminders, operational records | FR-008, FR-009, FR-010, FR-015 | NOT_STARTED | A failed notice does not change the appointment |
-| P6 | Private chat | FR-011 | NOT_STARTED | A non-participant cannot read the thread |
-| P7 | Public Q&A and archive | FR-012, FR-013 | NOT_STARTED | The author is absent from public responses |
-| P8 | Reviews, moderation, ranking | FR-014, FR-016 | NOT_STARTED | A review requires a verified visit. Ranking uses only an approved formula |
-| P9 | Finance | later finance point | NOT_STARTED | No card capture until this point is separately approved |
-| P10 | Clinical and imaging | later clinical point | NOT_STARTED | No clinical form is added before its own acceptance spec |
-| P11 | Release | all accepted points | NOT_STARTED | Backup restore and a role-by-role walkthrough. Blocked while host, backup owner, and deploy owner are unnamed |
+| 0 | Foundation | pnpm workspace, `apps/web` on 3000, `apps/api` on 4000, both read the root `.env`, Docker PostgreSQL, Prisma, health, lint, typecheck, test, build | NOT_STARTED | Both apps boot and the empty database migrates |
+| 1 | Identity | Register, login, logout, 12-hour session, rate limits, roles, `GET /me` | NOT_STARTED | A wrong role and a revoked membership are denied |
+| 2 | Organizations | Clinic, branches, staff, separate clinic and doctor verification | NOT_STARTED | An unpublished clinic stays private |
+| 3 | Public catalog | Doctor profiles, services and prices, Armenian-first pages, filters | NOT_STARTED | Another clinic's patients are not visible |
+| 4 | Booking | Schedules, resources, free slots, hold, confirm, cancel, reschedule, attendance | NOT_STARTED | Two concurrent requests cannot take the same slot |
+| 5 | Portals | Patient, doctor, and clinic screens, email reminders, operational patient card, price totals | NOT_STARTED | A failed notice does not change the appointment |
+| 6 | Chat | Private text thread from the doctor profile | NOT_STARTED | A non-participant cannot read it |
+| 7 | Questions | Anonymous public questions, moderation, searchable archive | NOT_STARTED | The author is absent from public responses |
+| 8 | Reviews | Review after a verified visit, reply, dispute, ranking only with an approved formula | NOT_STARTED | A review without a verified visit is rejected |
+| 9 | Finance | Invoices and card payments | NOT_STARTED | Starts only after a separate approval. No card capture before that |
+| 10 | Clinical | Charts, notes, imaging | NOT_STARTED | Starts only with its own acceptance spec |
+| 11 | Release | Backup restore, role-by-role walkthrough | NOT_STARTED | Blocked until host, backup owner, and deploy owner are named |
+
+## What point 0 contains
+
+1. Root pnpm workspace.
+2. `apps/web` — Next.js, port 3000, loads the root `.env`.
+3. `apps/api` — NestJS, `API_PORT` 4000, loads the same `.env`.
+4. Docker Compose — local PostgreSQL only, matching `DATABASE_URL`.
+5. Prisma — connection and an empty first migration.
+6. `GET /health` on the API.
+7. Format, lint, typecheck, test, and build scripts.
+
+Point 1 starts after point 0 boots. Public pages start at point 3. Booking starts at point 4.
 
 ## Still blocking release only
 
@@ -31,4 +43,4 @@ Do the points in order. Do not add empty modules for a point that has not starte
 
 ## Discipline
 
-For each point: inspect the repo, implement the smallest complete vertical slice, run positive and negative tests, then update this file from evidence. Do not mark a point verified from documentation alone.
+For each point: implement the smallest complete slice, run positive and negative tests, then update this file from evidence. Do not mark a point verified from documentation alone.

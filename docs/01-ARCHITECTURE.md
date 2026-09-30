@@ -4,7 +4,7 @@
 
 ## Architectural goal and boundaries
 
-Provide the 23 BRIEF features with one straightforward, secure, maintainable web/API/database deployment. Keep clinic operations isolated, expose only published public data, and make appointment availability/creation correct under concurrent requests. Do not build hidden chat/Q&A/clinical/finance capabilities for possible future releases.
+Provide the current BRIEF features with one web application, one API, and one database. Keep each clinic's patients, cards, and totals private. A doctor account belongs to one clinic. Do not build reviews, ratings, chat, Q&A, an EHR, or payment collection.
 
 ```text
 Public / Patient / Doctor / Clinic / Platform browser views
@@ -30,14 +30,14 @@ A worker exists **only when needed by an approved outbound notification channel*
 | --- | --- | --- |
 | `identity` | User, login/session, basic role identity | None |
 | `clinics` | Clinic record/publication, clinic-admin membership, clinic verification state | `identity` IDs only |
-| `doctors` | Independent doctor profile, specialty, verification, one active clinic link (proposed) | `identity`, published `clinics` link |
+| `doctors` | Doctor profile bound to exactly one clinic and one login | `identity`, that clinic's id |
 | `catalog` | Named service and clinic offering/price | Published `clinics`, authorized `doctors` |
 | `scheduling` | Doctor working periods, basic unavailability, availability reads | Approved clinic/doctor, booking occupancy contract |
 | `appointments` | Appointment and status events; transactional occupied intervals | Doctor/schedule/offering/patient approved lookups |
-| `marketplace` | Public-only home/list/search/profile/rating projections | Only allowlisted published clinic/doctor/catalog/review contracts |
-| `reviews` | Eligible completed-visit clinic reviews and native rating aggregates | Appointments' eligibility interface, clinic published ID |
-| `notifications` | Basic booking-event intents, in-app recipient visibility, optional delivery | Appointment domain events or transactionally generated intents |
-| `platform-admin` | Clinic/doctor review decisions and safe overview counts | Restricted clinic/doctor approval interfaces |
+| `marketplace` | Public home, clinic list, doctor list, and profiles. Name order, no rating | Published clinic, doctor, and catalog fields only |
+| `clinic-operations` | Dashboard, patient list, client card, booking-price totals | This clinic's appointments and patient contacts only |
+| `notifications` | Basic booking-event intents, in-app recipient visibility | Appointment events created in the same transaction |
+| `platform-admin` | Clinic and doctor approval and safe counts | No patient contacts and no booking amounts |
 
 `identity`, `clinics`, `doctors` and `appointments` must expose narrow internal application interfaces. **No module may directly write another module's private data**, even within the monolith. Shared technical infrastructure (DB/HTTP/logging) is not a business module.
 
@@ -48,7 +48,7 @@ A worker exists **only when needed by an approved outbound notification channel*
 3. Published projections use explicit DTO allowlists, never full ORM rows; approval status is independently checked for clinic and doctor publication.
 4. Platform administrator permissions are narrow: verification and aggregate platform counts. There is no blanket permission to read patient notes, private contact histories or future medical records.
 5. Revoking a clinic-admin membership prevents later operations; session alone does not grant stale clinic rights.
-6. Working assumption for MVP is at most one active clinic link per doctor, subject to owner approval. Do **not** implement multi-clinic doctor affiliation with incomplete conflict control.
+6. A doctor user has one clinic. Reject a second clinic membership on that user. Accepted 2026-09-30.
 
 ## Core flows
 
@@ -64,11 +64,9 @@ A working `REQUESTED` booking **occupies** the offered interval, so a second req
 
 **Concurrency invariant:** two active appointments (`REQUESTED` or `CONFIRMED`) may not overlap for one doctor. Check at transaction time and enforce by suitable PostgreSQL constraints/locking. Do not rely solely on application-side `SELECT` or display cache. Deduplicate retries using actor-scoped idempotency keys.
 
-### Completion and ratings
+### Completion, patients, and totals
 
-`Clinic admin marks CONFIRMED appointment COMPLETED after genuine attendance → review eligibility projection returns true only for patient + appointment's clinic → patient may submit one clinic review → rating aggregate/directory ordering refreshes.`
-
-Do not automatically infer medical treatment, diagnosis or clinical data from operational completion. Review moderation should remove unlawful content under reviewed rules, not manipulate negative scores.
+`Clinic admin marks CONFIRMED appointment COMPLETED after attendance.` That status does not create a review or a medical note. The clinic patient list and client card show only this clinic's appointments. Financial totals sum this clinic's stored appointment prices. They do not collect money.
 
 ### Notifications
 
@@ -80,10 +78,10 @@ One web runtime, one stateless API runtime, one PostgreSQL primary, optional med
 
 ## Deferred architectural boundaries
 
-No live modules for multi-branch operations, cross-clinic doctor schedules, room/equipment booking, rescheduling, messaging, anonymous Q&A, payments, analytics warehouse, EHR or imaging. Future designs require a new approved scope + ADR, rather than speculative tables/endpoints in the current MVP.
+No modules for multi-branch operations, one doctor account at many clinics, reviews, ratings, room booking, rescheduling, messaging, anonymous Q&A, payment collection, an analytics warehouse, EHR, or imaging.
 
 ## Approval gates
 
 - Validate current repository and choose a compatible minimal topology instead of forcing an unnecessary rewrite.
-- Confirm one active clinic per doctor, manual clinic confirmation, cancellation cutoff, clinic review formula, identity/verification and notification channel before implementing dependent flows.
+- Doctor accounts, booking, notifications, and the removed review scope are decided in `DECISIONS.md` and `ADR-002`. Production host is still open.
 - Prove access controls, appointment concurrency and restore in staging; record evidence in `PROGRESS.md`.

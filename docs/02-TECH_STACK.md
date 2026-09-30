@@ -26,7 +26,7 @@ Do not install Redis/BullMQ, separate scheduler, realtime gateway, Elasticsearch
 
 ## Server and rendering boundaries
 
-- Public Next.js pages may be cached only for published/approved providers and native rating aggregates; clinic-admin, patient and doctor pages are never shared across identities.
+- Public Next.js pages may be cached only for published clinics and doctors. Clinic, patient, and doctor pages are never shared across identities. There is no rating cache.
 - API uses server-side DTO validation, safe error codes and current membership/record ownership on every protected request.
 - PostgreSQL enforces overlapping active doctor reservations under transaction-safe rules. Real DB concurrency tests are mandatory.
 - Store booking times in UTC and render against the clinic's approved time-zone value. Even one-clinic scheduling requires DST/offset correctness where applicable.
@@ -37,7 +37,7 @@ Do not install Redis/BullMQ, separate scheduler, realtime gateway, Elasticsearch
 ```text
 apps/web                 Next.js public + protected role layouts
 apps/api                 NestJS API with all 10 logical business owners
-PostgreSQL               identity, published data, scheduling, booking, review, notices
+PostgreSQL               identity, published data, scheduling, booking, clinic patients, notices
 public media             only if approved profile uploads are in scope
 notification worker      only if approved external delivery requires retries
 ```

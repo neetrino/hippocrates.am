@@ -13,12 +13,13 @@
 | ORM | Prisma 7. The first schema is identity, written when implementation starts | Accepted for local development, 2026-09-29 |
 | Login/session | Email and password. Argon2id. 12-hour absolute server session. Login 10/minute/IP. Register 5/10 minutes/IP | Accepted 2026-09-29. Security review required before production |
 | Booking state | `REQUESTED` occupies the slot; clinic sets `CONFIRMED`; patient or clinic may cancel `REQUESTED` or `CONFIRMED` with no cutoff and no auto-expiry | Accepted 2026-09-29 |
-| Doctor association | One active clinic per doctor for minimum MVP | Accepted 2026-09-29 |
+| Doctor account | One login, one clinic. A second clinic needs a second account | Accepted 2026-09-30 |
 | Clinic location | One operational location per clinic | Accepted 2026-09-29 |
-| Rating | Rated clinics by average, then count, then name. Unrated clinics last. One decimal and count. No invented score | Accepted 2026-09-29 |
+| Reviews and ratings | Removed. Clinic lists use name order | Accepted 2026-09-30 |
+| Clinic operations | Dashboard, patient list, operational client card, totals from appointment prices. No EHR and no payment collection | Accepted 2026-09-30 |
 | Notifications | In-app booking request, confirmation, and cancellation only. No email in this release | Accepted 2026-09-29 |
 | Redis, BullMQ, WebSocket, dedicated search | **Not a default minimum-MVP dependency** | Deferred |
-| Payments, chat, Q&A, clinical/CT systems | Not part of minimum MVP | Deferred |
+| Payments, chat, Q&A, clinical/CT systems | Payment collection, chat, Q&A, and clinical systems stay out. Booking-price totals are in | Deferred, except `MVP-27` |
 | Storage | Public profile images only when a store is approved. Verification evidence stays private and is not auto-deleted | Accepted as a rule, 2026-09-29. File vendor still open |
 | Hosting | Local web, local API, local PostgreSQL in Docker Compose | Accepted for development, 2026-09-29. Production vendor and region open |
 | Interface language | Armenian only | Accepted 2026-09-29 |
@@ -29,7 +30,7 @@
 - Public web pages are rendered from allowlisted **published-only** projections; protect private account/clinic data from shared caches and metadata.
 - Backend, not UI hiding, enforces roles, current clinic membership, doctor assignment, patient ownership and platform-verifier restrictions.
 - In PostgreSQL, double booking is blocked by transaction-time validation plus an enforceable concurrency strategy; optimistic UI availability is never sufficient.
-- `COMPLETED` is an operational visit status needed for review eligibility; it does not create a clinical history.
+- `COMPLETED` records attendance. It does not create a review or a clinical history.
 - No extra distributed service, event bus or separate application is installed solely to anticipate deferred functions.
 - Use one deployable API and database initially; scale only from measured need, with separate approved change.
 
@@ -48,8 +49,8 @@
 
 - Separate development, staging and production credentials/data; dev/staging use synthetic test patients.
 - HTTPS, safe cookies/CSRF/Origin as applicable, input validation, login and booking rate limits, least-privileged DB credentials and secret storage.
-- Audit clinic/doctor approval, membership/role changes, booking transitions and review moderation if applicable; redact user contact data from technical logs.
+- Audit clinic/doctor approval, membership changes, and booking transitions. Redact patient contact data from technical logs.
 - CI: reproducible install, format/lint, strict typecheck, automated tests and build; reviewed versioned migrations only.
-- Before real patient onboarding: cross-clinic authorization negative tests, concurrent booking tests, cancellation/review eligibility tests, staging walkthrough and a demonstrated backup restore.
+- Before real patient onboarding: cross-clinic authorization tests, a test that one doctor account cannot open a second clinic, concurrent booking tests, cancellation tests, staging walkthrough, and a demonstrated backup restore.
 
 **Authority:** functional details `BRIEF.md`; architecture `01-ARCHITECTURE.md`; specific technology choices `02-TECH_STACK.md`; progress `PROGRESS.md`; approvals `DECISIONS.md`.

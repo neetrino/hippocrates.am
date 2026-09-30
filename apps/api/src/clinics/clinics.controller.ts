@@ -1,0 +1,101 @@
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import { AppError } from "../common/app-error";
+import { emailOf, optionalString, passwordOf, recordOf, requiredString } from "../common/input";
+import { PrismaService } from "../infrastructure/prisma.service";
+import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
+import { Roles } from "../identity/auth.decorators";
+import { CurrentActor } from "../identity/current-actor";
+import { SessionService } from "../identity/session.service";
+
+@Controller()
+export class ClinicsController {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly sessions: SessionService,
+  ) {}
+
+  @Post("clinics")
+  @Roles("SUPER_ADMIN")
+  async createClinic(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ clinicId: string }> {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    const input = recordOf(body);
+    const email = emailOf(input.adminEmail);
+    const existing = await this.prisma.user.findUnique({ where: { email } });
+    if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
+    const passwordHash = await this.sessions.hashPassword(passwordOf(input.adminPassword));
+    const clinic = await this.prisma.$transaction(async (tx) => {
+      const admin = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          displayName: requiredString(input.adminName, "Ադմինի անուն"),
+          role: "ADMIN",
+        },
+      });
+      const created = await tx.clinic.create({
+        data: {
+          name: requiredString(input.name, "Կլինիկայի անուն"),
+          address: optionalString(input.address),
+          phone: optionalString(input.phone),
+          description: optionalString(input.description),
+          ownerId: admin.id,
+          published: true,
+        },
+      });
+      await tx.user.update({ where: { id: admin.id }, data: { clinicId: created.id } });
+      await tx.branch.create({
+        data: { clinicId: created.id, name: "Հիմնական", address: optionalString(input.address) },
+      });
+      return created;
+    });
+    return { clinicId: clinic.id };
+  }
+
+  @Patch("clinics/:clinicId")
+  @Roles("ADMIN")
+  async updateClinic(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Body() body: unknown,
+  ): Promise<{ id: string }> {
+    requireClinicAdmin(actor, clinicId);
+    const input = recordOf(body);
+    await this.prisma.clinic.update({
+      where: { id: clinicId },
+      data: {
+        name: typeof input.name === "string" ? input.name.trim() : undefined,
+        description: typeof input.description === "string" ? input.description.trim() : undefined,
+        address: typeof input.address === "string" ? input.address.trim() : undefined,
+        phone: typeof input.phone === "string" ? input.phone.trim() : undefined,
+        published: typeof input.published === "boolean" ? input.published : undefined,
+      },
+    });
+    return { id: clinicId };
+  }
+
+  @Post("clinics/:clinicId/branches")
+  @Roles("ADMIN")
+  async addBranch(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Body() body: unknown,
+  ): Promise<{ id: string }> {
+    requireClinicAdmin(actor, clinicId);
+    const input = recordOf(body);
+    const branch = await this.prisma.branch.create({
+      data: {
+        clinicId,
+        name: requiredString(input.name, "Մասնաճյուղ"),
+        address: optionalString(input.address),
+      },
+    });
+    return { id: branch.id };
+  }
+
+  @Get("clinics/:clinicId/branches")
+  @Roles("ADMIN")
+  async listBranches(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+    requireClinicAdmin(actor, clinicId);
+    return this.prisma.branch.findMany({ where: { clinicId }, orderBy: { name: "asc" } });
+  }
+}

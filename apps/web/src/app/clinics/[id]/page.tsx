@@ -24,7 +24,7 @@ export default async function ClinicPage({ params }: { params: Promise<{ id: str
     <div className="shell section">
       <div className="card">
         <div className="media">
-          <Photo src={clinic.coverUrl} alt={clinic.name} />
+          <Photo src={clinic.coverUrl} alt={clinic.name} loading="eager" />
         </div>
         <div className="card-body">
           <p className="eyebrow">{clinic.district}</p>

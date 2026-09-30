@@ -33,7 +33,9 @@ export default async function HomePage() {
         </div>
         {data.clinics.length === 0 ? <EmptyState>Հրապարակված կլինիկա դեռ չկա։</EmptyState> : null}
         <div className="grid-cards">
-          {data.clinics.map((clinic) => <ClinicTile key={clinic.id} clinic={clinic} />)}
+          {data.clinics.map((clinic, index) => (
+            <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
+          ))}
         </div>
       </section>
       <section className="section">

@@ -16,7 +16,9 @@ export default async function ClinicsPage({ searchParams }: { searchParams: Prom
       </form>
       {clinics.length === 0 ? <EmptyState>Այս անունով կլինիկա չկա։</EmptyState> : null}
       <div className="grid-cards">
-        {clinics.map((clinic) => <ClinicTile key={clinic.id} clinic={clinic} />)}
+        {clinics.map((clinic, index) => (
+          <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
+        ))}
       </div>
     </div>
   );

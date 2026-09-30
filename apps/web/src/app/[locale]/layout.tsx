@@ -14,14 +14,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "Hippocrates",
     description: t("description"),
-    alternates: {
-      languages: {
-        hy: "/",
-        en: "/en",
-        ru: "/ru",
-        "x-default": "/",
-      },
-    },
   };
 }
 

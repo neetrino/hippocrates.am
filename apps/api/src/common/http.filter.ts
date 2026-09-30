@@ -1,0 +1,30 @@
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from "@nestjs/common";
+import type { Request, Response } from "express";
+import { AppError } from "./app-error";
+
+@Catch()
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost): void {
+    const response = host.switchToHttp().getResponse<Response>();
+    const request = host.switchToHttp().getRequest<Request>();
+    const requestId = request.requestId ?? "unknown";
+    if (exception instanceof AppError) {
+      response.status(exception.status).json({
+        error: { code: exception.code, message: exception.message },
+        requestId,
+      });
+      return;
+    }
+    if (exception instanceof HttpException) {
+      response.status(exception.getStatus()).json({
+        error: { code: "HTTP_ERROR", message: exception.message },
+        requestId,
+      });
+      return;
+    }
+    response.status(500).json({
+      error: { code: "INTERNAL", message: "Ներքին սխալ" },
+      requestId,
+    });
+  }
+}

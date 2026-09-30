@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { publicGet } from "@/shared/public-api";
 
 type HomeData = {
@@ -13,7 +14,7 @@ export default async function HomePage() {
       <p className="muted">Գրանցվեք որպես պացիենտ և home-ից ընտրեք ցանկացած կլինիկա։</p>
       {data.clinics.map((clinic) => (
         <article className="card" key={clinic.id}>
-          <a href={`/clinics/${clinic.id}`}>{clinic.name}</a>
+          <Link href={`/clinics/${clinic.id}`}>{clinic.name}</Link>
           <p className="muted">{clinic.address}</p>
         </article>
       ))}

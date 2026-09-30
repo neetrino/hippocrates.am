@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 
 type Me = { role: string; displayName: string; clinicId: string | null };
 type Appointment = { id: string; startsAt: string; status: string; priceAmd: number };
@@ -22,8 +23,8 @@ export default async function MePage() {
     <section className="grid">
       <h1>{me.displayName}</h1>
       <p className="muted">{me.role}</p>
-      {me.role === "SUPER_ADMIN" ? <a href="/platform">Գրանցել կլինիկա</a> : null}
-      {me.role === "ADMIN" ? <a href="/clinic">Կլինիկայի վահանակ</a> : null}
+      {me.role === "SUPER_ADMIN" ? <Link href="/platform">Գրանցել կլինիկա</Link> : null}
+      {me.role === "ADMIN" ? <Link href="/clinic">Կլինիկայի վահանակ</Link> : null}
       {(appointments ?? []).map((item) => (
         <article className="card" key={item.id}>
           <p>{new Date(item.startsAt).toLocaleString("hy-AM")}</p>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata = {
@@ -11,12 +12,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="hy">
       <body>
         <header>
-          <a href="/">Hippocrates</a>
+          <Link href="/">Hippocrates</Link>
           <nav>
-            <a href="/register">Գրանցում</a>
-            <a href="/login">Մուտք</a>
-            <a href="/questions">Հարցեր</a>
-            <a href="/me">Իմ էջը</a>
+            <Link href="/register">Գրանցում</Link>
+            <Link href="/login">Մուտք</Link>
+            <Link href="/questions">Հարցեր</Link>
+            <Link href="/me">Իմ էջը</Link>
           </nav>
         </header>
         <main>{children}</main>

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "target": "ES2023",
     "lib": ["ES2023"],
     "strict": true,
@@ -16,6 +16,6 @@
     "declaration": false,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["src/**/*.spec.ts", "dist"]
 }

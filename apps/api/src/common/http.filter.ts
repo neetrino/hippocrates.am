@@ -1,12 +1,13 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from "@nestjs/common";
-import type { Request, Response } from "express";
+import type { Response } from "express";
+import type { AppRequest } from "../types/http";
 import { AppError } from "./app-error";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
-    const request = host.switchToHttp().getRequest<Request>();
+    const request = host.switchToHttp().getRequest<AppRequest>();
     const requestId = request.requestId ?? "unknown";
     if (exception instanceof AppError) {
       response.status(exception.status).json({

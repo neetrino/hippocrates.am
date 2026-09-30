@@ -1,5 +1,4 @@
 import "reflect-metadata";
-import "./types/express";
 import { NestFactory } from "@nestjs/core";
 import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";

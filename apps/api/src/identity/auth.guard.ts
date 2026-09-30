@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import type { Request } from "express";
 import { AppError } from "../common/app-error";
 import type { Role } from "../generated/prisma/client";
+import type { AppRequest } from "../types/http";
 import { SessionService } from "./session.service";
 
 export const IS_PUBLIC = "isPublic";
@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<AppRequest>();
     const actor = await this.sessions.actorFrom(request);
     if (actor) request.actor = actor;
     if (isPublic) return true;

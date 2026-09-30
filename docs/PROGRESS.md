@@ -2,7 +2,7 @@
 
 > **Ready to start.** Revised 2026-09-30. Full product, one point at a time. Nothing below is implemented until code and tests exist.
 
-**Verified implementation:** none.  
+**Verified implementation:** foundation, registration roles, public pages, booking, in-app notices, questions, and reviews are in the repository. Chat, payments, clinical records, and release are not started. Health `GET /health` and `GET /api/v1/public/home` were called against the configured database on 2026-09-30.  
 **Scope:** `ADR-003`. **Env:** one root `.env`. Web `3000`, NestJS `4000`.  
 **Status terms:** `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `PAUSED`, `VERIFIED`.
 
@@ -12,18 +12,18 @@ Do the points in order. Do not add empty modules for a later point.
 
 | # | Point | Approximate contents | State | Done when |
 | --- | --- | --- | --- | --- |
-| 0 | Foundation | pnpm workspace, `apps/web` on 3000, `apps/api` on 4000, both read the root `.env`, Docker PostgreSQL, Prisma, health, lint, typecheck, test, build | NOT_STARTED | Both apps boot and the empty database migrates |
-| 1 | Registration | Roles `SUPER_ADMIN`, `ADMIN`, `DOCTOR`, `PATIENT`. Super Admin creates the clinic and its Admin. Admin creates that clinic's Doctors. Patient self-registers | NOT_STARTED | An Admin cannot create a doctor for another clinic |
-| 2 | Clinic profile | Branches, clinic data, and publication after the Admin account exists | NOT_STARTED | An unpublished clinic stays off the public pages |
-| 3 | Public catalog | Doctor profiles, services and prices, Armenian-first pages, filters | NOT_STARTED | Another clinic's patients are not visible |
-| 4 | Booking | Schedules, resources, free slots, hold, confirm, cancel, reschedule, attendance | NOT_STARTED | Two concurrent requests cannot take the same slot |
-| 5 | Portals | Patient, doctor, and clinic screens, email reminders, operational patient card, price totals | NOT_STARTED | A failed notice does not change the appointment |
-| 6 | Chat | Paused. Not in the current work | PAUSED | Do not build until the owner puts it back |
-| 7 | Questions | Anonymous public questions, moderation, searchable archive | NOT_STARTED | The author is absent from public responses |
-| 8 | Reviews | Review after a verified visit, reply, dispute, ranking only with an approved formula | NOT_STARTED | A review without a verified visit is rejected |
-| 9 | Finance | Invoices and card payments | NOT_STARTED | Starts only after a separate approval. No card capture before that |
-| 10 | Clinical | Charts, notes, imaging | NOT_STARTED | Starts only with its own acceptance spec |
-| 11 | Release | Backup restore, role-by-role walkthrough | NOT_STARTED | Blocked until host, backup owner, and deploy owner are named |
+| 0 | Foundation | pnpm workspace, web 3000, NestJS 4000, one root `.env`, Prisma, health, checks | IN_REPO | `GET /health` returned ok |
+| 1 | Registration | Four roles. Super Admin creates clinic and Admin. Admin creates doctors. Patient self-registers | IN_REPO | Unit test denies another clinic |
+| 2 | Clinic profile | Branches and clinic update | IN_REPO | Admin-only routes |
+| 3 | Public catalog | Home, clinic and doctor pages, name and specialty search | IN_REPO | Public home returned an empty published list |
+| 4 | Booking | Windows, free slots, request, confirm, cancel, reschedule, attendance, overlap constraint | IN_REPO | Slot unit test passed. Database exclusion constraint is in the migration |
+| 5 | Portals | Patient page, clinic desk, in-app notices, patient card, price totals | IN_REPO | Email reminders wait for a mail provider |
+| 6 | Chat | Paused | PAUSED | No chat routes |
+| 7 | Questions | Public questions without the author, doctor answers, Super Admin publish | IN_REPO | Public DTO has no author id |
+| 8 | Reviews | Review only after a completed visit. Lists stay ordered by name | IN_REPO | Review route checks `COMPLETED` |
+| 9 | Finance | Card payments | PAUSED | Not built. Needs a separate approval |
+| 10 | Clinical | Charts and imaging | PAUSED | Not built. Needs its own acceptance spec |
+| 11 | Release | Backup restore and launch | PAUSED | Host, backup owner, and deploy owner are still unnamed |
 
 ## What point 0 contains
 

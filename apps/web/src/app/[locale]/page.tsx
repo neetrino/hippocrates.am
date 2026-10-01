@@ -21,7 +21,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <div className="shell">
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">{t("eyebrow")}</p>
           <h1>{t("title")}</h1>
           <p className="lede">{t("lede")}</p>
           <form className="search" action={action}>

@@ -83,7 +83,7 @@ export function RegisterForm() {
           />
         </label>
       </div>
-      <PhoneField label={t("phone")} />
+      <PhoneField label={t("phone")} variant="auth" />
       <label className={fieldClass}>
         {t("email")}
         <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" className={inputClass} />

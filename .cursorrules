@@ -1,0 +1,31 @@
+# Commit messages (Cursor Generate Commit Message + Agent)
+
+When generating a Git commit message for this repository, ALWAYS use Conventional Commits.
+
+Format (one short subject line, no trailing period):
+
+```text
+type(scope): summary
+```
+
+Types: feat, fix, refactor, style, docs, test, chore, perf, ci
+
+Scope when clear: web, api, portal, auth, clinics, i18n
+
+Examples:
+
+```text
+feat(portal): add Super Admin clinics live search
+fix(auth): block letters in phone input
+style(portal): match Search and Add Clinic button widths
+refactor(web): extract PortalClinicsPanel
+chore: tighten commit message conventions
+```
+
+Rules:
+
+- Prefer this format even if recent `git log` messages are long essays.
+- Do NOT write multi-sentence subjects like "Refactor X by doing Y, enhancing Z..."
+- Subject under ~72 characters, imperative mood.
+- Optional short body only when needed; never restate the diff file-by-file.
+- Project has `.commitlintrc.json` extending `@commitlint/config-conventional` — messages must pass that style.

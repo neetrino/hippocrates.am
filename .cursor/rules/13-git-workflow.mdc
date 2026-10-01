@@ -15,6 +15,8 @@ alwaysApply: true
 
 Use **Conventional Commits**. Short subject, imperative mood, no trailing period.
 
+**Precedence:** this rule and root `.cursorrules` override historical `git log` style. Recent commits may be long prose — do **not** copy that pattern. The repo uses `.commitlintrc.json` (`@commitlint/config-conventional`).
+
 ### Format
 
 ```text

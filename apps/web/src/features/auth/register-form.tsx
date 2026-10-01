@@ -75,13 +75,15 @@ export function RegisterForm() {
           <input
             name="phone"
             type="tel"
-            inputMode="numeric"
-            pattern="[0-9]+"
-            placeholder="37491123456"
+            inputMode="tel"
+            pattern="\+[0-9]+"
+            placeholder="+37491123456"
+            defaultValue="+"
             required
             autoComplete="tel"
             onInput={(event) => {
-              event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "");
+              const digits = event.currentTarget.value.replace(/\D/g, "");
+              event.currentTarget.value = `+${digits}`;
             }}
           />
         </label>

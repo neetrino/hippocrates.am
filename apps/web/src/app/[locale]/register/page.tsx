@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { prepareLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
-import { JsonForm } from "@/shared/json-form";
+import { RegisterForm } from "@/features/auth/register-form";
 
 export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -25,16 +25,7 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
           <h1>{t("registerTitle")}</h1>
           <p className="muted">{t("registerHint")}</p>
         </div>
-        <JsonForm
-          action="/auth/register"
-          label={t("registerAction")}
-          next="/"
-          fields={[
-            { name: "displayName", label: t("displayName"), placeholder: "John Doe" },
-            { name: "email", label: t("email"), type: "email", placeholder: "john.doe@email.com" },
-            { name: "password", label: t("password"), type: "password", placeholder: "••••••••" },
-          ]}
-        />
+        <RegisterForm />
         <div className="auth-switch">
           <p className="muted">{t("hasAccount")}</p>
           <Link href="/login" className="btn btn-ghost btn-block">{t("goLogin")}</Link>

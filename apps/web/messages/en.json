@@ -106,7 +106,12 @@
     "noAccount": "Don't have an account?",
     "goRegister": "Create account",
     "hasAccount": "Already have an account?",
-    "goLogin": "Sign in"
+    "goLogin": "Sign in",
+    "name": "Name",
+    "surname": "Surname",
+    "phone": "Phone number",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match"
   },
   "me": {
     "signIn": "Sign in to see your page.",

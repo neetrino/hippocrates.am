@@ -26,14 +26,22 @@ export class AuthController {
   ): Promise<{ id: string }> {
     this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
     const input = recordOf(body);
+    const name = requiredString(input.name ?? input.displayName, "Անուն");
+    const surname = requiredString(input.surname, "Ազգանուն");
+    const phone = requiredString(input.phone, "Հեռախոս");
     const email = emailOf(input.email);
     const password = passwordOf(input.password);
-    const displayName = requiredString(input.displayName, "Անուն");
+    const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը");
+    if (password !== confirmPassword) {
+      throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
+    }
+    const displayName = `${name} ${surname}`.replace(/\s+/g, " ").trim();
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
     const user = await this.prisma.user.create({
       data: {
         email,
+        phone,
         displayName,
         passwordHash: await this.sessions.hashPassword(password),
         role: "PATIENT",

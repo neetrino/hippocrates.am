@@ -542,12 +542,24 @@ h2 { font-size: 1.45rem; }
   margin-top: 4px;
 }
 
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .auth-switch {
   display: grid;
   gap: 10px;
   padding-top: 8px;
   border-top: 1px solid var(--line);
   text-align: center;
+}
+
+@media (max-width: 520px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .auth-switch .muted { margin: 0; }

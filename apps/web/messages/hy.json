@@ -136,6 +136,20 @@
     "sendReview": "Ուղարկել կարծիք",
     "reviewFailed": "Կարծիքը չպահվեց"
   },
+  "portal": {
+    "subtitle": "Կառավարման պորտալ",
+    "navLabel": "Հարթակի բաժիններ",
+    "accountNav": "Հաշվի բաժիններ",
+    "dashboard": "Վահանակ",
+    "openMenu": "Բացել մենյուն",
+    "closeMenu": "Փակել մենյուն",
+    "statVisits": "Այցեր",
+    "statNotices": "Ծանուցումներ",
+    "quickAction": "Արագ գործողություն",
+    "registerHint": "Ստեղծեք կլինիկա և դրա ադմին հաշիվը։",
+    "sectionCount": "{count}",
+    "emptyVisits": "Այցեր դեռ չկան։"
+  },
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",
     "title": "Կլինիկայի վահանակ",

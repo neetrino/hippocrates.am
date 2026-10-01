@@ -136,6 +136,20 @@
     "sendReview": "Отправить отзыв",
     "reviewFailed": "Отзыв не сохранился"
   },
+  "portal": {
+    "subtitle": "Портал управления",
+    "navLabel": "Разделы платформы",
+    "accountNav": "Разделы аккаунта",
+    "dashboard": "Панель",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню",
+    "statVisits": "Визиты",
+    "statNotices": "Уведомления",
+    "quickAction": "Быстрое действие",
+    "registerHint": "Создайте клинику и аккаунт её админа.",
+    "sectionCount": "{count}",
+    "emptyVisits": "Визитов пока нет."
+  },
   "desk": {
     "denied": "Эта страница для админа клиники.",
     "title": "Панель клиники",

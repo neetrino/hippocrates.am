@@ -136,6 +136,20 @@
     "sendReview": "Send review",
     "reviewFailed": "The review was not saved"
   },
+  "portal": {
+    "subtitle": "Management portal",
+    "navLabel": "Platform sections",
+    "accountNav": "Account sections",
+    "dashboard": "Dashboard",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "statVisits": "Visits",
+    "statNotices": "Notices",
+    "quickAction": "Quick action",
+    "registerHint": "Create a clinic and its admin account.",
+    "sectionCount": "{count}",
+    "emptyVisits": "No visits yet."
+  },
   "desk": {
     "denied": "This page is for the clinic admin.",
     "title": "Clinic desk",

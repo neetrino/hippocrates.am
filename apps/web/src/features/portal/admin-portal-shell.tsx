@@ -152,7 +152,12 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
 
   useEffect(() => {
     function syncHash(): void {
-      setHash(window.location.hash || "");
+      const nextHash = window.location.hash || "";
+      setHash(nextHash);
+      if (!nextHash) return;
+      const id = nextHash.slice(1);
+      const target = document.getElementById(id);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     syncHash();
     window.addEventListener("hashchange", syncHash);

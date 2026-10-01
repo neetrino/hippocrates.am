@@ -119,10 +119,23 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .nav-links a:hover { color: var(--ink); }
 
-.btn-header {
-  padding: 12px 20px;
-  font-size: 0.98rem;
+.auth-trigger {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
   box-shadow: 0 10px 22px rgba(10, 186, 181, 0.22);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.auth-trigger svg { width: 20px; height: 20px; }
+
+.auth-trigger:hover {
+  background: #099e9a;
+  box-shadow: 0 12px 24px rgba(10, 186, 181, 0.28);
 }
 
 .locale-switch { position: relative; }

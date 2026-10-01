@@ -5,8 +5,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { cn } from "@/shared/ui/cn";
+import { LocaleFlag } from "@/shared/ui/locale-flag";
 
-const labels: Record<AppLocale, string> = { hy: "Հայ", en: "EN", ru: "РУ" };
+const labels: Record<AppLocale, string> = { hy: "HY", en: "EN", ru: "RU" };
 
 /** Drop a leading locale segment if present so switches never stack prefixes. */
 function localeNeutralPath(pathname: string): string {
@@ -86,9 +87,10 @@ export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
               aria-current={item === locale ? "true" : undefined}
               replace
               onClick={() => setOpen(false)}
-              className="rounded-[10px] px-3.5 py-2.5 text-[0.95rem] font-semibold hover:bg-accent-soft hover:text-accent aria-[current=true]:bg-accent-soft aria-[current=true]:text-accent"
+              className="inline-flex min-h-10 w-full items-center gap-2.5 rounded-[10px] px-3.5 py-2 font-sans text-[0.88rem] font-semibold tracking-[0.08em] text-ink uppercase hover:bg-accent-soft hover:text-accent aria-[current=true]:bg-accent-soft aria-[current=true]:text-accent"
             >
-              {labels[item]}
+              <LocaleFlag locale={item} />
+              <span className="leading-none">{labels[item]}</span>
             </Link>
           ))}
         </div>

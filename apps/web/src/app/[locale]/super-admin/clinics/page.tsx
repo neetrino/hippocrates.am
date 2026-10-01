@@ -32,7 +32,7 @@ export default async function PortalClinicsPage({
       <div className="grid gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <form
-            className="flex min-w-0 flex-1 gap-2 rounded-full border border-line bg-white p-2 shadow-soft focus-within:border-accent/45 focus-within:shadow-[0_14px_36px_rgba(0,167,157,0.12)] max-md:w-full max-md:flex-col max-md:rounded-[18px]"
+            className="min-w-0 flex-1 rounded-full border border-line bg-white shadow-soft focus-within:border-accent/45 focus-within:shadow-[0_14px_36px_rgba(0,167,157,0.12)] max-md:w-full"
             action={getPathname({ locale, href: "/super-admin/clinics" })}
           >
             <input
@@ -40,14 +40,8 @@ export default async function PortalClinicsPage({
               defaultValue={name ?? ""}
               placeholder={common("name")}
               aria-label={t("clinicName")}
-              className="min-w-0 flex-1 border-0 bg-transparent px-4 py-3 outline-none"
+              className="w-full min-w-0 border-0 bg-transparent px-5 py-3.5 outline-none"
             />
-            <button
-              className="inline-flex h-12 w-[10.5rem] shrink-0 grow-0 cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-4 text-sm font-semibold text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:w-full"
-              type="submit"
-            >
-              {common("search")}
-            </button>
           </form>
           <AddClinicSheet
             addLabel={portal("addClinic")}

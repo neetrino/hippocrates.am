@@ -49,17 +49,17 @@ export function DoctorTile({ doctor }: { doctor: DoctorCard }) {
           alt={doctor.user.displayName}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 380px"
         />
-        <div className="absolute inset-x-3 bottom-3 flex items-end gap-3 rounded-[22px] border border-white/55 bg-white/58 p-3.5 shadow-[0_10px_28px_rgba(20,36,40,0.08)] backdrop-blur-md transition-[background,border-color] duration-300 group-hover:border-white/70 group-hover:bg-white/68 max-md:inset-x-2.5 max-md:bottom-2.5 max-md:rounded-[18px] max-md:p-3">
+        <div className="absolute inset-x-3.5 bottom-3.5 flex items-center gap-3 rounded-[20px] border border-white/50 bg-white/42 px-4 py-3.5 shadow-[0_12px_30px_rgba(20,36,40,0.1)] backdrop-blur-xl transition-[background,border-color,transform] duration-300 group-hover:border-white/65 group-hover:bg-white/55 max-md:inset-x-2.5 max-md:bottom-2.5 max-md:rounded-[18px] max-md:px-3 max-md:py-3">
           <div className="min-w-0 flex-1">
-            <strong className="block font-display text-[1.12rem] leading-snug tracking-[-0.01em] font-semibold text-ink">
+            <strong className="block font-display text-[1.15rem] leading-snug tracking-[-0.01em] font-semibold text-ink">
               {doctor.user.displayName}
             </strong>
-            <p className="m-0 mt-1 text-[0.92rem] leading-snug text-muted">{doctor.specialty}</p>
-            <p className="m-0 mt-1 truncate text-[0.8rem] font-medium tracking-[0.01em] text-accent">
+            <p className="m-0 mt-1 text-[0.9rem] leading-snug text-muted">{doctor.specialty}</p>
+            <p className="m-0 mt-1 truncate text-[0.78rem] font-semibold tracking-[0.02em] text-accent">
               {doctor.clinic.name}
             </p>
           </div>
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-white transition-[background,transform] duration-300 group-hover:bg-accent group-hover:scale-105">
+          <span className="grid h-11 w-11 shrink-0 place-items-center self-end rounded-full bg-ink text-white transition-[background,transform] duration-300 group-hover:bg-accent group-hover:scale-105">
             <ArrowUpRightIcon />
           </span>
         </div>

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import type { Request, Response } from "express";
 import { AppError } from "../common/app-error";
-import { emailOf, passwordOf, recordOf, requiredString } from "../common/input";
+import { emailOf, passwordOf, personNameOf, recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import type { Actor } from "./access";
 import { Public } from "./auth.decorators";
@@ -26,8 +26,8 @@ export class AuthController {
   ): Promise<{ id: string }> {
     this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
     const input = recordOf(body);
-    const name = requiredString(input.name ?? input.displayName, "Անուն");
-    const surname = requiredString(input.surname, "Ազգանուն");
+    const name = personNameOf(input.name ?? input.displayName, "Անուն");
+    const surname = personNameOf(input.surname, "Ազգանուն");
     const phoneRaw = requiredString(input.phone, "Հեռախոս");
     const phone = phoneRaw.replace(/\D/g, "");
     if (phone.length < 8) {

@@ -23,6 +23,16 @@ export function passwordOf(value: unknown): string {
   return password;
 }
 
+/** Letters only, any Unicode script (hy, en, ru, ...). */
+export function personNameOf(value: unknown, field: string): string {
+  const raw = requiredString(value, field);
+  const name = raw.replace(/[^\p{L}]/gu, "");
+  if (name.length < 1 || !/^[\p{L}]+$/u.test(name)) {
+    throw new AppError("VALIDATION_FAILED", 400, `${field} կարող է պարունակել միայն տառեր`);
+  }
+  return name;
+}
+
 export function intOf(value: unknown, field: string, min: number, max: number): number {
   const number = typeof value === "number" ? value : Number(value);
   if (!Number.isInteger(number) || number < min || number > max) {

@@ -44,11 +44,29 @@ export function RegisterForm() {
       <div className="field-row">
         <label className="field">
           {t("name")}
-          <input name="name" type="text" placeholder="John" required autoComplete="given-name" />
+          <input
+            name="name"
+            type="text"
+            placeholder="John"
+            required
+            autoComplete="given-name"
+            onInput={(event) => {
+              event.currentTarget.value = event.currentTarget.value.replace(/[^\p{L}]/gu, "");
+            }}
+          />
         </label>
         <label className="field">
           {t("surname")}
-          <input name="surname" type="text" placeholder="Doe" required autoComplete="family-name" />
+          <input
+            name="surname"
+            type="text"
+            placeholder="Doe"
+            required
+            autoComplete="family-name"
+            onInput={(event) => {
+              event.currentTarget.value = event.currentTarget.value.replace(/[^\p{L}]/gu, "");
+            }}
+          />
         </label>
       </div>
       <div className="field-row">

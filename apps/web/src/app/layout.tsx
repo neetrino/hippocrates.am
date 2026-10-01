@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getLocale } from "next-intl/server";
 import { Noto_Sans, Noto_Sans_Armenian } from "next/font/google";
+import { getSiteUrl } from "@/shared/site-url";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
+};
 
 const sans = Noto_Sans({
   subsets: ["latin", "cyrillic"],

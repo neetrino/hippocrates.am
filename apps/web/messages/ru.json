@@ -58,7 +58,11 @@
     "emptyClinicSearch": "Клиники с таким названием нет.",
     "doctorsTitle": "Врачи",
     "doctorName": "Имя врача",
+    "doctorSearchPlaceholder": "Поиск по имени...",
     "specialty": "Специальность",
+    "openFilters": "Открыть фильтры",
+    "resetFilters": "Сбросить фильтры",
+    "applyFilters": "Применить фильтры",
     "emptyDoctorSearch": "По этому запросу врачей нет."
   },
   "clinicPage": {

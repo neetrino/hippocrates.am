@@ -58,7 +58,11 @@
     "emptyClinicSearch": "Այս անունով կլինիկա չկա։",
     "doctorsTitle": "Բժիշկներ",
     "doctorName": "Բժշկի անուն",
+    "doctorSearchPlaceholder": "Փնտրել անունով...",
     "specialty": "Մասնագիտություն",
+    "openFilters": "Բացել ֆիլտրերը",
+    "resetFilters": "Մաքրել ֆիլտրերը",
+    "applyFilters": "Կիրառել ֆիլտրերը",
     "emptyDoctorSearch": "Այս փնտրմամբ բժիշկ չկա։"
   },
   "clinicPage": {

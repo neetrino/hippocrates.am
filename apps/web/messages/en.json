@@ -58,7 +58,11 @@
     "emptyClinicSearch": "No clinic matches this name.",
     "doctorsTitle": "Doctors",
     "doctorName": "Doctor name",
+    "doctorSearchPlaceholder": "Search by name...",
     "specialty": "Specialty",
+    "openFilters": "Open filters",
+    "resetFilters": "Reset filters",
+    "applyFilters": "Apply filters",
     "emptyDoctorSearch": "No doctor matches this search."
   },
   "clinicPage": {

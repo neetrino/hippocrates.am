@@ -52,7 +52,7 @@ export default async function DoctorsPage({
         </button>
       </form>
       {doctors.length === 0 ? <EmptyState>{t("emptyDoctorSearch")}</EmptyState> : null}
-      <div className="grid gap-4 max-md:gap-3 md:grid-cols-3">
+      <div className="grid gap-5 max-md:gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
         {doctors.map((doctor) => <DoctorTile key={doctor.id} doctor={doctor} />)}
       </div>
     </div>

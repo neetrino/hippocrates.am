@@ -141,13 +141,20 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
             }}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative z-1 rounded-full px-[18px] py-2.5 text-[0.98rem] font-medium tracking-[0.01em] transition-[color,text-decoration-color,font-weight] duration-300",
-              active
-                ? "font-semibold text-accent underline decoration-accent decoration-2 underline-offset-[7px]"
-                : "text-muted hover:text-accent",
+              "relative z-1 grid h-11 place-items-center rounded-full px-[18px] text-[0.98rem] font-medium tracking-[0.01em] transition-[color,font-weight] duration-300",
+              active ? "font-semibold text-accent" : "text-muted hover:text-accent",
             )}
           >
-            {item.label}
+            <span className="relative leading-none">
+              {item.label}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "absolute top-[calc(100%+3px)] right-0 left-0 h-0.5 rounded-full",
+                  active ? "bg-accent" : "bg-transparent",
+                )}
+              />
+            </span>
           </Link>
         );
       })}

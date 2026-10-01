@@ -116,7 +116,7 @@ export function AddClinicSheet({
     <>
       <button
         type="button"
-        className="inline-flex w-[10.5rem] shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border-0 bg-accent px-4 py-3 text-sm font-semibold whitespace-nowrap text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:w-full"
+        className="inline-flex h-12 w-[10.5rem] shrink-0 grow-0 cursor-pointer items-center justify-center gap-2 rounded-full border-0 bg-accent px-4 text-sm font-semibold whitespace-nowrap text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:w-full"
         onClick={open}
       >
         <RegisterClinicIcon className="h-4 w-4" />

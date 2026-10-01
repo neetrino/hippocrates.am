@@ -43,7 +43,7 @@ export default async function PortalClinicsPage({
               className="min-w-0 flex-1 border-0 bg-transparent px-4 py-3 outline-none"
             />
             <button
-              className="inline-flex w-[10.5rem] shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent max-md:w-full"
+              className="inline-flex h-12 w-[10.5rem] shrink-0 grow-0 cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-4 text-sm font-semibold text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:w-full"
               type="submit"
             >
               {common("search")}

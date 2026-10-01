@@ -98,18 +98,31 @@ export function SiteNav({
     { href: "/questions" as const, label: questions },
   ];
 
+  function isActivePath(href: string): boolean {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
     <div className="contents">
       <nav className="justify-self-center gap-1.5 rounded-full border border-line bg-[#f5fafa] p-1.5 max-md:hidden md:flex md:items-center">
-        {links.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="rounded-full px-[18px] py-2.5 text-[0.98rem] font-medium tracking-[0.01em] text-muted transition-colors duration-160 hover:bg-white hover:text-accent hover:shadow-[0_4px_14px_rgba(0,167,157,0.1)]"
-          >
-            {item.label}
-          </Link>
-        ))}
+        {links.map((item) => {
+          const active = isActivePath(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "rounded-full px-[18px] py-2.5 text-[0.98rem] font-medium tracking-[0.01em] transition-[color,background,box-shadow,text-decoration-color] duration-160",
+                active
+                  ? "bg-white font-semibold text-accent underline decoration-accent decoration-2 underline-offset-[7px] shadow-[0_4px_14px_rgba(0,167,157,0.12)]"
+                  : "text-muted hover:bg-white hover:text-accent hover:shadow-[0_4px_14px_rgba(0,167,157,0.1)]",
+              )}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
       <div className="flex items-center justify-self-end gap-2.5 max-md:gap-2">
         <LocaleSwitch hideOnMobile />
@@ -170,16 +183,25 @@ export function SiteNav({
                 </div>
                 <div className="grid gap-[22px] rounded-[28px] bg-white px-[22px] pt-7 pb-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
                   <nav className="grid gap-1">
-                    {links.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        className="rounded-xl px-1.5 py-3.5 text-[1.35rem] font-semibold tracking-[-0.02em] text-ink active:bg-accent-soft active:text-accent"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                    {links.map((item) => {
+                      const active = isActivePath(item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "rounded-xl px-1.5 py-3.5 text-[1.35rem] font-semibold tracking-[-0.02em] transition-colors duration-160",
+                            active
+                              ? "bg-accent-soft text-accent underline decoration-accent decoration-2 underline-offset-[6px]"
+                              : "text-ink active:bg-accent-soft active:text-accent",
+                          )}
+                        >
+                          {item.label}
+                        </Link>
+                      );
+                    })}
                   </nav>
                   <div className="grid gap-2.5 border-t border-line pt-[18px]">
                     <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">{t("language")}</p>

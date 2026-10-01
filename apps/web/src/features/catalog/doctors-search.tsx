@@ -1,14 +1,22 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { MultiSelectFilter } from "@/features/catalog/multi-select-filter";
 import { cn } from "@/shared/ui/cn";
+
+export type DoctorFilterOptions = {
+  specialties: string[];
+  cities: string[];
+  clinics: string[];
+};
 
 type DoctorsSearchProps = {
   action: string;
   initialName: string;
-  initialSpecialty: string;
-  initialCity: string;
-  initialClinic: string;
+  initialSpecialty: string[];
+  initialCity: string[];
+  initialClinic: string[];
+  options: DoctorFilterOptions;
   labels: {
     namePlaceholder: string;
     nameAria: string;
@@ -18,6 +26,7 @@ type DoctorsSearchProps = {
     openFilters: string;
     resetFilters: string;
     applyFilters: string;
+    selectedCount: string;
   };
 };
 
@@ -43,50 +52,21 @@ function FilterIcon() {
   );
 }
 
-const fieldClass = "grid gap-1.5 text-[0.86rem] font-semibold text-ink";
-const controlClass =
-  "rounded-xl border border-line bg-white px-3.5 py-3 text-[0.95rem] font-normal text-ink outline-none placeholder:text-[#9aa6a5] focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)]";
-
-function FilterField({
-  label,
-  name,
-  defaultValue,
-  inputRef,
-}: {
-  label: string;
-  name: string;
-  defaultValue: string;
-  inputRef: RefObject<HTMLInputElement | null>;
-}) {
-  return (
-    <label className={fieldClass}>
-      <span>{label}</span>
-      <input
-        ref={inputRef}
-        name={name}
-        defaultValue={defaultValue}
-        placeholder={label}
-        aria-label={label}
-        className={controlClass}
-      />
-    </label>
-  );
-}
-
 export function DoctorsSearch({
   action,
   initialName,
   initialSpecialty,
   initialCity,
   initialClinic,
+  options,
   labels,
 }: DoctorsSearchProps) {
-  const hasActiveFilter = Boolean(initialSpecialty || initialCity || initialClinic);
+  const [specialty, setSpecialty] = useState(initialSpecialty);
+  const [city, setCity] = useState(initialCity);
+  const [clinic, setClinic] = useState(initialClinic);
+  const hasActiveFilter = specialty.length > 0 || city.length > 0 || clinic.length > 0;
   const [filtersOpen, setFiltersOpen] = useState(hasActiveFilter);
   const formRef = useRef<HTMLFormElement>(null);
-  const specialtyRef = useRef<HTMLInputElement>(null);
-  const cityRef = useRef<HTMLInputElement>(null);
-  const clinicRef = useRef<HTMLInputElement>(null);
   const panelId = useId();
 
   useEffect(() => {
@@ -99,19 +79,25 @@ export function DoctorsSearch({
   }, [filtersOpen]);
 
   function resetFilters(): void {
-    if (specialtyRef.current) specialtyRef.current.value = "";
-    if (cityRef.current) cityRef.current.value = "";
-    if (clinicRef.current) clinicRef.current.value = "";
-    formRef.current?.requestSubmit();
+    setSpecialty([]);
+    setCity([]);
+    setClinic([]);
+    // Submit on next tick so hidden inputs reflect cleared state.
+    queueMicrotask(() => formRef.current?.requestSubmit());
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>): void {
     const form = event.currentTarget;
     for (const element of Array.from(form.elements)) {
       if (!(element instanceof HTMLInputElement)) continue;
-      if (!element.name || element.value.trim()) continue;
+      if (!element.name || element.type === "hidden") continue;
+      if (element.value.trim()) continue;
       element.disabled = true;
     }
+  }
+
+  function selectedCountLabel(count: number): string {
+    return labels.selectedCount.replace("{count}", String(count));
   }
 
   return (
@@ -151,19 +137,33 @@ export function DoctorsSearch({
         hidden={!filtersOpen}
         className="rounded-[18px] border border-line bg-white p-4 shadow-soft max-md:p-3.5"
       >
-        <div className="grid gap-3 md:grid-cols-3">
-          <FilterField
+        <div className="grid gap-3 md:grid-cols-3 md:items-start">
+          <MultiSelectFilter
             label={labels.specialty}
             name="specialty"
-            defaultValue={initialSpecialty}
-            inputRef={specialtyRef}
+            options={options.specialties}
+            selected={specialty}
+            onChange={setSpecialty}
+            placeholder={labels.specialty}
+            selectedCountLabel={selectedCountLabel}
           />
-          <FilterField label={labels.city} name="city" defaultValue={initialCity} inputRef={cityRef} />
-          <FilterField
+          <MultiSelectFilter
+            label={labels.city}
+            name="city"
+            options={options.cities}
+            selected={city}
+            onChange={setCity}
+            placeholder={labels.city}
+            selectedCountLabel={selectedCountLabel}
+          />
+          <MultiSelectFilter
             label={labels.clinic}
             name="clinic"
-            defaultValue={initialClinic}
-            inputRef={clinicRef}
+            options={options.clinics}
+            selected={clinic}
+            onChange={setClinic}
+            placeholder={labels.clinic}
+            selectedCountLabel={selectedCountLabel}
           />
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">

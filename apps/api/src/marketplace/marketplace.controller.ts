@@ -42,6 +42,12 @@ function doctorView<T extends DoctorRow>(doctor: T) {
   return { ...rest, photoUrl: publicAssetUrl(photoKey) };
 }
 
+function parseMultiQuery(value?: string | string[]): string[] {
+  if (!value) return [];
+  const parts = Array.isArray(value) ? value.flatMap((item) => item.split(",")) : value.split(",");
+  return [...new Set(parts.map((item) => item.trim()).filter(Boolean))];
+}
+
 @Controller("public")
 export class MarketplaceController {
   constructor(private readonly prisma: PrismaService) {}
@@ -116,39 +122,56 @@ export class MarketplaceController {
   }
 
   @Public()
+  @Get("doctor-filters")
+  async doctorFilters() {
+    const [specialtyRows, clinicRows] = await Promise.all([
+      this.prisma.doctorProfile.findMany({
+        where: { published: true, clinic: { published: true } },
+        distinct: ["specialty"],
+        orderBy: { specialty: "asc" },
+        select: { specialty: true },
+      }),
+      this.prisma.clinic.findMany({
+        where: { published: true },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, district: true },
+      }),
+    ]);
+    const cities = [
+      ...new Set(clinicRows.map((clinic) => clinic.district.trim()).filter(Boolean)),
+    ].sort((a, b) => a.localeCompare(b, "hy"));
+    return {
+      specialties: specialtyRows.map((row) => row.specialty).filter(Boolean),
+      cities,
+      clinics: clinicRows.map((clinic) => ({ id: clinic.id, name: clinic.name })),
+    };
+  }
+
+  @Public()
   @Get("doctors")
   async doctors(
     @Query("name") name?: string,
-    @Query("specialty") specialty?: string,
-    @Query("city") city?: string,
-    @Query("clinic") clinic?: string,
+    @Query("specialty") specialty?: string | string[],
+    @Query("city") city?: string | string[],
+    @Query("clinic") clinic?: string | string[],
   ) {
+    const specialties = parseMultiQuery(specialty);
+    const cities = parseMultiQuery(city);
+    const clinics = parseMultiQuery(clinic);
+
     const clinicFilter: {
       published: true;
-      name?: { contains: string; mode: "insensitive" };
-      OR?: Array<
-        | { district: { contains: string; mode: "insensitive" } }
-        | { address: { contains: string; mode: "insensitive" } }
-      >;
+      name?: { in: string[] };
+      district?: { in: string[] };
     } = { published: true };
-    if (clinic?.trim()) {
-      clinicFilter.name = { contains: clinic.trim(), mode: "insensitive" };
-    }
-    if (city?.trim()) {
-      const cityQuery = city.trim();
-      clinicFilter.OR = [
-        { district: { contains: cityQuery, mode: "insensitive" } },
-        { address: { contains: cityQuery, mode: "insensitive" } },
-      ];
-    }
+    if (clinics.length > 0) clinicFilter.name = { in: clinics };
+    if (cities.length > 0) clinicFilter.district = { in: cities };
 
     const rows = await this.prisma.doctorProfile.findMany({
       where: {
         published: true,
         clinic: clinicFilter,
-        specialty: specialty?.trim()
-          ? { contains: specialty.trim(), mode: "insensitive" }
-          : undefined,
+        specialty: specialties.length > 0 ? { in: specialties } : undefined,
         user: name?.trim()
           ? { displayName: { contains: name.trim(), mode: "insensitive" } }
           : undefined,

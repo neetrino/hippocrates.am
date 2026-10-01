@@ -143,9 +143,9 @@ export function DoctorsSearch({
       <div
         id={panelId}
         hidden={!filtersOpen}
-        className="rounded-[18px] border border-line bg-white p-4 shadow-soft max-md:p-3.5"
+        className="overflow-visible rounded-[18px] border border-line bg-white p-4 shadow-soft max-md:p-3.5"
       >
-        <div className="grid gap-3 md:grid-cols-3 md:items-start">
+        <div className="grid gap-3 overflow-visible md:grid-cols-3 md:items-start">
           <MultiSelectFilter
             label={labels.specialty}
             name="specialty"

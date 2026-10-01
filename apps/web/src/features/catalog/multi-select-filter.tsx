@@ -72,7 +72,10 @@ export function MultiSelectFilter({
         : selectedCountLabel(selected.length);
 
   return (
-    <div className="grid gap-1.5 text-[0.86rem] font-semibold text-ink" ref={rootRef}>
+    <div
+      className={cn("relative grid gap-1.5 text-[0.86rem] font-semibold text-ink", open && "z-30")}
+      ref={rootRef}
+    >
       <span>{label}</span>
       {selected.map((value) => (
         <input key={`${name}-${value}`} type="hidden" name={name} value={value} />
@@ -100,7 +103,7 @@ export function MultiSelectFilter({
           role="listbox"
           aria-multiselectable="true"
           aria-label={label}
-          className="z-20 grid max-h-56 gap-0.5 overflow-y-auto rounded-[14px] border border-line bg-white p-1.5 shadow-soft"
+          className="absolute top-[calc(100%+6px)] right-0 left-0 z-40 grid max-h-56 gap-0.5 overflow-y-auto rounded-[14px] border border-line bg-white p-1.5 shadow-[0_16px_36px_rgba(20,36,40,0.14)]"
         >
           {options.length === 0 ? (
             <p className="m-0 px-3 py-2.5 text-[0.9rem] font-normal text-muted">—</p>

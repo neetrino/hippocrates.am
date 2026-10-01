@@ -71,14 +71,14 @@ function NavLink({
       className={cn(
         "group flex items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,box-shadow] duration-200",
         active
-          ? "-mr-3 rounded-r-none bg-white text-tiffany-ink shadow-[0_8px_22px_rgba(20,57,54,0.12)]"
-          : "mr-0 text-tiffany-ink/72 hover:bg-white/35 hover:text-tiffany-ink",
+          ? "-mr-3 rounded-r-none bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
+          : "mr-0 text-white/78 hover:bg-white/10 hover:text-white",
       )}
     >
       <span
         className={cn(
           "grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors duration-200",
-          active ? "bg-tiffany/55 text-tiffany-ink" : "bg-white/30 text-tiffany-ink",
+          active ? "bg-[#1e3a38]/10 text-[#1e3a38]" : "bg-white/10 text-white",
         )}
       >
         {item.icon}
@@ -106,10 +106,10 @@ function SidebarNav({
     <div className="flex h-full flex-col gap-8">
       <div className="px-1">
         <Link href="/super-admin" onClick={onNavigate} className="inline-flex flex-col gap-1.5">
-          <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-tiffany-ink">
+          <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">
             Hippocrates
           </span>
-          <p className="m-0 text-[0.68rem] font-bold tracking-[0.16em] text-tiffany-ink/55 uppercase">
+          <p className="m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase">
             {t("subtitle")}
           </p>
         </Link>
@@ -124,7 +124,7 @@ function SidebarNav({
           />
         ))}
       </nav>
-      <nav className="grid gap-1 border-t border-tiffany-ink/12 pt-5" aria-label={t("accountNav")}>
+      <nav className="grid gap-1 border-t border-white/12 pt-5" aria-label={t("accountNav")}>
         {footerItems.map((item) => (
           <NavLink
             key={`${item.href}-${item.hash ?? "root"}`}
@@ -133,7 +133,7 @@ function SidebarNav({
             onNavigate={onNavigate}
           />
         ))}
-        <LogoutButton className="mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-[0.82rem] font-semibold tracking-[0.06em] text-tiffany-ink/72 uppercase transition-colors duration-200 hover:bg-white/35 hover:text-tiffany-ink" />
+        <LogoutButton className="mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-[0.82rem] font-semibold tracking-[0.06em] text-white/78 uppercase transition-colors duration-200 hover:bg-white/10 hover:text-white" />
       </nav>
     </div>
   );
@@ -202,7 +202,7 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
 
   return (
     <div className="fixed inset-0 z-[60] flex bg-[#eef3f2]">
-      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-tiffany px-3 pt-7 pb-6 md:flex md:flex-col">
+      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-[#2a4a47] px-3 pt-7 pb-6 md:flex md:flex-col">
         <SidebarNav items={items} footerItems={footerItems} pathname={pathname} hash={hash} />
       </aside>
 
@@ -216,11 +216,11 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
           />
           <aside
             id={menuId}
-            className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-tiffany px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(20,57,54,0.22)]"
+            className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-[#2a4a47] px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]"
           >
             <button
               type="button"
-              className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/45 text-tiffany-ink"
+              className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white"
               aria-label={t("closeMenu")}
               onClick={() => setOpen(false)}
             >

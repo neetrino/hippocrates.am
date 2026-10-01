@@ -27,15 +27,6 @@ export function ClinicsIcon(props: IconProps) {
   );
 }
 
-export function DoctorsIcon(props: IconProps) {
-  return (
-    <BaseIcon {...props}>
-      <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M5.8 19.2c1.3-3 3.5-4.5 6.2-4.5s4.9 1.5 6.2 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </BaseIcon>
-  );
-}
-
 export function QuestionsIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

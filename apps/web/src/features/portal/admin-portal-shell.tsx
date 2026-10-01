@@ -6,7 +6,6 @@ import {
   CloseIcon,
   ClinicsIcon,
   DashboardIcon,
-  DoctorsIcon,
   MenuIcon,
   NoticesIcon,
   QuestionsIcon,
@@ -22,7 +21,6 @@ import { cn } from "@/shared/ui/cn";
 type PortalHref =
   | "/super-admin"
   | "/super-admin/clinics"
-  | "/super-admin/doctors"
   | "/super-admin/questions"
   | "/super-admin/register";
 
@@ -186,7 +184,6 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
   const items: NavItem[] = [
     { href: "/super-admin", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
     { href: "/super-admin/clinics", label: nav("clinics"), icon: <ClinicsIcon />, match: "prefix" },
-    { href: "/super-admin/doctors", label: nav("doctors"), icon: <DoctorsIcon />, match: "prefix" },
     { href: "/super-admin/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "prefix" },
     {
       href: "/super-admin/register",

@@ -23,7 +23,7 @@ export async function SiteHeader() {
           clinics={t("clinics")}
           doctors={t("doctors")}
           questions={t("questions")}
-          register={t("register")}
+          login={t("login")}
           openMenu={t("openMenu")}
           closeMenu={t("closeMenu")}
         />

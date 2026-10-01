@@ -95,13 +95,18 @@
   },
   "auth": {
     "loginTitle": "Մուտք",
+    "loginHint": "Մտեք ձեր հաշիվ՝ այցերն ու ծանուցումները տեսնելու համար։",
     "enter": "Մտնել",
     "email": "Էլ. փոստ",
     "password": "Գաղտնաբառ",
     "registerTitle": "Գրանցում",
     "registerHint": "Պացիենտի հաշիվը բացվում է այստեղից։",
     "registerAction": "Գրանցվել",
-    "displayName": "Անուն"
+    "displayName": "Անուն",
+    "noAccount": "Հաշիվ չունե՞ք",
+    "goRegister": "Գրանցվել",
+    "hasAccount": "Արդեն ունե՞ք հաշիվ",
+    "goLogin": "Մուտք գործել"
   },
   "me": {
     "signIn": "Մուտք գործեք՝ ձեր էջը տեսնելու համար։",

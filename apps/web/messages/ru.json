@@ -95,13 +95,18 @@
   },
   "auth": {
     "loginTitle": "Вход",
+    "loginHint": "Войдите, чтобы видеть визиты и уведомления.",
     "enter": "Войти",
     "email": "Эл. почта",
     "password": "Пароль",
     "registerTitle": "Регистрация",
     "registerHint": "Аккаунт пациента открывается здесь.",
     "registerAction": "Зарегистрироваться",
-    "displayName": "Имя"
+    "displayName": "Имя",
+    "noAccount": "Нет аккаунта?",
+    "goRegister": "Зарегистрироваться",
+    "hasAccount": "Уже есть аккаунт?",
+    "goLogin": "Войти"
   },
   "me": {
     "signIn": "Войдите, чтобы увидеть свою страницу.",

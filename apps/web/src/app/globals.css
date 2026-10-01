@@ -396,6 +396,15 @@ h2 { font-size: 1.45rem; }
   border: 1px solid var(--line);
   background: #ffffff;
   font-weight: 400;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 167, 157, 0.16);
 }
 
 .field textarea { min-height: 110px; resize: vertical; }
@@ -412,15 +421,28 @@ h2 { font-size: 1.45rem; }
   color: white;
   font-weight: 600;
   cursor: pointer;
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.btn:hover, button.btn:hover {
+  background: #009189;
+  box-shadow: 0 10px 22px rgba(0, 167, 157, 0.22);
 }
 
 .btn-small { padding: 8px 14px; }
 
 .btn-ghost {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--accent);
+  border: 1px solid rgba(0, 167, 157, 0.28);
 }
+
+.btn-ghost:hover {
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.btn-block { width: 100%; }
 
 .btn-danger { background: var(--danger); }
 
@@ -456,6 +478,78 @@ h2 { font-size: 1.45rem; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .auth-wrap { width: min(440px, 100%); margin: 48px auto; }
+
+.auth-page {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 180px);
+  padding: 40px 20px 56px;
+  background:
+    radial-gradient(720px 320px at 50% 0%, rgba(0, 167, 157, 0.12), transparent 70%),
+    #ffffff;
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 22px;
+  padding: 28px 26px 24px;
+  border: 1px solid rgba(0, 167, 157, 0.16);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgba(0, 167, 157, 0.1);
+}
+
+.auth-brand {
+  display: grid;
+  place-items: center;
+}
+
+.auth-logo {
+  width: auto;
+  height: 58px;
+  object-fit: contain;
+}
+
+.auth-copy {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.auth-copy h1 {
+  font-size: clamp(1.7rem, 4vw, 2.1rem);
+}
+
+.auth-card .stack .btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.auth-switch {
+  display: grid;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.auth-switch .muted { margin: 0; }
+
+.section-head a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.section-head a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.search:focus-within {
+  border-color: rgba(0, 167, 157, 0.45);
+  box-shadow: 0 14px 36px rgba(0, 167, 157, 0.12);
+}
 
 .error { color: var(--danger); margin: 0; }
 

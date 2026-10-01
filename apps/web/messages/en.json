@@ -95,13 +95,18 @@
   },
   "auth": {
     "loginTitle": "Sign in",
+    "loginHint": "Sign in to see your visits and notifications.",
     "enter": "Sign in",
     "email": "Email",
     "password": "Password",
     "registerTitle": "Register",
     "registerHint": "A patient account starts here.",
     "registerAction": "Create account",
-    "displayName": "Name"
+    "displayName": "Name",
+    "noAccount": "Don't have an account?",
+    "goRegister": "Create account",
+    "hasAccount": "Already have an account?",
+    "goLogin": "Sign in"
   },
   "me": {
     "signIn": "Sign in to see your page.",

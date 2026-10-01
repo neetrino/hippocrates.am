@@ -12,7 +12,7 @@ type SiteNavProps = {
   clinics: string;
   doctors: string;
   questions: string;
-  register: string;
+  login: string;
   openMenu: string;
   closeMenu: string;
 };
@@ -85,7 +85,7 @@ export function SiteNav({
   clinics,
   doctors,
   questions,
-  register,
+  login,
   openMenu,
   closeMenu,
 }: SiteNavProps) {
@@ -132,7 +132,7 @@ export function SiteNav({
       </nav>
       <div className="nav-actions">
         <LocaleSwitch />
-        <Link href="/register" className="auth-trigger" aria-label={register}>
+        <Link href="/login" className="auth-trigger" aria-label={login}>
           <UserIcon />
         </Link>
         <button

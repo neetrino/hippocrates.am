@@ -64,10 +64,10 @@ function NavLink({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-l-full py-2.5 pr-4 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,transform] duration-200",
+        "group flex items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,box-shadow] duration-200",
         active
-          ? "bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
-          : "text-white/78 hover:bg-white/10 hover:text-white",
+          ? "-mr-3 rounded-r-none bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
+          : "mr-0 text-white/78 hover:bg-white/10 hover:text-white",
       )}
     >
       <span
@@ -165,8 +165,8 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
   }, [pathname]);
 
   useEffect(() => {
-    document.body.classList.add("overflow-hidden");
-    return () => document.body.classList.remove("overflow-hidden");
+    document.body.classList.add("overflow-hidden", "admin-portal-open");
+    return () => document.body.classList.remove("overflow-hidden", "admin-portal-open");
   }, []);
 
   useEffect(() => {

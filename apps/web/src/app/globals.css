@@ -118,6 +118,13 @@
   }
 }
 
+@layer base {
+  body.admin-portal-open header,
+  body.admin-portal-open footer {
+    display: none;
+  }
+}
+
 @layer utilities {
   .scrollbar-soft {
     scrollbar-width: thin;

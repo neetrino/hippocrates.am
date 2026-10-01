@@ -29,7 +29,6 @@ export default async function PortalClinicsPage({
         searchAriaLabel={t("clinicSearchAria")}
         clearLabel={t("clearClinicSearch")}
         emptyLabel={t("emptyClinicSearch")}
-        resultCountLabel={(count) => t("clinicSearchCount", { count })}
         action={
           <AddClinicSheet
             addLabel={portal("addClinic")}

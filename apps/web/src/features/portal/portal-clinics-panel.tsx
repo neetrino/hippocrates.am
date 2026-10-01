@@ -1,6 +1,7 @@
 "use client";
 
 import { useDeferredValue, useId, useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import type { ClinicCard } from "@/shared/public-types";
 import { ClinicTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
@@ -12,7 +13,6 @@ type PortalClinicsPanelProps = {
   searchAriaLabel: string;
   clearLabel: string;
   emptyLabel: string;
-  resultCountLabel: (count: number) => string;
   action: ReactNode;
 };
 
@@ -64,9 +64,9 @@ export function PortalClinicsPanel({
   searchAriaLabel,
   clearLabel,
   emptyLabel,
-  resultCountLabel,
   action,
 }: PortalClinicsPanelProps) {
+  const t = useTranslations("catalog");
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const inputId = useId();
@@ -121,7 +121,7 @@ export function PortalClinicsPanel({
             isPending ? "opacity-55" : "opacity-100",
           )}
         >
-          {resultCountLabel(filtered.length)}
+          {t("clinicSearchCount", { count: filtered.length })}
         </p>
       ) : null}
 

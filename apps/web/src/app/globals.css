@@ -298,7 +298,18 @@ h2 { font-size: 1.45rem; }
   padding: 56px 0 28px;
 }
 
-.hero-copy { display: grid; gap: 16px; max-width: 720px; }
+.hero-copy {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.hero-copy h1 {
+  background: linear-gradient(120deg, var(--ink) 0%, #1a3d3a 70%, var(--accent) 140%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 .search {
   display: flex;

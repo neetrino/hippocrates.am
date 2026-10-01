@@ -43,7 +43,7 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
         </label>
       ))}
       {error ? <p className="error">{error}</p> : null}
-      <button className="btn" type="submit">{props.label}</button>
+      <button className="btn btn-block" type="submit">{props.label}</button>
     </form>
   );
 }

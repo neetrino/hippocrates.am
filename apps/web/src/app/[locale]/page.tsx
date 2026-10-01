@@ -32,7 +32,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="stats">
           <p>{t.rich("clinicStat", { count: data.clinics.length, strong: (chunks) => <strong>{chunks}</strong> })}</p>
           <p>{t.rich("doctorStat", { count: data.doctors.length, strong: (chunks) => <strong>{chunks}</strong> })}</p>
-          <p><Link href="/doctors">{t("allDoctors")}</Link></p>
         </div>
       </section>
       <section className="section">

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
+import { SiteHeaderShell } from "@/shared/ui/site-header-shell";
 
 function UserIcon() {
   return (
@@ -19,8 +20,8 @@ function UserIcon() {
 export async function SiteHeader() {
   const t = await getTranslations("nav");
   return (
-    <header className="site-header">
-      <div className="shell bar">
+    <SiteHeaderShell>
+      <div className="bar">
         <Link href="/" className="brand">
           <span className="mark" aria-hidden="true" />
           <span className="brand-name">Hippocrates</span>
@@ -32,15 +33,11 @@ export async function SiteHeader() {
         </nav>
         <div className="nav-actions">
           <LocaleSwitch />
-          <div className="nav-links">
-            <Link href="/login">{t("login")}</Link>
-            <Link href="/me">{t("me")}</Link>
-          </div>
           <Link href="/register" className="auth-trigger" aria-label={t("register")}>
             <UserIcon />
           </Link>
         </div>
       </div>
-    </header>
+    </SiteHeaderShell>
   );
 }

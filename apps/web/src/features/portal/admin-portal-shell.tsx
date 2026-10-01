@@ -19,7 +19,12 @@ import { routing } from "@/i18n/routing";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
-type PortalHref = "/me" | "/me/clinics" | "/me/doctors" | "/me/questions" | "/me/register";
+type PortalHref =
+  | "/super-admin"
+  | "/super-admin/clinics"
+  | "/super-admin/doctors"
+  | "/super-admin/questions"
+  | "/super-admin/register";
 
 type NavItem = {
   href: PortalHref;
@@ -41,7 +46,7 @@ function localeNeutralPath(pathname: string): string {
 
 function isItemActive(pathname: string, hash: string, item: NavItem): boolean {
   if (item.match === "hash") {
-    return pathname === "/me" && hash === `#${item.hash ?? ""}`;
+    return pathname === "/super-admin" && hash === `#${item.hash ?? ""}`;
   }
   if (item.match === "exact") {
     return pathname === item.href && (hash === "" || hash === "#");
@@ -100,9 +105,9 @@ function SidebarNav({
   return (
     <div className="flex h-full flex-col gap-8">
       <div className="px-1">
-        <Link href="/me" onClick={onNavigate} className="inline-flex flex-col gap-1.5">
+        <Link href="/super-admin" onClick={onNavigate} className="inline-flex flex-col gap-1.5">
           <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-tiffany-ink">
-            hippocrates
+            Hippocrates
           </span>
           <p className="m-0 text-[0.68rem] font-bold tracking-[0.16em] text-tiffany-ink/55 uppercase">
             {t("subtitle")}
@@ -179,15 +184,20 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
   }, [open]);
 
   const items: NavItem[] = [
-    { href: "/me", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
-    { href: "/me/clinics", label: nav("clinics"), icon: <ClinicsIcon />, match: "prefix" },
-    { href: "/me/doctors", label: nav("doctors"), icon: <DoctorsIcon />, match: "prefix" },
-    { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "prefix" },
-    { href: "/me/register", label: me("openPlatform"), icon: <RegisterClinicIcon />, match: "prefix" },
+    { href: "/super-admin", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
+    { href: "/super-admin/clinics", label: nav("clinics"), icon: <ClinicsIcon />, match: "prefix" },
+    { href: "/super-admin/doctors", label: nav("doctors"), icon: <DoctorsIcon />, match: "prefix" },
+    { href: "/super-admin/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "prefix" },
+    {
+      href: "/super-admin/register",
+      label: me("openPlatform"),
+      icon: <RegisterClinicIcon />,
+      match: "prefix",
+    },
   ];
   const footerItems: NavItem[] = [
-    { href: "/me", hash: "visits", label: me("visits"), icon: <VisitsIcon />, match: "hash" },
-    { href: "/me", hash: "notices", label: me("notices"), icon: <NoticesIcon />, match: "hash" },
+    { href: "/super-admin", hash: "visits", label: me("visits"), icon: <VisitsIcon />, match: "hash" },
+    { href: "/super-admin", hash: "notices", label: me("notices"), icon: <NoticesIcon />, match: "hash" },
   ];
 
   return (

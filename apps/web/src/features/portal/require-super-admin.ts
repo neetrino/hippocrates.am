@@ -10,4 +10,5 @@ export async function requireSuperAdmin(): Promise<Me> {
   if (me?.role === "SUPER_ADMIN") return me;
   const locale = (await getLocale()) as AppLocale;
   redirect({ href: "/login", locale });
+  throw new Error("Super Admin required");
 }

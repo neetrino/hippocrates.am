@@ -23,7 +23,7 @@ export default async function PortalRegisterPage({
         <JsonForm
           action="/clinics"
           label={t("submit")}
-          next="/me"
+          next="/super-admin"
           fields={[
             { name: "name", label: t("clinicName") },
             { name: "address", label: t("address") },

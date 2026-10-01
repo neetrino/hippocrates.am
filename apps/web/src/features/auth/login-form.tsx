@@ -5,6 +5,10 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 
+type LoginPayload = {
+  data: { id: string; role: string };
+};
+
 export function LoginForm() {
   const [error, setError] = useState("");
   const router = useRouter();
@@ -27,7 +31,9 @@ export function LoginForm() {
       setError(common("failed"));
       return;
     }
-    router.push("/me");
+    const body = (await response.json()) as LoginPayload;
+    const next = body.data.role === "SUPER_ADMIN" ? "/super-admin" : "/me";
+    router.push(next);
     router.refresh();
   }
 

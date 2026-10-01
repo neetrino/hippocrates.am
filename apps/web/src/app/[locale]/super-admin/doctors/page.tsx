@@ -62,7 +62,7 @@ export default async function PortalDoctorsPage({
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={t("doctorsTitle")}>
       <div className="grid gap-4">
         <DoctorsSearch
-          action={getPathname({ locale, href: "/me/doctors" })}
+          action={getPathname({ locale, href: "/super-admin/doctors" })}
           initialName={queryParams.name ?? ""}
           initialSpecialty={specialties}
           initialCity={cities}

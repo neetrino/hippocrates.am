@@ -1,20 +1,19 @@
 import { getTranslations } from "next-intl/server";
 import { prepareLocale } from "@/i18n/locale";
 import { redirect, Link } from "@/i18n/navigation";
-import type { AppLocale } from "@/i18n/routing";
 import { JsonForm } from "@/shared/json-form";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
 export default async function PlatformPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
-  const locale = prepareLocale(raw) as AppLocale;
+  const locale = prepareLocale(raw);
   const t = await getTranslations("platform");
   const nav = await getTranslations("nav");
   const me = await sessionGet<Me>("/auth/me");
 
   if (me?.role === "SUPER_ADMIN") {
-    redirect({ href: "/me/register", locale });
+    redirect({ href: "/super-admin/register", locale });
   }
 
   return (

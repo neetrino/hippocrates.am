@@ -3,8 +3,7 @@ import { AppointmentActions } from "@/features/portal/appointment-actions";
 import { LogoutButton } from "@/features/portal/logout-button";
 import { AnswerForm, AskQuestionForm } from "@/features/portal/question-forms";
 import { ReviewForm } from "@/features/portal/review-form";
-import { SuperAdminHome } from "@/features/portal/super-admin-home";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
 import { publicGet } from "@/shared/public-api";
@@ -15,8 +14,8 @@ type Notice = { id: string; body: string; createdAt: string };
 
 export default async function MePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
-  prepareLocale(raw);
-  const locale = await getLocale();
+  const locale = prepareLocale(raw);
+  const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const nav = await getTranslations("nav");
@@ -32,12 +31,12 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
     );
   }
 
+  if (me.role === "SUPER_ADMIN") {
+    redirect({ href: "/super-admin", locale });
+  }
+
   const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
   const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
-
-  if (me.role === "SUPER_ADMIN") {
-    return <SuperAdminHome me={me} appointments={appointments} notices={notices} />;
-  }
 
   const role = asRole(me.role);
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
@@ -73,7 +72,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
                     : `${item.clinic.name} · ${item.doctor.user.displayName}`}
                 </p>
                 <p>
-                  {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} ·{" "}
+                  {formatWhen(item.startsAt, displayLocale)} · {status ? common(status) : item.status} ·{" "}
                   {common("price", { amount: formatAmount(item.priceAmd) })}
                 </p>
                 {me.role === "PATIENT" ? <AppointmentActions id={item.id} status={item.status} mode="patient" /> : null}

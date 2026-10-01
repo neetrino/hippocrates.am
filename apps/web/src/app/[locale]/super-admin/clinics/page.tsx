@@ -29,7 +29,7 @@ export default async function PortalClinicsPage({
       <div className="grid gap-4">
         <form
           className="flex gap-2 rounded-full border border-line bg-white p-2 shadow-soft focus-within:border-accent/45 focus-within:shadow-[0_14px_36px_rgba(0,167,157,0.12)] max-md:flex-col max-md:rounded-[18px]"
-          action={getPathname({ locale, href: "/me/clinics" })}
+          action={getPathname({ locale, href: "/super-admin/clinics" })}
         >
           <input
             name="name"

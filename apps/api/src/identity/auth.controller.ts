@@ -28,7 +28,11 @@ export class AuthController {
     const input = recordOf(body);
     const name = requiredString(input.name ?? input.displayName, "Անուն");
     const surname = requiredString(input.surname, "Ազգանուն");
-    const phone = requiredString(input.phone, "Հեռախոս");
+    const phoneRaw = requiredString(input.phone, "Հեռախոս");
+    const phone = phoneRaw.replace(/\D/g, "");
+    if (phone.length < 8) {
+      throw new AppError("VALIDATION_FAILED", 400, "Հեռախոսահամարը սխալ է");
+    }
     const email = emailOf(input.email);
     const password = passwordOf(input.password);
     const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը");

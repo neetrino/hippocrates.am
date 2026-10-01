@@ -54,7 +54,18 @@ export function RegisterForm() {
       <div className="field-row">
         <label className="field">
           {t("phone")}
-          <input name="phone" type="tel" placeholder="+374 91 123 456" required autoComplete="tel" />
+          <input
+            name="phone"
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]+"
+            placeholder="37491123456"
+            required
+            autoComplete="tel"
+            onInput={(event) => {
+              event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "");
+            }}
+          />
         </label>
         <label className="field">
           {t("email")}

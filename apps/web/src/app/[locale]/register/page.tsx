@@ -9,7 +9,7 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
   const t = await getTranslations("auth");
   return (
     <section className="auth-page">
-      <div className="auth-card">
+      <div className="auth-card auth-card-wide">
         <div className="auth-copy">
           <h1>{t("registerTitle")}</h1>
           <p className="muted">{t("registerHint")}</p>

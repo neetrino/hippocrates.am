@@ -179,6 +179,12 @@
     "phone": "Телефон",
     "adminName": "Имя админа",
     "adminEmail": "Эл. почта админа",
-    "adminPassword": "Пароль админа"
+    "adminPassword": "Пароль админа",
+    "clinicNamePlaceholder": "напр. Арег Стоматология",
+    "addressPlaceholder": "напр. Абовяна 18, Ереван",
+    "phonePlaceholder": "+374 XX XXX XXX",
+    "adminNamePlaceholder": "напр. Анна Григорян",
+    "adminEmailPlaceholder": "admin@clinic.am",
+    "adminPasswordPlaceholder": "Не менее 8 символов"
   }
 }

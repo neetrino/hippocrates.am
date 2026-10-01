@@ -179,6 +179,12 @@
     "phone": "Հեռախոս",
     "adminName": "Ադմինի անուն",
     "adminEmail": "Ադմինի էլ. փոստ",
-    "adminPassword": "Ադմինի գաղտնաբառ"
+    "adminPassword": "Ադմինի գաղտնաբառ",
+    "clinicNamePlaceholder": "օր. Արեգ Ստոմատոլոգիա",
+    "addressPlaceholder": "օր. Աբովյան 18, Երևան",
+    "phonePlaceholder": "+374 XX XXX XXX",
+    "adminNamePlaceholder": "օր. Աննա Գրիգորյան",
+    "adminEmailPlaceholder": "admin@clinic.am",
+    "adminPasswordPlaceholder": "Առնվազն 8 նիշ"
   }
 }

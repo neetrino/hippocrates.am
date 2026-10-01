@@ -43,7 +43,7 @@ export default async function PortalClinicsPage({
               className="min-w-0 flex-1 border-0 bg-transparent px-4 py-3 outline-none"
             />
             <button
-              className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent max-md:w-full"
+              className="inline-flex w-[10.5rem] shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent max-md:w-full"
               type="submit"
             >
               {common("search")}
@@ -56,12 +56,38 @@ export default async function PortalClinicsPage({
             hint={platform("hint")}
             submitLabel={platform("submit")}
             fields={[
-              { name: "name", label: platform("clinicName") },
-              { name: "address", label: platform("address") },
-              { name: "phone", label: platform("phone") },
-              { name: "adminName", label: platform("adminName") },
-              { name: "adminEmail", label: platform("adminEmail"), type: "email" },
-              { name: "adminPassword", label: platform("adminPassword"), type: "password" },
+              {
+                name: "name",
+                label: platform("clinicName"),
+                placeholder: platform("clinicNamePlaceholder"),
+              },
+              {
+                name: "address",
+                label: platform("address"),
+                placeholder: platform("addressPlaceholder"),
+              },
+              {
+                name: "phone",
+                label: platform("phone"),
+                placeholder: platform("phonePlaceholder"),
+              },
+              {
+                name: "adminName",
+                label: platform("adminName"),
+                placeholder: platform("adminNamePlaceholder"),
+              },
+              {
+                name: "adminEmail",
+                label: platform("adminEmail"),
+                type: "email",
+                placeholder: platform("adminEmailPlaceholder"),
+              },
+              {
+                name: "adminPassword",
+                label: platform("adminPassword"),
+                type: "password",
+                placeholder: platform("adminPasswordPlaceholder"),
+              },
             ]}
           />
         </div>

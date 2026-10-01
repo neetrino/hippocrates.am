@@ -179,6 +179,12 @@
     "phone": "Phone",
     "adminName": "Admin name",
     "adminEmail": "Admin email",
-    "adminPassword": "Admin password"
+    "adminPassword": "Admin password",
+    "clinicNamePlaceholder": "e.g. Areg Stomatology",
+    "addressPlaceholder": "e.g. Abovyan 18, Yerevan",
+    "phonePlaceholder": "+374 XX XXX XXX",
+    "adminNamePlaceholder": "e.g. Anna Grigoryan",
+    "adminEmailPlaceholder": "admin@clinic.am",
+    "adminPasswordPlaceholder": "At least 8 characters"
   }
 }

@@ -25,12 +25,22 @@ export default async function PortalRegisterPage({
           label={t("submit")}
           next="/super-admin"
           fields={[
-            { name: "name", label: t("clinicName") },
-            { name: "address", label: t("address") },
-            { name: "phone", label: t("phone") },
-            { name: "adminName", label: t("adminName") },
-            { name: "adminEmail", label: t("adminEmail"), type: "email" },
-            { name: "adminPassword", label: t("adminPassword"), type: "password" },
+            { name: "name", label: t("clinicName"), placeholder: t("clinicNamePlaceholder") },
+            { name: "address", label: t("address"), placeholder: t("addressPlaceholder") },
+            { name: "phone", label: t("phone"), placeholder: t("phonePlaceholder") },
+            { name: "adminName", label: t("adminName"), placeholder: t("adminNamePlaceholder") },
+            {
+              name: "adminEmail",
+              label: t("adminEmail"),
+              type: "email",
+              placeholder: t("adminEmailPlaceholder"),
+            },
+            {
+              name: "adminPassword",
+              label: t("adminPassword"),
+              type: "password",
+              placeholder: t("adminPasswordPlaceholder"),
+            },
           ]}
         />
       </div>

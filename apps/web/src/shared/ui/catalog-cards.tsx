@@ -16,8 +16,10 @@ export function ClinicTile({
           <Photo src={clinic.coverUrl} alt={clinic.name} loading={loading} />
         </div>
         <div className="grid gap-2 px-[18px] pt-4 pb-[18px]">
-          <h2>{clinic.name}</h2>
-          <p className="m-0 text-muted">{[clinic.district, clinic.address].filter(Boolean).join(" · ")}</p>
+          <h2 className="text-[1.2rem] leading-snug tracking-[-0.01em]">{clinic.name}</h2>
+          <p className="m-0 text-[0.95rem] leading-relaxed text-muted">
+            {[clinic.district, clinic.address].filter(Boolean).join(" · ")}
+          </p>
         </div>
       </Link>
     </article>
@@ -32,9 +34,11 @@ export function DoctorTile({ doctor }: { doctor: DoctorCard }) {
           <Photo src={doctor.photoUrl} alt={doctor.user.displayName} />
         </div>
         <div>
-          <strong>{doctor.user.displayName}</strong>
-          <p className="m-0 text-muted">{doctor.specialty}</p>
-          <span className="mt-1 inline-flex w-fit items-center rounded-full bg-accent-soft px-2.5 py-1 text-[0.82rem] font-semibold text-accent">
+          <strong className="font-display text-[1.05rem] leading-snug tracking-[-0.01em] font-semibold">
+            {doctor.user.displayName}
+          </strong>
+          <p className="m-0 mt-0.5 text-[0.95rem] leading-relaxed text-muted">{doctor.specialty}</p>
+          <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-accent-soft px-2.5 py-1 text-[0.82rem] font-semibold tracking-[0.01em] text-accent">
             {doctor.clinic.name}
           </span>
         </div>

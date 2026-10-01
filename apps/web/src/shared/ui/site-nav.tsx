@@ -135,7 +135,7 @@ export function SiteNav({
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-full px-[18px] py-2.5 text-base font-semibold text-muted transition-colors duration-160 hover:bg-white hover:text-accent hover:shadow-[0_4px_14px_rgba(0,167,157,0.1)]"
+            className="rounded-full px-[18px] py-2.5 text-[0.98rem] font-medium tracking-[0.01em] text-muted transition-colors duration-160 hover:bg-white hover:text-accent hover:shadow-[0_4px_14px_rgba(0,167,157,0.1)]"
           >
             {item.label}
           </Link>

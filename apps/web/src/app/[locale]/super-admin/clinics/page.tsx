@@ -25,9 +25,11 @@ export default async function PortalClinicsPage({
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={t("clinicsTitle")}>
       <PortalClinicsPanel
         clinics={clinics}
-        namePlaceholder={common("name")}
-        nameAriaLabel={t("clinicName")}
+        searchPlaceholder={t("clinicSearchPlaceholder")}
+        searchAriaLabel={t("clinicSearchAria")}
+        clearLabel={t("clearClinicSearch")}
         emptyLabel={t("emptyClinicSearch")}
+        resultCountLabel={(count) => t("clinicSearchCount", { count })}
         action={
           <AddClinicSheet
             addLabel={portal("addClinic")}

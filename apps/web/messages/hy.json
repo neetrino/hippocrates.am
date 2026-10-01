@@ -55,7 +55,7 @@
   "catalog": {
     "clinicsTitle": "Կլինիկաներ",
     "clinicName": "Կլինիկայի անուն",
-    "emptyClinicSearch": "Այս անունով կլինիկա չկա։",
+    "emptyClinicSearch": "Այս որոնմանը համապատասխան կլինիկա չկա։",
     "doctorsTitle": "Բժիշկներ",
     "doctorName": "Բժշկի անուն",
     "doctorSearchPlaceholder": "Փնտրել անունով...",
@@ -67,7 +67,11 @@
     "applyFilters": "Կիրառել ֆիլտրերը",
     "selectedCount": "{count} ընտրված",
     "all": "Բոլորը",
-    "emptyDoctorSearch": "Այս փնտրմամբ բժիշկ չկա։"
+    "emptyDoctorSearch": "Այս փնտրմամբ բժիշկ չկա։",
+    "clinicSearchPlaceholder": "Որոնել անունով, հասցեով, շրջանով կամ հեռախոսով",
+    "clinicSearchAria": "Որոնել կլինիկաներ",
+    "clearClinicSearch": "Մաքրել որոնումը",
+    "clinicSearchCount": "{count, plural, one {# կլինիկա} other {# կլինիկա}}"
   },
   "clinicPage": {
     "branches": "Մասնաճյուղեր",

@@ -55,7 +55,7 @@
   "catalog": {
     "clinicsTitle": "Clinics",
     "clinicName": "Clinic name",
-    "emptyClinicSearch": "No clinic matches this name.",
+    "emptyClinicSearch": "No clinic matches this search.",
     "doctorsTitle": "Doctors",
     "doctorName": "Doctor name",
     "doctorSearchPlaceholder": "Search by name...",
@@ -67,7 +67,11 @@
     "applyFilters": "Apply filters",
     "selectedCount": "{count} selected",
     "all": "All",
-    "emptyDoctorSearch": "No doctor matches this search."
+    "emptyDoctorSearch": "No doctor matches this search.",
+    "clinicSearchPlaceholder": "Search by name, address, district, or phone",
+    "clinicSearchAria": "Search clinics",
+    "clearClinicSearch": "Clear search",
+    "clinicSearchCount": "{count, plural, one {# clinic} other {# clinics}}"
   },
   "clinicPage": {
     "branches": "Branches",

@@ -55,7 +55,7 @@
   "catalog": {
     "clinicsTitle": "Клиники",
     "clinicName": "Название клиники",
-    "emptyClinicSearch": "Клиники с таким названием нет.",
+    "emptyClinicSearch": "По этому запросу клиник нет.",
     "doctorsTitle": "Врачи",
     "doctorName": "Имя врача",
     "doctorSearchPlaceholder": "Поиск по имени...",
@@ -67,7 +67,11 @@
     "applyFilters": "Применить фильтры",
     "selectedCount": "Выбрано: {count}",
     "all": "Все",
-    "emptyDoctorSearch": "По этому запросу врачей нет."
+    "emptyDoctorSearch": "По этому запросу врачей нет.",
+    "clinicSearchPlaceholder": "Поиск по названию, адресу, району или телефону",
+    "clinicSearchAria": "Поиск клиник",
+    "clearClinicSearch": "Очистить поиск",
+    "clinicSearchCount": "{count, plural, one {# клиника} few {# клиники} many {# клиник} other {# клиники}}"
   },
   "clinicPage": {
     "branches": "Филиалы",

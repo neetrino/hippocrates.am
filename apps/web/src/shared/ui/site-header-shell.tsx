@@ -19,6 +19,7 @@ export function SiteHeaderShell({ children }: { children: ReactNode }) {
 
   return (
     <header
+      data-site-chrome="header"
       className={cn(
         "group sticky top-0 z-20 bg-transparent py-3.5 transition-[padding] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-md:py-2",
         scrolled && "is-scrolled py-2.5 max-md:py-1.5",

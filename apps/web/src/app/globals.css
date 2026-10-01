@@ -119,8 +119,7 @@
 }
 
 @layer base {
-  body.admin-portal-open header,
-  body.admin-portal-open footer {
+  body.admin-portal-open [data-site-chrome] {
     display: none;
   }
 }

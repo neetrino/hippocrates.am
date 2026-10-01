@@ -66,6 +66,7 @@
     "resetFilters": "Сбросить фильтры",
     "applyFilters": "Применить фильтры",
     "selectedCount": "Выбрано: {count}",
+    "all": "Все",
     "emptyDoctorSearch": "По этому запросу врачей нет."
   },
   "clinicPage": {

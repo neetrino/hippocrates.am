@@ -66,6 +66,7 @@
     "resetFilters": "Մաքրել ֆիլտրերը",
     "applyFilters": "Կիրառել ֆիլտրերը",
     "selectedCount": "{count} ընտրված",
+    "all": "Բոլորը",
     "emptyDoctorSearch": "Այս փնտրմամբ բժիշկ չկա։"
   },
   "clinicPage": {

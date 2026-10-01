@@ -27,6 +27,7 @@ type DoctorsSearchProps = {
     resetFilters: string;
     applyFilters: string;
     selectedCount: string;
+    all: string;
   };
 };
 
@@ -153,6 +154,7 @@ export function DoctorsSearch({
             selected={specialty}
             onChange={setSpecialty}
             placeholder={labels.specialty}
+            allLabel={labels.all}
             selectedCountLabel={selectedCountLabel}
           />
           <MultiSelectFilter
@@ -162,6 +164,7 @@ export function DoctorsSearch({
             selected={city}
             onChange={setCity}
             placeholder={labels.city}
+            allLabel={labels.all}
             selectedCountLabel={selectedCountLabel}
           />
           <MultiSelectFilter
@@ -171,6 +174,7 @@ export function DoctorsSearch({
             selected={clinic}
             onChange={setClinic}
             placeholder={labels.clinic}
+            allLabel={labels.all}
             selectedCountLabel={selectedCountLabel}
           />
         </div>

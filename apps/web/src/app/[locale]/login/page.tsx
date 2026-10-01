@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { prepareLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
-import { JsonForm } from "@/shared/json-form";
+import { LoginForm } from "@/features/auth/login-form";
 
 export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,33 +10,15 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
   return (
     <section className="auth-page">
       <div className="auth-card">
-        <div className="auth-brand">
-          <Image
-            src="/brand/hippocrates-logo.png"
-            alt="Hippocrates"
-            width={160}
-            height={98}
-            className="auth-logo"
-            priority
-          />
-        </div>
         <div className="auth-copy">
           <h1>{t("loginTitle")}</h1>
           <p className="muted">{t("loginHint")}</p>
         </div>
-        <JsonForm
-          action="/auth/login"
-          label={t("enter")}
-          next="/me"
-          fields={[
-            { name: "email", label: t("email"), type: "email", placeholder: "john.doe@email.com" },
-            { name: "password", label: t("password"), type: "password", placeholder: "••••••••" },
-          ]}
-        />
-        <div className="auth-switch">
-          <p className="muted">{t("noAccount")}</p>
-          <Link href="/register" className="btn btn-ghost btn-block">{t("goRegister")}</Link>
-        </div>
+        <LoginForm />
+        <p className="auth-switch-line">
+          {t("noAccount")}{" "}
+          <Link href="/register">{t("goRegister")}</Link>
+        </p>
       </div>
     </section>
   );

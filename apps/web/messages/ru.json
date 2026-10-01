@@ -96,12 +96,12 @@
   "auth": {
     "loginTitle": "Вход",
     "loginHint": "Войдите, чтобы видеть визиты и уведомления.",
-    "enter": "Войти",
+    "enter": "Продолжить",
     "email": "Эл. почта",
     "password": "Пароль",
     "registerTitle": "Регистрация",
     "registerHint": "Аккаунт пациента открывается здесь.",
-    "registerAction": "Зарегистрироваться",
+    "registerAction": "Продолжить",
     "displayName": "Имя",
     "noAccount": "Нет аккаунта?",
     "goRegister": "Зарегистрироваться",
@@ -111,7 +111,9 @@
     "surname": "Фамилия",
     "phone": "Телефон",
     "confirmPassword": "Повторите пароль",
-    "passwordMismatch": "Пароли не совпадают"
+    "passwordMismatch": "Пароли не совпадают",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль"
   },
   "me": {
     "signIn": "Войдите, чтобы увидеть свою страницу.",

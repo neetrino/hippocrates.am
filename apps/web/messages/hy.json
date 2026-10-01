@@ -96,12 +96,12 @@
   "auth": {
     "loginTitle": "Մուտք",
     "loginHint": "Մտեք ձեր հաշիվ՝ այցերն ու ծանուցումները տեսնելու համար։",
-    "enter": "Մտնել",
+    "enter": "Շարունակել",
     "email": "Էլ. փոստ",
     "password": "Գաղտնաբառ",
     "registerTitle": "Գրանցում",
     "registerHint": "Պացիենտի հաշիվը բացվում է այստեղից։",
-    "registerAction": "Գրանցվել",
+    "registerAction": "Շարունակել",
     "displayName": "Անուն",
     "noAccount": "Հաշիվ չունե՞ք",
     "goRegister": "Գրանցվել",
@@ -111,7 +111,9 @@
     "surname": "Ազգանուն",
     "phone": "Հեռախոս",
     "confirmPassword": "Կրկնել գաղտնաբառը",
-    "passwordMismatch": "Գաղտնաբառերը չեն համընկնում"
+    "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
+    "showPassword": "Ցույց տալ գաղտնաբառը",
+    "hidePassword": "Թաքցնել գաղտնաբառը"
   },
   "me": {
     "signIn": "Մուտք գործեք՝ ձեր էջը տեսնելու համար։",

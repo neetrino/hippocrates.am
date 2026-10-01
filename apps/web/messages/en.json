@@ -9,7 +9,9 @@
     "login": "Sign in",
     "me": "My page",
     "register": "Register",
-    "language": "Language"
+    "language": "Language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "footer": {
     "tagline": "Dental clinics and doctors in Armenia."

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { SiteHeaderShell } from "@/shared/ui/site-header-shell";
+import { SiteNav } from "@/shared/ui/site-nav";
 
 function UserIcon() {
   return (
@@ -33,17 +34,21 @@ export async function SiteHeader() {
             priority
           />
         </Link>
-        <nav className="nav">
-          <Link href="/clinics">{t("clinics")}</Link>
-          <Link href="/doctors">{t("doctors")}</Link>
-          <Link href="/questions">{t("questions")}</Link>
-        </nav>
-        <div className="nav-actions">
-          <LocaleSwitch />
-          <Link href="/register" className="auth-trigger" aria-label={t("register")}>
-            <UserIcon />
-          </Link>
-        </div>
+        <SiteNav
+          clinics={t("clinics")}
+          doctors={t("doctors")}
+          questions={t("questions")}
+          openMenu={t("openMenu")}
+          closeMenu={t("closeMenu")}
+          actions={(
+            <>
+              <LocaleSwitch />
+              <Link href="/register" className="auth-trigger" aria-label={t("register")}>
+                <UserIcon />
+              </Link>
+            </>
+          )}
+        />
       </div>
     </SiteHeaderShell>
   );

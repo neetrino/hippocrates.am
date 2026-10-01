@@ -9,10 +9,9 @@ const COUNTRY_OPTIONS = [
 
 type PhoneFieldProps = {
   label: string;
-  hint: string;
 };
 
-export function PhoneField({ label, hint }: PhoneFieldProps) {
+export function PhoneField({ label }: PhoneFieldProps) {
   return (
     <div className="field phone-field">
       <span>{label}</span>
@@ -42,7 +41,6 @@ export function PhoneField({ label, hint }: PhoneFieldProps) {
           }}
         />
       </div>
-      <p className="phone-field-hint">{hint}</p>
     </div>
   );
 }

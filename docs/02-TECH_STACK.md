@@ -7,7 +7,7 @@
 | Language | Strict TypeScript on a supported Node.js LTS | One type-checked web/API language | Proposed |
 | Repo/package manager | Existing repo layout or lightweight pnpm workspaces | Avoid migration solely for aesthetics | Proposed |
 | Web | Next.js App Router + compatible React | Server-first public discovery; protected role-specific portal | Proposed |
-| UI | Existing approved design system; Tailwind CSS if selected | Responsive, accessible booking screens | Proposed |
+| UI | Tailwind CSS 4.x (Next.js default PostCSS setup) | Utility-first styling colocated in components | Accepted |
 | API | NestJS REST under `/api/v1` | Central role and clinic authorization; OpenAPI contracts | Proposed |
 | DB | One PostgreSQL primary | Scheduling correctness and strong relational constraints | Proposed |
 | ORM | Prisma with reviewed SQL migrations where needed | Typed queries; DB-level overlap constraints may need raw SQL | Proposed |

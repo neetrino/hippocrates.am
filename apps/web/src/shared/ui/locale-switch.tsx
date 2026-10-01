@@ -4,8 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
-import { cx } from "@/shared/ui/cx";
-import styles from "@/shared/ui/locale-switch.module.css";
+import { cn } from "@/shared/ui/cn";
 
 const labels: Record<AppLocale, string> = { hy: "Հայ", en: "EN", ru: "РУ" };
 
@@ -22,7 +21,7 @@ function localeNeutralPath(pathname: string): string {
 
 function GlobeIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" />
       <ellipse cx="12" cy="12" rx="3.8" ry="9" stroke="currentColor" strokeWidth="1.7" />
       <path d="M3.2 9.2h17.6M3.2 14.8h17.6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
@@ -59,10 +58,10 @@ export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
   }, [open]);
 
   return (
-    <div className={cx(styles.root, hideOnMobile && styles.hideOnMobile)} ref={rootRef}>
+    <div className={cn("relative", hideOnMobile && "max-md:hidden")} ref={rootRef}>
       <button
         type="button"
-        className={styles.trigger}
+        className="grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border border-line bg-white p-0 text-ink transition-[color,border-color,box-shadow] duration-160 hover:border-accent hover:text-accent hover:shadow-[0_6px_16px_rgba(0,167,157,0.14)] aria-expanded:border-accent aria-expanded:text-accent aria-expanded:shadow-[0_6px_16px_rgba(0,167,157,0.14)]"
         aria-label={t("language")}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -72,7 +71,11 @@ export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
         <GlobeIcon />
       </button>
       {open ? (
-        <div className={styles.menu} id={menuId} role="menu">
+        <div
+          className="absolute top-[calc(100%+10px)] right-0 z-30 grid min-w-[140px] gap-0.5 rounded-[14px] border border-line bg-white p-2 shadow-soft"
+          id={menuId}
+          role="menu"
+        >
           {routing.locales.map((item) => (
             <Link
               key={item}
@@ -83,6 +86,7 @@ export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
               aria-current={item === locale ? "true" : undefined}
               replace
               onClick={() => setOpen(false)}
+              className="rounded-[10px] px-3.5 py-2.5 text-[0.95rem] font-semibold hover:bg-accent-soft hover:text-accent aria-[current=true]:bg-accent-soft aria-[current=true]:text-accent"
             >
               {labels[item]}
             </Link>

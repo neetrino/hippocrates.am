@@ -2,8 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
-import { cx } from "@/shared/ui/cx";
-import ui from "@/shared/ui/primitives.module.css";
 
 type DoctorOption = { id: string; name: string };
 
@@ -50,30 +48,37 @@ export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: 
     else setMessage(t("serviceFailed"));
   }
 
+  const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
+  const controlClass =
+    "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
+  const panelClass = "grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft";
+  const btnClass =
+    "inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
+
   return (
-    <div className={ui.split}>
-      <form className={cx(ui.panel, ui.stack)} onSubmit={(event) => void onDoctor(event)}>
+    <div className="grid gap-5 md:grid-cols-[1.3fr_0.7fr] md:items-start">
+      <form className={panelClass} onSubmit={(event) => void onDoctor(event)}>
         <h2>{t("newDoctor")}</h2>
-        <label className={ui.field}>{common("name")}<input name="displayName" required /></label>
-        <label className={ui.field}>{auth("email")}<input name="email" type="email" required /></label>
-        <label className={ui.field}>{auth("password")}<input name="password" type="password" required /></label>
-        <label className={ui.field}>{catalog("specialty")}<input name="specialty" required /></label>
-        <button className={ui.btn} type="submit">{t("saveDoctor")}</button>
+        <label className={fieldClass}>{common("name")}<input name="displayName" required className={controlClass} /></label>
+        <label className={fieldClass}>{auth("email")}<input name="email" type="email" required className={controlClass} /></label>
+        <label className={fieldClass}>{auth("password")}<input name="password" type="password" required className={controlClass} /></label>
+        <label className={fieldClass}>{catalog("specialty")}<input name="specialty" required className={controlClass} /></label>
+        <button className={btnClass} type="submit">{t("saveDoctor")}</button>
       </form>
-      <form className={cx(ui.panel, ui.stack)} onSubmit={(event) => void onOffering(event)}>
+      <form className={panelClass} onSubmit={(event) => void onOffering(event)}>
         <h2>{t("newService")}</h2>
-        <label className={ui.field}>
+        <label className={fieldClass}>
           {t("doctor")}
-          <select name="doctorId" required defaultValue={doctors[0]?.id ?? ""}>
+          <select name="doctorId" required defaultValue={doctors[0]?.id ?? ""} className={controlClass}>
             {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.name}</option>)}
           </select>
         </label>
-        <label className={ui.field}>{common("name")}<input name="name" required /></label>
-        <label className={ui.field}>{t("amd")}<input name="priceAmd" type="number" required /></label>
-        <label className={ui.field}>{t("duration")}<input name="durationMinutes" type="number" required /></label>
-        <button className={ui.btn} type="submit">{t("add")}</button>
+        <label className={fieldClass}>{common("name")}<input name="name" required className={controlClass} /></label>
+        <label className={fieldClass}>{t("amd")}<input name="priceAmd" type="number" required className={controlClass} /></label>
+        <label className={fieldClass}>{t("duration")}<input name="durationMinutes" type="number" required className={controlClass} /></label>
+        <button className={btnClass} type="submit">{t("add")}</button>
       </form>
-      {message ? <p className={ui.error}>{message}</p> : null}
+      {message ? <p className="m-0 text-danger">{message}</p> : null}
     </div>
   );
 }

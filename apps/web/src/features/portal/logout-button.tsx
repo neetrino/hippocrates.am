@@ -2,8 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { cx } from "@/shared/ui/cx";
-import ui from "@/shared/ui/primitives.module.css";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -19,7 +17,11 @@ export function LogoutButton() {
   }
 
   return (
-    <button className={cx(ui.btn, ui.btnGhost, ui.btnSmall)} type="button" onClick={() => void logout()}>
+    <button
+      className="inline-flex cursor-pointer items-center justify-center rounded-full border border-accent/28 bg-white px-3.5 py-2 text-sm font-semibold text-accent transition-colors duration-160 hover:bg-accent-soft"
+      type="button"
+      onClick={() => void logout()}
+    >
       {t("logout")}
     </button>
   );

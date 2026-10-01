@@ -12,8 +12,9 @@ function r2RemotePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"]
 }
 
 const nextConfig: NextConfig = {
-  agentRules: false,
-  images: { remotePatterns: r2RemotePatterns() },
+  images: {
+    remotePatterns: r2RemotePatterns(),
+  },
 };
 
 export default withNextIntl(nextConfig);

@@ -5,9 +5,7 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { formatAmount, formatTime } from "@/shared/format";
 import type { OfferingCard } from "@/shared/public-types";
-import { cx } from "@/shared/ui/cx";
-import ui from "@/shared/ui/primitives.module.css";
-import styles from "@/features/booking/booking-panel.module.css";
+import { cn } from "@/shared/ui/cn";
 
 type SlotResponse = { data: { startsAt: string[] } };
 
@@ -65,14 +63,19 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
     router.refresh();
   }
 
-  if (!offering) return <p className={ui.muted}>{t("noService")}</p>;
+  if (!offering) return <p className="m-0 text-muted">{t("noService")}</p>;
+
+  const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
+  const controlClass =
+    "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 
   return (
-    <div className={cx(ui.panel, ui.stack)}>
+    <div className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft">
       <h2>{t("title")}</h2>
-      <label className={ui.field}>
+      <label className={fieldClass}>
         {t("service")}
         <select
+          className={controlClass}
           value={offeringId}
           onChange={(event) => {
             setOfferingId(event.target.value);
@@ -87,9 +90,10 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
           ))}
         </select>
       </label>
-      <label className={ui.field}>
+      <label className={fieldClass}>
         {t("day")}
         <input
+          className={controlClass}
           type="date"
           value={date}
           min={todayIso()}
@@ -99,15 +103,29 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
           }}
         />
       </label>
-      <div className={styles.slots}>
+      <div className="flex flex-wrap gap-2">
         {slots.map((slot) => (
-          <button key={slot} type="button" className={styles.slot} aria-pressed={selected === slot} onClick={() => setSelected(slot)}>
+          <button
+            key={slot}
+            type="button"
+            className={cn(
+              "cursor-pointer rounded-full border border-line bg-white px-3 py-2",
+              selected === slot && "border-accent bg-accent text-white",
+            )}
+            aria-pressed={selected === slot}
+            onClick={() => setSelected(slot)}
+          >
             {formatTime(slot)}
           </button>
         ))}
       </div>
-      {message ? <p className={ui.muted}>{message}</p> : null}
-      <button className={ui.btn} type="button" disabled={!selected || pending} onClick={() => void book()}>
+      {message ? <p className="m-0 text-muted">{message}</p> : null}
+      <button
+        className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:cursor-not-allowed disabled:opacity-55"
+        type="button"
+        disabled={!selected || pending}
+        onClick={() => void book()}
+      >
         {t("book")}
       </button>
     </div>

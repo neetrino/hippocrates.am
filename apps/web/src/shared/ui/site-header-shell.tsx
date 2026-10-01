@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { cx } from "@/shared/ui/cx";
-import primitives from "@/shared/ui/primitives.module.css";
-import styles from "@/shared/ui/site-header.module.css";
+import { cn } from "@/shared/ui/cn";
 
 const SCROLL_ACTIVATE_Y = 16;
 
@@ -20,9 +18,20 @@ export function SiteHeaderShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <header className={cx(styles.header, scrolled && styles.headerScrolled)}>
-      <div className={cx(primitives.shell, styles.inner)}>
-        <div className={styles.surface} aria-hidden="true" />
+    <header
+      className={cn(
+        "group sticky top-0 z-20 bg-transparent py-3.5 transition-[padding] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-md:py-2",
+        scrolled && "is-scrolled py-2.5 max-md:py-1.5",
+      )}
+    >
+      <div className="relative mx-auto w-[min(var(--max-width-shell),calc(100%-48px))] max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-0 rounded-full border border-accent/14 bg-white/94 opacity-0 shadow-[0_12px_34px_rgba(20,36,40,0.08)] backdrop-blur-[18px] transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-md:rounded-[22px]",
+            scrolled && "opacity-100",
+          )}
+          aria-hidden="true"
+        />
         {children}
       </div>
     </header>

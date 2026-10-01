@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 import { PhoneField, buildPhoneNumber } from "@/features/auth/phone-field";
-import styles from "@/features/auth/auth.module.css";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
@@ -46,10 +45,15 @@ export function RegisterForm() {
     router.refresh();
   }
 
+  const fieldClass =
+    "grid w-full min-w-0 gap-1.5 text-[0.86rem] font-semibold";
+  const inputClass =
+    "w-full min-w-0 rounded-[14px] border-0 bg-auth-field px-3 py-[11px] text-[0.92rem] font-normal placeholder:text-[#9aa6a5] focus:bg-auth-field-focus focus:shadow-[0_0_0_3px_rgba(0,167,157,0.18)] focus:outline-none";
+
   return (
-    <form className={styles.form} onSubmit={(event) => void onSubmit(event)}>
-      <div className={styles.fieldRow}>
-        <label className={styles.field}>
+    <form className="grid min-w-0 gap-3" onSubmit={(event) => void onSubmit(event)}>
+      <div className="grid min-w-0 grid-cols-2 gap-2.5 max-sm:grid-cols-1">
+        <label className={fieldClass}>
           {t("name")}
           <input
             name="name"
@@ -57,12 +61,13 @@ export function RegisterForm() {
             placeholder="John"
             required
             autoComplete="given-name"
+            className={inputClass}
             onInput={(event) => {
               event.currentTarget.value = event.currentTarget.value.replace(/[^\p{L}]/gu, "");
             }}
           />
         </label>
-        <label className={styles.field}>
+        <label className={fieldClass}>
           {t("surname")}
           <input
             name="surname"
@@ -70,6 +75,7 @@ export function RegisterForm() {
             placeholder="Doe"
             required
             autoComplete="family-name"
+            className={inputClass}
             onInput={(event) => {
               event.currentTarget.value = event.currentTarget.value.replace(/[^\p{L}]/gu, "");
             }}
@@ -77,11 +83,11 @@ export function RegisterForm() {
         </label>
       </div>
       <PhoneField label={t("phone")} />
-      <label className={styles.field}>
+      <label className={fieldClass}>
         {t("email")}
-        <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" />
+        <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" className={inputClass} />
       </label>
-      <div className={styles.fieldRow}>
+      <div className="grid min-w-0 grid-cols-2 gap-2.5 max-sm:grid-cols-1">
         <PasswordField
           name="password"
           label={t("password")}
@@ -99,8 +105,13 @@ export function RegisterForm() {
           hideLabel={t("hidePassword")}
         />
       </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
-      <button className={styles.btn} type="submit">{t("registerAction")}</button>
+      {error ? <p className="m-0 text-danger">{error}</p> : null}
+      <button
+        className="mt-0.5 inline-flex min-h-11 w-full max-w-full cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 text-[0.84rem] font-semibold tracking-[0.05em] text-white uppercase shadow-[0_10px_20px_rgba(0,167,157,0.18)] transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.24)]"
+        type="submit"
+      >
+        {t("registerAction")}
+      </button>
     </form>
   );
 }

@@ -9,7 +9,9 @@
     "login": "Вход",
     "me": "Моя страница",
     "register": "Регистрация",
-    "language": "Язык"
+    "language": "Язык",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню"
   },
   "footer": {
     "tagline": "Стоматологические клиники и врачи в Армении."
@@ -93,13 +95,26 @@
   },
   "auth": {
     "loginTitle": "Вход",
-    "enter": "Войти",
+    "loginHint": "Войдите, чтобы видеть визиты и уведомления.",
+    "enter": "Продолжить",
     "email": "Эл. почта",
     "password": "Пароль",
     "registerTitle": "Регистрация",
     "registerHint": "Аккаунт пациента открывается здесь.",
-    "registerAction": "Зарегистрироваться",
-    "displayName": "Имя"
+    "registerAction": "Продолжить",
+    "displayName": "Имя",
+    "noAccount": "Нет аккаунта?",
+    "goRegister": "Зарегистрироваться",
+    "hasAccount": "Уже есть аккаунт?",
+    "goLogin": "Войти",
+    "name": "Имя",
+    "surname": "Фамилия",
+    "phone": "Телефон",
+    "confirmPassword": "Повторите пароль",
+    "passwordMismatch": "Пароли не совпадают",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "phoneInvalid": "Некорректный номер телефона"
   },
   "me": {
     "signIn": "Войдите, чтобы увидеть свою страницу.",

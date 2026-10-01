@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import type { Request, Response } from "express";
 import { AppError } from "../common/app-error";
-import { emailOf, passwordOf, recordOf, requiredString } from "../common/input";
+import { emailOf, passwordOf, personNameOf, recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import type { Actor } from "./access";
 import { Public } from "./auth.decorators";
@@ -26,14 +26,26 @@ export class AuthController {
   ): Promise<{ id: string }> {
     this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
     const input = recordOf(body);
+    const name = personNameOf(input.name ?? input.displayName, "Անուն");
+    const surname = personNameOf(input.surname, "Ազգանուն");
+    const phoneRaw = requiredString(input.phone, "Հեռախոս");
+    const phone = phoneRaw.replace(/\D/g, "");
+    if (phone.length < 8) {
+      throw new AppError("VALIDATION_FAILED", 400, "Հեռախոսահամարը սխալ է");
+    }
     const email = emailOf(input.email);
     const password = passwordOf(input.password);
-    const displayName = requiredString(input.displayName, "Անուն");
+    const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը");
+    if (password !== confirmPassword) {
+      throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
+    }
+    const displayName = `${name} ${surname}`.replace(/\s+/g, " ").trim();
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
     const user = await this.prisma.user.create({
       data: {
         email,
+        phone,
         displayName,
         passwordHash: await this.sessions.hashPassword(password),
         role: "PATIENT",

@@ -9,7 +9,9 @@
     "login": "Մուտք",
     "me": "Իմ էջը",
     "register": "Գրանցում",
-    "language": "Լեզու"
+    "language": "Լեզու",
+    "openMenu": "Բացել մենյուն",
+    "closeMenu": "Փակել մենյուն"
   },
   "footer": {
     "tagline": "Ատամնաբուժական կլինիկաներ և բժիշկներ Հայաստանում։"
@@ -93,13 +95,26 @@
   },
   "auth": {
     "loginTitle": "Մուտք",
-    "enter": "Մտնել",
+    "loginHint": "Մտեք ձեր հաշիվ՝ այցերն ու ծանուցումները տեսնելու համար։",
+    "enter": "Շարունակել",
     "email": "Էլ. փոստ",
     "password": "Գաղտնաբառ",
     "registerTitle": "Գրանցում",
     "registerHint": "Պացիենտի հաշիվը բացվում է այստեղից։",
-    "registerAction": "Գրանցվել",
-    "displayName": "Անուն"
+    "registerAction": "Շարունակել",
+    "displayName": "Անուն",
+    "noAccount": "Հաշիվ չունե՞ք",
+    "goRegister": "Գրանցվել",
+    "hasAccount": "Արդեն ունե՞ք հաշիվ",
+    "goLogin": "Մուտք գործել",
+    "name": "Անուն",
+    "surname": "Ազգանուն",
+    "phone": "Հեռախոս",
+    "confirmPassword": "Կրկնել գաղտնաբառը",
+    "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
+    "showPassword": "Ցույց տալ գաղտնաբառը",
+    "hidePassword": "Թաքցնել գաղտնաբառը",
+    "phoneInvalid": "Հեռախոսահամարը սխալ է"
   },
   "me": {
     "signIn": "Մուտք գործեք՝ ձեր էջը տեսնելու համար։",

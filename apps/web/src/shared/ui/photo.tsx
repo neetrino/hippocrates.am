@@ -8,10 +8,16 @@ type PhotoProps = {
 };
 
 export function Photo({ src, alt, loading }: PhotoProps) {
-  if (!src) return <div className="photo-fallback">{alt.slice(0, 1)}</div>;
+  if (!src) {
+    return (
+      <div className="grid h-full w-full place-items-center bg-linear-to-br from-accent-soft to-sand text-2xl font-bold text-accent">
+        {alt.slice(0, 1)}
+      </div>
+    );
+  }
   return (
     <Image
-      className="photo-img"
+      className="object-cover"
       src={src}
       alt={alt}
       fill

@@ -9,7 +9,9 @@
     "login": "Sign in",
     "me": "My page",
     "register": "Register",
-    "language": "Language"
+    "language": "Language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "footer": {
     "tagline": "Dental clinics and doctors in Armenia."
@@ -93,13 +95,26 @@
   },
   "auth": {
     "loginTitle": "Sign in",
-    "enter": "Sign in",
+    "loginHint": "Sign in to see your visits and notifications.",
+    "enter": "Continue",
     "email": "Email",
     "password": "Password",
     "registerTitle": "Register",
     "registerHint": "A patient account starts here.",
-    "registerAction": "Create account",
-    "displayName": "Name"
+    "registerAction": "Continue",
+    "displayName": "Name",
+    "noAccount": "No account?",
+    "goRegister": "Sign up",
+    "hasAccount": "Already have an account?",
+    "goLogin": "Log in",
+    "name": "Name",
+    "surname": "Surname",
+    "phone": "Phone number",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "phoneInvalid": "Phone number is invalid"
   },
   "me": {
     "signIn": "Sign in to see your page.",

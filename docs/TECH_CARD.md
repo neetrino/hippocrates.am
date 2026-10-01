@@ -7,6 +7,7 @@
 | Product boundary | Full product, points P0–P11 in `PROGRESS.md`. No reduced first release | Accepted 2026-09-30 |
 | Repository | `apps/web` and `apps/api`. No `packages/*` until real reuse | Accepted. Folders are not created yet |
 | Web | Next.js App Router. One UI for public, patient, doctor, clinic, and platform areas | Accepted |
+| Styling | Tailwind CSS 4.x via `@tailwindcss/postcss` (Next.js default) | Accepted |
 | Backend | NestJS modular-monolith REST API | Accepted |
 | Language | TypeScript strict, Node.js 24 | Accepted for local development |
 | Persistence | One PostgreSQL 17 database | Accepted for local development |

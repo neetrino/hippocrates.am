@@ -16,5 +16,13 @@ export function LogoutButton() {
     router.refresh();
   }
 
-  return <button className="btn btn-ghost btn-small" type="button" onClick={() => void logout()}>{t("logout")}</button>;
+  return (
+    <button
+      className="inline-flex cursor-pointer items-center justify-center rounded-full border border-accent/28 bg-white px-3.5 py-2 text-sm font-semibold text-accent transition-colors duration-160 hover:bg-accent-soft"
+      type="button"
+      onClick={() => void logout()}
+    >
+      {t("logout")}
+    </button>
+  );
 }

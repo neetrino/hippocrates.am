@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 import { PhoneField, buildPhoneNumber } from "@/features/auth/phone-field";
+import { sanitizeNameInput } from "@/shared/input-constraints";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
@@ -63,7 +64,7 @@ export function RegisterForm() {
             autoComplete="given-name"
             className={inputClass}
             onInput={(event) => {
-              event.currentTarget.value = event.currentTarget.value.replace(/[^\p{L}]/gu, "");
+              event.currentTarget.value = sanitizeNameInput(event.currentTarget.value);
             }}
           />
         </label>
@@ -77,7 +78,7 @@ export function RegisterForm() {
             autoComplete="family-name"
             className={inputClass}
             onInput={(event) => {
-              event.currentTarget.value = event.currentTarget.value.replace(/[^\p{L}]/gu, "");
+              event.currentTarget.value = sanitizeNameInput(event.currentTarget.value);
             }}
           />
         </label>

@@ -59,6 +59,7 @@ export default async function PortalClinicsPage({
               {
                 name: "name",
                 label: platform("clinicName"),
+                kind: "name",
                 placeholder: platform("clinicNamePlaceholder"),
               },
               {
@@ -69,11 +70,12 @@ export default async function PortalClinicsPage({
               {
                 name: "phone",
                 label: platform("phone"),
-                placeholder: platform("phonePlaceholder"),
+                kind: "phone",
               },
               {
                 name: "adminName",
                 label: platform("adminName"),
+                kind: "name",
                 placeholder: platform("adminNamePlaceholder"),
               },
               {

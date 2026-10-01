@@ -6,7 +6,13 @@ import { CloseIcon, RegisterClinicIcon } from "@/features/portal/admin-sidebar-i
 import { JsonForm } from "@/shared/json-form";
 import { cn } from "@/shared/ui/cn";
 
-type FormField = { name: string; label: string; type?: string };
+type FormField = {
+  name: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  kind?: "text" | "phone" | "name";
+};
 
 type AddClinicSheetProps = {
   addLabel: string;

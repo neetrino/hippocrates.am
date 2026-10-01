@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { cn } from "@/shared/ui/cn";
 
 type DoctorsSearchProps = {
@@ -65,8 +65,23 @@ export function DoctorsSearch({
     formRef.current?.requestSubmit();
   }
 
+  function onSubmit(event: FormEvent<HTMLFormElement>): void {
+    const form = event.currentTarget;
+    for (const element of Array.from(form.elements)) {
+      if (!(element instanceof HTMLInputElement)) continue;
+      if (!element.name || element.value.trim()) continue;
+      element.disabled = true;
+    }
+  }
+
   return (
-    <form ref={formRef} action={action} method="get" className="relative grid gap-3">
+    <form
+      ref={formRef}
+      action={action}
+      method="get"
+      onSubmit={onSubmit}
+      className="relative grid gap-3"
+    >
       <div className="flex items-center gap-3 rounded-full bg-[#eef2f2] px-4 py-[13px] shadow-[0_8px_22px_rgba(20,36,40,0.06)] transition-[box-shadow,background] duration-160 focus-within:bg-[#e8eded] focus-within:shadow-[0_10px_26px_rgba(0,167,157,0.12)]">
         <SearchIcon />
         <input

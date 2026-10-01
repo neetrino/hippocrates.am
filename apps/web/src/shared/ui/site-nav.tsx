@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
@@ -17,6 +17,17 @@ type SiteNavProps = {
   login: string;
   openMenu: string;
   closeMenu: string;
+};
+
+type NavLink = {
+  href: "/clinics" | "/doctors" | "/questions";
+  label: string;
+};
+
+type IndicatorBox = {
+  left: number;
+  width: number;
+  ready: boolean;
 };
 
 const localeCodes: Record<AppLocale, string> = { hy: "HY", en: "EN", ru: "RU" };
@@ -57,6 +68,93 @@ function CloseIcon() {
   );
 }
 
+function isActivePath(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: string }) {
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const [indicator, setIndicator] = useState<IndicatorBox>({ left: 0, width: 0, ready: false });
+  const activeIndex = links.findIndex((item) => isActivePath(pathname, item.href));
+  const labelsKey = links.map((item) => item.label).join("|");
+
+  useLayoutEffect(() => {
+    function measure(): void {
+      const nav = navRef.current;
+      const active = itemRefs.current[activeIndex];
+      if (!nav || !active || activeIndex < 0) {
+        setIndicator((prev) => ({ ...prev, ready: false }));
+        return;
+      }
+      const navRect = nav.getBoundingClientRect();
+      const itemRect = active.getBoundingClientRect();
+      setIndicator({
+        left: itemRect.left - navRect.left,
+        width: itemRect.width,
+        ready: true,
+      });
+    }
+
+    measure();
+    const nav = navRef.current;
+    if (!nav || typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    const observer = new ResizeObserver(measure);
+    observer.observe(nav);
+    for (const item of itemRefs.current) {
+      if (item) observer.observe(item);
+    }
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [activeIndex, labelsKey, pathname]);
+
+  return (
+    <nav
+      ref={navRef}
+      className="relative justify-self-center gap-1.5 rounded-full border border-line bg-[#f5fafa] p-1.5 max-md:hidden md:flex md:items-center"
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute top-1.5 bottom-1.5 rounded-full bg-white shadow-[0_4px_14px_rgba(0,167,157,0.12)] transition-[transform,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          indicator.ready ? "opacity-100" : "opacity-0",
+        )}
+        style={{
+          width: indicator.width,
+          transform: `translateX(${indicator.left}px)`,
+        }}
+      />
+      {links.map((item, index) => {
+        const active = index === activeIndex;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            ref={(node) => {
+              itemRefs.current[index] = node;
+            }}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "relative z-1 rounded-full px-[18px] py-2.5 text-[0.98rem] font-medium tracking-[0.01em] transition-[color,text-decoration-color,font-weight] duration-300",
+              active
+                ? "font-semibold text-accent underline decoration-accent decoration-2 underline-offset-[7px]"
+                : "text-muted hover:text-accent",
+            )}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
 export function SiteNav({
   clinics,
   doctors,
@@ -92,38 +190,15 @@ export function SiteNav({
     };
   }, [open]);
 
-  const links = [
-    { href: "/clinics" as const, label: clinics },
-    { href: "/doctors" as const, label: doctors },
-    { href: "/questions" as const, label: questions },
+  const links: NavLink[] = [
+    { href: "/clinics", label: clinics },
+    { href: "/doctors", label: doctors },
+    { href: "/questions", label: questions },
   ];
-
-  function isActivePath(href: string): boolean {
-    return pathname === href || pathname.startsWith(`${href}/`);
-  }
 
   return (
     <div className="contents">
-      <nav className="justify-self-center gap-1.5 rounded-full border border-line bg-[#f5fafa] p-1.5 max-md:hidden md:flex md:items-center">
-        {links.map((item) => {
-          const active = isActivePath(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "rounded-full px-[18px] py-2.5 text-[0.98rem] font-medium tracking-[0.01em] transition-[color,background,box-shadow,text-decoration-color] duration-160",
-                active
-                  ? "bg-white font-semibold text-accent underline decoration-accent decoration-2 underline-offset-[7px] shadow-[0_4px_14px_rgba(0,167,157,0.12)]"
-                  : "text-muted hover:bg-white hover:text-accent hover:shadow-[0_4px_14px_rgba(0,167,157,0.1)]",
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <DesktopPrimaryNav links={links} pathname={pathname} />
       <div className="flex items-center justify-self-end gap-2.5 max-md:gap-2">
         <LocaleSwitch hideOnMobile />
         <Link
@@ -184,7 +259,7 @@ export function SiteNav({
                 <div className="grid gap-[22px] rounded-[28px] bg-white px-[22px] pt-7 pb-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
                   <nav className="grid gap-1">
                     {links.map((item) => {
-                      const active = isActivePath(item.href);
+                      const active = isActivePath(pathname, item.href);
                       return (
                         <Link
                           key={item.href}

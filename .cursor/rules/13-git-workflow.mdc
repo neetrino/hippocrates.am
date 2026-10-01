@@ -1,12 +1,58 @@
 ---
-description: Git — branches, conventional commits, PR hygiene.
+description: Git — branches, Conventional Commits (feat/fix/…), PR hygiene. Apply when committing or writing commit messages.
 globs: []
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Git workflow
 
-- Follow the repository's branch and commit conventions; when none exist, prefer focused branches and Conventional Commits.
+- Follow the repository's branch conventions; prefer focused branches.
 - **PRs** — small, focused, green CI, description template, self-review first.
 - **No force-push** to `main`/`develop`; no secrets in commits.
 - **CHANGELOG** maintained if project ships versions.
+
+## Commit messages (required)
+
+Use **Conventional Commits**. Short subject, imperative mood, no trailing period.
+
+### Format
+
+```text
+type(scope): summary
+
+optional body
+```
+
+### Types
+
+| Type | When |
+| --- | --- |
+| `feat` | New user-facing capability |
+| `fix` | Bug fix |
+| `refactor` | Internal restructure, same behavior |
+| `style` | Formatting / visual-only UI polish |
+| `docs` | Documentation only |
+| `test` | Tests only |
+| `chore` | Tooling, deps, config, housekeeping |
+| `perf` | Performance improvement |
+| `ci` | CI/CD only |
+
+### Scope
+
+Optional but preferred when clear: `web`, `api`, `portal`, `auth`, `clinics`, `i18n`, …
+
+### Examples
+
+```text
+feat(portal): add Super Admin clinics live search
+fix(auth): block letters in phone input
+style(portal): match Search and Add Clinic button widths
+refactor(web): extract PortalClinicsPanel
+chore: update Cursor git commit conventions
+```
+
+### Do not
+
+- Long essay subjects or “Update/Fix stuff”
+- Subject that only lists files
+- Mixing unrelated changes in one commit (split instead)

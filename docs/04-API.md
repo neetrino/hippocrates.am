@@ -20,7 +20,8 @@
 | `GET /public/home` | Homepage summary and entry points | Only published content |
 | `GET /public/clinics?name=` | Clinic list and name search | Published clinics only. Filters and ratings arrive on later points |
 | `GET /public/clinics/:id` | Published clinic, its doctors, and offerings/prices | Safe allowlisted fields only |
-| `GET /public/doctors?name=&specialty=&city=&clinic=` | Independent published doctor directory and basic search (city matches clinic district/address; clinic matches clinic name) | Published doctor AND associated clinic approved |
+| `GET /public/doctor-filters` | Distinct specialty, city (district), and clinic options for doctor filters | Published clinics/doctors only |
+| `GET /public/doctors?name=&specialty=&city=&clinic=` | Independent published doctor directory; specialty/city/clinic accept one or many exact values | Published doctor AND associated clinic approved |
 | `GET /public/doctors/:id` | Published doctor profile | No internal credential attachments |
 | `GET /public/clinics/:id/services` | Published service/price list | Distinguish quoted estimate from fixed price where applicable |
 | `GET /public/availability?doctorId=&serviceId=&date=` | Genuine bookable slots for doctor/service | Advisory display only; booking rechecks in DB |

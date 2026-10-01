@@ -65,6 +65,7 @@
     "openFilters": "Open filters",
     "resetFilters": "Reset filters",
     "applyFilters": "Apply filters",
+    "selectedCount": "{count} selected",
     "emptyDoctorSearch": "No doctor matches this search."
   },
   "clinicPage": {

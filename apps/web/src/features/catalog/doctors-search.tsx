@@ -65,7 +65,10 @@ export function DoctorsSearch({
   const [city, setCity] = useState(initialCity);
   const [clinic, setClinic] = useState(initialClinic);
   const hasActiveFilter = specialty.length > 0 || city.length > 0 || clinic.length > 0;
-  const [filtersOpen, setFiltersOpen] = useState(hasActiveFilter);
+  const [filtersOpen, setFiltersOpen] = useState(
+    initialSpecialty.length > 0 || initialCity.length > 0 || initialClinic.length > 0,
+  );
+  const [pendingReset, setPendingReset] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const panelId = useId();
 
@@ -78,12 +81,17 @@ export function DoctorsSearch({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [filtersOpen]);
 
+  useEffect(() => {
+    if (!pendingReset) return;
+    setPendingReset(false);
+    formRef.current?.requestSubmit();
+  }, [pendingReset, specialty, city, clinic]);
+
   function resetFilters(): void {
     setSpecialty([]);
     setCity([]);
     setClinic([]);
-    // Submit on next tick so hidden inputs reflect cleared state.
-    queueMicrotask(() => formRef.current?.requestSubmit());
+    setPendingReset(true);
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>): void {

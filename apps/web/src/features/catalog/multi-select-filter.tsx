@@ -121,7 +121,7 @@ export function MultiSelectFilter({
                 >
                   <span
                     className={cn(
-                      "grid h-4.5 w-4.5 shrink-0 place-items-center rounded-[5px] border transition-colors duration-140",
+                      "grid h-[18px] w-[18px] shrink-0 place-items-center rounded-[5px] border transition-colors duration-140",
                       checked ? "border-accent bg-accent text-white" : "border-line bg-white",
                     )}
                     aria-hidden="true"

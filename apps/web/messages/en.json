@@ -113,7 +113,9 @@
     "confirmPassword": "Confirm password",
     "passwordMismatch": "Passwords do not match",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "phoneHint": "Select the country, then enter the local number without the country code.",
+    "phoneInvalid": "Phone number is invalid"
   },
   "me": {
     "signIn": "Sign in to see your page.",

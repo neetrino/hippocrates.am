@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
+import { PhoneField, buildPhoneNumber } from "@/features/auth/phone-field";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
@@ -17,10 +18,16 @@ export function RegisterForm() {
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const surname = String(form.get("surname") ?? "").trim();
-    const phone = String(form.get("phone") ?? "").trim();
+    const countryId = String(form.get("phoneCountry") ?? "am");
+    const phoneLocal = String(form.get("phoneLocal") ?? "").trim();
+    const phone = buildPhoneNumber(countryId, phoneLocal);
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
     const confirmPassword = String(form.get("confirmPassword") ?? "");
+    if (phoneLocal.replace(/\D/g, "").length < 6) {
+      setError(t("phoneInvalid"));
+      return;
+    }
     if (password !== confirmPassword) {
       setError(t("passwordMismatch"));
       return;
@@ -69,29 +76,11 @@ export function RegisterForm() {
           />
         </label>
       </div>
-      <div className="field-row">
-        <label className="field">
-          {t("phone")}
-          <input
-            name="phone"
-            type="tel"
-            inputMode="tel"
-            pattern="\+[0-9]+"
-            placeholder="+37491123456"
-            defaultValue="+"
-            required
-            autoComplete="tel"
-            onInput={(event) => {
-              const digits = event.currentTarget.value.replace(/\D/g, "");
-              event.currentTarget.value = `+${digits}`;
-            }}
-          />
-        </label>
-        <label className="field">
-          {t("email")}
-          <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" />
-        </label>
-      </div>
+      <PhoneField label={t("phone")} hint={t("phoneHint")} />
+      <label className="field">
+        {t("email")}
+        <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" />
+      </label>
       <div className="field-row">
         <PasswordField
           name="password"

@@ -530,17 +530,7 @@ h2 { font-size: 1.45rem; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(0, 167, 157, 0.14);
-  box-shadow: 0 10px 24px rgba(0, 167, 157, 0.1);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.auth-logo-link:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(0, 167, 157, 0.14);
+  line-height: 0;
 }
 
 .auth-logo {

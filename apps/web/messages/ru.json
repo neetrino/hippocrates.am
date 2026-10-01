@@ -60,6 +60,8 @@
     "doctorName": "Имя врача",
     "doctorSearchPlaceholder": "Поиск по имени...",
     "specialty": "Специальность",
+    "city": "Город",
+    "clinic": "Клиника",
     "openFilters": "Открыть фильтры",
     "resetFilters": "Сбросить фильтры",
     "applyFilters": "Применить фильтры",

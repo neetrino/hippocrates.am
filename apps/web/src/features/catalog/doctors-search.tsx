@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
 import { cn } from "@/shared/ui/cn";
 
 type DoctorsSearchProps = {
   action: string;
   initialName: string;
   initialSpecialty: string;
+  initialCity: string;
+  initialClinic: string;
   labels: {
     namePlaceholder: string;
     nameAria: string;
     specialty: string;
+    city: string;
+    clinic: string;
     openFilters: string;
     resetFilters: string;
     applyFilters: string;
@@ -39,17 +43,51 @@ function FilterIcon() {
   );
 }
 
+const fieldClass = "grid gap-1.5 text-[0.86rem] font-semibold text-ink";
+const controlClass =
+  "rounded-xl border border-line bg-white px-3.5 py-3 text-[0.95rem] font-normal text-ink outline-none placeholder:text-[#9aa6a5] focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)]";
+
+function FilterField({
+  label,
+  name,
+  defaultValue,
+  inputRef,
+}: {
+  label: string;
+  name: string;
+  defaultValue: string;
+  inputRef: RefObject<HTMLInputElement | null>;
+}) {
+  return (
+    <label className={fieldClass}>
+      <span>{label}</span>
+      <input
+        ref={inputRef}
+        name={name}
+        defaultValue={defaultValue}
+        placeholder={label}
+        aria-label={label}
+        className={controlClass}
+      />
+    </label>
+  );
+}
+
 export function DoctorsSearch({
   action,
   initialName,
   initialSpecialty,
+  initialCity,
+  initialClinic,
   labels,
 }: DoctorsSearchProps) {
-  const [filtersOpen, setFiltersOpen] = useState(Boolean(initialSpecialty));
+  const hasActiveFilter = Boolean(initialSpecialty || initialCity || initialClinic);
+  const [filtersOpen, setFiltersOpen] = useState(hasActiveFilter);
   const formRef = useRef<HTMLFormElement>(null);
   const specialtyRef = useRef<HTMLInputElement>(null);
+  const cityRef = useRef<HTMLInputElement>(null);
+  const clinicRef = useRef<HTMLInputElement>(null);
   const panelId = useId();
-  const hasActiveFilter = Boolean(initialSpecialty);
 
   useEffect(() => {
     if (!filtersOpen) return;
@@ -62,6 +100,8 @@ export function DoctorsSearch({
 
   function resetFilters(): void {
     if (specialtyRef.current) specialtyRef.current.value = "";
+    if (cityRef.current) cityRef.current.value = "";
+    if (clinicRef.current) clinicRef.current.value = "";
     formRef.current?.requestSubmit();
   }
 
@@ -111,17 +151,21 @@ export function DoctorsSearch({
         hidden={!filtersOpen}
         className="rounded-[18px] border border-line bg-white p-4 shadow-soft max-md:p-3.5"
       >
-        <label className="grid gap-1.5 text-[0.86rem] font-semibold text-ink">
-          <span>{labels.specialty}</span>
-          <input
-            ref={specialtyRef}
+        <div className="grid gap-3 md:grid-cols-3">
+          <FilterField
+            label={labels.specialty}
             name="specialty"
             defaultValue={initialSpecialty}
-            placeholder={labels.specialty}
-            aria-label={labels.specialty}
-            className="rounded-xl border border-line bg-white px-3.5 py-3 text-[0.95rem] font-normal text-ink outline-none placeholder:text-[#9aa6a5] focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)]"
+            inputRef={specialtyRef}
           />
-        </label>
+          <FilterField label={labels.city} name="city" defaultValue={initialCity} inputRef={cityRef} />
+          <FilterField
+            label={labels.clinic}
+            name="clinic"
+            defaultValue={initialClinic}
+            inputRef={clinicRef}
+          />
+        </div>
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
           <button
             type="button"

@@ -12,7 +12,7 @@ export default async function DoctorsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ name?: string; specialty?: string }>;
+  searchParams: Promise<{ name?: string; specialty?: string; city?: string; clinic?: string }>;
 }) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
@@ -21,6 +21,8 @@ export default async function DoctorsPage({
   const query = new URLSearchParams();
   if (queryParams.name) query.set("name", queryParams.name);
   if (queryParams.specialty) query.set("specialty", queryParams.specialty);
+  if (queryParams.city) query.set("city", queryParams.city);
+  if (queryParams.clinic) query.set("clinic", queryParams.clinic);
   const suffix = query.size > 0 ? `?${query}` : "";
   const doctors = await publicGet<DoctorCard[]>(`/public/doctors${suffix}`);
   return (
@@ -30,10 +32,14 @@ export default async function DoctorsPage({
         action={getPathname({ locale, href: "/doctors" })}
         initialName={queryParams.name ?? ""}
         initialSpecialty={queryParams.specialty ?? ""}
+        initialCity={queryParams.city ?? ""}
+        initialClinic={queryParams.clinic ?? ""}
         labels={{
           namePlaceholder: t("doctorSearchPlaceholder"),
           nameAria: t("doctorName"),
           specialty: t("specialty"),
+          city: t("city"),
+          clinic: t("clinic"),
           openFilters: t("openFilters"),
           resetFilters: t("resetFilters"),
           applyFilters: t("applyFilters"),

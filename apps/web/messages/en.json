@@ -60,6 +60,8 @@
     "doctorName": "Doctor name",
     "doctorSearchPlaceholder": "Search by name...",
     "specialty": "Specialty",
+    "city": "City",
+    "clinic": "Clinic",
     "openFilters": "Open filters",
     "resetFilters": "Reset filters",
     "applyFilters": "Apply filters",

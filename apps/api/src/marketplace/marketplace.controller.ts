@@ -117,13 +117,41 @@ export class MarketplaceController {
 
   @Public()
   @Get("doctors")
-  async doctors(@Query("name") name?: string, @Query("specialty") specialty?: string) {
+  async doctors(
+    @Query("name") name?: string,
+    @Query("specialty") specialty?: string,
+    @Query("city") city?: string,
+    @Query("clinic") clinic?: string,
+  ) {
+    const clinicFilter: {
+      published: true;
+      name?: { contains: string; mode: "insensitive" };
+      OR?: Array<
+        | { district: { contains: string; mode: "insensitive" } }
+        | { address: { contains: string; mode: "insensitive" } }
+      >;
+    } = { published: true };
+    if (clinic?.trim()) {
+      clinicFilter.name = { contains: clinic.trim(), mode: "insensitive" };
+    }
+    if (city?.trim()) {
+      const cityQuery = city.trim();
+      clinicFilter.OR = [
+        { district: { contains: cityQuery, mode: "insensitive" } },
+        { address: { contains: cityQuery, mode: "insensitive" } },
+      ];
+    }
+
     const rows = await this.prisma.doctorProfile.findMany({
       where: {
         published: true,
-        clinic: { published: true },
-        specialty: specialty ? { contains: specialty, mode: "insensitive" } : undefined,
-        user: name ? { displayName: { contains: name, mode: "insensitive" } } : undefined,
+        clinic: clinicFilter,
+        specialty: specialty?.trim()
+          ? { contains: specialty.trim(), mode: "insensitive" }
+          : undefined,
+        user: name?.trim()
+          ? { displayName: { contains: name.trim(), mode: "insensitive" } }
+          : undefined,
       },
       orderBy: { user: { displayName: "asc" } },
       select: doctorSelect,

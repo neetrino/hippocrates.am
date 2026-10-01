@@ -77,7 +77,7 @@ export default async function DoctorsPage({
           openFilters: t("openFilters"),
           resetFilters: t("resetFilters"),
           applyFilters: t("applyFilters"),
-          selectedCount: t("selectedCount"),
+          selectedCount: t.raw("selectedCount") as string,
         }}
       />
       {doctors.length === 0 ? <EmptyState>{t("emptyDoctorSearch")}</EmptyState> : null}

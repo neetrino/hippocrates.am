@@ -51,30 +51,34 @@ export function RegisterForm() {
           <input name="surname" type="text" placeholder="Doe" required autoComplete="family-name" />
         </label>
       </div>
-      <label className="field">
-        {t("phone")}
-        <input name="phone" type="tel" placeholder="+374 91 123 456" required autoComplete="tel" />
-      </label>
-      <label className="field">
-        {t("email")}
-        <input name="email" type="email" placeholder="john.doe@email.com" required autoComplete="email" />
-      </label>
-      <PasswordField
-        name="password"
-        label={t("password")}
-        placeholder="••••••••"
-        autoComplete="new-password"
-        showLabel={t("showPassword")}
-        hideLabel={t("hidePassword")}
-      />
-      <PasswordField
-        name="confirmPassword"
-        label={t("confirmPassword")}
-        placeholder="••••••••"
-        autoComplete="new-password"
-        showLabel={t("showPassword")}
-        hideLabel={t("hidePassword")}
-      />
+      <div className="field-row">
+        <label className="field">
+          {t("phone")}
+          <input name="phone" type="tel" placeholder="+374 91 123 456" required autoComplete="tel" />
+        </label>
+        <label className="field">
+          {t("email")}
+          <input name="email" type="email" placeholder="john.doe@email.com" required autoComplete="email" />
+        </label>
+      </div>
+      <div className="field-row">
+        <PasswordField
+          name="password"
+          label={t("password")}
+          placeholder="••••••••"
+          autoComplete="new-password"
+          showLabel={t("showPassword")}
+          hideLabel={t("hidePassword")}
+        />
+        <PasswordField
+          name="confirmPassword"
+          label={t("confirmPassword")}
+          placeholder="••••••••"
+          autoComplete="new-password"
+          showLabel={t("showPassword")}
+          hideLabel={t("hidePassword")}
+        />
+      </div>
       {error ? <p className="error">{error}</p> : null}
       <button className="btn btn-block btn-auth" type="submit">{t("registerAction")}</button>
     </form>

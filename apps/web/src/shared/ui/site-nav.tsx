@@ -87,11 +87,9 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
         setIndicator((prev) => ({ ...prev, ready: false }));
         return;
       }
-      const navRect = nav.getBoundingClientRect();
-      const itemRect = active.getBoundingClientRect();
       setIndicator({
-        left: itemRect.left - navRect.left,
-        width: itemRect.width,
+        left: active.offsetLeft,
+        width: active.offsetWidth,
         ready: true,
       });
     }
@@ -122,12 +120,12 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
       <span
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute top-1.5 bottom-1.5 rounded-full bg-white shadow-[0_4px_14px_rgba(0,167,157,0.12)] transition-[transform,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "pointer-events-none absolute top-1.5 bottom-1.5 left-0 rounded-full bg-white shadow-[0_4px_14px_rgba(0,167,157,0.12)] transition-[transform,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           indicator.ready ? "opacity-100" : "opacity-0",
         )}
         style={{
           width: indicator.width,
-          transform: `translateX(${indicator.left}px)`,
+          transform: `translate3d(${indicator.left}px, 0, 0)`,
         }}
       />
       {links.map((item, index) => {

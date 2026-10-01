@@ -18,9 +18,8 @@ export function RegisterForm() {
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const surname = String(form.get("surname") ?? "").trim();
-    const countryId = String(form.get("phoneCountry") ?? "am");
     const phoneLocal = String(form.get("phoneLocal") ?? "").trim();
-    const phone = buildPhoneNumber(countryId, phoneLocal);
+    const phone = buildPhoneNumber(phoneLocal);
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
     const confirmPassword = String(form.get("confirmPassword") ?? "");

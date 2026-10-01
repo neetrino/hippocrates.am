@@ -19,7 +19,7 @@ import { routing } from "@/i18n/routing";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
-type PortalHref = "/me" | "/clinics" | "/doctors" | "/questions" | "/platform";
+type PortalHref = "/me" | "/me/clinics" | "/me/doctors" | "/me/questions" | "/me/register";
 
 type NavItem = {
   href: PortalHref;
@@ -66,14 +66,14 @@ function NavLink({
       className={cn(
         "group flex items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,box-shadow] duration-200",
         active
-          ? "-mr-3 rounded-r-none bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
-          : "mr-0 text-white/78 hover:bg-white/10 hover:text-white",
+          ? "-mr-3 rounded-r-none bg-white text-tiffany-ink shadow-[0_8px_22px_rgba(20,57,54,0.12)]"
+          : "mr-0 text-tiffany-ink/72 hover:bg-white/35 hover:text-tiffany-ink",
       )}
     >
       <span
         className={cn(
           "grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors duration-200",
-          active ? "bg-[#1e3a38]/10 text-[#1e3a38]" : "bg-white/10 text-white",
+          active ? "bg-tiffany/55 text-tiffany-ink" : "bg-white/30 text-tiffany-ink",
         )}
       >
         {item.icon}
@@ -101,10 +101,10 @@ function SidebarNav({
     <div className="flex h-full flex-col gap-8">
       <div className="px-1">
         <Link href="/me" onClick={onNavigate} className="inline-flex flex-col gap-1.5">
-          <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">
+          <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-tiffany-ink">
             hippocrates
           </span>
-          <p className="m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase">
+          <p className="m-0 text-[0.68rem] font-bold tracking-[0.16em] text-tiffany-ink/55 uppercase">
             {t("subtitle")}
           </p>
         </Link>
@@ -119,7 +119,7 @@ function SidebarNav({
           />
         ))}
       </nav>
-      <nav className="grid gap-1 border-t border-white/12 pt-5" aria-label={t("accountNav")}>
+      <nav className="grid gap-1 border-t border-tiffany-ink/12 pt-5" aria-label={t("accountNav")}>
         {footerItems.map((item) => (
           <NavLink
             key={`${item.href}-${item.hash ?? "root"}`}
@@ -128,7 +128,7 @@ function SidebarNav({
             onNavigate={onNavigate}
           />
         ))}
-        <LogoutButton className="mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-[0.82rem] font-semibold tracking-[0.06em] text-white/78 uppercase transition-colors duration-200 hover:bg-white/10 hover:text-white" />
+        <LogoutButton className="mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-[0.82rem] font-semibold tracking-[0.06em] text-tiffany-ink/72 uppercase transition-colors duration-200 hover:bg-white/35 hover:text-tiffany-ink" />
       </nav>
     </div>
   );
@@ -180,10 +180,10 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
 
   const items: NavItem[] = [
     { href: "/me", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
-    { href: "/clinics", label: nav("clinics"), icon: <ClinicsIcon />, match: "prefix" },
-    { href: "/doctors", label: nav("doctors"), icon: <DoctorsIcon />, match: "prefix" },
-    { href: "/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "prefix" },
-    { href: "/platform", label: me("openPlatform"), icon: <RegisterClinicIcon />, match: "prefix" },
+    { href: "/me/clinics", label: nav("clinics"), icon: <ClinicsIcon />, match: "prefix" },
+    { href: "/me/doctors", label: nav("doctors"), icon: <DoctorsIcon />, match: "prefix" },
+    { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "prefix" },
+    { href: "/me/register", label: me("openPlatform"), icon: <RegisterClinicIcon />, match: "prefix" },
   ];
   const footerItems: NavItem[] = [
     { href: "/me", hash: "visits", label: me("visits"), icon: <VisitsIcon />, match: "hash" },
@@ -192,7 +192,7 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
 
   return (
     <div className="fixed inset-0 z-[60] flex bg-[#eef3f2]">
-      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-[#2a4a47] px-3 pt-7 pb-6 md:flex md:flex-col">
+      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-tiffany px-3 pt-7 pb-6 md:flex md:flex-col">
         <SidebarNav items={items} footerItems={footerItems} pathname={pathname} hash={hash} />
       </aside>
 
@@ -206,11 +206,11 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
           />
           <aside
             id={menuId}
-            className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-[#2a4a47] px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]"
+            className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-tiffany px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(20,57,54,0.22)]"
           >
             <button
               type="button"
-              className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white"
+              className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/45 text-tiffany-ink"
               aria-label={t("closeMenu")}
               onClick={() => setOpen(false)}
             >

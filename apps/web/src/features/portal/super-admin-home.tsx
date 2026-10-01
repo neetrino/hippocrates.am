@@ -26,7 +26,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
       title={me.displayName}
       action={
         <Link
-          href="/platform"
+          href="/me/register"
           className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover max-md:hidden"
         >
           {t("openPlatform")}
@@ -51,13 +51,13 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
               {noticeCount}
             </p>
           </article>
-          <article className="rounded-[1.4rem] bg-[#2a4a47] px-5 py-5 text-white shadow-soft sm:col-span-2 xl:col-span-1">
-            <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-white/60 uppercase">
+          <article className="rounded-[1.4rem] bg-tiffany px-5 py-5 text-tiffany-ink shadow-soft sm:col-span-2 xl:col-span-1">
+            <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-tiffany-ink/60 uppercase">
               {portal("quickAction")}
             </p>
-            <p className="mt-2 mb-4 text-[1.05rem] font-medium text-white/90">{portal("registerHint")}</p>
+            <p className="mt-2 mb-4 text-[1.05rem] font-medium text-tiffany-ink/90">{portal("registerHint")}</p>
             <Link
-              href="/platform"
+              href="/me/register"
               className="inline-flex rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-160 hover:bg-accent-hover"
             >
               {t("openPlatform")}

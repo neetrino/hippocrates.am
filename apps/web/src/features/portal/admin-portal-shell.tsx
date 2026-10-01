@@ -9,7 +9,6 @@ import {
   MenuIcon,
   NoticesIcon,
   QuestionsIcon,
-  RegisterClinicIcon,
   VisitsIcon,
 } from "@/features/portal/admin-sidebar-icons";
 import { LogoutButton } from "@/features/portal/logout-button";
@@ -18,11 +17,7 @@ import { routing } from "@/i18n/routing";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
-type PortalHref =
-  | "/super-admin"
-  | "/super-admin/clinics"
-  | "/super-admin/questions"
-  | "/super-admin/register";
+type PortalHref = "/super-admin" | "/super-admin/clinics" | "/super-admin/questions";
 
 type NavItem = {
   href: PortalHref;
@@ -185,12 +180,6 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
     { href: "/super-admin", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
     { href: "/super-admin/clinics", label: nav("clinics"), icon: <ClinicsIcon />, match: "prefix" },
     { href: "/super-admin/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "prefix" },
-    {
-      href: "/super-admin/register",
-      label: me("openPlatform"),
-      icon: <RegisterClinicIcon />,
-      match: "prefix",
-    },
   ];
   const footerItems: NavItem[] = [
     { href: "/super-admin", hash: "visits", label: me("visits"), icon: <VisitsIcon />, match: "hash" },

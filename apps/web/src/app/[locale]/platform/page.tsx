@@ -13,7 +13,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ local
   const me = await sessionGet<Me>("/auth/me");
 
   if (me?.role === "SUPER_ADMIN") {
-    redirect({ href: "/super-admin/register", locale });
+    redirect({ href: "/super-admin/clinics", locale });
   }
 
   return (

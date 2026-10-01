@@ -26,7 +26,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
       title={me.displayName}
       action={
         <Link
-          href="/super-admin/register"
+          href="/super-admin/clinics"
           className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover max-md:hidden"
         >
           {t("openPlatform")}
@@ -57,7 +57,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
             </p>
             <p className="mt-2 mb-4 text-[1.05rem] font-medium text-white/90">{portal("registerHint")}</p>
             <Link
-              href="/super-admin/register"
+              href="/super-admin/clinics"
               className="inline-flex rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-160 hover:bg-accent-hover"
             >
               {t("openPlatform")}

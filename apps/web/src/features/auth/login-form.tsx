@@ -38,7 +38,7 @@ export function LoginForm() {
         <input
           name="email"
           type="email"
-          placeholder="john.doe@email.com"
+          placeholder="john.doe@gmail.com"
           required
           autoComplete="email"
         />

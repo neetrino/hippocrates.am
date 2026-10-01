@@ -89,7 +89,7 @@ export function RegisterForm() {
         </label>
         <label className="field">
           {t("email")}
-          <input name="email" type="email" placeholder="john.doe@email.com" required autoComplete="email" />
+          <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" />
         </label>
       </div>
       <div className="field-row">

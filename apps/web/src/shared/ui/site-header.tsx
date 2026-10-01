@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
@@ -22,9 +23,15 @@ export async function SiteHeader() {
   return (
     <SiteHeaderShell>
       <div className="bar">
-        <Link href="/" className="brand">
-          <span className="mark" aria-hidden="true" />
-          <span className="brand-name">Hippocrates</span>
+        <Link href="/" className="brand" aria-label="Hippocrates">
+          <Image
+            src="/brand/hippocrates-logo.png"
+            alt="Hippocrates"
+            width={180}
+            height={110}
+            className="brand-logo"
+            priority
+          />
         </Link>
         <nav className="nav">
           <Link href="/clinics">{t("clinics")}</Link>

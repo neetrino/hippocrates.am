@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { PasswordField } from "@/features/auth/password-field";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
@@ -39,7 +40,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="stack" onSubmit={(event) => void onSubmit(event)}>
+    <form className="auth-form" onSubmit={(event) => void onSubmit(event)}>
       <div className="field-row">
         <label className="field">
           {t("name")}
@@ -58,16 +59,24 @@ export function RegisterForm() {
         {t("email")}
         <input name="email" type="email" placeholder="john.doe@email.com" required autoComplete="email" />
       </label>
-      <label className="field">
-        {t("password")}
-        <input name="password" type="password" placeholder="••••••••" required autoComplete="new-password" />
-      </label>
-      <label className="field">
-        {t("confirmPassword")}
-        <input name="confirmPassword" type="password" placeholder="••••••••" required autoComplete="new-password" />
-      </label>
+      <PasswordField
+        name="password"
+        label={t("password")}
+        placeholder="••••••••"
+        autoComplete="new-password"
+        showLabel={t("showPassword")}
+        hideLabel={t("hidePassword")}
+      />
+      <PasswordField
+        name="confirmPassword"
+        label={t("confirmPassword")}
+        placeholder="••••••••"
+        autoComplete="new-password"
+        showLabel={t("showPassword")}
+        hideLabel={t("hidePassword")}
+      />
       {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-block" type="submit">{t("registerAction")}</button>
+      <button className="btn btn-block btn-auth" type="submit">{t("registerAction")}</button>
     </form>
   );
 }

@@ -148,7 +148,9 @@
     "quickAction": "Արագ գործողություն",
     "registerHint": "Ստեղծեք կլինիկա և դրա ադմին հաշիվը։",
     "sectionCount": "{count}",
-    "emptyVisits": "Այցեր դեռ չկան։"
+    "emptyVisits": "Այցեր դեռ չկան։",
+    "addClinic": "Ավելացնել կլինիկա",
+    "closeSheet": "Փակել"
   },
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",

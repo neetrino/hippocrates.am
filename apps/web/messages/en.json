@@ -148,7 +148,9 @@
     "quickAction": "Quick action",
     "registerHint": "Create a clinic and its admin account.",
     "sectionCount": "{count}",
-    "emptyVisits": "No visits yet."
+    "emptyVisits": "No visits yet.",
+    "addClinic": "Add Clinic",
+    "closeSheet": "Close"
   },
   "desk": {
     "denied": "This page is for the clinic admin.",

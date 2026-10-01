@@ -148,7 +148,9 @@
     "quickAction": "Быстрое действие",
     "registerHint": "Создайте клинику и аккаунт её админа.",
     "sectionCount": "{count}",
-    "emptyVisits": "Визитов пока нет."
+    "emptyVisits": "Визитов пока нет.",
+    "addClinic": "Добавить клинику",
+    "closeSheet": "Закрыть"
   },
   "desk": {
     "denied": "Эта страница для админа клиники.",

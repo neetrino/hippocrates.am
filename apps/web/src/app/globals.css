@@ -161,7 +161,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   height: 14px;
 }
 
-.menu-icon i {
+.menu-icon span {
   position: absolute;
   left: 0;
   display: block;
@@ -172,18 +172,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: transform 200ms ease, top 200ms ease, opacity 200ms ease;
 }
 
-.menu-icon i:nth-child(1) { top: 0; }
-.menu-icon i:nth-child(2) { top: 6px; }
-.menu-icon i:nth-child(3) { top: 12px; }
+.menu-icon span:nth-child(1) { top: 0; }
+.menu-icon span:nth-child(2) { top: 6px; }
+.menu-icon span:nth-child(3) { top: 12px; }
 
-.menu-icon.is-open i:nth-child(1) {
+.menu-icon.is-open span:nth-child(1) {
   top: 6px;
   transform: rotate(45deg);
 }
 
-.menu-icon.is-open i:nth-child(2) { opacity: 0; }
+.menu-icon.is-open span:nth-child(2) { opacity: 0; }
 
-.menu-icon.is-open i:nth-child(3) {
+.menu-icon.is-open span:nth-child(3) {
   top: 6px;
   transform: rotate(-45deg);
 }
@@ -557,11 +557,17 @@ h2 { font-size: 1.45rem; }
     gap: 8px;
     justify-self: auto;
     transform: translateX(105%);
-    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 280ms;
   }
 
   .nav.is-open {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .nav a {

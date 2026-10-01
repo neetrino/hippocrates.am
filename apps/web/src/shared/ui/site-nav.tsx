@@ -1,25 +1,40 @@
 "use client";
 
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, Link } from "@/i18n/navigation";
+import { LocaleSwitch } from "@/shared/ui/locale-switch";
 
 type SiteNavProps = {
   clinics: string;
   doctors: string;
   questions: string;
+  register: string;
   openMenu: string;
   closeMenu: string;
-  actions: ReactNode;
 };
+
+function UserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M5.5 19.2c1.4-3.1 3.7-4.6 6.5-4.6s5.1 1.5 6.5 4.6"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export function SiteNav({
   clinics,
   doctors,
   questions,
+  register,
   openMenu,
   closeMenu,
-  actions,
 }: SiteNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -55,7 +70,10 @@ export function SiteNav({
         <Link href="/questions" onClick={() => setOpen(false)}>{questions}</Link>
       </nav>
       <div className="nav-actions">
-        {actions}
+        <LocaleSwitch />
+        <Link href="/register" className="auth-trigger" aria-label={register}>
+          <UserIcon />
+        </Link>
         <button
           type="button"
           className="menu-trigger"
@@ -65,9 +83,9 @@ export function SiteNav({
           onClick={() => setOpen((value) => !value)}
         >
           <span className={open ? "menu-icon is-open" : "menu-icon"} aria-hidden="true">
-            <i />
-            <i />
-            <i />
+            <span />
+            <span />
+            <span />
           </span>
         </button>
       </div>

@@ -410,6 +410,11 @@ h2 { font-size: 1.45rem; }
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #9aa6a5;
+}
+
 .field input:focus,
 .field select:focus,
 .field textarea:focus {

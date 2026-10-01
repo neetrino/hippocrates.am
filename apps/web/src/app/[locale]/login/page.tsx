@@ -30,8 +30,8 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
           label={t("enter")}
           next="/me"
           fields={[
-            { name: "email", label: t("email"), type: "email" },
-            { name: "password", label: t("password"), type: "password" },
+            { name: "email", label: t("email"), type: "email", placeholder: "john.doe@email.com" },
+            { name: "password", label: t("password"), type: "password", placeholder: "••••••••" },
           ]}
         />
         <div className="auth-switch">

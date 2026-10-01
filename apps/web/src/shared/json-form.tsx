@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 
-type Field = { name: string; label: string; type?: string };
+type Field = { name: string; label: string; type?: string; placeholder?: string };
 
 export function JsonForm(props: { action: string; fields: Field[]; label: string; next: string }) {
   const [error, setError] = useState("");
@@ -39,7 +39,12 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
       {props.fields.map((field) => (
         <label className="field" key={field.name}>
           {field.label}
-          <input name={field.name} type={field.type ?? "text"} required />
+          <input
+            name={field.name}
+            type={field.type ?? "text"}
+            placeholder={field.placeholder}
+            required
+          />
         </label>
       ))}
       {error ? <p className="error">{error}</p> : null}

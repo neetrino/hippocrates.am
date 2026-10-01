@@ -30,9 +30,9 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
           label={t("registerAction")}
           next="/"
           fields={[
-            { name: "displayName", label: t("displayName") },
-            { name: "email", label: t("email"), type: "email" },
-            { name: "password", label: t("password"), type: "password" },
+            { name: "displayName", label: t("displayName"), placeholder: "John Doe" },
+            { name: "email", label: t("email"), type: "email", placeholder: "john.doe@email.com" },
+            { name: "password", label: t("password"), type: "password", placeholder: "••••••••" },
           ]}
         />
         <div className="auth-switch">

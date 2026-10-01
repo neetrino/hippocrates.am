@@ -117,3 +117,33 @@
     transform: translateY(0) scale(1);
   }
 }
+
+@layer utilities {
+  .scrollbar-soft {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 167, 157, 0.35) transparent;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-track {
+    margin: 6px 0;
+    background: transparent;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(0, 167, 157, 0.28);
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 167, 157, 0.48);
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

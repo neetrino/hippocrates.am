@@ -152,7 +152,7 @@ export function MultiSelectFilter({
           role="listbox"
           aria-multiselectable="true"
           aria-label={label}
-          className="absolute top-[calc(100%+6px)] right-0 left-0 z-40 grid max-h-56 gap-0.5 overflow-y-auto rounded-[14px] border border-line bg-white p-1.5 shadow-[0_16px_36px_rgba(20,36,40,0.14)]"
+          className="scrollbar-soft absolute top-[calc(100%+6px)] right-0 left-0 z-40 grid max-h-56 gap-0.5 overflow-y-auto rounded-[14px] border border-line bg-white p-1.5 shadow-[0_16px_36px_rgba(20,36,40,0.14)]"
         >
           <OptionRow label={allLabel} checked={allSelected} onClick={selectAll} />
           {options.map((option) => (

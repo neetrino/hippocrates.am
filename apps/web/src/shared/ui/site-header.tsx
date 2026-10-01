@@ -9,7 +9,7 @@ export async function SiteHeader() {
       <div className="shell bar">
         <Link href="/" className="brand">
           <span className="mark" aria-hidden="true" />
-          Hippocrates
+          <span className="brand-name">Hippocrates</span>
         </Link>
         <nav className="nav">
           <Link href="/clinics">{t("clinics")}</Link>
@@ -18,9 +18,11 @@ export async function SiteHeader() {
         </nav>
         <div className="nav-actions">
           <LocaleSwitch />
-          <Link href="/login">{t("login")}</Link>
-          <Link href="/me">{t("me")}</Link>
-          <Link href="/register" className="btn btn-small">{t("register")}</Link>
+          <div className="nav-links">
+            <Link href="/login">{t("login")}</Link>
+            <Link href="/me">{t("me")}</Link>
+          </div>
+          <Link href="/register" className="btn btn-header">{t("register")}</Link>
         </div>
       </div>
     </header>

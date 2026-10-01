@@ -3,11 +3,11 @@ import { getPathname } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
 import { publicGet } from "@/shared/public-api";
-import type { ClinicCard, DoctorCard } from "@/shared/public-types";
+import type { ClinicCard } from "@/shared/public-types";
 import { ClinicTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
 
-type HomeData = { clinics: ClinicCard[]; doctors: DoctorCard[] };
+type HomeData = { clinics: ClinicCard[] };
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -28,10 +28,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <input name="name" placeholder={t("clinicPlaceholder")} aria-label={t("clinicPlaceholder")} />
             <button className="btn" type="submit">{common("search")}</button>
           </form>
-        </div>
-        <div className="stats">
-          <p>{t.rich("clinicStat", { count: data.clinics.length, strong: (chunks) => <strong>{chunks}</strong> })}</p>
-          <p>{t.rich("doctorStat", { count: data.doctors.length, strong: (chunks) => <strong>{chunks}</strong> })}</p>
         </div>
       </section>
       <section className="section">

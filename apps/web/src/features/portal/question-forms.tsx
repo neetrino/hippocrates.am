@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 export function AskQuestionForm() {
   const [error, setError] = useState("");
@@ -25,12 +27,12 @@ export function AskQuestionForm() {
   }
 
   return (
-    <form className="stack" onSubmit={(event) => void onSubmit(event)}>
+    <form className={ui.stack} onSubmit={(event) => void onSubmit(event)}>
       <h2>{t("ask")}</h2>
-      <label className="field">{t("askTitle")}<input name="title" required /></label>
-      <label className="field">{t("askBody")}<textarea name="body" required /></label>
-      {error ? <p className="error">{error}</p> : null}
-      <button className="btn" type="submit">{common("send")}</button>
+      <label className={ui.field}>{t("askTitle")}<input name="title" required /></label>
+      <label className={ui.field}>{t("askBody")}<textarea name="body" required /></label>
+      {error ? <p className={ui.error}>{error}</p> : null}
+      <button className={ui.btn} type="submit">{common("send")}</button>
     </form>
   );
 }
@@ -56,10 +58,10 @@ export function AnswerForm({ questionId }: { questionId: string }) {
   }
 
   return (
-    <form className="stack" onSubmit={(event) => void onSubmit(event)}>
-      <label className="field">{t("answer")}<textarea name="body" required /></label>
-      {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-small" type="submit">{t("answerAction")}</button>
+    <form className={ui.stack} onSubmit={(event) => void onSubmit(event)}>
+      <label className={ui.field}>{t("answer")}<textarea name="body" required /></label>
+      {error ? <p className={ui.error}>{error}</p> : null}
+      <button className={cx(ui.btn, ui.btnSmall)} type="submit">{t("answerAction")}</button>
     </form>
   );
 }

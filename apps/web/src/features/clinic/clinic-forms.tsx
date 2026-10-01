@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 type DoctorOption = { id: string; name: string };
 
@@ -49,29 +51,29 @@ export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: 
   }
 
   return (
-    <div className="split">
-      <form className="panel stack" onSubmit={(event) => void onDoctor(event)}>
+    <div className={ui.split}>
+      <form className={cx(ui.panel, ui.stack)} onSubmit={(event) => void onDoctor(event)}>
         <h2>{t("newDoctor")}</h2>
-        <label className="field">{common("name")}<input name="displayName" required /></label>
-        <label className="field">{auth("email")}<input name="email" type="email" required /></label>
-        <label className="field">{auth("password")}<input name="password" type="password" required /></label>
-        <label className="field">{catalog("specialty")}<input name="specialty" required /></label>
-        <button className="btn" type="submit">{t("saveDoctor")}</button>
+        <label className={ui.field}>{common("name")}<input name="displayName" required /></label>
+        <label className={ui.field}>{auth("email")}<input name="email" type="email" required /></label>
+        <label className={ui.field}>{auth("password")}<input name="password" type="password" required /></label>
+        <label className={ui.field}>{catalog("specialty")}<input name="specialty" required /></label>
+        <button className={ui.btn} type="submit">{t("saveDoctor")}</button>
       </form>
-      <form className="panel stack" onSubmit={(event) => void onOffering(event)}>
+      <form className={cx(ui.panel, ui.stack)} onSubmit={(event) => void onOffering(event)}>
         <h2>{t("newService")}</h2>
-        <label className="field">
+        <label className={ui.field}>
           {t("doctor")}
           <select name="doctorId" required defaultValue={doctors[0]?.id ?? ""}>
             {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.name}</option>)}
           </select>
         </label>
-        <label className="field">{common("name")}<input name="name" required /></label>
-        <label className="field">{t("amd")}<input name="priceAmd" type="number" required /></label>
-        <label className="field">{t("duration")}<input name="durationMinutes" type="number" required /></label>
-        <button className="btn" type="submit">{t("add")}</button>
+        <label className={ui.field}>{common("name")}<input name="name" required /></label>
+        <label className={ui.field}>{t("amd")}<input name="priceAmd" type="number" required /></label>
+        <label className={ui.field}>{t("duration")}<input name="durationMinutes" type="number" required /></label>
+        <button className={ui.btn} type="submit">{t("add")}</button>
       </form>
-      {message ? <p className="error">{message}</p> : null}
+      {message ? <p className={ui.error}>{message}</p> : null}
     </div>
   );
 }

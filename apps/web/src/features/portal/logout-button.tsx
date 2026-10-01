@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -16,5 +18,9 @@ export function LogoutButton() {
     router.refresh();
   }
 
-  return <button className="btn btn-ghost btn-small" type="button" onClick={() => void logout()}>{t("logout")}</button>;
+  return (
+    <button className={cx(ui.btn, ui.btnGhost, ui.btnSmall)} type="button" onClick={() => void logout()}>
+      {t("logout")}
+    </button>
+  );
 }

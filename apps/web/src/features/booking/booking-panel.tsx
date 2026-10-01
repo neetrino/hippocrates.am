@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { formatAmount, formatTime } from "@/shared/format";
 import type { OfferingCard } from "@/shared/public-types";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
+import styles from "@/features/booking/booking-panel.module.css";
 
 type SlotResponse = { data: { startsAt: string[] } };
 
@@ -62,12 +65,12 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
     router.refresh();
   }
 
-  if (!offering) return <p className="muted">{t("noService")}</p>;
+  if (!offering) return <p className={ui.muted}>{t("noService")}</p>;
 
   return (
-    <div className="panel stack">
+    <div className={cx(ui.panel, ui.stack)}>
       <h2>{t("title")}</h2>
-      <label className="field">
+      <label className={ui.field}>
         {t("service")}
         <select
           value={offeringId}
@@ -84,7 +87,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
           ))}
         </select>
       </label>
-      <label className="field">
+      <label className={ui.field}>
         {t("day")}
         <input
           type="date"
@@ -96,15 +99,15 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
           }}
         />
       </label>
-      <div className="slots">
+      <div className={styles.slots}>
         {slots.map((slot) => (
-          <button key={slot} type="button" className="slot" aria-pressed={selected === slot} onClick={() => setSelected(slot)}>
+          <button key={slot} type="button" className={styles.slot} aria-pressed={selected === slot} onClick={() => setSelected(slot)}>
             {formatTime(slot)}
           </button>
         ))}
       </div>
-      {message ? <p className="muted">{message}</p> : null}
-      <button className="btn" type="button" disabled={!selected || pending} onClick={() => void book()}>
+      {message ? <p className={ui.muted}>{message}</p> : null}
+      <button className={ui.btn} type="button" disabled={!selected || pending} onClick={() => void book()}>
         {t("book")}
       </button>
     </div>

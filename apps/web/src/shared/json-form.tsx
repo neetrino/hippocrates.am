@@ -3,6 +3,8 @@
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 type Field = { name: string; label: string; type?: string; placeholder?: string };
 
@@ -35,9 +37,9 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
   }
 
   return (
-    <form className="stack" onSubmit={(event) => void onSubmit(event)}>
+    <form className={ui.stack} onSubmit={(event) => void onSubmit(event)}>
       {props.fields.map((field) => (
-        <label className="field" key={field.name}>
+        <label className={ui.field} key={field.name}>
           {field.label}
           <input
             name={field.name}
@@ -47,8 +49,8 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
           />
         </label>
       ))}
-      {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-block" type="submit">{props.label}</button>
+      {error ? <p className={ui.error}>{error}</p> : null}
+      <button className={cx(ui.btn, ui.btnBlock)} type="submit">{props.label}</button>
     </form>
   );
 }

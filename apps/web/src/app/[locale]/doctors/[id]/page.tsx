@@ -8,6 +8,9 @@ import { formatAmount } from "@/shared/format";
 import { publicGet } from "@/shared/public-api";
 import type { DoctorCard, OfferingCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
+import { cx } from "@/shared/ui/cx";
+import catalog from "@/shared/ui/catalog.module.css";
+import ui from "@/shared/ui/primitives.module.css";
 
 type DoctorPageData = DoctorCard & { offerings: OfferingCard[] };
 
@@ -20,19 +23,19 @@ export default async function DoctorPage({ params }: { params: Promise<{ locale:
   const offerings = doctor.offerings.map((item) => ({ ...item, doctorId: doctor.id }));
   const slots = await initialSlots(offerings[0]);
   return (
-    <div className="shell section split">
-      <article className="card">
-        <div className="media">
+    <div className={cx(ui.shell, ui.section, ui.split)}>
+      <article className={catalog.card}>
+        <div className={catalog.media}>
           <Photo src={doctor.photoUrl} alt={doctor.user.displayName} />
         </div>
-        <div className="card-body">
-          <p className="eyebrow">{doctor.specialty}</p>
+        <div className={catalog.cardBody}>
+          <p className={ui.eyebrow}>{doctor.specialty}</p>
           <h1>{doctor.user.displayName}</h1>
           <p><Link href={`/clinics/${doctor.clinic.id}`}>{doctor.clinic.name}</Link></p>
-          <p className="lede">{doctor.bio}</p>
-          <div className="list">
+          <p className={ui.lede}>{doctor.bio}</p>
+          <div className={ui.list}>
             {offerings.map((item) => (
-              <div key={item.id} className="row">
+              <div key={item.id} className={ui.row}>
                 <span>{item.name}</span>
                 <span>
                   {t("price", { amount: formatAmount(item.priceAmd) })} · {t("minutes", { count: item.durationMinutes })}

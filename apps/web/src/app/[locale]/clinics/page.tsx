@@ -5,6 +5,8 @@ import { publicGet } from "@/shared/public-api";
 import type { ClinicCard } from "@/shared/public-types";
 import { ClinicTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 export default async function ClinicsPage({
   params,
@@ -21,14 +23,14 @@ export default async function ClinicsPage({
   const query = name ? `?name=${encodeURIComponent(name)}` : "";
   const clinics = await publicGet<ClinicCard[]>(`/public/clinics${query}`);
   return (
-    <div className="shell section">
+    <div className={cx(ui.shell, ui.section)}>
       <h1>{t("clinicsTitle")}</h1>
-      <form className="search" action={getPathname({ locale, href: "/clinics" })}>
+      <form className={ui.search} action={getPathname({ locale, href: "/clinics" })}>
         <input name="name" defaultValue={name ?? ""} placeholder={common("name")} aria-label={t("clinicName")} />
-        <button className="btn" type="submit">{common("search")}</button>
+        <button className={ui.btn} type="submit">{common("search")}</button>
       </form>
       {clinics.length === 0 ? <EmptyState>{t("emptyClinicSearch")}</EmptyState> : null}
-      <div className="grid-cards">
+      <div className={ui.gridCards}>
         {clinics.map((clinic, index) => (
           <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
         ))}

@@ -1,5 +1,8 @@
 "use client";
 
+import auth from "@/features/auth/auth.module.css";
+import styles from "@/features/auth/phone-field.module.css";
+
 const ARMENIA_DIAL_CODE = "374";
 
 type PhoneFieldProps = {
@@ -8,14 +11,14 @@ type PhoneFieldProps = {
 
 export function PhoneField({ label }: PhoneFieldProps) {
   return (
-    <div className="field phone-field">
+    <div className={auth.field}>
       <span>{label}</span>
-      <div className="phone-field-row">
-        <span className="phone-code" aria-hidden="true">
+      <div className={styles.row}>
+        <span className={styles.code} aria-hidden="true">
           +{ARMENIA_DIAL_CODE}
         </span>
         <input
-          className="phone-local"
+          className={styles.local}
           name="phoneLocal"
           type="tel"
           inputMode="numeric"

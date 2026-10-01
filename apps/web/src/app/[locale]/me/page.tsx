@@ -9,6 +9,8 @@ import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format
 import { publicGet } from "@/shared/public-api";
 import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 type Notice = { id: string; body: string; createdAt: string };
 
@@ -23,7 +25,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const me = await sessionGet<Me>("/auth/me");
   if (!me) {
     return (
-      <div className="shell section">
+      <div className={cx(ui.shell, ui.section)}>
         <p>{t("signIn")} <Link href="/login">{nav("login")}</Link></p>
       </div>
     );
@@ -33,25 +35,25 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const notices = await sessionGet<Notice[]>("/me/notifications");
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
   return (
-    <div className="shell section stack">
-      <div className="section-head">
+    <div className={cx(ui.shell, ui.section, ui.stack)}>
+      <div className={ui.sectionHead}>
         <div>
-          <p className="eyebrow">{role ? common(role) : me.role}</p>
+          <p className={ui.eyebrow}>{role ? common(role) : me.role}</p>
           <h1>{me.displayName}</h1>
         </div>
         <LogoutButton />
       </div>
-      {me.role === "SUPER_ADMIN" ? <Link className="btn" href="/platform">{t("openPlatform")}</Link> : null}
-      {me.role === "ADMIN" ? <Link className="btn" href="/clinic">{t("openClinic")}</Link> : null}
-      <section className="section">
+      {me.role === "SUPER_ADMIN" ? <Link className={ui.btn} href="/platform">{t("openPlatform")}</Link> : null}
+      {me.role === "ADMIN" ? <Link className={ui.btn} href="/clinic">{t("openClinic")}</Link> : null}
+      <section className={ui.section}>
         <h2>{t("visits")}</h2>
-        <div className="list">
+        <div className={ui.list}>
           {(appointments ?? []).map((item) => {
             const status = asVisitStatus(item.status);
             return (
-              <article className="panel" key={item.id}>
+              <article className={ui.panel} key={item.id}>
                 <strong>{item.offering.name}</strong>
-                <p className="muted">{me.role === "DOCTOR" ? item.patient.displayName : `${item.clinic.name} · ${item.doctor.user.displayName}`}</p>
+                <p className={ui.muted}>{me.role === "DOCTOR" ? item.patient.displayName : `${item.clinic.name} · ${item.doctor.user.displayName}`}</p>
                 <p>{formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} · {common("price", { amount: formatAmount(item.priceAmd) })}</p>
                 {me.role === "PATIENT" ? <AppointmentActions id={item.id} status={item.status} mode="patient" /> : null}
                 {me.role === "PATIENT" && item.status === "COMPLETED" && !item.review ? <ReviewForm appointmentId={item.id} /> : null}
@@ -60,17 +62,17 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           })}
         </div>
       </section>
-      <section className="section">
+      <section className={ui.section}>
         <h2>{t("notices")}</h2>
-        {(notices ?? []).length === 0 ? <p className="muted">{t("noNotices")}</p> : null}
-        {(notices ?? []).map((notice) => <p className="row" key={notice.id}>{notice.body}</p>)}
+        {(notices ?? []).length === 0 ? <p className={ui.muted}>{t("noNotices")}</p> : null}
+        {(notices ?? []).map((notice) => <p className={ui.row} key={notice.id}>{notice.body}</p>)}
       </section>
       {me.role === "PATIENT" ? <AskQuestionForm /> : null}
       {me.role === "DOCTOR" ? (
-        <section className="section stack">
+        <section className={cx(ui.section, ui.stack)}>
           <h2>{questionsCopy("public")}</h2>
           {questions.map((question) => (
-            <article className="panel" key={question.id}>
+            <article className={ui.panel} key={question.id}>
               <h3>{question.title}</h3>
               <p>{question.body}</p>
               <AnswerForm questionId={question.id} />

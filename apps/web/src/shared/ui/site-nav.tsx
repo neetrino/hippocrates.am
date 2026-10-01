@@ -1,12 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
+import styles from "@/shared/ui/site-header.module.css";
+
+function subscribeNoop(): () => void {
+  return () => undefined;
+}
 
 type SiteNavProps = {
   clinics: string;
@@ -22,7 +27,7 @@ const localeCodes: Record<AppLocale, string> = { hy: "HY", en: "EN", ru: "RU" };
 function LocaleFlag({ locale }: { locale: AppLocale }) {
   if (locale === "hy") {
     return (
-      <svg className="locale-flag" viewBox="0 0 18 12" aria-hidden="true">
+      <svg className={styles.localeFlag} viewBox="0 0 18 12" aria-hidden="true">
         <rect width="18" height="4" y="0" fill="#D90012" />
         <rect width="18" height="4" y="4" fill="#0033A0" />
         <rect width="18" height="4" y="8" fill="#F2A800" />
@@ -31,7 +36,7 @@ function LocaleFlag({ locale }: { locale: AppLocale }) {
   }
   if (locale === "ru") {
     return (
-      <svg className="locale-flag" viewBox="0 0 18 12" aria-hidden="true">
+      <svg className={styles.localeFlag} viewBox="0 0 18 12" aria-hidden="true">
         <rect width="18" height="4" y="0" fill="#FFFFFF" stroke="#D0D5D4" strokeWidth="0.3" />
         <rect width="18" height="4" y="4" fill="#0039A6" />
         <rect width="18" height="4" y="8" fill="#D52B1E" />
@@ -39,7 +44,7 @@ function LocaleFlag({ locale }: { locale: AppLocale }) {
     );
   }
   return (
-    <svg className="locale-flag" viewBox="0 0 18 12" aria-hidden="true">
+    <svg className={styles.localeFlag} viewBox="0 0 18 12" aria-hidden="true">
       <rect width="18" height="12" fill="#012169" />
       <path d="M0 0L18 12M18 0L0 12" stroke="#FFFFFF" strokeWidth="2" />
       <path d="M0 0L18 12M18 0L0 12" stroke="#C8102E" strokeWidth="1" />
@@ -90,19 +95,18 @@ export function SiteNav({
   closeMenu,
 }: SiteNavProps) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const pathname = localeNeutralPath(usePathname());
   const locale = useLocale();
+  const routeKey = `${locale}:${pathname}`;
+  const [menuRoute, setMenuRoute] = useState(routeKey);
   const t = useTranslations("nav");
   const menuId = useId();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname, locale]);
+  if (menuRoute !== routeKey) {
+    setMenuRoute(routeKey);
+    if (open) setOpen(false);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -124,26 +128,26 @@ export function SiteNav({
   ];
 
   return (
-    <div className="header-chrome">
-      <nav className="nav">
+    <div className={styles.chrome}>
+      <nav className={styles.nav}>
         {links.map((item) => (
           <Link key={item.href} href={item.href}>{item.label}</Link>
         ))}
       </nav>
-      <div className="nav-actions">
-        <LocaleSwitch />
-        <Link href="/login" className="auth-trigger" aria-label={login}>
+      <div className={styles.navActions}>
+        <LocaleSwitch hideOnMobile />
+        <Link href="/login" className={styles.authTrigger} aria-label={login}>
           <UserIcon />
         </Link>
         <button
           type="button"
-          className="menu-trigger"
+          className={styles.menuTrigger}
           aria-label={openMenu}
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen(true)}
         >
-          <span className="menu-icon" aria-hidden="true">
+          <span className={styles.menuIcon} aria-hidden="true">
             <span />
             <span />
             <span />
@@ -152,49 +156,49 @@ export function SiteNav({
       </div>
       {mounted && open
         ? createPortal(
-            <div className="mobile-menu" id={menuId} role="dialog" aria-modal="true" aria-label={openMenu}>
+            <div className={styles.mobileMenu} id={menuId} role="dialog" aria-modal="true" aria-label={openMenu}>
               <button
                 type="button"
-                className="mobile-menu-backdrop"
+                className={styles.mobileMenuBackdrop}
                 aria-label={closeMenu}
                 onClick={() => setOpen(false)}
               />
-              <div className="mobile-menu-shell">
-                <div className="mobile-menu-top">
+              <div className={styles.mobileMenuShell}>
+                <div className={styles.mobileMenuTop}>
                   <Image
                     src="/brand/hippocrates-logo.png"
                     alt="Hippocrates"
                     width={160}
                     height={98}
-                    className="mobile-menu-logo"
+                    className={styles.mobileMenuLogo}
                   />
                   <button
                     type="button"
-                    className="mobile-menu-close"
+                    className={styles.mobileMenuClose}
                     aria-label={closeMenu}
                     onClick={() => setOpen(false)}
                   >
                     <CloseIcon />
                   </button>
                 </div>
-                <div className="mobile-menu-card">
-                  <nav className="mobile-menu-nav">
+                <div className={styles.mobileMenuCard}>
+                  <nav className={styles.mobileMenuNav}>
                     {links.map((item) => (
                       <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
                         {item.label}
                       </Link>
                     ))}
                   </nav>
-                  <div className="mobile-menu-locales">
-                    <p className="mobile-menu-locales-label">{t("language")}</p>
-                    <div className="mobile-locale-pill" role="group" aria-label={t("language")}>
+                  <div className={styles.mobileMenuLocales}>
+                    <p className={styles.mobileMenuLocalesLabel}>{t("language")}</p>
+                    <div className={styles.mobileLocalePill} role="group" aria-label={t("language")}>
                       {routing.locales.map((item) => (
                         <Link
                           key={item}
                           href={pathname}
                           locale={item}
                           hrefLang={item}
-                          className={item === locale ? "is-active" : undefined}
+                          className={item === locale ? styles.mobileLocaleActive : undefined}
                           aria-current={item === locale ? "true" : undefined}
                           replace
                           onClick={() => setOpen(false)}

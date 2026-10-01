@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 import { PhoneField, buildPhoneNumber } from "@/features/auth/phone-field";
+import styles from "@/features/auth/auth.module.css";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
@@ -46,9 +47,9 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="auth-form" onSubmit={(event) => void onSubmit(event)}>
-      <div className="field-row">
-        <label className="field">
+    <form className={styles.form} onSubmit={(event) => void onSubmit(event)}>
+      <div className={styles.fieldRow}>
+        <label className={styles.field}>
           {t("name")}
           <input
             name="name"
@@ -61,7 +62,7 @@ export function RegisterForm() {
             }}
           />
         </label>
-        <label className="field">
+        <label className={styles.field}>
           {t("surname")}
           <input
             name="surname"
@@ -76,11 +77,11 @@ export function RegisterForm() {
         </label>
       </div>
       <PhoneField label={t("phone")} />
-      <label className="field">
+      <label className={styles.field}>
         {t("email")}
         <input name="email" type="email" placeholder="john.doe@gmail.com" required autoComplete="email" />
       </label>
-      <div className="field-row">
+      <div className={styles.fieldRow}>
         <PasswordField
           name="password"
           label={t("password")}
@@ -98,8 +99,8 @@ export function RegisterForm() {
           hideLabel={t("hidePassword")}
         />
       </div>
-      {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-block btn-auth" type="submit">{t("registerAction")}</button>
+      {error ? <p className={styles.error}>{error}</p> : null}
+      <button className={styles.btn} type="submit">{t("registerAction")}</button>
     </form>
   );
 }

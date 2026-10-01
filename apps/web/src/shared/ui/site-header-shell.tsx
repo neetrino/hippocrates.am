@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { cx } from "@/shared/ui/cx";
+import primitives from "@/shared/ui/primitives.module.css";
+import styles from "@/shared/ui/site-header.module.css";
 
 const SCROLL_ACTIVATE_Y = 16;
 
@@ -17,9 +20,9 @@ export function SiteHeaderShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <header className={scrolled ? "site-header is-scrolled" : "site-header"}>
-      <div className="shell header-inner">
-        <div className="header-surface" aria-hidden="true" />
+    <header className={cx(styles.header, scrolled && styles.headerScrolled)}>
+      <div className={cx(primitives.shell, styles.inner)}>
+        <div className={styles.surface} aria-hidden="true" />
         {children}
       </div>
     </header>

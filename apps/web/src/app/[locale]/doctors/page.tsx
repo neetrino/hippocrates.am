@@ -5,6 +5,8 @@ import { publicGet } from "@/shared/public-api";
 import type { DoctorCard } from "@/shared/public-types";
 import { DoctorTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 export default async function DoctorsPage({
   params,
@@ -24,15 +26,15 @@ export default async function DoctorsPage({
   const suffix = query.size > 0 ? `?${query}` : "";
   const doctors = await publicGet<DoctorCard[]>(`/public/doctors${suffix}`);
   return (
-    <div className="shell section">
+    <div className={cx(ui.shell, ui.section)}>
       <h1>{t("doctorsTitle")}</h1>
-      <form className="search" action={getPathname({ locale, href: "/doctors" })}>
+      <form className={ui.search} action={getPathname({ locale, href: "/doctors" })}>
         <input name="name" defaultValue={queryParams.name ?? ""} placeholder={common("name")} aria-label={t("doctorName")} />
         <input name="specialty" defaultValue={queryParams.specialty ?? ""} placeholder={t("specialty")} aria-label={t("specialty")} />
-        <button className="btn" type="submit">{common("search")}</button>
+        <button className={ui.btn} type="submit">{common("search")}</button>
       </form>
       {doctors.length === 0 ? <EmptyState>{t("emptyDoctorSearch")}</EmptyState> : null}
-      <div className="grid-cards">
+      <div className={ui.gridCards}>
         {doctors.map((doctor) => <DoctorTile key={doctor.id} doctor={doctor} />)}
       </div>
     </div>

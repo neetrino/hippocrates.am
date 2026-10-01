@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import auth from "@/features/auth/auth.module.css";
+import styles from "@/features/auth/password-field.module.css";
 
 type PasswordFieldProps = {
   name: string;
@@ -21,9 +23,9 @@ export function PasswordField({
 }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
   return (
-    <label className="field">
+    <label className={auth.field}>
       {label}
-      <span className="password-field">
+      <span className={styles.wrap}>
         <input
           name={name}
           type={visible ? "text" : "password"}
@@ -33,7 +35,7 @@ export function PasswordField({
         />
         <button
           type="button"
-          className="password-toggle"
+          className={styles.toggle}
           aria-label={visible ? hideLabel : showLabel}
           onClick={() => setVisible((value) => !value)}
         >

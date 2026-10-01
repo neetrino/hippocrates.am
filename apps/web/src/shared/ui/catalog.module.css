@@ -1,0 +1,24 @@
+.card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 167, 157, 0.28);
+  box-shadow: 0 18px 40px rgba(20, 36, 40, 0.08);
+}
+
+.cardBody { display: grid; gap: 8px; padding: 16px 18px 18px; }
+
+.media { position: relative; aspect-ratio: 16 / 10; background: var(--sand); }
+
+.mediaSquare { aspect-ratio: 1; }
+
+.doctorRow { display: grid; grid-template-columns: 88px 1fr; gap: 14px; align-items: center; }
+
+.doctorRow .media { width: 88px; height: 88px; border-radius: 14px; overflow: hidden; }

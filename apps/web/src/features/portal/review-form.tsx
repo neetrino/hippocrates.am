@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
+import { cx } from "@/shared/ui/cx";
+import ui from "@/shared/ui/primitives.module.css";
 
 export function ReviewForm({ appointmentId }: { appointmentId: string }) {
   const [error, setError] = useState("");
@@ -28,8 +30,8 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
   }
 
   return (
-    <form className="stack" onSubmit={(event) => void onSubmit(event)}>
-      <label className="field">
+    <form className={ui.stack} onSubmit={(event) => void onSubmit(event)}>
+      <label className={ui.field}>
         {t("rating")}
         <select name="rating" defaultValue="5">
           <option value="5">5</option>
@@ -39,12 +41,12 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
           <option value="1">1</option>
         </select>
       </label>
-      <label className="field">
+      <label className={ui.field}>
         {t("review")}
         <textarea name="body" required />
       </label>
-      {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-small" type="submit">{t("sendReview")}</button>
+      {error ? <p className={ui.error}>{error}</p> : null}
+      <button className={cx(ui.btn, ui.btnSmall)} type="submit">{t("sendReview")}</button>
     </form>
   );
 }

@@ -4,6 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { cx } from "@/shared/ui/cx";
+import styles from "@/shared/ui/locale-switch.module.css";
 
 const labels: Record<AppLocale, string> = { hy: "Հայ", en: "EN", ru: "РУ" };
 
@@ -28,7 +30,11 @@ function GlobeIcon() {
   );
 }
 
-export function LocaleSwitch() {
+type LocaleSwitchProps = {
+  hideOnMobile?: boolean;
+};
+
+export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
   const locale = useLocale();
   const pathname = localeNeutralPath(usePathname());
   const t = useTranslations("nav");
@@ -53,10 +59,10 @@ export function LocaleSwitch() {
   }, [open]);
 
   return (
-    <div className="locale-switch" ref={rootRef}>
+    <div className={cx(styles.root, hideOnMobile && styles.hideOnMobile)} ref={rootRef}>
       <button
         type="button"
-        className="locale-trigger"
+        className={styles.trigger}
         aria-label={t("language")}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -66,7 +72,7 @@ export function LocaleSwitch() {
         <GlobeIcon />
       </button>
       {open ? (
-        <div className="locale-menu" id={menuId} role="menu">
+        <div className={styles.menu} id={menuId} role="menu">
           {routing.locales.map((item) => (
             <Link
               key={item}

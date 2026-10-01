@@ -9,6 +9,9 @@ import { publicGet } from "@/shared/public-api";
 import type { ClinicCard, DoctorCard, OfferingCard, ReviewCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
 import { Rating } from "@/shared/ui/rating";
+import { cx } from "@/shared/ui/cx";
+import catalog from "@/shared/ui/catalog.module.css";
+import ui from "@/shared/ui/primitives.module.css";
 
 type ClinicPageData = ClinicCard & {
   branches: { id: string; name: string; address: string }[];
@@ -26,43 +29,43 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
   const common = await getTranslations("common");
   const slots = await initialSlots(clinic.offerings[0]);
   return (
-    <div className="shell section">
-      <div className="card">
-        <div className="media">
+    <div className={cx(ui.shell, ui.section)}>
+      <div className={catalog.card}>
+        <div className={catalog.media}>
           <Photo src={clinic.coverUrl} alt={clinic.name} loading="eager" />
         </div>
-        <div className="card-body">
-          <p className="eyebrow">{clinic.district}</p>
+        <div className={catalog.cardBody}>
+          <p className={ui.eyebrow}>{clinic.district}</p>
           <h1>{clinic.name}</h1>
-          <p className="lede">{clinic.description}</p>
-          <p className="muted">{clinic.address}</p>
-          <p className="muted">{clinic.phone}</p>
+          <p className={ui.lede}>{clinic.description}</p>
+          <p className={ui.muted}>{clinic.address}</p>
+          <p className={ui.muted}>{clinic.phone}</p>
         </div>
       </div>
-      <div className="split">
-        <div className="stack">
-          <section className="section">
+      <div className={ui.split}>
+        <div className={ui.stack}>
+          <section className={ui.section}>
             <h2>{t("branches")}</h2>
             {clinic.branches.map((branch) => (
               <p key={branch.id}>{branch.name} · {branch.address}</p>
             ))}
           </section>
-          <section className="section">
+          <section className={ui.section}>
             <h2>{t("doctors")}</h2>
-            <div className="list">
+            <div className={ui.list}>
               {clinic.doctors.map((doctor) => (
-                <Link key={doctor.id} href={`/doctors/${doctor.id}`} className="row">
+                <Link key={doctor.id} href={`/doctors/${doctor.id}`} className={ui.row}>
                   <span>{doctor.user.displayName}</span>
-                  <span className="muted">{doctor.specialty}</span>
+                  <span className={ui.muted}>{doctor.specialty}</span>
                 </Link>
               ))}
             </div>
           </section>
-          <section className="section">
+          <section className={ui.section}>
             <h2>{t("prices")}</h2>
-            <div className="list">
+            <div className={ui.list}>
               {clinic.offerings.map((item) => (
-                <div key={item.id} className="row">
+                <div key={item.id} className={ui.row}>
                   <span>{item.doctor?.user.displayName} · {item.name}</span>
                   <span>
                     {common("price", { amount: formatAmount(item.priceAmd) })}
@@ -72,14 +75,14 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
               ))}
             </div>
           </section>
-          <section className="section">
+          <section className={ui.section}>
             <h2>{t("reviews")}</h2>
-            {clinic.reviews.length === 0 ? <p className="muted">{t("noReviews")}</p> : null}
+            {clinic.reviews.length === 0 ? <p className={ui.muted}>{t("noReviews")}</p> : null}
             {clinic.reviews.map((review) => (
-              <article key={review.id} className="panel">
+              <article key={review.id} className={ui.panel}>
                 <Rating value={review.rating} />
                 <p>{review.body}</p>
-                {review.reply ? <p className="muted">{t("reply", { reply: review.reply })}</p> : null}
+                {review.reply ? <p className={ui.muted}>{t("reply", { reply: review.reply })}</p> : null}
               </article>
             ))}
           </section>

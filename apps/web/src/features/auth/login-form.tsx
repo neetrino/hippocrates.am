@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
+import styles from "@/features/auth/auth.module.css";
 
 export function LoginForm() {
   const [error, setError] = useState("");
@@ -32,8 +33,8 @@ export function LoginForm() {
   }
 
   return (
-    <form className="auth-form" onSubmit={(event) => void onSubmit(event)}>
-      <label className="field">
+    <form className={styles.form} onSubmit={(event) => void onSubmit(event)}>
+      <label className={styles.field}>
         {t("email")}
         <input
           name="email"
@@ -51,8 +52,8 @@ export function LoginForm() {
         showLabel={t("showPassword")}
         hideLabel={t("hidePassword")}
       />
-      {error ? <p className="error">{error}</p> : null}
-      <button className="btn btn-block btn-auth" type="submit">{t("enter")}</button>
+      {error ? <p className={styles.error}>{error}</p> : null}
+      <button className={styles.btn} type="submit">{t("enter")}</button>
     </form>
   );
 }

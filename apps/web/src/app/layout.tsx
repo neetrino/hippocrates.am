@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const locale = await getLocale();
   return (
     <html lang={locale} className={`${sans.variable} ${armenian.variable}`} data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body className="bg-white pb-6">{children}</body>
     </html>
   );
 }

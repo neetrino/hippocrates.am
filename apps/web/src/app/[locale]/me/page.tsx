@@ -9,8 +9,6 @@ import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format
 import { publicGet } from "@/shared/public-api";
 import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
-import { cx } from "@/shared/ui/cx";
-import ui from "@/shared/ui/primitives.module.css";
 
 type Notice = { id: string; body: string; createdAt: string };
 
@@ -25,7 +23,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const me = await sessionGet<Me>("/auth/me");
   if (!me) {
     return (
-      <div className={cx(ui.shell, ui.section)}>
+      <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
         <p>{t("signIn")} <Link href="/login">{nav("login")}</Link></p>
       </div>
     );
@@ -34,26 +32,30 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const appointments = await sessionGet<AppointmentCard[]>("/appointments/mine");
   const notices = await sessionGet<Notice[]>("/me/notifications");
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
+  const btn =
+    "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
   return (
-    <div className={cx(ui.shell, ui.section, ui.stack)}>
-      <div className={ui.sectionHead}>
+    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-3.5 pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+      <div className="flex items-end justify-between gap-3 max-md:items-center">
         <div>
-          <p className={ui.eyebrow}>{role ? common(role) : me.role}</p>
+          <p className="mb-3 text-[0.78rem] font-semibold tracking-[0.08em] text-accent uppercase">
+            {role ? common(role) : me.role}
+          </p>
           <h1>{me.displayName}</h1>
         </div>
         <LogoutButton />
       </div>
-      {me.role === "SUPER_ADMIN" ? <Link className={ui.btn} href="/platform">{t("openPlatform")}</Link> : null}
-      {me.role === "ADMIN" ? <Link className={ui.btn} href="/clinic">{t("openClinic")}</Link> : null}
-      <section className={ui.section}>
+      {me.role === "SUPER_ADMIN" ? <Link className={btn} href="/platform">{t("openPlatform")}</Link> : null}
+      {me.role === "ADMIN" ? <Link className={btn} href="/clinic">{t("openClinic")}</Link> : null}
+      <section className="grid gap-[18px] pt-7">
         <h2>{t("visits")}</h2>
-        <div className={ui.list}>
+        <div className="grid gap-3">
           {(appointments ?? []).map((item) => {
             const status = asVisitStatus(item.status);
             return (
-              <article className={ui.panel} key={item.id}>
+              <article className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" key={item.id}>
                 <strong>{item.offering.name}</strong>
-                <p className={ui.muted}>{me.role === "DOCTOR" ? item.patient.displayName : `${item.clinic.name} · ${item.doctor.user.displayName}`}</p>
+                <p className="m-0 text-muted">{me.role === "DOCTOR" ? item.patient.displayName : `${item.clinic.name} · ${item.doctor.user.displayName}`}</p>
                 <p>{formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} · {common("price", { amount: formatAmount(item.priceAmd) })}</p>
                 {me.role === "PATIENT" ? <AppointmentActions id={item.id} status={item.status} mode="patient" /> : null}
                 {me.role === "PATIENT" && item.status === "COMPLETED" && !item.review ? <ReviewForm appointmentId={item.id} /> : null}
@@ -62,17 +64,21 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           })}
         </div>
       </section>
-      <section className={ui.section}>
+      <section className="grid gap-[18px] pt-7">
         <h2>{t("notices")}</h2>
-        {(notices ?? []).length === 0 ? <p className={ui.muted}>{t("noNotices")}</p> : null}
-        {(notices ?? []).map((notice) => <p className={ui.row} key={notice.id}>{notice.body}</p>)}
+        {(notices ?? []).length === 0 ? <p className="m-0 text-muted">{t("noNotices")}</p> : null}
+        {(notices ?? []).map((notice) => (
+          <p className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={notice.id}>
+            {notice.body}
+          </p>
+        ))}
       </section>
       {me.role === "PATIENT" ? <AskQuestionForm /> : null}
       {me.role === "DOCTOR" ? (
-        <section className={cx(ui.section, ui.stack)}>
+        <section className="grid gap-3.5 pt-7">
           <h2>{questionsCopy("public")}</h2>
           {questions.map((question) => (
-            <article className={ui.panel} key={question.id}>
+            <article className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" key={question.id}>
               <h3>{question.title}</h3>
               <p>{question.body}</p>
               <AnswerForm questionId={question.id} />

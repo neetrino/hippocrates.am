@@ -2,7 +2,7 @@
   "name": "@hippocrates/api",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../../.env -- node --watch -r ts-node/register -r ./src/register-prisma-ts.cjs src/main.ts",
+    "dev": "dotenv -e ../../.env -- node ./scripts/dev-watch.cjs",
     "build": "tsc -p tsconfig.json",
     "start": "dotenv -e ../../.env -- node dist/main.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",

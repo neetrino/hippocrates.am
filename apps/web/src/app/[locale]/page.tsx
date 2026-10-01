@@ -4,7 +4,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
 import { publicGet } from "@/shared/public-api";
 import type { ClinicCard, DoctorCard } from "@/shared/public-types";
-import { ClinicTile, DoctorTile } from "@/shared/ui/catalog-cards";
+import { ClinicTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
 
 type HomeData = { clinics: ClinicCard[]; doctors: DoctorCard[] };
@@ -45,16 +45,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {data.clinics.map((clinic, index) => (
             <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
           ))}
-        </div>
-      </section>
-      <section className="section">
-        <div className="section-head">
-          <h2>{nav("doctors")}</h2>
-          <Link href="/doctors">{common("seeAll")}</Link>
-        </div>
-        {data.doctors.length === 0 ? <EmptyState>{t("emptyDoctors")}</EmptyState> : null}
-        <div className="grid-cards">
-          {data.doctors.map((doctor) => <DoctorTile key={doctor.id} doctor={doctor} />)}
         </div>
       </section>
     </div>

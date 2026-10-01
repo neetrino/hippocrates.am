@@ -34,7 +34,7 @@ export function DoctorTile({ doctor }: { doctor: DoctorCard }) {
         <div>
           <strong>{doctor.user.displayName}</strong>
           <p className="muted">{doctor.specialty}</p>
-          <p className="muted">{doctor.clinic.name}</p>
+          <span className="badge">{doctor.clinic.name}</span>
         </div>
       </Link>
     </article>

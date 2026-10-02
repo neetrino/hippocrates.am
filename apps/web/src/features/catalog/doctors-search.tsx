@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { flushSync } from "react-dom";
 import { MultiSelectFilter } from "@/features/catalog/multi-select-filter";
 import { cn } from "@/shared/ui/cn";
 
@@ -69,7 +70,6 @@ export function DoctorsSearch({
   const [filtersOpen, setFiltersOpen] = useState(
     initialSpecialty.length > 0 || initialCity.length > 0 || initialClinic.length > 0,
   );
-  const [pendingReset, setPendingReset] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const panelId = useId();
 
@@ -82,17 +82,13 @@ export function DoctorsSearch({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [filtersOpen]);
 
-  useEffect(() => {
-    if (!pendingReset) return;
-    setPendingReset(false);
-    formRef.current?.requestSubmit();
-  }, [pendingReset, specialty, city, clinic]);
-
   function resetFilters(): void {
-    setSpecialty([]);
-    setCity([]);
-    setClinic([]);
-    setPendingReset(true);
+    flushSync(() => {
+      setSpecialty([]);
+      setCity([]);
+      setClinic([]);
+    });
+    formRef.current?.requestSubmit();
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>): void {

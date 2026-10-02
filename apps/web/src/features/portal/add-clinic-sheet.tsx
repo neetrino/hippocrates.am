@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon, RegisterClinicIcon } from "@/features/portal/admin-sidebar-icons";
 import { JsonForm } from "@/shared/json-form";
@@ -25,6 +25,10 @@ type AddClinicSheetProps = {
 
 const SHEET_MS = 420;
 
+function subscribeNoop(): () => void {
+  return () => undefined;
+}
+
 export function AddClinicSheet({
   addLabel,
   closeLabel,
@@ -35,12 +39,8 @@ export function AddClinicSheet({
 }: AddClinicSheetProps) {
   const [visible, setVisible] = useState(false);
   const [entered, setEntered] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const titleId = useId();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!visible) return;

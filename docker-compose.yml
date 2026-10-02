@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: hippocrates
+      POSTGRES_PASSWORD: hippocrates
+      POSTGRES_DB: hippocrates
+    ports:
+      - "5432:5432"
+    volumes:
+      - hippocrates_pg:/var/lib/postgresql/data
+
+volumes:
+  hippocrates_pg:

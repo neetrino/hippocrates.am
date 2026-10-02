@@ -3,7 +3,7 @@
 > **Contract proposal, not implemented endpoints.** Use this as a compact Cursor-facing design reference. The approved BRIEF and TECH_CARD determine which operations are shipped and the precise API surface. No route below may be considered live without matching implementation and tests.
 
 **Version:** 1.0-draft  
-**Target:** V1 / MVP  
+**Target:** Version 1  
 **Date:** 2026-09-28  
 **Status:** PROPOSED
 

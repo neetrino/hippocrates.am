@@ -1,33 +1,33 @@
-<!-- AGENT_SCOPE: REFERENCE_ONLY | FEATURE_SOURCE: NO | AUTO_IMPLEMENT: NO | CURRENT_V1_AUTHORITY: NO -->
+<!-- AGENT_SCOPE: ACTIVE | FEATURE_SOURCE: YES | AUTO_IMPLEMENT: POINT_BY_POINT | CURRENT_AUTHORITY: YES -->
 
 > [!IMPORTANT]
-> **AI AGENTS — HISTORICAL REFERENCE ONLY. DO NOT TREAT THIS FILE AS A FEATURE LIST.**
+> **AI AGENTS — ACTIVE PRODUCT SPECIFICATION.**
 >
-> This document is retained for background and traceability. **It is NOT the approved Hippocrates.am V1 brief, feature backlog, implementation plan, or instruction to build the capabilities described below.** When scanning project documents, extracting features, planning work, generating tasks, writing code, or reporting V1 scope, **exclude this file as a source of required features**. Its tables, “MVP” labels, acceptance criteria, and imperative instructions are historical proposals, not automatically approved work.
+> This file is the canonical product for Hippocrates.am. Build it one point at a time, in the order in `docs/PROGRESS.md`. Do not treat it as optional background. Do not shrink it to a reduced first release.
 >
-> **Current authority:** use the product owner's latest explicit decisions and the **approved** `docs/BRIEF.md` for V1 product scope; use approved `docs/01-ARCHITECTURE.md` (or the designated approved architecture file), `docs/TECH_CARD.md`, and recorded ADRs for implementation constraints. If these documents are drafts, missing, or disagree, report the gap and request approval rather than treating this file as a fallback feature source.
+> **Companion authority:** `docs/BRIEF.md`, `docs/architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md`, `docs/TECH_CARD.md`, and `docs/DECISIONS.md`. If a reduced-pack sentence remains elsewhere, ADR-003 wins.
 >
-> Read or quote this document **only when explicitly asked for historical comparison or background**. Even then, label its contents as reference material; do not automatically copy features into `PROGRESS.md` or implement them. This notice overrides contradictory “single source of truth,” “implementation-ready,” “required MVP,” or agent-execution language in the archived content below.
+> Finance capture and clinical records are later points of this same product. Do not invent clinical forms or take live payments before those points have their own acceptance spec.
 
 ---
 
 # HIPPOCRATES.AM — Canonical Product & Engineering Specification
 
-**Version:** 3.0-draft | **Date:** 2026-09-28 | **Audience:** Cursor AI agents, tech lead, product owner, QA, security reviewer  
-**Status:** ARCHIVED REFERENCE — not approved as V1 requirements or as an implementation task list.  
-**Language policy:** developer artifacts, code, API contracts and test names in English; public UI supports Armenian as default, plus Russian and English as configured. Product-owner explanations and decisions must be presented in Armenian unless the owner requests otherwise.
+**Version:** 3.1 | **Date:** 2026-09-30 | **Audience:** Cursor AI agents, tech lead, product owner, QA, security reviewer  
+**Status:** ACTIVE. Full product. Deliver point by point. Implementation has not started.  
+**Language policy:** developer artifacts, code, API contracts and test names in English; public UI uses Armenian as the default, plus Russian and English. Product-owner explanations and decisions must be presented in Armenian unless the owner requests otherwise.
 
-> **Historical provenance (non-authoritative):** This archived v3 draft drew on `reference/PROJECT_OVERVIEW_V2_ORIGINAL.txt` and `reference/OOAD_ARCHITECTURE_V02_ORIGINAL.md`. It may help compare earlier proposals but is **not** the current feature or implementation source. Use only the approved documents identified in the agent notice above.
+> **Provenance:** This specification drew on `reference/PROJECT_OVERVIEW_V2_ORIGINAL.txt` and `reference/OOAD_ARCHITECTURE_V02_ORIGINAL.md`. The 2026-09-29 reduced pack is withdrawn.
 
 ## 0. Agent execution contract — READ FIRST
 
 1. **No invented implementation state.** Inspect the repository, README, package scripts, migrations, CI, secrets handling, tests and infrastructure. Report verified facts before proposing changes. An uploaded requirements file is not proof that any feature already exists.
 2. **No destructive or production operations without explicit approval.** No migration against production, seed into a live database, mass edit, deletion, external messaging, real payments or deployment without the owner approving the exact action. Use isolated local/staging fixtures and test providers.
 3. **Do not ask the owner dozens of open questions.** Build the safe, approved foundation and present grouped unresolved business decisions with 2–3 clearly contrasted options in Armenian. Block only the specific feature requiring that decision.
-4. **Do not imply medical/legal certification.** Operational MVP excludes full medical records, diagnosis automation, live diagnostic-data exchange and surgery workflow until clinical/legal approval. Marketplace, administrative booking and communications still require appropriate privacy/security design and review before production.
+4. **Do not imply medical/legal certification.** Clinical records, diagnosis automation, live diagnostic-data exchange and surgery workflow wait for the clinical point and for clinical/legal approval. Marketplace, booking and communications still require privacy and security review before production.
 5. **Deliver vertical slices, not mock-only screens.** Each slice must include domain model, validated API, authorization, real persistence, UI, error handling, events if needed, tests, documentation and staging verification. Never report a slice as completed merely because pages render.
 6. **Keep a living `docs/PROGRESS.md`.** Record each task as `planned / in_progress / blocked / verified`, evidence (tests, paths, migration), risks and next work. The final status must distinguish implemented, simulated and untested capabilities.
-7. **Do not broaden the MVP.** In the MVP, private text chat and anonymous public Q&A are required, but medical images, surgical records, DICOM viewing and live payment capture are not. Do not quietly build unapproved additions.
+7. **Do not skip ahead.** Private text chat and anonymous public Q&A are required points. Medical images, surgical records, DICOM viewing and live payment capture are later points. Do not build a later point inside an earlier one.
 8. **Security and isolation override convenience.** Never expose cross-clinic patient data, private messages, Q&A author identity or provider credentials for debugging/analytics.
 9. **If requirements conflict:** explicit latest product-owner decision > original v2.0 product specification > this file's clearly flagged provisional engineering design > older v0.2 architecture proposal. Ask for owner confirmation if latest product intent cannot be established.
 10. **Stop conditions:** pause affected integration/go-live on missing legal basis, clinician-approved medical templates, untested tenant isolation, unrecoverable backups, or a payment/provider contract not authorized. Continue unrelated safe slices.
@@ -37,7 +37,7 @@
 - **[OWNER-HISTORY]** established in earlier Hippocrates discussions but not necessarily in v2.0.
 - **[DESIGN]** proposed implementation choice, revisable by the owner/tech lead.
 - **[GATE]** cannot be launched until a specified clinical, legal, provider or business decision is approved.
-- **[FUTURE]** architecture accommodation only; do not build in MVP.
+- **[FUTURE]** architecture accommodation only; build it on its own later point.
 
 ## 1. Product mission, boundaries and non-goals
 
@@ -53,53 +53,53 @@
 
 **Ecosystem organization types:** `DENTAL_CLINIC`, `MAXILLOFACIAL_CENTER` [V2] and `DIAGNOSTIC_IMAGING_CENTER` [OWNER-HISTORY, FUTURE]. Orthodontics, implants, pediatric dentistry, periodontics and oral surgery are specialty/service categories, not automatically different tenant types. Dental laboratories are [FUTURE]. An organization may have multiple service categories and multiple branches.
 
-**In scope for MVP [V2]:** the 17 product features in section 2. **Out of MVP:** digital dental chart, diagnosis and treatment records, surgical case management, automatic clinical recommendations, DICOM/PACS, diagnostic cross-organization exchange, full inventory, payroll, Google review syncing, dedicated mobile app, insurance/ArMed integrations and irreversible live financial actions. Architecture must not prevent later addition.
+**In scope now [V2]:** the 17 product features in section 2, delivered point by point. **Later points:** digital dental chart, diagnosis and treatment records, surgical case management, automatic clinical recommendations, DICOM/PACS, diagnostic cross-organization exchange, full inventory, payroll, Google review syncing, dedicated mobile app, insurance/ArMed integrations and irreversible live financial actions. Architecture must not prevent later addition.
 
 **No clinical decision support:** rankings display documented profiles and **patient-reported service experience**, not an objective measure of clinician skill or medical outcome; public Q&A is general information, not personal diagnosis or emergency service.
 
 ## 2. Release scope: exactly what to implement
 
-### 2.1 MVP product requirements (source v2.0)
+### 2.1 Product requirements (source v2.0)
 
 | ID | Priority | Requirement / acceptance intent | Owner context |
 |---|---|---|---|
-| FR-001 | MVP | Public homepage, global nav, localized content, search entry, login/registration | Public/CMS |
-| FR-002 | MVP | Public clinic and doctor directories with multi-select filters: area/distance where permitted, specialty, services, comparative prices, ratings, availability, languages | Marketplace |
-| FR-003 | MVP | Public Clinic Space profile: overview, branches, practitioners, prices/services, available equipment/material claims, approved certificates, reviews, contact/map and booking CTA | Org/CMS |
-| FR-004 | MVP | Public doctor profile: verified vs self-entered credentials, specialties, work locations, public work contact where authorized, languages, service/price and availability | Practitioner |
-| FR-005 | MVP | Common service definitions and location-specific `ServiceOffering` with price, duration, conditions, practitioner(s), branch and publish lifecycle | Catalog |
-| FR-006 | MVP | Branch/practitioner schedules, exceptions, finite resources and availability calculation preventing overlapping confirmed allocations | Scheduling |
-| FR-007 | MVP | Patient/authorized reception booking, optional approval flow, hold expiry, confirm, cancel/reschedule, no-show, attendance and immutable appointment history | Booking |
-| FR-008 | MVP | Basic in-app/email notifications; configurable reminder templates including initial proposed 24h and 2h before visit, SMS only with configured provider/consent | Notifications |
-| FR-009 | MVP | Patient Portal: dashboard, upcoming/past appointments, favorites, chat, own Q&A/reviews, notifications and profile/settings | Patient |
-| FR-010 | MVP | Doctor Portal: own schedule and bookings in selected org, private chat, public answers, basic operational metrics | Practitioner |
-| FR-011 | MVP | Private patient–doctor **text** conversation can be requested directly from doctor's public profile, without mandatory prior booking [V2]. Doctor may decline/disable requests; protect against spam; no auto-export to Q&A | Messaging |
-| FR-012 | MVP | Anonymous-to-public question submission, private author link, moderation, verified doctor answers and author notifications | Public Q&A |
-| FR-013 | MVP | Dedicated public searchable permanent Q&A archive, subject categories, answered/unanswered filters, safe public SEO, hidden author from public **and responding doctors** | Public Q&A |
-| FR-014 | MVP | Internal first-party reviews for doctor/clinic after verified attendance, review replies and fair dispute process; off-platform proof reviewed separately | Reviews |
-| FR-015 | MVP | Clinic Management basic branches, staff and delegated permissions, patients' **operational** records, offerings, calendars, appointments, reviews and basic metrics | Org/Booking |
-| FR-016 | MVP | Platform Admin verification, public CMS, moderation, plan visibility, platform stats, audit and organization lifecycle | Admin |
-| FR-017 | MVP | Registration and verification workflows for organizations and professional profiles, expiry/revocation handling | Verification |
+| FR-001 | Product | Public homepage, global nav, localized content, search entry, login/registration | Public/CMS |
+| FR-002 | Product | Public clinic and doctor directories with multi-select filters: area/distance where permitted, specialty, services, comparative prices, ratings, availability, languages | Marketplace |
+| FR-003 | Product | Public Clinic Space profile: overview, branches, practitioners, prices/services, available equipment/material claims, approved certificates, reviews, contact/map and booking CTA | Org/CMS |
+| FR-004 | Product | Public doctor profile: verified vs self-entered credentials, specialties, work locations, public work contact where authorized, languages, service/price and availability | Practitioner |
+| FR-005 | Product | Common service definitions and location-specific `ServiceOffering` with price, duration, conditions, practitioner(s), branch and publish lifecycle | Catalog |
+| FR-006 | Product | Branch/practitioner schedules, exceptions, finite resources and availability calculation preventing overlapping confirmed allocations | Scheduling |
+| FR-007 | Product | Patient/authorized reception booking, optional approval flow, hold expiry, confirm, cancel/reschedule, no-show, attendance and immutable appointment history | Booking |
+| FR-008 | Product | Basic in-app/email notifications; configurable reminder templates including initial proposed 24h and 2h before visit, SMS only with configured provider/consent | Notifications |
+| FR-009 | Product | Patient Portal: dashboard, upcoming/past appointments, favorites, chat, own Q&A/reviews, notifications and profile/settings | Patient |
+| FR-010 | Product | Doctor Portal: own schedule and bookings in selected org, private chat, public answers, basic operational metrics | Practitioner |
+| FR-011 | Product | Private patient–doctor **text** conversation can be requested directly from doctor's public profile, without mandatory prior booking [V2]. Doctor may decline/disable requests; protect against spam; no auto-export to Q&A | Messaging |
+| FR-012 | Product | Anonymous-to-public question submission, private author link, moderation, verified doctor answers and author notifications | Public Q&A |
+| FR-013 | Product | Dedicated public searchable permanent Q&A archive, subject categories, answered/unanswered filters, safe public SEO, hidden author from public **and responding doctors** | Public Q&A |
+| FR-014 | Product | Internal first-party reviews for doctor/clinic after verified attendance, review replies and fair dispute process; off-platform proof reviewed separately | Reviews |
+| FR-015 | Product | Clinic Management basic branches, staff and delegated permissions, patients' **operational** records, offerings, calendars, appointments, reviews and basic metrics | Org/Booking |
+| FR-016 | Product | Platform Admin verification, public CMS, moderation, plan visibility, platform stats, audit and organization lifecycle | Admin |
+| FR-017 | Product | Registration and verification workflows for organizations and professional profiles, expiry/revocation handling | Verification |
 
-**Acceptance of MVP:** Every FR-001…017 implemented end-to-end with functioning persistence/API/permissions, tested in staging with representative non-production data; no unsupported claims of clinical software readiness. A CLI script or documentation alone does not satisfy an FR.
+**Acceptance:** Every FR-001…017 implemented end-to-end with functioning persistence/API/permissions, tested in staging with representative non-production data; no unsupported claims of clinical software readiness. A CLI script or documentation alone does not satisfy an FR.
 
 ### 2.2 Phase 2 [V2], only after owner approval
-Advanced multi-branch/staff permissions; full operational finance and **real** online payments/refunds; advanced reporting; external third-party review integrations *only under provider API/content terms*; permitted secure file transfer; push/SMS extensions; commercial subscription lifecycle. Basic MVP plan visibility does not imply production billing automation.
+Advanced multi-branch/staff permissions; full operational finance and **real** online payments/refunds; advanced reporting; external third-party review integrations *only under provider API/content terms*; permitted secure file transfer; push/SMS extensions; commercial subscription lifecycle. Basic Product plan visibility does not imply production billing automation.
 
 ### 2.3 Phase 3 [V2 + OWNER-HISTORY], future gated clinical ecosystem
 Protected medical records, dental chart and clinical notes; treatment plans; surgery and postoperative workflows; diagnostic centers, doctor referrals, CT/CBCT/OPG scheduling, imaging studies/reports, permissioned return of results; lab orders; later telehealth, permitted existing clinic/ArMed integrations. Formal clinical data workflows, provider contracts, medical-document legal retention, lawful data processing/location and DICOM/FHIR integration design require separate signed-off specifications. **Do not create clinical forms from assumptions.**
 
 ### 2.4 Explicit conflict resolutions; owner approval still needed
 - **Chat gate:** v2.0 explicitly permits new private requests directly from doctor profile, so no booking prerequisite. Earlier booked-only assumption is superseded; doctor opt-out/anti-spam [DESIGN].
-- **Deposits:** v2.0 describes optional deposits during MVP booking but puts real payment integration in Phase 2. MVP may show `DEPOSIT_REQUIRED_MANUAL` / record off-platform payment verification ONLY with clinic's approved procedure; no mock checkout presented as real. Default to **no required online prepayment** until payment gateway, refund handling and agreements approved.
-- **Diagnostic priority:** user previously emphasized external CT center integration, but newest v2.0 stages it in Phase 3. Keep complete extension boundaries and explicit `DEC-003` in decision log: may be moved forward for an approved pilot; do not implement live exchange in MVP by assumption.
-- **Clinic finances:** MVP presents price and basic booking/admin metrics; advanced financial ledger and online checkout start in Phase 2. Do not confuse patient-paid clinical fees with Hippocrates subscription invoices.
-- **Promotion:** earlier concept considered paid placement for similarly rated clinics. This is not an approved MVP feature in v2.0; store no invisible paid boosts. Any future ads must be plainly labeled, never blended into clinical-quality claims.
-- **Medical notes:** v2.0 defers them. Design `Encounter` boundary now but do not pretend the MVP is a compliant EHR.
+- **Deposits:** v2.0 describes optional deposits during booking but puts real payment integration on the finance point. Booking may show `DEPOSIT_REQUIRED_MANUAL` / record off-platform payment verification ONLY with clinic's approved procedure; no mock checkout presented as real. Default to **no required online prepayment** until payment gateway, refund handling and agreements approved.
+- **Diagnostic priority:** user previously emphasized external CT center integration, but newest v2.0 stages it in Phase 3. Keep complete extension boundaries and explicit `DEC-003` in decision log: may be moved forward for an approved pilot; do not implement live exchange in Product by assumption.
+- **Clinic finances:** Product presents price and basic booking/admin metrics; advanced financial ledger and online checkout start in Phase 2. Do not confuse patient-paid clinical fees with Hippocrates subscription invoices.
+- **Promotion:** earlier concept considered paid placement for similarly rated clinics. This is not an approved feature in v2.0; store no invisible paid boosts. Any future ads must be plainly labeled, never blended into clinical-quality claims.
+- **Medical notes:** v2.0 places them on the clinical point. Do not pretend an earlier point is a compliant EHR.
 
 ## 3. Actors and authorization boundaries
 
-| Actor | MVP capabilities | Must NOT receive by default |
+| Actor | Product capabilities | Must NOT receive by default |
 |---|---|---|
 | Anonymous visitor | Search/read published profiles, browse moderated Q&A | Patient details, Q&A author mapping, private conversations |
 | Patient account | Own bookings/profile/preferences/favorites, chat, Q&A, reviews | Another patient's records or internal clinic finance |
@@ -120,27 +120,27 @@ Each module is the only authoritative writer of its aggregates. Other modules ac
 
 | BC | Module (owner) | Core entities | Commands | Emitted events | Release |
 |---|---|---|---|---|---|
-| 01 | Identity & Access | UserIdentity, Session, Membership, RoleAssignment | signIn, inviteMember, changeRole, revokeSession | `identity.user.created.v1`, `identity.membership.changed.v1` | MVP |
-| 02 | Organizations | Organization, Branch, VerificationCase | registerOrg, verifyOrg, addBranch, suspendOrg | `organization.verified.v1`, `organization.suspended.v1` | MVP |
-| 03 | Practitioners | Practitioner, Credential, Affiliation, Specialty | verifyPractitioner, affiliate, changeStatus | `practitioner.verified.v1`, `affiliation.changed.v1` | MVP |
-| 04 | Patient Registry | Patient, OrganizationPatient, ContactPreference | registerPatient, linkPatientToOrg, updateOwnInfo | `patient.registered.v1` (no patient demographics) | MVP |
-| 05 | Service Catalog | ServiceDefinition, ServiceOffering, OfferingVersion | publishOffering, updateOffering, archiveOffering | `catalog.offering.published.v1`, `catalog.offering.changed.v1` | MVP |
-| 06 | Scheduling | WorkSchedule, ScheduleException, Resource, SlotHold, ResourceReservation | computeAvailability, placeHold, consumeHold, release | `scheduling.hold.expired.v1` | MVP |
-| 07 | Appointments | Appointment, AppointmentEvent, AttendanceEvidence | request, confirm, cancel, reschedule, checkIn, complete | `appointment.confirmed.v1`, `appointment.completed.v1` | MVP |
-| 08 | Marketplace | PublicListing, ListingProjection, SearchProjection | indexPublicData, search, compare | `listing.updated.v1` | MVP |
-| 09 | Messaging | Conversation, Message, MessageReadReceipt | requestConversation, accept, send, close, block | `message.sent.v1`, `conversation.requested.v1` | MVP |
-| 10 | Public Q&A | Question, Answer, Category, PrivateQuestionAuthor | submitQuestion, moderate, publishAnswer, close | `qa.question.published.v1`, `qa.answer.published.v1` | MVP |
-| 11 | Reviews | ReviewEligibility, Review, ReviewReply, ReviewCase | grantEligibility, publishReview, respond, dispute | `review.published.v1` | MVP |
-| 12 | Notifications | Notification, Template, DeliveryAttempt, Preference | queueNotification, deliver, retry | `notification.delivery.updated.v1` | MVP |
-| 13 | Clinic Operations | LocalPatientNote (organizational only), OperationalDashboard | recordReceptionNote, summarize | `operations.summary.updated.v1` | MVP basic |
-| 14 | Platform Administration & CMS | CMSPage, ModerationCase, PlatformPlan | publishPage, approveOrg, resolveReport | `cms.page.published.v1` | MVP |
+| 01 | Identity & Access | UserIdentity, Session, Membership, RoleAssignment | signIn, inviteMember, changeRole, revokeSession | `identity.user.created.v1`, `identity.membership.changed.v1` | Product |
+| 02 | Organizations | Organization, Branch, VerificationCase | registerOrg, verifyOrg, addBranch, suspendOrg | `organization.verified.v1`, `organization.suspended.v1` | Product |
+| 03 | Practitioners | Practitioner, Credential, Affiliation, Specialty | verifyPractitioner, affiliate, changeStatus | `practitioner.verified.v1`, `affiliation.changed.v1` | Product |
+| 04 | Patient Registry | Patient, OrganizationPatient, ContactPreference | registerPatient, linkPatientToOrg, updateOwnInfo | `patient.registered.v1` (no patient demographics) | Product |
+| 05 | Service Catalog | ServiceDefinition, ServiceOffering, OfferingVersion | publishOffering, updateOffering, archiveOffering | `catalog.offering.published.v1`, `catalog.offering.changed.v1` | Product |
+| 06 | Scheduling | WorkSchedule, ScheduleException, Resource, SlotHold, ResourceReservation | computeAvailability, placeHold, consumeHold, release | `scheduling.hold.expired.v1` | Product |
+| 07 | Appointments | Appointment, AppointmentEvent, AttendanceEvidence | request, confirm, cancel, reschedule, checkIn, complete | `appointment.confirmed.v1`, `appointment.completed.v1` | Product |
+| 08 | Marketplace | PublicListing, ListingProjection, SearchProjection | indexPublicData, search, compare | `listing.updated.v1` | Product |
+| 09 | Messaging | Conversation, Message, MessageReadReceipt | requestConversation, accept, send, close, block | `message.sent.v1`, `conversation.requested.v1` | Product |
+| 10 | Public Q&A | Question, Answer, Category, PrivateQuestionAuthor | submitQuestion, moderate, publishAnswer, close | `qa.question.published.v1`, `qa.answer.published.v1` | Product |
+| 11 | Reviews | ReviewEligibility, Review, ReviewReply, ReviewCase | grantEligibility, publishReview, respond, dispute | `review.published.v1` | Product |
+| 12 | Notifications | Notification, Template, DeliveryAttempt, Preference | queueNotification, deliver, retry | `notification.delivery.updated.v1` | Product |
+| 13 | Clinic Operations | LocalPatientNote (organizational only), OperationalDashboard | recordReceptionNote, summarize | `operations.summary.updated.v1` | Early point |
+| 14 | Platform Administration & CMS | CMSPage, ModerationCase, PlatformPlan | publishPage, approveOrg, resolveReport | `cms.page.published.v1` | Product |
 | 15 | Clinic Finance | Estimate, Invoice, Payment, Refund | invoice, settle, refund | `finance.payment.settled.v1` | Phase 2 |
-| 16 | SaaS Billing | Subscription, Plan, PlanEntitlement | subscribe, bill, cancel | `saas.entitlement.changed.v1` | Phase 2 (MVP read-only configuration) |
+| 16 | SaaS Billing | Subscription, Plan, PlanEntitlement | subscribe, bill, cancel | `saas.entitlement.changed.v1` | Finance point |
 | 17 | Clinical Records | Encounter, ClinicalNote, DentalChartEntry, ClinicalAttachment | openEncounter, signNote, appendCorrection | `clinical.encounter.closed.v1` | Phase 3 [GATE] |
 | 18 | Care & Surgery | TreatmentPlan, PerformedProcedure, SurgicalCase | proposePlan, recordProcedure, runSurgery | `care.procedure.recorded.v1` | Phase 3 [GATE] |
 | 19 | Diagnostic Referral & Imaging | Referral, DiagnosticOrder, ImagingStudy, DiagnosticReport | issue, accept, perform, release | `diagnostic.report.released.v1` (IDs only) | Phase 3 [GATE] |
 | 20 | Integration & Reporting | OutboxEvent, InboxReceipt, AnalyticsProjection | publish, project, retry | internal integration | Cross-cutting |
-| 21 | Security Policy & Audit | AccessGrant, ConsentRecord, AuditEvent | evaluate, grant/revoke, appendAudit | `security.grant.revoked.v1` | MVP framework; richer Phase 3 |
+| 21 | Security Policy & Audit | AccessGrant, ConsentRecord, AuditEvent | evaluate, grant/revoke, appendAudit | `security.grant.revoked.v1` | Product framework; richer Phase 3 |
 
 **Naming:** API/domain uses `Practitioner`; user-facing text is “Doctor”. `Clinic` is one type of `Organization`. `ServiceDefinition` is an abstract catalog entry; `ServiceOffering` is a **specific clinic/branch** offering with versioned price/duration. `Appointment` is not `Encounter`. `Referral`, `ImagingStudy` and `DiagnosticReport` are separate.
 
@@ -161,7 +161,7 @@ Each module is the only authoritative writer of its aggregates. Other modules ac
 | Question | 1 → 1 PRIVATE link | PrivateQuestionAuthor | Public question/answer payload never serializes author key/identity |
 | Question | 1 → 0..* | Answer | Only verified practitioner may publish answer; moderated separately |
 | Appointment / verified offline visit | 1 → 0..* | ReviewEligibility | Max one eligible review **per target** (doctor vs clinic) per verified visit |
-| Conversation | 1 → 2 participants (MVP) | Patient + Practitioner | Private contents never feed public Q&A or analytics text |
+| Conversation | 1 → 2 participants (Product) | Patient + Practitioner | Private contents never feed public Q&A or analytics text |
 | Referral | 1 → 0..* | ImagingStudy | Request is not proof imaging was performed [FUTURE] |
 | ImagingStudy | 1 → 0..* | DiagnosticReport versions | Report SIGNED/RELEASED independent of study COMPLETED [FUTURE] |
 
@@ -196,7 +196,7 @@ Each module is the only authoritative writer of its aggregates. Other modules ac
 - `ELIGIBLE → SUBMITTED → PENDING_MODERATION → PUBLISHED | REJECTED | HIDDEN`; a dispute opens `UNDER_REVIEW` metadata and preserves moderation trail. Do not remove a review solely because its rating is low. Internal review and third-party external rating **must never be merged into one unattributed figure**.
 - Default sort/ranking: transparent relevant filter + confidence-aware internal review aggregation [V2 intent; algorithm weights / publication must be owner approved]. If paid placements added in future they are conspicuously labeled and excluded from the organic score.
 
-### 6.6 Future medical/diagnostics (model only; do not code full workflows in MVP)
+### 6.6 Future medical/diagnostics (model only; do not code full workflows in Product)
 - `ClinicalNote: DRAFT → SIGNED` with explicit append-only signed amendment instead of overwrite.
 - `TreatmentPlan: DRAFT → PROPOSED → ACCEPTED | DECLINED → ACTIVE → COMPLETED | DISCONTINUED`; patient consent to a procedure is separate from quote acceptance.
 - `Referral: DRAFT → ISSUED → ACCEPTED → SCHEDULED → PERFORMED → CLOSED`, with declined/cancelled branches.
@@ -214,7 +214,7 @@ Each module is the only authoritative writer of its aggregates. Other modules ac
 
 **Failure cases:** duplicate org registration, forged documents, expired credentials, missing branch, unverified doctor, stale index. Build tests and a human exception queue.
 
-### WF-02 End-to-end booking (the primary MVP transaction)
+### WF-02 End-to-end booking (the primary Product transaction)
 1. Visitor searches an approved offering/doctor/branch; booking queries authoritative availability, not the search-index cache.
 2. Check both affiliation schedule and globally reserved practitioner busy times, plus branch room/chair/equipment requirements. The global busy-time check exposes `BUSY/FREE`, **not another clinic’s patient details**.
 3. Patient (or authorized receptionist) selects time; Scheduling places TTL hold across **all** required resources with a unique idempotency key. Competing requests cannot both hold the same resource/time.
@@ -247,7 +247,7 @@ Each module is the only authoritative writer of its aggregates. Other modules ac
 3. Publish moderated first-party review and aggregate sample count/confidence; do not fabricate “top doctor” medical quality metric.
 4. External provider reviews [Phase 2] are separate with displayed provenance and current provider policy.
 
-### WF-06 Diagnostic collaboration [FUTURE; no MVP live exchange]
+### WF-06 Diagnostic collaboration [FUTURE; no Product live exchange]
 Physician creates consent/lawful-basis-gated referral → patient selects diagnostic center/scan service → imaging center accepts and schedules device/staff → performs study and records secure file references → specialist signs report → report is released **only after a fresh authorization check** to an approved recipient → audit every disclosure. `Referral`, `Study`, `DiagnosticReport`, `AccessGrant` are separately owned; no private medical data in general event payloads. Technical modeling may follow FHIR ServiceRequest / ImagingStudy, and DICOM for imaging, but standards compatibility needs dedicated implementation design and testing.
 
 ## 8. Engineering architecture and operational design [DESIGN]
@@ -255,7 +255,7 @@ Physician creates consent/lawful-basis-gated referral → patient selects diagno
 ### 8.1 Baseline technology (adapt to pre-existing repo, do not overwrite working stack)
 - **Frontend:** Next.js App Router + React + TypeScript; public SEO pages via appropriate server rendering, secure server components and localization framework; HY default, RU/EN content when supplied.
 - **Backend:** NestJS TypeScript modular monolith with one module per bounded context; contract-driven application services; no business policy embedded only in React components.
-- **Persistence:** PostgreSQL with Prisma, transactional writes and migrations; one shared logical DB for MVP, explicit tenant scoping of all nonpublic operational data. Use platform-controlled schema migration gates; test restore.
+- **Persistence:** PostgreSQL with Prisma, transactional writes and migrations; one shared logical DB for Product, explicit tenant scoping of all nonpublic operational data. Use platform-controlled schema migration gates; test restore.
 - **Async:** Redis-backed queue only for noncritical delayed side effects (reminders, search projection, external API retries). Business correctness must not depend on queue uptime. DB transactional outbox + inbox deduplication.
 - **Storage:** private S3-compatible object storage with server-mediated short-lived signed URLs, content-type and malware-scan policy before public publication, versioning/retention where appropriate; separate public CMS assets from private verification documents.
 - **Infrastructure:** reproducible local compose for Postgres/Redis/mock mail; isolated staging and prod environment files. Deployment provider is **unresolved**: do not assume Vercel/Hetzner/Cloud Run as a product decision without repo/owner evidence.

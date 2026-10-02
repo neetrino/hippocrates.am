@@ -2,7 +2,7 @@
 
 > Version 1 simple modular-monolith layout. The paths below describe a **proposed application tree**, not a claim that applications or modules already exist. Read the real repository before creating, replacing, or moving files.
 
-**Target:** Version 1 / MVP  
+**Target:** Version 1  
 **Version:** 1.0-draft  
 **Date:** 2026-09-28  
 **Status:** PROPOSED; reconcile with approved `TECH_CARD.md`, actual repository and `ARCHITECTURE_TEMPLATE.md`.

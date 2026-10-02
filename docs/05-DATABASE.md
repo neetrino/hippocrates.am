@@ -1,6 +1,6 @@
-# Minimum MVP Database Design — Hippocrates.am
+# Database design — Hippocrates.am
 
-> **CONCEPTUAL SCHEMA, NOT IMPLEMENTED MIGRATIONS.** Revised 2026-09-30. No review tables. A doctor profile has one clinic. No EHR and no payment tables. Financial totals are queries over appointment prices.
+> **CONCEPTUAL SCHEMA, NOT IMPLEMENTED MIGRATIONS.** Revised 2026-09-30. Early points use the tables below. Chat, Q&A, review, branch, invoice, and clinical tables are added on their points. Do not create them in the identity migration.
 
 ## Authoritative data groups
 
@@ -8,10 +8,10 @@
 | --- | --- | --- |
 | Identity | `User` | Opaque ID, display name, approved contact/login fields, account state |
 | Identity | `Session` | Hashed opaque session ID, user, expiry/revocation, activity policy |
-| Clinics | `Clinic` | Public name, description, single MVP location/contact, draft/published state |
+| Clinics | `Clinic` | Public name, description, contact, draft/published state. Branches arrive on point P2 |
 | Clinics | `ClinicMembership` | User, clinic, role (admin); active/revoked state and timestamps |
 | Verification | `VerificationCase` | **Separate target type** CLINIC or DOCTOR, reviewer, status and audit; protected evidence refs if approved |
-| Doctors | `DoctorProfile` | One user, exactly one clinic, specialization, public fields, verification. A second clinic is a second user |
+| Doctors | `DoctorProfile` | One user, specialization, public fields, verification. Affiliations to clinics are separate rows |
 | Catalog | `Service` | Minimal approved service identity/name/category as needed |
 | Catalog | `ClinicOffering` | Clinic, approved doctor/service eligibility if needed, published price/currency and optional estimate flag |
 | Scheduling | `DoctorSchedule` | Doctor+clinic, weekday/date and time intervals, clinic time zone |
@@ -23,7 +23,7 @@
 | Patients | `ClinicPatient` | Clinic, patient user, contact needed by that clinic. Created from this clinic's appointments. No clinical note |
 | Audit | `AuditEvent` | Restricted clinic/doctor approvals, permissions and booking actions with sanitized metadata |
 
-Store only necessary patient contact information for booking. Clinical diagnosis, visit notes, imaging, payment details, private messaging and anonymous-public-Q&A author data **must not** be added by the minimum schema.
+The identity migration stores contact needed for booking. Clinical notes, imaging, payments, messages, and Q&A author maps are later migrations. Do not add them before their point.
 
 ## Conceptual relationships
 
@@ -56,7 +56,7 @@ The diagram is conceptual; actual column names/types/keys require approved migra
 - Every clinic-owned operational row has a trustworthy clinic scope or a constrained FK path to one. Composite integrity and service checks block Clinic A references to Clinic B private objects.
 - `Clinic` and `DoctorProfile` publication are distinct; public clinic and doctor projections require independently approved verification states where applicable.
 - Clinic membership revocation is checked **on each protected request**; a stale signed-in session does not preserve revoked clinic powers.
-- `DoctorProfile.clinicId` is required. The doctor user cannot have a membership or profile at a second clinic. Enforce this with a unique doctor user and a check that rejects a second clinic.
+- A doctor user may have one affiliation row per clinic. Overlapping active appointments are rejected for that doctor across clinics.
 - Patient may have appointments with several clinics but sees only their own records; each clinic sees only its own permitted booking details.
 
 ## Appointment state and conflict integrity
@@ -83,13 +83,13 @@ Cancellation transaction validates actor, policy, status, and updates appointmen
 
 - Published clinic/doctor lookup by status/name/specialty; foreign keys for clinic offerings and doctor assignments.
 - Clinic/day, doctor/time and patient/time indexes for booking and portal lists.
-- Unique doctor user. Overlap exclusion and idempotency unique key.
-- Clinic plus patient unique on `ClinicPatient`. Authorized booking events and minimal audit indexes. No review index.
+- Unique user email. Overlap exclusion per doctor and idempotency unique key.
+- Clinic plus patient unique on `ClinicPatient`. Review indexes arrive on point P8.
 - Create tables from reviewed, versioned migrations only; verify `CHECK` constraints, exclusion indexes, rollback strategy and query plans in staging.
 - Development/staging use synthetic fixtures; define backup encryption, region, retention and a **tested restore** before first real appointment.
 
-## Minimal schema exclusions
+## Tables that wait for their point
 
-No `Conversation`, `Message`, `PublicQuestion`, `ClinicReview`, `ReviewReply`, room booking, multi-branch operations, a doctor user with two clinics, `TreatmentPlan`, `MedicalNote`, imaging, invoice, deposit, or payment tables. Booking-price totals are queries, not a ledger.
+Do not create `Conversation`, `Message`, `PublicQuestion`, `ClinicReview`, `Branch`, `TreatmentPlan`, `MedicalNote`, imaging, invoice, or payment tables in P0 or P1. Booking-price totals on P5 are queries, not a ledger. Invoices start on P9. Clinical tables start on P10.
 
-**Still open:** production data residency and the file-storage vendor. Accepted: email login, 12-hour sessions, one doctor account per clinic, clinic-confirmed booking, in-app notices, private verification evidence, no reviews, and `MVP-24` through `MVP-27`. `BRIEF.md` is product authority.
+**Still open:** production data residency and the file-storage vendor. Accepted: email login, 12-hour sessions, private verification evidence, and the point order in `PROGRESS.md`. `BRIEF.md` and `ADR-003` are product authority.

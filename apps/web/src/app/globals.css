@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #142428;
+  --color-muted: #5a6766;
+  --color-accent: #00a79d;
+  --color-accent-hover: #009189;
+  --color-accent-soft: #e5f6f5;
+  --color-danger: #8f3d32;
+  --color-sand: #f3f5f5;
+  --color-line: #e6eceb;
+  --color-auth-field: #eef6f5;
+  --color-auth-field-focus: #e7f4f3;
+  --shadow-soft: 0 14px 36px rgba(20, 36, 40, 0.06);
+  --shadow-accent: 0 10px 22px rgba(0, 167, 157, 0.22);
+  --radius-card: 1rem;
+  --max-width-shell: 77.5rem;
+}
+
+@layer base {
+  ::selection {
+    background: var(--color-accent);
+    color: #ffffff;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-sans), var(--font-hy), "Noto Sans", "Noto Sans Armenian", sans-serif;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    letter-spacing: -0.03em;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.08;
+  }
+
+  h2 {
+    font-size: 1.45rem;
+  }
+
+  @media (max-width: 960px) {
+    h1 {
+      font-size: clamp(1.75rem, 8vw, 2.4rem);
+    }
+  }
+}
+
+@keyframes mobile-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

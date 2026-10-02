@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { LocaleFlag } from "@/shared/ui/locale-flag";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
@@ -18,41 +19,21 @@ type SiteNavProps = {
   closeMenu: string;
 };
 
+type NavLink = {
+  href: "/clinics" | "/doctors" | "/questions";
+  label: string;
+};
+
+type IndicatorBox = {
+  left: number;
+  width: number;
+  ready: boolean;
+};
+
 const localeCodes: Record<AppLocale, string> = { hy: "HY", en: "EN", ru: "RU" };
 
 function subscribeNoop(): () => void {
   return () => undefined;
-}
-
-function LocaleFlag({ locale }: { locale: AppLocale }) {
-  const className = "h-[11px] w-4 shrink-0 rounded-sm shadow-[inset_0_0_0_1px_rgba(20,36,40,0.12)]";
-  if (locale === "hy") {
-    return (
-      <svg className={className} viewBox="0 0 18 12" aria-hidden="true">
-        <rect width="18" height="4" y="0" fill="#D90012" />
-        <rect width="18" height="4" y="4" fill="#0033A0" />
-        <rect width="18" height="4" y="8" fill="#F2A800" />
-      </svg>
-    );
-  }
-  if (locale === "ru") {
-    return (
-      <svg className={className} viewBox="0 0 18 12" aria-hidden="true">
-        <rect width="18" height="4" y="0" fill="#FFFFFF" stroke="#D0D5D4" strokeWidth="0.3" />
-        <rect width="18" height="4" y="4" fill="#0039A6" />
-        <rect width="18" height="4" y="8" fill="#D52B1E" />
-      </svg>
-    );
-  }
-  return (
-    <svg className={className} viewBox="0 0 18 12" aria-hidden="true">
-      <rect width="18" height="12" fill="#012169" />
-      <path d="M0 0L18 12M18 0L0 12" stroke="#FFFFFF" strokeWidth="2" />
-      <path d="M0 0L18 12M18 0L0 12" stroke="#C8102E" strokeWidth="1" />
-      <path d="M9 0V12M0 6H18" stroke="#FFFFFF" strokeWidth="3" />
-      <path d="M9 0V12M0 6H18" stroke="#C8102E" strokeWidth="1.6" />
-    </svg>
-  );
 }
 
 function localeNeutralPath(pathname: string): string {
@@ -84,6 +65,98 @@ function CloseIcon() {
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
       <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
+  );
+}
+
+function isActivePath(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: string }) {
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const [indicator, setIndicator] = useState<IndicatorBox>({ left: 0, width: 0, ready: false });
+  const activeIndex = links.findIndex((item) => isActivePath(pathname, item.href));
+  const labelsKey = links.map((item) => item.label).join("|");
+
+  useLayoutEffect(() => {
+    function measure(): void {
+      const nav = navRef.current;
+      const active = itemRefs.current[activeIndex];
+      if (!nav || !active || activeIndex < 0) {
+        setIndicator((prev) => ({ ...prev, ready: false }));
+        return;
+      }
+      setIndicator({
+        left: active.offsetLeft,
+        width: active.offsetWidth,
+        ready: true,
+      });
+    }
+
+    measure();
+    const nav = navRef.current;
+    if (!nav || typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    const observer = new ResizeObserver(measure);
+    observer.observe(nav);
+    for (const item of itemRefs.current) {
+      if (item) observer.observe(item);
+    }
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [activeIndex, labelsKey, pathname]);
+
+  return (
+    <nav
+      ref={navRef}
+      className="relative justify-self-center gap-1.5 rounded-full border border-line bg-[#f5fafa] p-1.5 max-md:hidden md:flex md:items-center"
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute top-1.5 bottom-1.5 left-0 rounded-full bg-white shadow-[0_4px_14px_rgba(0,167,157,0.12)] transition-[transform,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          indicator.ready ? "opacity-100" : "opacity-0",
+        )}
+        style={{
+          width: indicator.width,
+          transform: `translate3d(${indicator.left}px, 0, 0)`,
+        }}
+      />
+      {links.map((item, index) => {
+        const active = index === activeIndex;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            ref={(node) => {
+              itemRefs.current[index] = node;
+            }}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "relative z-1 grid h-11 place-items-center rounded-full px-[18px] text-[0.98rem] font-medium tracking-[0.01em] transition-[color,font-weight] duration-300",
+              active ? "font-semibold text-accent" : "text-muted hover:text-accent",
+            )}
+          >
+            <span className="relative leading-none">
+              {item.label}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "absolute top-[calc(100%+3px)] right-0 left-0 h-0.5 rounded-full",
+                  active ? "bg-accent" : "bg-transparent",
+                )}
+              />
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -122,25 +195,15 @@ export function SiteNav({
     };
   }, [open]);
 
-  const links = [
-    { href: "/clinics" as const, label: clinics },
-    { href: "/doctors" as const, label: doctors },
-    { href: "/questions" as const, label: questions },
+  const links: NavLink[] = [
+    { href: "/clinics", label: clinics },
+    { href: "/doctors", label: doctors },
+    { href: "/questions", label: questions },
   ];
 
   return (
     <div className="contents">
-      <nav className="justify-self-center gap-1.5 rounded-full border border-line bg-[#f5fafa] p-1.5 max-md:hidden md:flex md:items-center">
-        {links.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="rounded-full px-[18px] py-2.5 text-base font-semibold text-muted transition-colors duration-160 hover:bg-white hover:text-accent hover:shadow-[0_4px_14px_rgba(0,167,157,0.1)]"
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <DesktopPrimaryNav links={links} pathname={pathname} />
       <div className="flex items-center justify-self-end gap-2.5 max-md:gap-2">
         <LocaleSwitch hideOnMobile />
         <Link
@@ -200,16 +263,25 @@ export function SiteNav({
                 </div>
                 <div className="grid gap-[22px] rounded-[28px] bg-white px-[22px] pt-7 pb-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
                   <nav className="grid gap-1">
-                    {links.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        className="rounded-xl px-1.5 py-3.5 text-[1.35rem] font-semibold tracking-[-0.02em] text-ink active:bg-accent-soft active:text-accent"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                    {links.map((item) => {
+                      const active = isActivePath(pathname, item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "rounded-xl px-1.5 py-3.5 text-[1.35rem] font-semibold tracking-[-0.02em] transition-colors duration-160",
+                            active
+                              ? "bg-accent-soft text-accent underline decoration-accent decoration-2 underline-offset-[6px]"
+                              : "text-ink active:bg-accent-soft active:text-accent",
+                          )}
+                        >
+                          {item.label}
+                        </Link>
+                      );
+                    })}
                   </nav>
                   <div className="grid gap-2.5 border-t border-line pt-[18px]">
                     <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">{t("language")}</p>

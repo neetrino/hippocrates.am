@@ -1,0 +1,25 @@
+---
+description: Form input constraints — phone digits only, names without digits.
+globs: ["**/features/auth/**", "**/shared/json-form.tsx", "**/shared/input-constraints.ts", "**/features/portal/**"]
+alwaysApply: false
+---
+
+# Form inputs
+
+## Phone fields
+
+- Allow digits and an optional leading `+` only. Strip letters and other symbols on input.
+- Prefer the shared `PhoneField` + `buildPhoneNumber` pattern (`+374` prefix + local digits) over a free-text phone with a `+374…` placeholder.
+- Do not put the dial code inside the editable placeholder when a fixed prefix UI is used — that causes overlapping `+` / placeholder visuals.
+- Use `inputMode="numeric"` / `type="tel"` for the editable local part.
+
+## Name fields
+
+- Person and clinic **name** fields (`name`, `surname`, `adminName`, `*Name`) must not accept digits.
+- Allow Unicode letters, spaces, apostrophes, and hyphens. Use `sanitizeNameInput` from `@/shared/input-constraints`.
+- Do **not** apply name rules to address, email, password, or search fields.
+
+## Shared helpers
+
+- Reuse `@/shared/input-constraints` and existing auth field components instead of one-off `onInput` regexes in each form.
+- Keep server-side validation as the authority; client filtering is UX only.

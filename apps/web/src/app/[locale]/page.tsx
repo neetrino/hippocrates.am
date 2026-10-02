@@ -24,7 +24,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <h1 className="bg-linear-to-br from-ink via-[#1a3d3a] to-accent bg-clip-text text-transparent">
             {t("title")}
           </h1>
-          <p className="m-0 max-w-[42rem] text-lg leading-relaxed text-muted max-md:text-base">{t("lede")}</p>
+          <p className="m-0 max-w-[42rem] text-lg leading-[1.7] font-light tracking-[0.01em] text-muted max-md:text-base">
+            {t("lede")}
+          </p>
           <form
             className="flex gap-2 rounded-full border border-line bg-white p-2 shadow-soft focus-within:border-accent/45 focus-within:shadow-[0_14px_36px_rgba(0,167,157,0.12)] max-md:flex-col max-md:rounded-[18px]"
             action={action}

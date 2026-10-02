@@ -55,11 +55,23 @@
   "catalog": {
     "clinicsTitle": "Клиники",
     "clinicName": "Название клиники",
-    "emptyClinicSearch": "Клиники с таким названием нет.",
+    "emptyClinicSearch": "По этому запросу клиник нет.",
     "doctorsTitle": "Врачи",
     "doctorName": "Имя врача",
+    "doctorSearchPlaceholder": "Поиск по имени...",
     "specialty": "Специальность",
-    "emptyDoctorSearch": "По этому запросу врачей нет."
+    "city": "Город",
+    "clinic": "Клиника",
+    "openFilters": "Открыть фильтры",
+    "resetFilters": "Сбросить фильтры",
+    "applyFilters": "Применить фильтры",
+    "selectedCount": "Выбрано: {count}",
+    "all": "Все",
+    "emptyDoctorSearch": "По этому запросу врачей нет.",
+    "clinicSearchPlaceholder": "Поиск по названию, адресу, району или телефону",
+    "clinicSearchAria": "Поиск клиник",
+    "clearClinicSearch": "Очистить поиск",
+    "clinicSearchCount": "{count, plural, one {# клиника} few {# клиники} many {# клиник} other {# клиники}}"
   },
   "clinicPage": {
     "branches": "Филиалы",
@@ -128,6 +140,22 @@
     "sendReview": "Отправить отзыв",
     "reviewFailed": "Отзыв не сохранился"
   },
+  "portal": {
+    "subtitle": "Портал управления",
+    "navLabel": "Разделы платформы",
+    "accountNav": "Разделы аккаунта",
+    "dashboard": "Панель",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню",
+    "statVisits": "Визиты",
+    "statNotices": "Уведомления",
+    "quickAction": "Быстрое действие",
+    "registerHint": "Создайте клинику и аккаунт её админа.",
+    "sectionCount": "{count}",
+    "emptyVisits": "Визитов пока нет.",
+    "addClinic": "Добавить клинику",
+    "closeSheet": "Закрыть"
+  },
   "desk": {
     "denied": "Эта страница для админа клиники.",
     "title": "Панель клиники",
@@ -155,6 +183,12 @@
     "phone": "Телефон",
     "adminName": "Имя админа",
     "adminEmail": "Эл. почта админа",
-    "adminPassword": "Пароль админа"
+    "adminPassword": "Пароль админа",
+    "clinicNamePlaceholder": "напр. Арег Стоматология",
+    "addressPlaceholder": "напр. Абовяна 18, Ереван",
+    "phonePlaceholder": "+374 XX XXX XXX",
+    "adminNamePlaceholder": "напр. Анна Григорян",
+    "adminEmailPlaceholder": "admin@clinic.am",
+    "adminPasswordPlaceholder": "Не менее 8 символов"
   }
 }

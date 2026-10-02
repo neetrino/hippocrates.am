@@ -15,6 +15,11 @@
   --shadow-accent: 0 10px 22px rgba(0, 167, 157, 0.22);
   --radius-card: 1rem;
   --max-width-shell: 77.5rem;
+  --font-sans:
+    var(--font-noto-hy), var(--font-noto-sans), "Noto Sans Armenian", "Noto Sans", sans-serif;
+  --font-display:
+    var(--font-noto-serif-hy), var(--font-noto-serif), "Noto Serif Armenian", "Noto Serif",
+    Georgia, serif;
 }
 
 @layer base {
@@ -25,13 +30,20 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
     min-height: 100vh;
     background: #ffffff;
     color: var(--color-ink);
-    font-family: var(--font-sans), var(--font-hy), "Noto Sans", "Noto Sans Armenian", sans-serif;
+    font-family: var(--font-sans);
+    font-size: 1.015rem;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0.005em;
   }
 
   a {
@@ -55,21 +67,42 @@
   h2,
   h3 {
     margin: 0;
-    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-ink);
+    text-wrap: balance;
   }
 
   h1 {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    line-height: 1.08;
+    font-size: clamp(2.15rem, 4.2vw, 3.65rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.018em;
   }
 
   h2 {
-    font-size: 1.45rem;
+    font-size: clamp(1.35rem, 2vw, 1.55rem);
+    letter-spacing: -0.012em;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  strong {
+    font-weight: 600;
   }
 
   @media (max-width: 960px) {
     h1 {
-      font-size: clamp(1.75rem, 8vw, 2.4rem);
+      font-size: clamp(1.85rem, 8vw, 2.55rem);
+      letter-spacing: -0.014em;
     }
   }
 }
@@ -82,5 +115,41 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@layer base {
+  body.admin-portal-open [data-site-chrome] {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .scrollbar-soft {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 167, 157, 0.35) transparent;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-track {
+    margin: 6px 0;
+    background: transparent;
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(0, 167, 157, 0.28);
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 167, 157, 0.48);
+  }
+
+  .scrollbar-soft::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }

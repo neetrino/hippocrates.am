@@ -1,6 +1,5 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { readFile } from "node:fs/promises";
-import sharp from "sharp";
 
 type R2Config = {
   client: S3Client;
@@ -42,6 +41,7 @@ function r2Config(): R2Config {
 export async function uploadImage(key: string, sourcePath: string): Promise<string> {
   const config = r2Config();
   const source = await readFile(sourcePath);
+  const { default: sharp } = await import("sharp");
   const body = await sharp(source).webp({ quality: 82 }).toBuffer();
   await config.client.send(
     new PutObjectCommand({

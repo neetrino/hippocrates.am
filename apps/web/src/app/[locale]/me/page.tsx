@@ -3,7 +3,7 @@ import { AppointmentActions } from "@/features/portal/appointment-actions";
 import { LogoutButton } from "@/features/portal/logout-button";
 import { AnswerForm, AskQuestionForm } from "@/features/portal/question-forms";
 import { ReviewForm } from "@/features/portal/review-form";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
 import { publicGet } from "@/shared/public-api";
@@ -14,8 +14,8 @@ type Notice = { id: string; body: string; createdAt: string };
 
 export default async function MePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
-  prepareLocale(raw);
-  const locale = await getLocale();
+  const locale = prepareLocale(raw);
+  const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const nav = await getTranslations("nav");
@@ -24,13 +24,21 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   if (!me) {
     return (
       <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
-        <p>{t("signIn")} <Link href="/login">{nav("login")}</Link></p>
+        <p>
+          {t("signIn")} <Link href="/login">{nav("login")}</Link>
+        </p>
       </div>
     );
   }
+
+  if (me.role === "SUPER_ADMIN") {
+    redirect({ href: "/super-admin", locale });
+  }
+
+  const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
+  const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
+
   const role = asRole(me.role);
-  const appointments = await sessionGet<AppointmentCard[]>("/appointments/mine");
-  const notices = await sessionGet<Notice[]>("/me/notifications");
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
   const btn =
     "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
@@ -45,20 +53,32 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
         </div>
         <LogoutButton />
       </div>
-      {me.role === "SUPER_ADMIN" ? <Link className={btn} href="/platform">{t("openPlatform")}</Link> : null}
-      {me.role === "ADMIN" ? <Link className={btn} href="/clinic">{t("openClinic")}</Link> : null}
+      {me.role === "ADMIN" ? (
+        <Link className={btn} href="/clinic">
+          {t("openClinic")}
+        </Link>
+      ) : null}
       <section className="grid gap-[18px] pt-7">
         <h2>{t("visits")}</h2>
         <div className="grid gap-3">
-          {(appointments ?? []).map((item) => {
+          {appointments.map((item) => {
             const status = asVisitStatus(item.status);
             return (
               <article className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" key={item.id}>
                 <strong>{item.offering.name}</strong>
-                <p className="m-0 text-muted">{me.role === "DOCTOR" ? item.patient.displayName : `${item.clinic.name} · ${item.doctor.user.displayName}`}</p>
-                <p>{formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} · {common("price", { amount: formatAmount(item.priceAmd) })}</p>
+                <p className="m-0 text-muted">
+                  {me.role === "DOCTOR"
+                    ? item.patient.displayName
+                    : `${item.clinic.name} · ${item.doctor.user.displayName}`}
+                </p>
+                <p>
+                  {formatWhen(item.startsAt, displayLocale)} · {status ? common(status) : item.status} ·{" "}
+                  {common("price", { amount: formatAmount(item.priceAmd) })}
+                </p>
                 {me.role === "PATIENT" ? <AppointmentActions id={item.id} status={item.status} mode="patient" /> : null}
-                {me.role === "PATIENT" && item.status === "COMPLETED" && !item.review ? <ReviewForm appointmentId={item.id} /> : null}
+                {me.role === "PATIENT" && item.status === "COMPLETED" && !item.review ? (
+                  <ReviewForm appointmentId={item.id} />
+                ) : null}
               </article>
             );
           })}
@@ -66,9 +86,12 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
       </section>
       <section className="grid gap-[18px] pt-7">
         <h2>{t("notices")}</h2>
-        {(notices ?? []).length === 0 ? <p className="m-0 text-muted">{t("noNotices")}</p> : null}
-        {(notices ?? []).map((notice) => (
-          <p className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={notice.id}>
+        {notices.length === 0 ? <p className="m-0 text-muted">{t("noNotices")}</p> : null}
+        {notices.map((notice) => (
+          <p
+            className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5"
+            key={notice.id}
+          >
             {notice.body}
           </p>
         ))}

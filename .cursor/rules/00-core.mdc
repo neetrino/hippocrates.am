@@ -89,6 +89,7 @@ Full DoD/PR/release checklists: [`docs/reference/Check/Quality/project-quality-c
 | State | `16-state-management.mdc` |
 | CI/CD | `17-cicd.mdc` |
 | i18n | `20-i18n.mdc` |
+| Form inputs | `21-form-inputs.mdc` |
 
 Workflows: [`.agents/skills/`](../../.agents/skills/). Platform how-tos and other long-form material live under `docs/reference/`.
 

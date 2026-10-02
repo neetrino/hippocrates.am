@@ -55,11 +55,23 @@
   "catalog": {
     "clinicsTitle": "Clinics",
     "clinicName": "Clinic name",
-    "emptyClinicSearch": "No clinic matches this name.",
+    "emptyClinicSearch": "No clinic matches this search.",
     "doctorsTitle": "Doctors",
     "doctorName": "Doctor name",
+    "doctorSearchPlaceholder": "Search by name...",
     "specialty": "Specialty",
-    "emptyDoctorSearch": "No doctor matches this search."
+    "city": "City",
+    "clinic": "Clinic",
+    "openFilters": "Open filters",
+    "resetFilters": "Reset filters",
+    "applyFilters": "Apply filters",
+    "selectedCount": "{count} selected",
+    "all": "All",
+    "emptyDoctorSearch": "No doctor matches this search.",
+    "clinicSearchPlaceholder": "Search by name, address, district, or phone",
+    "clinicSearchAria": "Search clinics",
+    "clearClinicSearch": "Clear search",
+    "clinicSearchCount": "{count, plural, one {# clinic} other {# clinics}}"
   },
   "clinicPage": {
     "branches": "Branches",
@@ -128,6 +140,22 @@
     "sendReview": "Send review",
     "reviewFailed": "The review was not saved"
   },
+  "portal": {
+    "subtitle": "Management portal",
+    "navLabel": "Platform sections",
+    "accountNav": "Account sections",
+    "dashboard": "Dashboard",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "statVisits": "Visits",
+    "statNotices": "Notices",
+    "quickAction": "Quick action",
+    "registerHint": "Create a clinic and its admin account.",
+    "sectionCount": "{count}",
+    "emptyVisits": "No visits yet.",
+    "addClinic": "Add Clinic",
+    "closeSheet": "Close"
+  },
   "desk": {
     "denied": "This page is for the clinic admin.",
     "title": "Clinic desk",
@@ -155,6 +183,12 @@
     "phone": "Phone",
     "adminName": "Admin name",
     "adminEmail": "Admin email",
-    "adminPassword": "Admin password"
+    "adminPassword": "Admin password",
+    "clinicNamePlaceholder": "e.g. Areg Stomatology",
+    "addressPlaceholder": "e.g. Abovyan 18, Yerevan",
+    "phonePlaceholder": "+374 XX XXX XXX",
+    "adminNamePlaceholder": "e.g. Anna Grigoryan",
+    "adminEmailPlaceholder": "admin@clinic.am",
+    "adminPasswordPlaceholder": "At least 8 characters"
   }
 }

@@ -42,6 +42,10 @@ explicit approved task
 
 Preserve the existing implementation unless the approved task or TECH_CARD explicitly requires a migration or replacement.
 
+## Commit messages
+
+Use Conventional Commits: `type(scope): summary` (see `.cursor/rules/13-git-workflow.mdc` and root `.cursorrules`). Do not copy long historical `git log` subjects. Example: `feat(portal): add Super Admin clinics live search`.
+
 ## Working boundaries
 
 - Do not change architecture, stack, public APIs, database schema, or business behavior outside the approved task.

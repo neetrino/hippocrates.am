@@ -1,13 +1,16 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Patch, Post, Req, Res } from "@nestjs/common";
 import type { Request, Response } from "express";
 import { AppError } from "../common/app-error";
-import { emailOf, passwordOf, personNameOf, recordOf, requiredString } from "../common/input";
+import { emailOf, passwordOf, personNameOf, recordOf, requiredPhoneOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import type { Actor } from "./access";
 import { Public } from "./auth.decorators";
 import { CurrentActor } from "./current-actor";
 import { RateLimitService } from "./rate-limit.service";
 import { SessionService } from "./session.service";
+import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
+import { clearUserPhoto, saveUserPhoto } from "./user-photo";
+import { publicAssetUrl } from "../infrastructure/r2.storage";
 
 @Controller("auth")
 export class AuthController {
@@ -28,11 +31,7 @@ export class AuthController {
     const input = recordOf(body);
     const name = personNameOf(input.name ?? input.displayName, "Անուն");
     const surname = personNameOf(input.surname, "Ազգանուն");
-    const phoneRaw = requiredString(input.phone, "Հեռախոս");
-    const phone = phoneRaw.replace(/\D/g, "");
-    if (phone.length < 8) {
-      throw new AppError("VALIDATION_FAILED", 400, "Հեռախոսահամարը սխալ է");
-    }
+    const phone = requiredPhoneOf(input.phone);
     const email = emailOf(input.email);
     const password = passwordOf(input.password);
     const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը");
@@ -81,7 +80,9 @@ export class AuthController {
   }
 
   @Get("me")
-  async me(@CurrentActor() actor: Actor): Promise<Actor & { displayName: string; email: string }> {
+  async me(
+    @CurrentActor() actor: Actor,
+  ): Promise<Actor & { displayName: string; email: string; phone: string | null; photoUrl: string | null; emailVisitNotices: boolean }> {
     const user = await this.prisma.user.findUnique({ where: { id: actor.id } });
     if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
     return {
@@ -90,6 +91,36 @@ export class AuthController {
       clinicId: user.clinicId,
       displayName: user.displayName,
       email: user.email,
+      phone: user.phone,
+      photoUrl: publicAssetUrl(user.photoKey),
+      emailVisitNotices: user.emailVisitNotices,
     };
+  }
+
+  @Patch("me")
+  async updateProfile(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<OwnProfile> {
+    this.limits.consume(`profile:${actor.id}`, 20, 10 * 60 * 1000);
+    return updateOwnProfile(this.prisma, this.sessions, actor.id, body);
+  }
+
+  @Post("me/password")
+  async updatePassword(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ ok: true }> {
+    this.limits.consume(`password:${actor.id}`, 5, 10 * 60 * 1000);
+    await changeOwnPassword(this.prisma, this.sessions, actor.id, body);
+    return { ok: true };
+  }
+
+  @Post("me/photo")
+  async uploadPhoto(@CurrentActor() actor: Actor, @Req() request: Request): Promise<{ photoUrl: string }> {
+    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    const photoUrl = await saveUserPhoto(this.prisma, actor.id, request);
+    return { photoUrl };
+  }
+
+  @Delete("me/photo")
+  async deletePhoto(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
+    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    await clearUserPhoto(this.prisma, actor.id);
+    return { ok: true };
   }
 }

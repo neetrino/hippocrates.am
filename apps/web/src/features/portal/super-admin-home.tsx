@@ -106,11 +106,11 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
           ) : (
             <div className="grid gap-3">
               {notices.map((notice) => (
-                <p
-                  className="m-0 rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5"
-                  key={notice.id}
-                >
+                <p className="m-0 rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5" key={notice.id}>
                   {notice.body}
+                  <time className="mt-1 block text-sm text-muted" dateTime={notice.createdAt}>
+                    {formatWhen(notice.createdAt, locale)}
+                  </time>
                 </p>
               ))}
             </div>

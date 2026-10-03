@@ -4,7 +4,8 @@ import { FormEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { getPathname } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
-import { PhoneField, buildPhoneNumber } from "@/features/auth/phone-field";
+import { readPhone, toE164 } from "@/features/auth/phone-countries";
+import { PhoneField } from "@/features/auth/phone-field";
 import { sanitizeNameInput } from "@/shared/input-constraints";
 
 export function RegisterForm() {
@@ -19,12 +20,12 @@ export function RegisterForm() {
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const surname = String(form.get("surname") ?? "").trim();
-    const phoneLocal = String(form.get("phoneLocal") ?? "").trim();
-    const phone = buildPhoneNumber(phoneLocal);
+    const entered = readPhone(form);
+    const phone = toE164(entered.iso, entered.local);
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
     const confirmPassword = String(form.get("confirmPassword") ?? "");
-    if (phoneLocal.replace(/\D/g, "").length < 6) {
+    if (!phone) {
       setError(t("phoneInvalid"));
       return;
     }

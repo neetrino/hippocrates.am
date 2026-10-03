@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
+import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { AskQuestionForm } from "@/features/portal/question-forms";
 import { ReviewForm } from "@/features/portal/review-form";
@@ -48,15 +49,6 @@ function VisitCard({ item, when, statusLabel, priceLabel }: { item: AppointmentC
   );
 }
 
-function AccountField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[1.15rem] border border-line bg-sand/70 px-4 py-4">
-      <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">{label}</p>
-      <p className="mt-1 mb-0">{value}</p>
-    </div>
-  );
-}
-
 export async function PatientHome({ me, appointments, notices }: PatientHomeProps) {
   const locale = await getLocale();
   const t = await getTranslations("me");
@@ -65,18 +57,12 @@ export async function PatientHome({ me, appointments, notices }: PatientHomeProp
   const nav = await getTranslations("nav");
   const upcoming = appointments.filter((item) => item.status === "REQUESTED" || item.status === "CONFIRMED");
   const reviewed = appointments.filter((item) => item.review);
-  const bookClass =
-    "inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover";
 
   return (
     <PatientPortalShell
       eyebrow={common("PATIENT")}
       title={me.displayName}
-      action={
-        <Link href="/clinics" className={`${bookClass} max-md:hidden`}>
-          {t("bookVisit")}
-        </Link>
-      }
+      portrait={<PatientAvatar name={me.displayName} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
     >
       <div className="grid gap-6">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -144,27 +130,6 @@ export async function PatientHome({ me, appointments, notices }: PatientHomeProp
           )}
         </PortalSection>
 
-        <PortalSection id="notices" title={t("notices")} countLabel={portal("sectionCount", { count: notices.length })}>
-          {notices.length === 0 ? (
-            <EmptyNote>{t("noNotices")}</EmptyNote>
-          ) : (
-            <div className="grid gap-3">
-              {notices.map((notice) => (
-                <p className="m-0 rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5" key={notice.id}>
-                  {notice.body}
-                </p>
-              ))}
-            </div>
-          )}
-        </PortalSection>
-
-        <PortalSection id="settings" title={t("settings")}>
-          <div className="grid gap-3">
-            <AccountField label={t("name")} value={me.displayName} />
-            <AccountField label={t("email")} value={me.email} />
-            <p className="m-0 text-sm text-muted">{t("settingsHint")}</p>
-          </div>
-        </PortalSection>
       </div>
     </PatientPortalShell>
   );

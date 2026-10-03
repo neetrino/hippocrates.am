@@ -91,7 +91,10 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
             className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5"
             key={notice.id}
           >
-            {notice.body}
+            <span>{notice.body}</span>
+            <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
+              {formatWhen(notice.createdAt, displayLocale)}
+            </time>
           </p>
         ))}
       </section>

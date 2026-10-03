@@ -34,8 +34,10 @@ model User {
   displayName  String
   role         Role
   clinicId     String?
-  phone        String?
-  createdAt    DateTime @default(now())
+  phone             String?
+  photoKey          String?
+  emailVisitNotices Boolean  @default(true)
+  createdAt         DateTime @default(now())
   clinic       Clinic?  @relation("ClinicStaff", fields: [clinicId], references: [id])
   ownedClinics Clinic[] @relation("ClinicOwner")
   sessions     Session[]

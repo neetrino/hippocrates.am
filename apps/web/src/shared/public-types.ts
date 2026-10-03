@@ -63,4 +63,7 @@ export type Me = {
   clinicId: string | null;
   displayName: string;
   email: string;
+  phone: string | null;
+  photoUrl: string | null;
+  emailVisitNotices: boolean;
 };

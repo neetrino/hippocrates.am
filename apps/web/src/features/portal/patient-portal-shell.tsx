@@ -18,9 +18,10 @@ type PatientPortalShellProps = {
   title: string;
   eyebrow: string;
   action?: ReactNode;
+  portrait?: ReactNode;
 };
 
-export function PatientPortalShell({ children, title, eyebrow, action }: PatientPortalShellProps) {
+export function PatientPortalShell({ children, title, eyebrow, action, portrait }: PatientPortalShellProps) {
   const t = useTranslations("portal");
   const nav = useTranslations("nav");
   const me = useTranslations("me");
@@ -32,8 +33,8 @@ export function PatientPortalShell({ children, title, eyebrow, action }: Patient
     { href: "/me", hash: "reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "hash" },
   ];
   const footerItems: PortalNavItem[] = [
-    { href: "/me", hash: "notices", label: me("notices"), icon: <NoticesIcon />, match: "hash" },
-    { href: "/me", hash: "settings", label: me("settings"), icon: <SettingsIcon />, match: "hash" },
+    { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact" },
+    { href: "/me/settings", label: me("settings"), icon: <SettingsIcon />, match: "exact" },
   ];
 
   return (
@@ -46,6 +47,7 @@ export function PatientPortalShell({ children, title, eyebrow, action }: Patient
       title={title}
       eyebrow={eyebrow}
       action={action}
+      portrait={portrait}
     >
       {children}
     </PortalShell>

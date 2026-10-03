@@ -2,7 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
-import { buildPhoneNumber, PhoneField } from "@/features/auth/phone-field";
+import { readPhone, toE164 } from "@/features/auth/phone-countries";
+import { PhoneField } from "@/features/auth/phone-field";
 import { useRouter } from "@/i18n/navigation";
 import { isNameFieldName, isPhoneFieldName, sanitizeNameInput } from "@/shared/input-constraints";
 
@@ -25,6 +26,7 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
   const [error, setError] = useState("");
   const router = useRouter();
   const t = useTranslations("common");
+  const auth = useTranslations("auth");
   const usesPhoneField = props.fields.some((field) => fieldKind(field) === "phone");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -34,12 +36,17 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
     const payload: Record<string, string | number | boolean> = {};
     for (const [key, value] of form.entries()) {
       if (typeof value !== "string") continue;
-      if (key === "phoneLocal") continue;
+      if (key === "phoneLocal" || key === "phoneCountry") continue;
       payload[key] = /Amd|Minute|weekday|rating|duration/.test(key) ? Number(value) : value;
     }
     if (usesPhoneField) {
-      const phoneLocal = String(form.get("phoneLocal") ?? "").trim();
-      payload.phone = buildPhoneNumber(phoneLocal);
+      const entered = readPhone(form);
+      const phone = toE164(entered.iso, entered.local);
+      if (!phone) {
+        setError(auth("phoneInvalid"));
+        return;
+      }
+      payload.phone = phone;
     }
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1${props.action}`, {
       method: "POST",

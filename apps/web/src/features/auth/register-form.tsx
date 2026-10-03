@@ -1,15 +1,15 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { getPathname } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 import { PhoneField, buildPhoneNumber } from "@/features/auth/phone-field";
 import { sanitizeNameInput } from "@/shared/input-constraints";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
-  const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("auth");
   const common = useTranslations("common");
 
@@ -42,8 +42,7 @@ export function RegisterForm() {
       setError(common("failed"));
       return;
     }
-    router.push("/me");
-    router.refresh();
+    window.location.assign(getPathname({ locale, href: "/me" }));
   }
 
   const fieldClass =

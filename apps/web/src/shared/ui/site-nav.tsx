@@ -10,11 +10,14 @@ import { LocaleFlag } from "@/shared/ui/locale-flag";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
+export type AccountHref = "/login" | "/me" | "/super-admin";
+
 type SiteNavProps = {
   clinics: string;
   doctors: string;
   questions: string;
-  login: string;
+  accountHref: AccountHref;
+  accountLabel: string;
   openMenu: string;
   closeMenu: string;
 };
@@ -164,7 +167,8 @@ export function SiteNav({
   clinics,
   doctors,
   questions,
-  login,
+  accountHref,
+  accountLabel,
   openMenu,
   closeMenu,
 }: SiteNavProps) {
@@ -207,9 +211,9 @@ export function SiteNav({
       <div className="flex items-center justify-self-end gap-2.5 max-md:gap-2">
         <LocaleSwitch hideOnMobile />
         <Link
-          href="/login"
+          href={accountHref}
           className="grid h-[42px] w-[42px] place-items-center rounded-full bg-accent text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:h-[38px] max-md:w-[38px]"
-          aria-label={login}
+          aria-label={accountLabel}
         >
           <UserIcon />
         </Link>

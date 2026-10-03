@@ -1,8 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { AppointmentActions } from "@/features/portal/appointment-actions";
 import { LogoutButton } from "@/features/portal/logout-button";
-import { AnswerForm, AskQuestionForm } from "@/features/portal/question-forms";
-import { ReviewForm } from "@/features/portal/review-form";
+import { PatientHome } from "@/features/portal/patient-home";
+import { AnswerForm } from "@/features/portal/question-forms";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
@@ -37,6 +36,10 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
 
   const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
   const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
+
+  if (me.role === "PATIENT") {
+    return <PatientHome me={me} appointments={appointments} notices={notices} />;
+  }
 
   const role = asRole(me.role);
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
@@ -75,10 +78,6 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
                   {formatWhen(item.startsAt, displayLocale)} · {status ? common(status) : item.status} ·{" "}
                   {common("price", { amount: formatAmount(item.priceAmd) })}
                 </p>
-                {me.role === "PATIENT" ? <AppointmentActions id={item.id} status={item.status} mode="patient" /> : null}
-                {me.role === "PATIENT" && item.status === "COMPLETED" && !item.review ? (
-                  <ReviewForm appointmentId={item.id} />
-                ) : null}
               </article>
             );
           })}
@@ -96,7 +95,6 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           </p>
         ))}
       </section>
-      {me.role === "PATIENT" ? <AskQuestionForm /> : null}
       {me.role === "DOCTOR" ? (
         <section className="grid gap-3.5 pt-7">
           <h2>{questionsCopy("public")}</h2>

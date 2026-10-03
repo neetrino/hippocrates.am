@@ -7,6 +7,7 @@
 ## Ներառված ֆայլերը
 
 - `docs/FUNCTIONALITY_HY.md` — ամբողջ պրոյեկտի կետերը։
+- `docs/USER_ACCOUNT_HY.md` — պացիենտի հաշվի sidebar-ի դաշտերը (`FR-009`)։
 - `docs/BRIEF.md` — նպատակը, կետերը և դեռ բաց թողարկման հարցերը։
 - `docs/archive/expanded-v1/HIPPOCRATES_MASTER_SPEC (1).md` — canonical սպեցիֆիկացիա (`FR-001`…`FR-017`)։
 - `docs/TECH_CARD.md` — տեղական ստեկը։

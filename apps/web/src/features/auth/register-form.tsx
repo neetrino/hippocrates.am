@@ -42,7 +42,7 @@ export function RegisterForm() {
       setError(common("failed"));
       return;
     }
-    router.push("/");
+    router.push("/me");
     router.refresh();
   }
 

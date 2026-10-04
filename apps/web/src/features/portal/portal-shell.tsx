@@ -9,7 +9,17 @@ import { routing } from "@/i18n/routing";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
-export type PortalHref = "/me" | "/me/notices" | "/me/settings" | "/super-admin" | "/super-admin/clinics" | "/super-admin/questions";
+export type PortalHref =
+  | "/me"
+  | "/me/visits"
+  | "/me/favorites"
+  | "/me/questions"
+  | "/me/reviews"
+  | "/me/notices"
+  | "/me/settings"
+  | "/super-admin"
+  | "/super-admin/clinics"
+  | "/super-admin/questions";
 
 export type PortalHash = "visits" | "notices" | "favorites" | "questions" | "reviews" | "settings";
 

@@ -112,7 +112,11 @@ export function SettingsPassword() {
           </div>
         </form>
       ) : (
-        <button type="button" onClick={showForm} className={submitClass}>
+        <button
+          type="button"
+          onClick={showForm}
+          className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border border-line bg-white px-3.5 py-2 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent"
+        >
           {t("changePassword")}
         </button>
       )}

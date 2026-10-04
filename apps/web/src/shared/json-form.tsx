@@ -2,8 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
-import { readPhone, toE164 } from "@/features/auth/phone-countries";
-import { PhoneField } from "@/features/auth/phone-field";
+import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { useRouter } from "@/i18n/navigation";
 import { isNameFieldName, isPhoneFieldName, sanitizeNameInput } from "@/shared/input-constraints";
 
@@ -36,12 +35,11 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
     const payload: Record<string, string | number | boolean> = {};
     for (const [key, value] of form.entries()) {
       if (typeof value !== "string") continue;
-      if (key === "phoneLocal" || key === "phoneCountry") continue;
+      if (key === "phoneLocal") continue;
       payload[key] = /Amd|Minute|weekday|rating|duration/.test(key) ? Number(value) : value;
     }
     if (usesPhoneField) {
-      const entered = readPhone(form);
-      const phone = toE164(entered.iso, entered.local);
+      const phone = armeniaPhone(String(form.get("phoneLocal") ?? ""));
       if (!phone) {
         setError(auth("phoneInvalid"));
         return;

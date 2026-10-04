@@ -126,8 +126,7 @@
     "passwordMismatch": "Passwords do not match",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "phoneInvalid": "Phone number is invalid",
-    "country": "Country"
+    "phoneInvalid": "Phone number is invalid"
   },
   "me": {
     "signIn": "Sign in to see your page.",
@@ -152,6 +151,7 @@
     "emailRequired": "Email cannot be empty",
     "emailInvalid": "Email is invalid",
     "emailPasswordRequired": "Enter your current password to change the email",
+    "editProfile": "Edit profile",
     "changePhoto": "Change photo",
     "photoChange": "Change photo",
     "photoDelete": "Delete photo",

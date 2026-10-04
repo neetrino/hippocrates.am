@@ -1,5 +1,4 @@
 import { AppError } from "./app-error";
-import { canonicalPhone } from "./phone-countries";
 
 export function requiredString(value: unknown, field: string): string {
   if (typeof value !== "string" || value.trim() === "") {
@@ -33,12 +32,15 @@ export function displayNameOf(value: unknown): string {
   return name;
 }
 
-/** Empty phone clears the field. A value must match that country's dial code and length. */
+/** Empty phone clears the field. A value must be +374 and exactly 8 digits. */
 export function optionalPhoneOf(value: unknown): string | null {
   if (typeof value !== "string" || value.trim() === "") return null;
-  const phone = canonicalPhone(value);
-  if (!phone) throw new AppError("VALIDATION_FAILED", 400, "Հեռախոսահամարը սխալ է");
-  return phone;
+  const digits = value.replace(/\D/g, "");
+  const local = digits.startsWith("374") ? digits.slice(3) : "";
+  if (local.length !== 8 || local.startsWith("0")) {
+    throw new AppError("VALIDATION_FAILED", 400, "Հեռախոսահամարը սխալ է");
+  }
+  return `+374${local}`;
 }
 
 /** Required phone in the same country format as `optionalPhoneOf`. */

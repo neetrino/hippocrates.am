@@ -126,8 +126,7 @@
     "passwordMismatch": "Пароли не совпадают",
     "showPassword": "Показать пароль",
     "hidePassword": "Скрыть пароль",
-    "phoneInvalid": "Некорректный номер телефона",
-    "country": "Страна"
+    "phoneInvalid": "Некорректный номер телефона"
   },
   "me": {
     "signIn": "Войдите, чтобы увидеть свою страницу.",
@@ -152,6 +151,7 @@
     "emailRequired": "Эл. почту нельзя оставить пустой",
     "emailInvalid": "Эл. почта указана неверно",
     "emailPasswordRequired": "Чтобы сменить эл. почту, введите текущий пароль",
+    "editProfile": "Редактировать",
     "changePhoto": "Сменить фото",
     "photoChange": "Сменить фото",
     "photoDelete": "Удалить фото",

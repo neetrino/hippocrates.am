@@ -4,35 +4,43 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { PasswordField } from "@/features/auth/password-field";
-import { readPhone, toE164 } from "@/features/auth/phone-countries";
-import { PhoneField } from "@/features/auth/phone-field";
+import { armeniaPhone, localArmeniaDigits, PhoneField } from "@/features/auth/phone-field";
 import { accountRequest } from "@/features/portal/settings-request";
 import { sanitizeNameInput } from "@/shared/input-constraints";
 
 const labelClass = "grid gap-1.5 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase";
 const inputClass =
   "rounded-xl border border-line bg-white px-3.5 py-3 text-base font-normal tracking-normal text-ink normal-case";
+const outlineButton =
+  "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border border-line bg-white px-3.5 py-2 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent disabled:opacity-60";
+const confirmButton =
+  "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-3.5 py-2 text-sm font-semibold tracking-normal text-white normal-case transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:opacity-60";
 
 type SettingsProfileProps = {
   displayName: string;
   email: string;
   phone: string | null;
+  editing: boolean;
+  onCancel: () => void;
+  onSaved: () => void;
 };
 
-export function SettingsProfile({ displayName, email, phone }: SettingsProfileProps) {
+export function SettingsProfile({ displayName, email, phone, editing, onCancel, onSaved }: SettingsProfileProps) {
   const t = useTranslations("me");
   const auth = useTranslations("auth");
   const common = useTranslations("common");
   const router = useRouter();
   const parts = splitDisplayName(displayName);
   const [emailValue, setEmailValue] = useState(email);
-  useEffect(() => {
-    setEmailValue(email);
-  }, [email]);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const emailChanged = emailValue.trim().toLowerCase() !== email.trim().toLowerCase();
+
+  useEffect(() => {
+    setEmailValue(email);
+    if (editing) setSaved(false);
+  }, [editing, email]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -41,21 +49,18 @@ export function SettingsProfile({ displayName, email, phone }: SettingsProfilePr
     const surname = String(form.get("surname") ?? "").trim();
     const nextEmail = emailValue.trim();
     const currentPassword = String(form.get("currentPassword") ?? "");
-    const entered = readPhone(form);
+    const local = String(form.get("phoneLocal") ?? "");
     const problem = profileProblem(
-      { name, surname, email: nextEmail, emailChanged, currentPassword, iso: entered.iso, local: entered.local },
+      { name, surname, email: nextEmail, emailChanged, currentPassword, local },
       t,
       auth,
     );
     if (problem) {
-      setSaved(false);
       setError(problem);
       return;
     }
-    const e164 = entered.local.length === 0 ? null : toE164(entered.iso, entered.local);
     setBusy(true);
     setError("");
-    setSaved(false);
     const result = await accountRequest("/auth/me", {
       method: "PATCH",
       headers: { "content-type": "application/json" },
@@ -63,7 +68,7 @@ export function SettingsProfile({ displayName, email, phone }: SettingsProfilePr
         name,
         surname,
         email: nextEmail,
-        phone: e164,
+        phone: local.replace(/\D/g, "").length === 0 ? null : armeniaPhone(local),
         ...(emailChanged ? { currentPassword } : {}),
       }),
     });
@@ -73,13 +78,31 @@ export function SettingsProfile({ displayName, email, phone }: SettingsProfilePr
       return;
     }
     setSaved(true);
+    onSaved();
     router.refresh();
+  }
+
+  if (!editing) {
+    return (
+      <div className="max-w-xl border-b border-line pb-6">
+        <ProfileFacts
+          name={parts.name}
+          surname={parts.surname}
+          email={email}
+          phone={formatArmeniaPhone(phone)}
+          labels={{ name: t("name"), surname: t("surname"), email: t("email"), phone: t("phone") }}
+        />
+        {saved ? <p className="m-0 mt-4 text-sm text-accent">{t("saved")}</p> : null}
+      </div>
+    );
   }
 
   return (
     <form className="grid max-w-xl gap-4 border-b border-line pb-6" onSubmit={(event) => void onSubmit(event)}>
-      <NameField label={t("name")} name="name" defaultValue={parts.name} autoComplete="given-name" />
-      <NameField label={t("surname")} name="surname" defaultValue={parts.surname} autoComplete="family-name" />
+      <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+        <NameField label={t("name")} name="name" defaultValue={parts.name} autoComplete="given-name" />
+        <NameField label={t("surname")} name="surname" defaultValue={parts.surname} autoComplete="family-name" />
+      </div>
       <label className={labelClass}>
         {t("email")}
         <input
@@ -104,15 +127,47 @@ export function SettingsProfile({ displayName, email, phone }: SettingsProfilePr
       ) : null}
       <PhoneField label={t("phone")} variant="settings" phone={phone} required={false} />
       {error ? <p className="m-0 text-sm font-normal tracking-normal text-danger normal-case">{error}</p> : null}
-      {saved ? <p className="m-0 text-sm font-normal tracking-normal text-accent normal-case">{t("saved")}</p> : null}
-      <button
-        type="submit"
-        disabled={busy}
-        className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-3.5 py-2 text-sm font-semibold tracking-normal text-white normal-case transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:opacity-60"
-      >
-        {common("confirm")}
-      </button>
+      <div className="flex flex-wrap justify-end gap-2">
+        <button type="button" disabled={busy} onClick={onCancel} className={outlineButton}>
+          {common("cancel")}
+        </button>
+        <button type="submit" disabled={busy} className={confirmButton}>
+          {common("confirm")}
+        </button>
+      </div>
     </form>
+  );
+}
+
+function ProfileFacts({
+  name,
+  surname,
+  email,
+  phone,
+  labels,
+}: {
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  labels: { name: string; surname: string; email: string; phone: string };
+}) {
+  return (
+    <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-5 max-sm:grid-cols-1">
+      <Fact label={labels.name} value={name || "—"} />
+      <Fact label={labels.surname} value={surname || "—"} />
+      <Fact label={labels.email} value={email} />
+      <Fact label={labels.phone} value={phone} />
+    </dl>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid gap-1">
+      <dt className="text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">{label}</dt>
+      <dd className="m-0 text-base font-normal tracking-normal text-ink normal-case">{value}</dd>
+    </div>
   );
 }
 
@@ -149,6 +204,13 @@ function splitDisplayName(displayName: string): { name: string; surname: string 
   return { name: parts[0] ?? "", surname: parts.slice(1).join(" ") };
 }
 
+function formatArmeniaPhone(phone: string | null): string {
+  const local = localArmeniaDigits(phone);
+  if (!local) return "—";
+  if (local.length !== 8) return phone?.trim() || "—";
+  return `+374 ${local.slice(0, 2)} ${local.slice(2, 4)} ${local.slice(4, 6)} ${local.slice(6)}`;
+}
+
 function profileProblem(
   input: {
     name: string;
@@ -156,7 +218,6 @@ function profileProblem(
     email: string;
     emailChanged: boolean;
     currentPassword: string;
-    iso: string;
     local: string;
   },
   t: (key: "nameRequired" | "surnameRequired" | "emailRequired" | "emailInvalid" | "emailPasswordRequired") => string,
@@ -167,6 +228,6 @@ function profileProblem(
   if (!input.email) return t("emailRequired");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) return t("emailInvalid");
   if (input.emailChanged && input.currentPassword.trim() === "") return t("emailPasswordRequired");
-  if (input.local.length > 0 && !toE164(input.iso, input.local)) return auth("phoneInvalid");
+  if (input.local.replace(/\D/g, "").length > 0 && !armeniaPhone(input.local)) return auth("phoneInvalid");
   return null;
 }

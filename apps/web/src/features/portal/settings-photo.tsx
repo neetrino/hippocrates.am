@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { accountRequest } from "@/features/portal/settings-request";
@@ -17,6 +17,7 @@ type SettingsPhotoProps = {
   deleteAction: string;
   failed: string;
   invalid: string;
+  action?: ReactNode;
 };
 
 async function sendPhoto(file: File): Promise<string | null> {
@@ -82,6 +83,7 @@ export function SettingsPhoto({
   deleteAction,
   failed,
   invalid,
+  action,
 }: SettingsPhotoProps) {
   const input = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -150,7 +152,8 @@ export function SettingsPhoto({
 
   return (
     <div className="mb-6 border-b border-line pb-6" ref={rootRef}>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-4">
         <button
           type="button"
           aria-label={changeLabel}
@@ -159,9 +162,9 @@ export function SettingsPhoto({
           aria-controls={current && menuOpen ? menuId : undefined}
           disabled={busy}
           onClick={onAvatarClick}
-          className="group relative grid h-16 w-16 cursor-pointer place-items-center overflow-hidden rounded-full border-0 bg-transparent p-0 disabled:opacity-60"
+          className="group relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border-0 bg-transparent p-0 disabled:opacity-60"
         >
-          <PatientAvatar name={name} photoUrl={current} className="h-16 w-16 text-2xl" />
+          <PatientAvatar name={name} photoUrl={current} className="h-20 w-20 text-2xl" />
           {current ? null : (
             <span
               className="pointer-events-none absolute inset-0 grid place-items-center bg-ink/50 text-[1.7rem] leading-none font-bold text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
@@ -175,6 +178,8 @@ export function SettingsPhoto({
           <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-accent uppercase">{roleLabel}</p>
           <p className="m-0 truncate font-display text-[1.45rem] leading-tight font-bold text-ink">{name}</p>
         </div>
+        </div>
+        {action}
       </div>
       {current && menuOpen ? (
         <PhotoMenu

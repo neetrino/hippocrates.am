@@ -126,8 +126,7 @@
     "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
     "showPassword": "Ցույց տալ գաղտնաբառը",
     "hidePassword": "Թաքցնել գաղտնաբառը",
-    "phoneInvalid": "Հեռախոսահամարը սխալ է",
-    "country": "Երկիր"
+    "phoneInvalid": "Հեռախոսահամարը սխալ է"
   },
   "me": {
     "signIn": "Մուտք գործեք՝ ձեր էջը տեսնելու համար։",
@@ -152,6 +151,7 @@
     "emailRequired": "Էլ. փոստը չի կարող դատարկ մնալ",
     "emailInvalid": "Էլ. փոստը սխալ է",
     "emailPasswordRequired": "Էլ. փոստը փոխելու համար գրեք ընթացիկ գաղտնաբառը",
+    "editProfile": "Խմբագրել",
     "changePhoto": "Փոխել նկարը",
     "photoChange": "Փոխել նկարը",
     "photoDelete": "Ջնջել նկարը",

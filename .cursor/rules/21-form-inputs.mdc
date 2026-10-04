@@ -9,10 +9,10 @@ alwaysApply: false
 ## Phone fields
 
 - Allow digits only in the local part. Strip letters and other symbols on input.
-- Prefer the shared `PhoneField`. The country select supplies the dial code, and the local part accepts only the lengths legal for that country.
-- Do not put the dial code inside the editable placeholder — the country select already shows it.
+- Prefer the shared `PhoneField`: fixed `+374` prefix and exactly 8 local digits.
+- Do not put the dial code inside the editable placeholder — the prefix is already shown beside the field.
 - Use `inputMode="numeric"` / `type="tel"` for the editable local part.
-- Keep `apps/web/src/features/auth/phone-countries.ts` and `apps/api/src/common/phone-countries.ts` in sync. Server validation is the authority.
+- Server validation is the authority and accepts only `+374` plus 8 digits.
 
 ## Name fields
 

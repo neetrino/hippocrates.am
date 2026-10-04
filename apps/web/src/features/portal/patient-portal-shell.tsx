@@ -27,10 +27,10 @@ export function PatientPortalShell({ children, title, eyebrow, action, portrait 
   const me = useTranslations("me");
   const items: PortalNavItem[] = [
     { href: "/me", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
-    { href: "/me", hash: "visits", label: me("visits"), icon: <VisitsIcon />, match: "hash" },
-    { href: "/me", hash: "favorites", label: me("favorites"), icon: <FavoritesIcon />, match: "hash" },
-    { href: "/me", hash: "questions", label: nav("questions"), icon: <QuestionsIcon />, match: "hash" },
-    { href: "/me", hash: "reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "hash" },
+    { href: "/me/visits", label: me("visits"), icon: <VisitsIcon />, match: "exact" },
+    { href: "/me/favorites", label: me("favorites"), icon: <FavoritesIcon />, match: "exact" },
+    { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "exact" },
+    { href: "/me/reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "exact" },
   ];
   const footerItems: PortalNavItem[] = [
     { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact" },

@@ -1,8 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
-import { SettingsPassword } from "@/features/portal/settings-password";
-import { SettingsPhoto } from "@/features/portal/settings-photo";
-import { SettingsProfile } from "@/features/portal/settings-profile";
+import { SettingsCard } from "@/features/portal/settings-card";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import type { Me } from "@/shared/public-types";
@@ -29,20 +27,7 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
 
   return (
     <PatientPortalShell eyebrow={common("PATIENT")} title={t("settings")}>
-      <section className="rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
-        <SettingsPhoto
-          name={me.displayName}
-          photoUrl={me.photoUrl}
-          roleLabel={common("PATIENT")}
-          changeLabel={t("changePhoto")}
-          changeAction={t("photoChange")}
-          deleteAction={t("photoDelete")}
-          failed={t("photoFailed")}
-          invalid={t("photoInvalid")}
-        />
-        <SettingsProfile displayName={me.displayName} email={me.email} phone={me.phone} />
-        <SettingsPassword />
-      </section>
+      <SettingsCard displayName={me.displayName} email={me.email} phone={me.phone} photoUrl={me.photoUrl} />
     </PatientPortalShell>
   );
 }

@@ -50,6 +50,46 @@ function overlaps(start: Date, end: Date, ranges: TimeRange[]): boolean {
 
 export type DaySlot = { start: Date; busy: boolean };
 
+/** Hours where the clinic and the doctor are both open. No clinic hours means the doctor hours stand. */
+export function openWindows(clinic: MinuteWindow[], doctor: MinuteWindow[]): MinuteWindow[] {
+  if (clinic.length === 0) return doctor;
+  const overlaps: MinuteWindow[] = [];
+  for (const left of clinic) {
+    for (const right of doctor) {
+      if (left.weekday !== right.weekday) continue;
+      const startMinute = Math.max(left.startMinute, right.startMinute);
+      const endMinute = Math.min(left.endMinute, right.endMinute);
+      if (startMinute < endMinute) overlaps.push({ weekday: left.weekday, startMinute, endMinute });
+    }
+  }
+  return mergeWindows(overlaps);
+}
+
+function mergeWindows(windows: MinuteWindow[]): MinuteWindow[] {
+  const byDay = new Map<number, MinuteWindow[]>();
+  for (const window of windows) {
+    const day = byDay.get(window.weekday) ?? [];
+    day.push(window);
+    byDay.set(window.weekday, day);
+  }
+  const merged: MinuteWindow[] = [];
+  for (const [weekday, day] of byDay) {
+    const sorted = [...day].sort((left, right) => left.startMinute - right.startMinute);
+    let current = sorted[0];
+    if (!current) continue;
+    for (const next of sorted.slice(1)) {
+      if (next.startMinute > current.endMinute) {
+        merged.push(current);
+        current = next;
+      } else {
+        current = { weekday, startMinute: current.startMinute, endMinute: Math.max(current.endMinute, next.endMinute) };
+      }
+    }
+    merged.push(current);
+  }
+  return merged;
+}
+
 /** Working-day starts. Closed exceptions are omitted. A visit makes the start busy. */
 export function daySlots(input: {
   isoDate: string;
@@ -58,6 +98,8 @@ export function daySlots(input: {
   durationMinutes: number;
   busy: TimeRange[];
   blocked: TimeRange[];
+  /** Slots that have already started by this instant are closed. */
+  now?: Date;
 }): DaySlot[] {
   const noon = localToUtc(input.isoDate, 12 * 60, input.timeZone);
   const weekday = zonedWeekday(noon, input.timeZone);
@@ -72,7 +114,8 @@ export function daySlots(input: {
       const start = localToUtc(input.isoDate, minute, input.timeZone);
       const end = new Date(start.getTime() + input.durationMinutes * 60_000);
       if (overlaps(start, end, input.blocked)) continue;
-      slots.push({ start, busy: overlaps(start, end, input.busy) });
+      const started = input.now !== undefined && start.getTime() <= input.now.getTime();
+      slots.push({ start, busy: started || overlaps(start, end, input.busy) });
     }
   }
   return slots;
@@ -85,6 +128,7 @@ export function bookableStarts(input: {
   durationMinutes: number;
   busy: TimeRange[];
   blocked: TimeRange[];
+  now?: Date;
 }): Date[] {
   return daySlots(input)
     .filter((slot) => !slot.busy)

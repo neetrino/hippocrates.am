@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { ClinicForms } from "@/features/clinic/clinic-forms";
+import { ClinicHours, type HourWindow } from "@/features/clinic/clinic-hours";
 import { ClinicLocaleForm } from "@/features/clinic/clinic-locale-form";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
 import { prepareLocale } from "@/i18n/locale";
@@ -14,6 +15,7 @@ type Dashboard = { pending: number; today: number; patientCount: number };
 type LocaleDoctor = { id: string; name: string; displayName: string; specialty: string; bio: string };
 type LocaleDraft = { name: string; district: string; address: string; description: string; doctors: LocaleDoctor[] };
 type ClinicLocales = { en: LocaleDraft; ru: LocaleDraft };
+type ClinicHourBook = { clinic: HourWindow[]; doctors: { id: string; windows: HourWindow[] }[] };
 
 export default async function ClinicDeskPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -31,12 +33,13 @@ export default async function ClinicDeskPage({ params }: { params: Promise<{ loc
     );
   }
   const clinicId = me.clinicId;
-  const [doctors, offerings, appointments, dashboard, locales] = await Promise.all([
+  const [doctors, offerings, appointments, dashboard, locales, hours] = await Promise.all([
     sessionGet<StaffDoctor[]>(`/clinics/${clinicId}/doctors`),
     sessionGet<StaffOffering[]>(`/clinics/${clinicId}/offerings`),
     sessionGet<AppointmentCard[]>("/appointments/mine"),
     sessionGet<Dashboard>(`/clinics/${clinicId}/dashboard`),
     sessionGet<ClinicLocales>(`/clinics/${clinicId}/locales`),
+    sessionGet<ClinicHourBook>(`/clinics/${clinicId}/hours`),
   ]);
   return (
     <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-3.5 pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
@@ -80,6 +83,17 @@ export default async function ClinicDeskPage({ params }: { params: Promise<{ loc
           ))}
         </div>
       </section>
+      {hours ? (
+        <ClinicHours
+          clinicId={clinicId}
+          clinicWindows={hours.clinic}
+          doctors={(doctors ?? []).map((doctor) => ({
+            id: doctor.id,
+            name: doctor.user.displayName,
+            windows: hours.doctors.find((item) => item.id === doctor.id)?.windows ?? [],
+          }))}
+        />
+      ) : null}
       <ClinicForms
         clinicId={clinicId}
         doctors={(doctors ?? []).map((doctor) => ({ id: doctor.id, name: doctor.user.displayName }))}

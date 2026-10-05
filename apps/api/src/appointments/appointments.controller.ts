@@ -6,7 +6,7 @@ import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { appointmentNotice, NotificationsService } from "../notifications/notifications.service";
-import { bookableStarts } from "../scheduling/slots";
+import { bookableStarts, openWindows } from "../scheduling/slots";
 import { Prisma } from "../generated/prisma/client";
 
 const appointmentCard = {
@@ -147,7 +147,7 @@ export class AppointmentsController {
   private async loadOffering(offeringId: string) {
     const offering = await this.prisma.serviceOffering.findFirst({
       where: { id: offeringId, published: true, doctor: { published: true }, clinic: { published: true } },
-      include: { clinic: true, doctor: { include: { windows: true } } },
+      include: { clinic: { include: { windows: true } }, doctor: { include: { windows: true } } },
     });
     if (!offering) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");
     return offering;
@@ -175,10 +175,11 @@ export class AppointmentsController {
     return bookableStarts({
       isoDate,
       timeZone: offering.clinic.timeZone,
-      windows: offering.doctor.windows,
+      windows: openWindows(offering.clinic.windows, offering.doctor.windows),
       durationMinutes: offering.durationMinutes,
       busy: appointments.map((item) => ({ start: item.startsAt, end: item.endsAt })),
       blocked: exceptions.map((item) => ({ start: item.startsAt, end: item.endsAt })),
+      now: new Date(),
     });
   }
 

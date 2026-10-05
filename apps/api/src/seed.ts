@@ -12,6 +12,8 @@ import {
   patientEmail,
   patientName,
   questions,
+  clinicWeekdays,
+  clinicWindow,
   scheduleWeekdays,
   scheduleWindow,
   type ClinicFixture,
@@ -108,6 +110,14 @@ async function ensureOfferings(prisma: Db, clinicId: string, doctorId: string, d
   });
 }
 
+async function ensureClinicWindows(prisma: Db, clinicId: string): Promise<void> {
+  const count = await prisma.clinicWindow.count({ where: { clinicId } });
+  if (count > 0) return;
+  await prisma.clinicWindow.createMany({
+    data: clinicWeekdays.map((weekday) => ({ clinicId, weekday, ...clinicWindow })),
+  });
+}
+
 async function ensureWindows(prisma: Db, doctorId: string): Promise<void> {
   const count = await prisma.scheduleWindow.count({ where: { doctorId } });
   if (count > 0) return;
@@ -142,6 +152,7 @@ async function seedClinic(prisma: Db, clinic: ClinicFixture, password: string): 
     password,
   });
   const row = await upsertClinic(prisma, ownerId, clinic);
+  await ensureClinicWindows(prisma, row.id);
   await ensureImage(prisma, "clinic", row.id, clinic.coverFile, row.coverKey);
   for (const doctor of clinic.doctors) await seedDoctor(prisma, row.id, doctor, password);
   await ensureCatalogLocales(prisma, row.id, clinic.name);

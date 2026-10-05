@@ -6,20 +6,16 @@ import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, formatVisitDate } from "@/shared/format";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 
-type Notice = { id: string; body: string; createdAt: string };
-
 type PatientHomeProps = {
   me: Me;
   appointments: AppointmentCard[];
-  notices: Notice[];
 };
 
 const card = "rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6";
 
-export async function PatientHome({ me, appointments, notices }: PatientHomeProps) {
+export async function PatientHome({ me, appointments }: PatientHomeProps) {
   const locale = await getLocale();
   const t = await getTranslations("me");
-  const portal = await getTranslations("portal");
   const common = await getTranslations("common");
   const upcoming = nearestVisit(appointments);
   const waiting = reviewWaiting(appointments);
@@ -30,7 +26,7 @@ export async function PatientHome({ me, appointments, notices }: PatientHomeProp
       title={me.displayName}
       portrait={<PatientAvatar name={me.displayName} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
     >
-      <section className="grid items-start gap-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(16rem,0.85fr)]">
+      <section className={waiting ? "grid items-start gap-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(16rem,0.85fr)]" : undefined}>
         {upcoming ? (
           <NextVisit visit={upcoming} locale={locale} label={t("nextVisit")} statusLabel={statusLabel(upcoming.status, common)} />
         ) : (
@@ -44,18 +40,12 @@ export async function PatientHome({ me, appointments, notices }: PatientHomeProp
             </Link>
           </article>
         )}
-        <div className="grid gap-3">
-          <Link href="/me/notices" className={`${card} block transition-shadow duration-160 hover:shadow-accent`}>
-            <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">{portal("statNotices")}</p>
-            <p className="mt-2 mb-0 font-display text-[2rem] font-bold leading-none text-ink">{notices.length}</p>
+        {waiting ? (
+          <Link href="/me/visits" className={`${card} block transition-shadow duration-160 hover:shadow-accent`}>
+            <p className="m-0 font-semibold text-ink">{clinicDisplayName(waiting.clinic, locale)}</p>
+            <p className="mt-1 mb-0 text-sm text-muted">{t("reviewWaiting")}</p>
           </Link>
-          {waiting ? (
-            <Link href="/me/visits" className={`${card} block transition-shadow duration-160 hover:shadow-accent`}>
-              <p className="m-0 font-semibold text-ink">{clinicDisplayName(waiting.clinic, locale)}</p>
-              <p className="mt-1 mb-0 text-sm text-muted">{t("reviewWaiting")}</p>
-            </Link>
-          ) : null}
-        </div>
+        ) : null}
       </section>
     </PatientPortalShell>
   );

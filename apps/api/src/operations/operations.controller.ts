@@ -1,9 +1,10 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { readNoticeIds } from "../notifications/notice-ids";
 
 @Controller()
 export class OperationsController {
@@ -85,6 +86,49 @@ export class OperationsController {
       where: { userId: actor.id },
       orderBy: { createdAt: "desc" },
       take: 50,
+      select: {
+        id: true,
+        body: true,
+        createdAt: true,
+        readAt: true,
+        appointment: {
+          select: {
+            startsAt: true,
+            clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
+            doctor: {
+              select: {
+                user: { select: { displayName: true } },
+                locales: { select: { locale: true, name: true } },
+              },
+            },
+          },
+        },
+      },
     });
+  }
+
+  @Post("me/notifications/read")
+  async readNotifications(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
+    await this.prisma.notification.updateMany({
+      where: { userId: actor.id, readAt: null },
+      data: { readAt: new Date() },
+    });
+    return { ok: true };
+  }
+
+  @Delete("me/notifications")
+  async deleteNotifications(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ deleted: number }> {
+    const result = await this.prisma.notification.deleteMany({
+      where: { userId: actor.id, id: { in: readNoticeIds(body) } },
+    });
+    return { deleted: result.count };
+  }
+
+  @Delete("me/notifications/read")
+  async deleteReadNotifications(@CurrentActor() actor: Actor): Promise<{ deleted: number }> {
+    const result = await this.prisma.notification.deleteMany({
+      where: { userId: actor.id, readAt: { not: null } },
+    });
+    return { deleted: result.count };
   }
 }

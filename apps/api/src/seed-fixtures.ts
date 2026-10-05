@@ -23,6 +23,8 @@ const weekdayWindow = { startMinute: 9 * 60, endMinute: 17 * 60 };
 
 export const scheduleWeekdays = [1, 2, 3, 4, 5];
 export const scheduleWindow = weekdayWindow;
+export const clinicWeekdays = [1, 2, 3, 4, 5, 6];
+export const clinicWindow = { startMinute: 9 * 60, endMinute: 18 * 60 };
 
 export const patientEmail = "patient@hippocrates.local";
 export const patientName = "Արամ Հովհաննիսյան";

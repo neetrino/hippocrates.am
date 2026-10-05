@@ -78,6 +78,7 @@ model Clinic {
   reviews     Review[]
   questions   Question[]
   locales     ClinicLocale[]
+  windows     ClinicWindow[]
 }
 
 model ClinicLocale {
@@ -144,6 +145,17 @@ model ServiceOffering {
   clinic          Clinic  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   doctor          DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   appointments    Appointment[]
+}
+
+model ClinicWindow {
+  id          String @id @default(cuid())
+  clinicId    String
+  weekday     Int
+  startMinute Int
+  endMinute   Int
+  clinic      Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
 }
 
 model ScheduleWindow {

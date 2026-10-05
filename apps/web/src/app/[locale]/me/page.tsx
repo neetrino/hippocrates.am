@@ -12,7 +12,7 @@ import { publicGet } from "@/shared/public-api";
 import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
-type Notice = { id: string; body: string; createdAt: string };
+type Notice = { id: string; body: string; createdAt: string; readAt: string | null };
 
 export default async function MePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -39,11 +39,12 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   }
 
   const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
-  const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
 
   if (me.role === "PATIENT") {
-    return <PatientHome me={me} appointments={appointments} notices={notices} />;
+    return <PatientHome me={me} appointments={appointments} />;
   }
+
+  const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
 
   const role = asRole(me.role);
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];

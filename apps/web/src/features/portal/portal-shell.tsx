@@ -29,6 +29,7 @@ export type PortalNavItem = {
   label: string;
   icon: ReactNode;
   match?: "exact" | "prefix" | "hash";
+  badge?: number;
 };
 
 type PortalShellProps = {
@@ -119,7 +120,7 @@ function NavLink({
       }}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,box-shadow] duration-200",
+        "group flex w-full items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,box-shadow] duration-200",
         active
           ? "-mr-3 rounded-r-none bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
           : "mr-0 text-white/78 hover:bg-white/10 hover:text-white",
@@ -134,6 +135,11 @@ function NavLink({
         {item.icon}
       </span>
       <span className="truncate">{item.label}</span>
+      {item.badge && item.badge > 0 ? (
+        <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[0.72rem] font-bold text-white">
+          {item.badge}
+        </span>
+      ) : null}
     </Link>
   );
 }

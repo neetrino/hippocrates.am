@@ -5,7 +5,7 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Public, Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
-import { bookableStarts } from "./slots";
+import { daySlots } from "./slots";
 
 @Controller()
 export class SchedulingController {
@@ -46,7 +46,7 @@ export class SchedulingController {
     @Query("doctorId") doctorId: string,
     @Query("offeringId") offeringId: string,
     @Query("date") date: string,
-  ): Promise<{ startsAt: string[] }> {
+  ): Promise<{ startsAt: string[]; slots: { startsAt: string; busy: boolean }[] }> {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "")) {
       throw new AppError("VALIDATION_FAILED", 400, "Ամսաթիվը սխալ է");
     }
@@ -70,15 +70,15 @@ export class SchedulingController {
         where: { doctorId, startsAt: { lt: dayEnd }, endsAt: { gt: dayStart } },
       }),
     ]);
-    const starts = bookableStarts({
+    const slots = daySlots({
       isoDate: date,
       timeZone: offering.clinic.timeZone,
       windows: offering.doctor.windows,
       durationMinutes: offering.durationMinutes,
       busy: appointments.map((item) => ({ start: item.startsAt, end: item.endsAt })),
       blocked: exceptions.map((item) => ({ start: item.startsAt, end: item.endsAt })),
-    });
-    return { startsAt: starts.map((start) => start.toISOString()) };
+    }).map((slot) => ({ startsAt: slot.start.toISOString(), busy: slot.busy }));
+    return { startsAt: slots.filter((slot) => !slot.busy).map((slot) => slot.startsAt), slots };
   }
 }
 

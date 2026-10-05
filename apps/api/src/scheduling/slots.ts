@@ -48,18 +48,20 @@ function overlaps(start: Date, end: Date, ranges: TimeRange[]): boolean {
   return ranges.some((range) => start < range.end && end > range.start);
 }
 
-export function bookableStarts(input: {
+export type DaySlot = { start: Date; busy: boolean };
+
+/** Working-day starts. Closed exceptions are omitted. A visit makes the start busy. */
+export function daySlots(input: {
   isoDate: string;
   timeZone: string;
   windows: MinuteWindow[];
   durationMinutes: number;
   busy: TimeRange[];
   blocked: TimeRange[];
-}): Date[] {
+}): DaySlot[] {
   const noon = localToUtc(input.isoDate, 12 * 60, input.timeZone);
   const weekday = zonedWeekday(noon, input.timeZone);
-  const starts: Date[] = [];
-  const occupied = [...input.busy, ...input.blocked];
+  const slots: DaySlot[] = [];
   for (const window of input.windows) {
     if (window.weekday !== weekday) continue;
     for (
@@ -69,8 +71,22 @@ export function bookableStarts(input: {
     ) {
       const start = localToUtc(input.isoDate, minute, input.timeZone);
       const end = new Date(start.getTime() + input.durationMinutes * 60_000);
-      if (!overlaps(start, end, occupied)) starts.push(start);
+      if (overlaps(start, end, input.blocked)) continue;
+      slots.push({ start, busy: overlaps(start, end, input.busy) });
     }
   }
-  return starts;
+  return slots;
+}
+
+export function bookableStarts(input: {
+  isoDate: string;
+  timeZone: string;
+  windows: MinuteWindow[];
+  durationMinutes: number;
+  busy: TimeRange[];
+  blocked: TimeRange[];
+}): Date[] {
+  return daySlots(input)
+    .filter((slot) => !slot.busy)
+    .map((slot) => slot.start);
 }

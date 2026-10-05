@@ -77,6 +77,20 @@ model Clinic {
   appointments Appointment[]
   reviews     Review[]
   questions   Question[]
+  locales     ClinicLocale[]
+}
+
+model ClinicLocale {
+  id          String @id @default(cuid())
+  clinicId    String
+  locale      String
+  name        String @default("")
+  district    String @default("")
+  address     String @default("")
+  description String @default("")
+  clinic      Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, locale])
 }
 
 model Branch {
@@ -103,6 +117,19 @@ model DoctorProfile {
   appointments Appointment[]
   answers     Answer[]
   reviews     Review[]
+  locales     DoctorLocale[]
+}
+
+model DoctorLocale {
+  id        String @id @default(cuid())
+  doctorId  String
+  locale    String
+  name      String @default("")
+  specialty String @default("")
+  bio       String @default("")
+  doctor    DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, locale])
 }
 
 model ServiceOffering {
@@ -207,4 +234,16 @@ model Review {
   patient       User     @relation(fields: [patientId], references: [id])
   clinic        Clinic   @relation(fields: [clinicId], references: [id])
   doctor        DoctorProfile @relation(fields: [doctorId], references: [id])
+  locales       ReviewLocale[]
+}
+
+model ReviewLocale {
+  id       String @id @default(cuid())
+  reviewId String
+  locale   String
+  body     String @default("")
+  reply    String @default("")
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, locale])
 }

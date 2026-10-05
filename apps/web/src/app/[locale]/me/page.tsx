@@ -4,7 +4,10 @@ import { PatientHome } from "@/features/portal/patient-home";
 import { AnswerForm } from "@/features/portal/question-forms";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
+import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
+import { noticeMessageKey } from "@/shared/notice-text";
+import { localizedServiceName } from "@/shared/service-name";
 import { publicGet } from "@/shared/public-api";
 import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
@@ -17,6 +20,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
+  const services = await getTranslations("services");
   const nav = await getTranslations("nav");
   const questionsCopy = await getTranslations("questions");
   const me = await sessionGet<Me>("/auth/me");
@@ -68,11 +72,11 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
             const status = asVisitStatus(item.status);
             return (
               <article className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" key={item.id}>
-                <strong>{item.offering.name}</strong>
+                <strong>{localizedServiceName(item.offering.name, services)}</strong>
                 <p className="m-0 text-muted">
                   {me.role === "DOCTOR"
                     ? item.patient.displayName
-                    : `${item.clinic.name} · ${item.doctor.user.displayName}`}
+                    : `${clinicDisplayName(item.clinic, displayLocale)} · ${doctorDisplayName(item.doctor, displayLocale)}`}
                 </p>
                 <p>
                   {formatWhen(item.startsAt, displayLocale)} · {status ? common(status) : item.status} ·{" "}
@@ -86,17 +90,20 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
       <section className="grid gap-[18px] pt-7">
         <h2>{t("notices")}</h2>
         {notices.length === 0 ? <p className="m-0 text-muted">{t("noNotices")}</p> : null}
-        {notices.map((notice) => (
-          <p
-            className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5"
-            key={notice.id}
-          >
-            <span>{notice.body}</span>
-            <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
-              {formatWhen(notice.createdAt, displayLocale)}
-            </time>
-          </p>
-        ))}
+        {notices.map((notice) => {
+          const messageKey = noticeMessageKey(notice.body);
+          return (
+            <p
+              className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5"
+              key={notice.id}
+            >
+              <span>{messageKey ? t(messageKey) : notice.body}</span>
+              <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
+                {formatWhen(notice.createdAt, displayLocale)}
+              </time>
+            </p>
+          );
+        })}
       </section>
       {me.role === "DOCTOR" ? (
         <section className="grid gap-3.5 pt-7">

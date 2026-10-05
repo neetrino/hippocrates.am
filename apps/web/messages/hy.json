@@ -79,7 +79,8 @@
     "prices": "Գներ",
     "reviews": "Կարծիքներ",
     "noReviews": "Կարծիք դեռ չկա։",
-    "reply": "Կլինիկա. {reply}"
+    "reply": "Կլինիկա. {reply}",
+    "mainBranch": "Գլխավոր"
   },
   "booking": {
     "title": "Ամրագրել այց",
@@ -90,7 +91,9 @@
     "noSlots": "Այդ օրը ազատ ժամ չկա",
     "slotsFailed": "Ազատ ժամերը չբեռնվեցին",
     "signIn": "Ամրագրելու համար մուտք գործեք որպես պացիենտ",
-    "taken": "Այդ ժամը ազատ չէ"
+    "taken": "Այդ ժամը ազատ չէ",
+    "busy": "Զբաղված",
+    "booked": "Ամրագրումը ստացվեց"
   },
   "questions": {
     "title": "Հանրային հարցեր",
@@ -133,12 +136,16 @@
     "openPlatform": "Գրանցել կլինիկա",
     "openClinic": "Կլինիկայի վահանակ",
     "visits": "Այցեր",
+    "showMore": "Ավելին · {count}",
+    "showLess": "Փակել",
     "favorites": "Նախընտրածներ",
     "reviews": "Կարծիքներ",
     "settings": "Կարգավորումներ",
     "upcoming": "Առաջիկա այցեր",
     "bookVisit": "Ամրագրել այց",
     "bookHint": "Ընտրեք կլինիկա և ազատ ժամ։",
+    "nextVisit": "Մոտակա այց",
+    "reviewWaiting": "Այս այցից կարծիք դեռ չկա",
     "emptyFavorites": "Նախընտրած կլինիկա կամ բժիշկ դեռ չկա։",
     "emptyReviews": "Կարծիք դեռ չկա։ Ավարտված այցից կարող եք գրել Այցեր բաժնում։",
     "reviewSent": "Կարծիքը ուղարկված է",
@@ -169,6 +176,11 @@
     "changePassword": "Փոխել գաղտնաբառը",
     "notices": "Ծանուցումներ",
     "noNotices": "Ծանուցում չկա։",
+    "noticeRequested": "Նոր ամրագրման հայտ",
+    "noticeConfirmed": "Ամրագրումը հաստատված է",
+    "noticeCancelled": "Ամրագրումը չեղարկված է",
+    "noticeRescheduled": "Ամրագրումը տեղափոխված է",
+    "noticeCompleted": "Այցն ավարտված է",
     "rating": "Գնահատական",
     "review": "Կարծիք",
     "sendReview": "Ուղարկել կարծիք",
@@ -208,7 +220,17 @@
     "doctorFailed": "Բժիշկը չգրանցվեց",
     "serviceFailed": "Ծառայությունը չպահվեց",
     "amd": "Գին (դրամ)",
-    "duration": "Րոպե"
+    "duration": "Րոպե",
+    "localeTexts": "Այլ լեզուներ",
+    "localeHint": "Դատարկ դաշտը կմնա հայերեն։ Բժշկական տեքստը ինքնուրույն չի թարգմանվում։",
+    "latinName": "Անունն այս լեզվով",
+    "doctorName": "Բժշկի անունն այս լեզվով",
+    "description": "Նկարագրություն",
+    "bio": "Կարճ տեքստ",
+    "localeSaved": "Պահված է",
+    "localeFailed": "Չպահվեց",
+    "english": "Անգլերեն",
+    "russian": "Ռուսերեն"
   },
   "platform": {
     "title": "Կլինիկայի գրանցում",
@@ -226,5 +248,19 @@
     "adminNamePlaceholder": "օր. Աննա Գրիգորյան",
     "adminEmailPlaceholder": "admin@clinic.am",
     "adminPasswordPlaceholder": "Առնվազն 8 նիշ"
+  },
+  "services": {
+    "consult": "Խորհրդատվություն",
+    "cleaning": "Մաքրում",
+    "surgicalConsult": "Վիրաբուժական խորհրդատվություն",
+    "extraction": "Ատամի հեռացում",
+    "orthodonticConsult": "Օրթոդոնտիկ խորհրդատվություն",
+    "braceCheck": "Կապիչների հսկողություն",
+    "implantConsult": "Իմպլանտի խորհրդատվություն",
+    "followUp": "Վերահսկիչ այց",
+    "childExam": "Մանկական զննում",
+    "preventive": "Կանխարգելիչ մշակում",
+    "prostheticConsult": "Օրթոպեդիկ խորհրդատվություն",
+    "crownPrep": "Պսակի չափագրում"
   }
 }

@@ -5,7 +5,7 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
-import { NotificationsService } from "../notifications/notifications.service";
+import { appointmentNotice, NotificationsService } from "../notifications/notifications.service";
 import { bookableStarts } from "../scheduling/slots";
 import { Prisma } from "../generated/prisma/client";
 
@@ -16,8 +16,8 @@ const appointmentCard = {
   priceAmd: true,
   isEstimate: true,
   offering: { select: { name: true } },
-  clinic: { select: { name: true } },
-  doctor: { select: { user: { select: { displayName: true } } } },
+  clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
+  doctor: { select: { user: { select: { displayName: true } }, locales: { select: { locale: true, name: true } } } },
   patient: { select: { displayName: true } },
   review: { select: { id: true } },
 } as const;
@@ -52,7 +52,7 @@ export class AppointmentsController {
     }
     const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
     const created = await this.insertAppointment(actor.id, offering, startsAt, endsAt, idempotencyKey);
-    await this.notices.afterAppointment(created, "Նոր ամրագրման հայտ");
+    await this.notices.afterAppointment(created, appointmentNotice.requested);
     return { id: created.id };
   }
 
@@ -61,7 +61,7 @@ export class AppointmentsController {
   async confirm(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
     const appointment = await this.owned(actor, id, "REQUESTED");
     const updated = await this.prisma.appointment.update({ where: { id: appointment.id }, data: { status: "CONFIRMED" } });
-    await this.notices.afterAppointment(updated, "Ամրագրումը հաստատված է");
+    await this.notices.afterAppointment(updated, appointmentNotice.confirmed);
     return { id: updated.id };
   }
 
@@ -75,7 +75,7 @@ export class AppointmentsController {
     const isAdmin = actor.role === "ADMIN" && actor.clinicId === appointment.clinicId;
     if (!isPatient && !isAdmin) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
     const updated = await this.prisma.appointment.update({ where: { id }, data: { status: "CANCELLED" } });
-    await this.notices.afterAppointment(updated, "Ամրագրումը չեղարկված է");
+    await this.notices.afterAppointment(updated, appointmentNotice.cancelled);
     return { id: updated.id };
   }
 
@@ -105,7 +105,7 @@ export class AppointmentsController {
     }
     const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
     const updated = await this.prisma.appointment.update({ where: { id }, data: { startsAt, endsAt } });
-    await this.notices.afterAppointment(updated, "Ամրագրումը տեղափոխված է");
+    await this.notices.afterAppointment(updated, appointmentNotice.rescheduled);
     return { id: updated.id };
   }
 

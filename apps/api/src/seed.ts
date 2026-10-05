@@ -4,6 +4,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import * as argon2 from "argon2";
 import { PrismaClient, type Role } from "./generated/prisma/client";
 import { uploadImage } from "./infrastructure/r2.storage";
+import { appointmentNotice } from "./notifications/notifications.service";
+import { ensureCatalogLocales, ensureReviewLocales } from "./seed-locales";
 import { localToUtc } from "./scheduling/slots";
 import {
   clinics,
@@ -142,6 +144,7 @@ async function seedClinic(prisma: Db, clinic: ClinicFixture, password: string): 
   const row = await upsertClinic(prisma, ownerId, clinic);
   await ensureImage(prisma, "clinic", row.id, clinic.coverFile, row.coverKey);
   for (const doctor of clinic.doctors) await seedDoctor(prisma, row.id, doctor, password);
+  await ensureCatalogLocales(prisma, row.id, clinic.name);
 }
 
 function lastMondayIso(): string {
@@ -186,7 +189,7 @@ async function seedVisit(prisma: Db, patientId: string): Promise<void> {
     },
   });
   await prisma.notification.create({
-    data: { userId: patientId, appointmentId: appointment.id, body: "Այցն ավարտված է" },
+    data: { userId: patientId, appointmentId: appointment.id, body: appointmentNotice.completed },
   });
 }
 
@@ -217,6 +220,7 @@ async function seed(): Promise<void> {
     for (const clinic of clinics) await seedClinic(prisma, clinic, password);
     const patientId = await upsertUser(prisma, { email: patientEmail, displayName: patientName, role: "PATIENT", password });
     await seedVisit(prisma, patientId);
+    await ensureReviewLocales(prisma);
     await seedQuestions(prisma, patientId);
   } finally {
     await prisma.$disconnect();

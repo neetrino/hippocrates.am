@@ -1,16 +1,20 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { loadPatientAccount, PatientSignIn } from "@/features/portal/patient-account";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { prepareLocale } from "@/i18n/locale";
+import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
+import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
 export default async function PatientReviewsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
+  const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
+  const services = await getTranslations("services");
   if (!(await loadPatientAccount(locale))) return <PatientSignIn />;
   const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
   const reviewed = appointments.filter((item) => item.review);
@@ -25,9 +29,9 @@ export default async function PatientReviewsPage({ params }: { params: Promise<{
           <div className="grid gap-3">
             {reviewed.map((item) => (
               <article className="grid gap-1 rounded-[1.15rem] border border-line bg-sand/70 px-4 py-4" key={item.id}>
-                <strong>{item.offering.name}</strong>
+                <strong>{localizedServiceName(item.offering.name, services)}</strong>
                 <p className="m-0 text-muted">
-                  {item.clinic.name} · {item.doctor.user.displayName}
+                  {clinicDisplayName(item.clinic, displayLocale)} · {doctorDisplayName(item.doctor, displayLocale)}
                 </p>
                 <p className="m-0">{t("reviewSent")}</p>
               </article>

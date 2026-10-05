@@ -2,6 +2,14 @@ import { Injectable, Logger } from "@nestjs/common";
 import type { Appointment } from "../generated/prisma/client";
 import { PrismaService } from "../infrastructure/prisma.service";
 
+export const appointmentNotice = {
+  requested: "notice.requested",
+  confirmed: "notice.confirmed",
+  cancelled: "notice.cancelled",
+  rescheduled: "notice.rescheduled",
+  completed: "notice.completed",
+} as const;
+
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);

@@ -3,6 +3,7 @@ import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { formatWhen } from "@/shared/format";
+import { noticeMessageKey } from "@/shared/notice-text";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
@@ -36,14 +37,17 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
           <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
         ) : (
           <div className="grid gap-3">
-            {notices.map((notice) => (
-              <article className="rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5" key={notice.id}>
-                <p className="m-0">{notice.body}</p>
-                <time className="mt-1 block text-sm text-muted" dateTime={notice.createdAt}>
-                  {formatWhen(notice.createdAt, displayLocale)}
-                </time>
-              </article>
-            ))}
+            {notices.map((notice) => {
+              const messageKey = noticeMessageKey(notice.body);
+              return (
+                <article className="rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5" key={notice.id}>
+                  <p className="m-0">{messageKey ? t(messageKey) : notice.body}</p>
+                  <time className="mt-1 block text-sm text-muted" dateTime={notice.createdAt}>
+                    {formatWhen(notice.createdAt, displayLocale)}
+                  </time>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>

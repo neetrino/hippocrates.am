@@ -9,8 +9,10 @@ import { EmptyState } from "@/shared/ui/empty-state";
 
 type DoctorFiltersResponse = {
   specialties: string[];
+  specialtyLabels?: Record<string, string>;
   cities: string[];
-  clinics: { id: string; name: string }[];
+  cityLabels?: Record<string, string>;
+  clinics: { id: string; name: string; label?: string }[];
 };
 
 function toList(value?: string | string[]): string[] {
@@ -50,8 +52,8 @@ export default async function DoctorsPage({
   const suffix = query.size > 0 ? `?${query}` : "";
 
   const [doctors, filterOptions] = await Promise.all([
-    publicGet<DoctorCard[]>(`/public/doctors${suffix}`),
-    publicGet<DoctorFiltersResponse>("/public/doctor-filters"),
+    publicGet<DoctorCard[]>(`/public/doctors${suffix}`, locale),
+    publicGet<DoctorFiltersResponse>("/public/doctor-filters", locale),
   ]);
 
   return (
@@ -67,6 +69,9 @@ export default async function DoctorsPage({
           specialties: filterOptions.specialties,
           cities: filterOptions.cities,
           clinics: filterOptions.clinics.map((clinic) => clinic.name),
+          specialtyLabels: filterOptions.specialtyLabels ?? {},
+          cityLabels: filterOptions.cityLabels ?? {},
+          clinicLabels: Object.fromEntries(filterOptions.clinics.map((clinic) => [clinic.name, clinic.label || clinic.name])),
         }}
         labels={{
           namePlaceholder: t("doctorSearchPlaceholder"),

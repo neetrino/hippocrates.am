@@ -25,6 +25,14 @@ export function formatWhen(iso: string, locale: string): string {
   }).format(new Date(iso));
 }
 
+/** Visit day in the active locale, Yerevan time, without the clock. */
+export function formatVisitDate(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(localeTag[locale] ?? "hy-AM", {
+    dateStyle: "medium",
+    timeZone: yerevan,
+  }).format(new Date(iso));
+}
+
 export function formatTime(iso: string): string {
   return new Intl.DateTimeFormat("en-GB", {
     hour: "2-digit",

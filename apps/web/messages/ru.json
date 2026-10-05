@@ -79,7 +79,8 @@
     "prices": "Цены",
     "reviews": "Отзывы",
     "noReviews": "Отзывов пока нет.",
-    "reply": "Клиника. {reply}"
+    "reply": "Клиника. {reply}",
+    "mainBranch": "Главный"
   },
   "booking": {
     "title": "Записать визит",
@@ -90,7 +91,9 @@
     "noSlots": "В этот день свободного времени нет",
     "slotsFailed": "Свободное время не загрузилось",
     "signIn": "Чтобы записаться, войдите как пациент",
-    "taken": "Это время уже занято"
+    "taken": "Это время уже занято",
+    "busy": "Занято",
+    "booked": "Визит записан"
   },
   "questions": {
     "title": "Публичные вопросы",
@@ -133,12 +136,16 @@
     "openPlatform": "Зарегистрировать клинику",
     "openClinic": "Панель клиники",
     "visits": "Визиты",
+    "showMore": "Ещё · {count}",
+    "showLess": "Свернуть",
     "favorites": "Избранное",
     "reviews": "Отзывы",
     "settings": "Настройки",
     "upcoming": "Ближайшие визиты",
     "bookVisit": "Записать визит",
     "bookHint": "Выберите клинику и свободное время.",
+    "nextVisit": "Ближайший визит",
+    "reviewWaiting": "По этому визиту отзыва ещё нет",
     "emptyFavorites": "Сохранённых клиник и врачей пока нет.",
     "emptyReviews": "Отзывов пока нет. Написать можно после завершённого визита.",
     "reviewSent": "Отзыв отправлен",
@@ -169,6 +176,11 @@
     "changePassword": "Сменить пароль",
     "notices": "Уведомления",
     "noNotices": "Уведомлений нет.",
+    "noticeRequested": "Новая заявка на запись",
+    "noticeConfirmed": "Запись подтверждена",
+    "noticeCancelled": "Запись отменена",
+    "noticeRescheduled": "Запись перенесена",
+    "noticeCompleted": "Визит завершён",
     "rating": "Оценка",
     "review": "Отзыв",
     "sendReview": "Отправить отзыв",
@@ -208,7 +220,17 @@
     "doctorFailed": "Врач не зарегистрирован",
     "serviceFailed": "Услуга не сохранилась",
     "amd": "Цена (драм)",
-    "duration": "Минуты"
+    "duration": "Минуты",
+    "localeTexts": "Другие языки",
+    "localeHint": "Пустое поле остаётся на армянском. Медицинский текст не переводится сам.",
+    "latinName": "Название на этом языке",
+    "doctorName": "Имя врача на этом языке",
+    "description": "Описание",
+    "bio": "Короткий текст",
+    "localeSaved": "Сохранено",
+    "localeFailed": "Не сохранилось",
+    "english": "Английский",
+    "russian": "Русский"
   },
   "platform": {
     "title": "Регистрация клиники",
@@ -226,5 +248,19 @@
     "adminNamePlaceholder": "напр. Анна Григорян",
     "adminEmailPlaceholder": "admin@clinic.am",
     "adminPasswordPlaceholder": "Не менее 8 символов"
+  },
+  "services": {
+    "consult": "Консультация",
+    "cleaning": "Чистка",
+    "surgicalConsult": "Хирургическая консультация",
+    "extraction": "Удаление зуба",
+    "orthodonticConsult": "Ортодонтическая консультация",
+    "braceCheck": "Контроль брекетов",
+    "implantConsult": "Консультация по импланту",
+    "followUp": "Контрольный визит",
+    "childExam": "Детский осмотр",
+    "preventive": "Профилактическая обработка",
+    "prostheticConsult": "Ортопедическая консультация",
+    "crownPrep": "Снятие мерок для коронки"
   }
 }

@@ -10,7 +10,7 @@ const circleClass =
   "grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border-0 bg-accent p-0 text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:h-[38px] max-md:w-[38px]";
 
 const rowClass =
-  "inline-flex min-h-10 w-full cursor-pointer items-center rounded-[10px] border-0 bg-transparent px-3.5 py-2 text-left font-sans text-[0.88rem] font-semibold text-ink hover:bg-accent-soft hover:text-accent";
+  "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 text-left font-sans text-[0.78rem] font-medium whitespace-nowrap text-ink/80 transition-colors duration-160 hover:bg-accent-soft hover:text-accent";
 
 type AccountMenuProps = {
   href: AccountHref;
@@ -71,11 +71,11 @@ function SignedInMenu({ label }: { label: string }) {
       </button>
       {open ? (
         <div
-          className="absolute top-[calc(100%+10px)] right-0 z-30 grid min-w-[160px] gap-0.5 rounded-[14px] border border-line bg-white p-2 shadow-soft"
+          className="absolute top-[calc(100%+6px)] right-0 z-30 w-max rounded-xl border border-line bg-white p-1 shadow-[0_8px_20px_rgba(20,36,40,0.08)]"
           id={menuId}
           role="menu"
         >
-          <LogoutButton className={rowClass} />
+          <LogoutButton className={rowClass} showIcon />
         </div>
       ) : null}
     </div>

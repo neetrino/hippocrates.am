@@ -25,18 +25,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
   const noticeCount = notices.length;
 
   return (
-    <AdminPortalShell
-      eyebrow={common("SUPER_ADMIN")}
-      title={me.displayName}
-      action={
-        <Link
-          href="/super-admin/clinics"
-          className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover max-md:hidden"
-        >
-          {t("openPlatform")}
-        </Link>
-      }
-    >
+    <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={me.displayName}>
       <div className="grid gap-6">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <article className="rounded-[1.4rem] bg-white px-5 py-5 shadow-soft">

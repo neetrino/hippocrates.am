@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getLocale } from "next-intl/server";
-import { Noto_Sans, Noto_Sans_Armenian, Noto_Serif, Noto_Serif_Armenian } from "next/font/google";
+import { Cormorant_Garamond, Noto_Sans, Noto_Sans_Armenian, Noto_Serif, Noto_Serif_Armenian } from "next/font/google";
 import { getSiteUrl } from "@/shared/site-url";
 import "./globals.css";
 
@@ -37,12 +37,20 @@ const serifArmenian = Noto_Serif_Armenian({
   display: "swap",
 });
 
+const catalogSerif = Cormorant_Garamond({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  weight: ["500", "600"],
+  style: ["italic"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
   return (
     <html
       lang={locale}
-      className={`${sans.variable} ${armenian.variable} ${serif.variable} ${serifArmenian.variable}`}
+      className={`${sans.variable} ${armenian.variable} ${serif.variable} ${serifArmenian.variable} ${catalogSerif.variable}`}
       data-scroll-behavior="smooth"
     >
       <body className="bg-background">{children}</body>

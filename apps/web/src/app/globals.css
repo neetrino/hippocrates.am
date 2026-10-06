@@ -35,6 +35,9 @@
   --font-display:
     var(--font-noto-serif-hy), var(--font-noto-serif), "Noto Serif Armenian", "Noto Serif",
     Georgia, serif;
+  --font-catalog:
+    var(--font-cormorant), var(--font-noto-serif-hy), var(--font-noto-serif), "Noto Serif Armenian",
+    "Noto Serif", Georgia, serif;
 }
 
 @layer base {

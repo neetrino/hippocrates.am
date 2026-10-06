@@ -15,9 +15,9 @@ export function HomeCatalog({
   clinics: ClinicCard[];
 }) {
   return (
-    <section className="page-shell-wide grid gap-6 pt-10 pb-2 max-md:gap-4 max-md:pt-7">
-      <div className="relative flex min-h-16 items-center justify-center">
-        <h2 className="text-center text-[clamp(2.8rem,4.4vw,3.7rem)] leading-none tracking-[-0.035em]">
+    <section className="page-shell-wide grid gap-8 pt-8 max-md:gap-6 max-md:pt-6">
+      <div className="relative flex items-center justify-center">
+        <h2 className="text-center font-catalog text-[clamp(2.8rem,4.4vw,3.7rem)] leading-[0.82] font-medium tracking-[-0.02em] text-muted italic">
           {clinicsTitle}
         </h2>
         <Link href="/clinics" className="btn btn-ghost absolute right-0 shrink-0">

@@ -25,7 +25,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   ]);
 
   return (
-    <PageFrame className="pb-6">
+    <>
       <HomeHero
         locale={locale}
         title={t("title")}
@@ -36,6 +36,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         doctorsLabel={t("allDoctors")}
         clinics={data.clinics}
       />
+      <PageFrame className="pt-10 pb-6 max-md:pt-7">
       <HomeTrust
         items={[
           { title: t("trust1Title"), body: t("trust1Body") },
@@ -72,6 +73,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         clinicsLabel={t("ctaClinics")}
         doctorsLabel={t("ctaDoctors")}
       />
-    </PageFrame>
+      </PageFrame>
+    </>
   );
 }

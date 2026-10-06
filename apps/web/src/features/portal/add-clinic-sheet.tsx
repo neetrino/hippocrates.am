@@ -3,16 +3,8 @@
 import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon, RegisterClinicIcon } from "@/features/portal/admin-sidebar-icons";
-import { JsonForm } from "@/shared/json-form";
+import { RegisterClinicForm } from "@/features/portal/register-clinic-form";
 import { cn } from "@/shared/ui/cn";
-
-type FormField = {
-  name: string;
-  label: string;
-  type?: string;
-  placeholder?: string;
-  kind?: "text" | "phone" | "name";
-};
 
 type AddClinicSheetProps = {
   addLabel: string;
@@ -20,7 +12,6 @@ type AddClinicSheetProps = {
   title: string;
   hint: string;
   submitLabel: string;
-  fields: FormField[];
 };
 
 const SHEET_MS = 420;
@@ -35,7 +26,6 @@ export function AddClinicSheet({
   title,
   hint,
   submitLabel,
-  fields,
 }: AddClinicSheetProps) {
   const [visible, setVisible] = useState(false);
   const [entered, setEntered] = useState(false);
@@ -106,7 +96,7 @@ export function AddClinicSheet({
             entered ? "translate-y-0 opacity-100 delay-150" : "translate-y-3 opacity-0 delay-0",
           )}
         >
-          <JsonForm action="/clinics" label={submitLabel} next="/super-admin/clinics" fields={fields} />
+          <RegisterClinicForm submitLabel={submitLabel} />
         </div>
       </aside>
     </div>

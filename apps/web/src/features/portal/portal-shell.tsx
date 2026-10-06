@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { CloseIcon, MenuIcon } from "@/features/portal/admin-sidebar-icons";
-import { LogoutButton } from "@/features/portal/logout-button";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { AccountMenu, type AccountHref } from "@/shared/ui/account-menu";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
 
@@ -38,6 +38,7 @@ type PortalShellProps = {
   eyebrow: string;
   subtitle: string;
   homeHref: PortalHref;
+  accountHref: AccountHref;
   items: PortalNavItem[];
   footerItems: PortalNavItem[];
   navLabel?: string;
@@ -214,7 +215,6 @@ function SidebarNav({
             onActivate={onActivate}
           />
         ))}
-        <LogoutButton className={cn("mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-white/78 transition-colors duration-200 hover:bg-white/10 hover:text-white", navText(plainLabels))} />
       </nav>
     </div>
   );
@@ -226,6 +226,7 @@ function PortalHeader({
   action,
   portrait,
   plainLabels,
+  accountHref,
   open,
   menuId,
   onOpen,
@@ -235,16 +236,18 @@ function PortalHeader({
   action?: ReactNode;
   portrait?: ReactNode;
   plainLabels: boolean;
+  accountHref: AccountHref;
   open: boolean;
   menuId: string;
   onOpen: () => void;
 }) {
   const t = useTranslations("portal");
+  const accountLabel = useTranslations("nav")("me");
   const eyebrowClass = plainLabels
     ? "m-0 text-xs font-semibold text-accent"
     : "m-0 text-[0.72rem] font-semibold tracking-[0.12em] text-accent uppercase";
   return (
-    <header className="flex flex-wrap items-center gap-x-3 gap-y-3 px-4 pt-4 pb-2 md:px-7 md:pt-6">
+    <header className="relative z-10 flex flex-wrap items-center gap-x-3 gap-y-3 px-4 pt-4 pb-2 md:px-7 md:pt-6">
       <div className="flex min-w-[min(100%,16rem)] flex-1 items-center gap-3">
         <button
           type="button"
@@ -265,12 +268,13 @@ function PortalHeader({
       <div className="ml-auto flex shrink-0 items-center gap-2.5">
         {action}
         <LocaleSwitch />
+        <AccountMenu href={accountHref} label={accountLabel} />
       </div>
     </header>
   );
 }
 
-export function PortalShell({ children, title, eyebrow, subtitle, homeHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
+export function PortalShell({ children, title, eyebrow, subtitle, homeHref, accountHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
   const t = useTranslations("portal");
   const pathname = localeNeutralPath(usePathname());
   const [hash, activate] = usePortalHash(pathname);
@@ -317,7 +321,7 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, item
         </div>
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
-        <PortalHeader eyebrow={eyebrow} title={title} action={action} portrait={portrait} plainLabels={plainLabels} open={open} menuId={menuId} onOpen={() => setOpen(true)} />
+        <PortalHeader eyebrow={eyebrow} title={title} action={action} portrait={portrait} plainLabels={plainLabels} accountHref={accountHref} open={open} menuId={menuId} onOpen={() => setOpen(true)} />
         <div className="scrollbar-soft min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-8 md:px-7">{children}</div>
       </div>
     </div>

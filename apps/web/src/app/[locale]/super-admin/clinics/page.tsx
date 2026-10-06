@@ -36,42 +36,6 @@ export default async function PortalClinicsPage({
             title={platform("title")}
             hint={platform("hint")}
             submitLabel={platform("submit")}
-            fields={[
-              {
-                name: "name",
-                label: platform("clinicName"),
-                kind: "name",
-                placeholder: platform("clinicNamePlaceholder"),
-              },
-              {
-                name: "address",
-                label: platform("address"),
-                placeholder: platform("addressPlaceholder"),
-              },
-              {
-                name: "phone",
-                label: platform("phone"),
-                kind: "phone",
-              },
-              {
-                name: "adminName",
-                label: platform("adminName"),
-                kind: "name",
-                placeholder: platform("adminNamePlaceholder"),
-              },
-              {
-                name: "adminEmail",
-                label: platform("adminEmail"),
-                type: "email",
-                placeholder: platform("adminEmailPlaceholder"),
-              },
-              {
-                name: "adminPassword",
-                label: platform("adminPassword"),
-                type: "password",
-                placeholder: platform("adminPasswordPlaceholder"),
-              },
-            ]}
           />
         }
       />

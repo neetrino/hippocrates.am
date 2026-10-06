@@ -218,7 +218,12 @@
     "sectionCount": "{count}",
     "emptyVisits": "No visits yet.",
     "addClinic": "Add Clinic",
-    "closeSheet": "Close"
+    "closeSheet": "Close",
+    "backToClinics": "Clinics",
+    "languages": "Languages",
+    "emptySection": "None yet.",
+    "hidden": "Hidden",
+    "latestReviews": "Latest 20"
   },
   "desk": {
     "denied": "This page is for the clinic admin.",
@@ -282,7 +287,14 @@
     "phonePlaceholder": "+374 XX XXX XXX",
     "adminNamePlaceholder": "e.g. Anna Grigoryan",
     "adminEmailPlaceholder": "admin@clinic.am",
-    "adminPasswordPlaceholder": "At least 8 characters"
+    "adminPasswordPlaceholder": "At least 8 characters",
+    "armenian": "Armenian",
+    "english": "English",
+    "russian": "Russian",
+    "district": "District",
+    "description": "Description",
+    "localeHint": "An empty English or Russian field stays in Armenian.",
+    "armenianRequired": "Fill in the Armenian name and address."
   },
   "services": {
     "consult": "Consultation",

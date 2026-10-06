@@ -13,6 +13,50 @@ type LocaleDraft = {
 
 const limits = { name: 80, district: 80, address: 160, description: 600, specialty: 80, bio: 600 };
 
+export type ClinicCopy = {
+  name: string;
+  district: string;
+  address: string;
+  description: string;
+};
+
+/** Armenian source text. Name and address are required. */
+export function sourceClinicText(input: Record<string, unknown>): ClinicCopy {
+  const name = limited(input.name, limits.name);
+  const address = limited(input.address, limits.address);
+  if (!name) throw new AppError("VALIDATION_FAILED", 400, "Կլինիկայի անուն պարտադիր է");
+  if (!address) throw new AppError("VALIDATION_FAILED", 400, "Հասցե պարտադիր է");
+  return {
+    name,
+    address,
+    district: limited(input.district, limits.district),
+    description: limited(input.description, limits.description),
+  };
+}
+
+/** English or Russian copy. An empty object is skipped. */
+export function localeCopies(value: unknown): { locale: CatalogLocale; text: ClinicCopy }[] {
+  if (value == null) return [];
+  const row = recordOf(value);
+  return (["en", "ru"] as const).flatMap((locale) => {
+    if (row[locale] == null) return [];
+    const text = optionalCopy(row[locale]);
+    return text ? [{ locale, text }] : [];
+  });
+}
+
+function optionalCopy(value: unknown): ClinicCopy | null {
+  const row = recordOf(value);
+  const text = {
+    name: limited(row.name, limits.name),
+    district: limited(row.district, limits.district),
+    address: limited(row.address, limits.address),
+    description: limited(row.description, limits.description),
+  };
+  if (!text.name && !text.district && !text.address && !text.description) return null;
+  return text;
+}
+
 function limited(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
   const text = value.trim();

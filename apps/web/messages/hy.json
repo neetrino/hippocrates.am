@@ -218,7 +218,12 @@
     "sectionCount": "{count}",
     "emptyVisits": "Այցեր դեռ չկան։",
     "addClinic": "Ավելացնել կլինիկա",
-    "closeSheet": "Փակել"
+    "closeSheet": "Փակել",
+    "backToClinics": "Կլինիկաներ",
+    "languages": "Լեզուներ",
+    "emptySection": "Դեռ չկա։",
+    "hidden": "Թաքնված",
+    "latestReviews": "Վերջին 20-ը"
   },
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",
@@ -282,7 +287,14 @@
     "phonePlaceholder": "+374 XX XXX XXX",
     "adminNamePlaceholder": "օր. Աննա Գրիգորյան",
     "adminEmailPlaceholder": "admin@clinic.am",
-    "adminPasswordPlaceholder": "Առնվազն 8 նիշ"
+    "adminPasswordPlaceholder": "Առնվազն 8 նիշ",
+    "armenian": "Հայերեն",
+    "english": "Անգլերեն",
+    "russian": "Ռուսերեն",
+    "district": "Շրջան",
+    "description": "Նկարագրություն",
+    "localeHint": "Անգլերենի կամ ռուսերենի դատարկ դաշտը կմնա հայերեն։",
+    "armenianRequired": "Լրացրեք հայերեն անունը և հասցեն։"
   },
   "services": {
     "consult": "Խորհրդատվություն",

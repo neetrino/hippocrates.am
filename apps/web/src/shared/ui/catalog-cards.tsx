@@ -5,13 +5,15 @@ import { Photo } from "@/shared/ui/photo";
 export function ClinicTile({
   clinic,
   loading,
+  href = `/clinics/${clinic.id}`,
 }: {
   clinic: ClinicCard;
   loading?: "eager" | "lazy";
+  href?: `/clinics/${string}` | `/super-admin/clinics/${string}`;
 }) {
   return (
     <article className="overflow-hidden rounded-card border border-line bg-white shadow-soft transition-[transform,box-shadow,border-color] duration-180 hover:-translate-y-0.5 hover:border-accent/28 hover:shadow-[0_18px_40px_rgba(20,36,40,0.08)]">
-      <Link href={`/clinics/${clinic.id}`}>
+      <Link href={href}>
         <div className="relative aspect-16/10 bg-sand">
           <Photo src={clinic.coverUrl} alt={clinic.name} loading={loading} />
         </div>

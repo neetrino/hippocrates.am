@@ -2,9 +2,10 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
+import { type AccountHref } from "@/shared/ui/account-menu";
 import { BrandLogo } from "@/shared/ui/brand-logo";
 import { SiteHeaderShell } from "@/shared/ui/site-header-shell";
-import { SiteNav, type AccountHref } from "@/shared/ui/site-nav";
+import { SiteNav } from "@/shared/ui/site-nav";
 
 function accountHref(role: string | null): AccountHref {
   if (role === "SUPER_ADMIN") return "/super-admin";

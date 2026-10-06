@@ -5,12 +5,11 @@ import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { AccountMenu, type AccountHref } from "@/shared/ui/account-menu";
 import { BrandLogo } from "@/shared/ui/brand-logo";
 import { LocaleFlag } from "@/shared/ui/locale-flag";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
-
-export type AccountHref = "/login" | "/me" | "/super-admin";
 
 type SiteNavProps = {
   clinics: string;
@@ -47,20 +46,6 @@ function localeNeutralPath(pathname: string): string {
     }
   }
   return pathname;
-}
-
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-5 w-5">
-      <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="1.7" />
-      <path
-        d="M5.5 19.2c1.4-3.1 3.7-4.6 6.5-4.6s5.1 1.5 6.5 4.6"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
 }
 
 function CloseIcon() {
@@ -210,13 +195,7 @@ export function SiteNav({
       <DesktopPrimaryNav links={links} pathname={pathname} />
       <div className="flex items-center justify-self-end gap-2.5 max-md:gap-2">
         <LocaleSwitch hideOnMobile />
-        <Link
-          href={accountHref}
-          className="grid h-[42px] w-[42px] place-items-center rounded-full bg-accent text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:h-[38px] max-md:w-[38px]"
-          aria-label={accountLabel}
-        >
-          <UserIcon />
-        </Link>
+        <AccountMenu href={accountHref} label={accountLabel} />
         <button
           type="button"
           className="hidden h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border border-line bg-white p-0 text-ink max-md:grid max-md:h-[38px] max-md:w-[38px]"

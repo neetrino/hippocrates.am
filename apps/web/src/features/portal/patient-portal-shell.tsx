@@ -64,6 +64,7 @@ export function PatientPortalShell({ children, title, eyebrow, action, portrait 
   return (
     <PortalShell
       homeHref="/me"
+      accountHref="/me"
       subtitle={t("patientSubtitle")}
       navLabel={t("patientNavLabel")}
       items={items}

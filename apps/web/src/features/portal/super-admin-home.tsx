@@ -32,7 +32,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
             <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">
               {portal("statVisits")}
             </p>
-            <p className="mt-2 mb-0 font-display text-[2rem] font-bold leading-none text-ink">
+            <p className="mt-2 mb-0 font-display text-[2rem] leading-snug font-bold text-ink">
               {visitCount}
             </p>
           </article>
@@ -40,7 +40,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
             <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">
               {portal("statNotices")}
             </p>
-            <p className="mt-2 mb-0 font-display text-[2rem] font-bold leading-none text-ink">
+            <p className="mt-2 mb-0 font-display text-[2rem] leading-snug font-bold text-ink">
               {noticeCount}
             </p>
           </article>

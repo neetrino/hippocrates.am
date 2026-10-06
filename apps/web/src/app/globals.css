@@ -69,17 +69,19 @@
   h2,
   h3 {
     margin: 0;
+    overflow: visible;
     font-family: var(--font-display);
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.35;
     color: var(--color-ink);
+    overflow-wrap: break-word;
     text-wrap: balance;
   }
 
   h1 {
     font-size: clamp(2.15rem, 4.2vw, 3.65rem);
     font-weight: 700;
-    line-height: 1.12;
+    line-height: 1.28;
     letter-spacing: -0.018em;
   }
 
@@ -91,6 +93,14 @@
   h3 {
     font-size: 1.15rem;
     letter-spacing: -0.01em;
+  }
+
+  p,
+  li,
+  label,
+  button,
+  a {
+    overflow-wrap: break-word;
   }
 
   p {

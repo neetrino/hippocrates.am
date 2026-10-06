@@ -83,7 +83,7 @@ function EmptyNext({ title, hint }: { title: string; hint: string }) {
 function ReviewLine({ clinic, label }: { clinic: string; label: string }) {
   return (
     <Link href="/me/visits" className={`${card} flex items-center justify-between gap-3 px-5 py-3.5`}>
-      <span className="min-w-0 truncate text-sm text-ink">{clinic}</span>
+      <span className="min-w-0 break-words text-sm text-ink">{clinic}</span>
       <span className="shrink-0 text-sm font-semibold text-accent">{label}</span>
     </Link>
   );
@@ -106,7 +106,7 @@ function NextVisit({
   return (
     <Link href="/me/visits" className={`${card} block px-5 py-5 transition-shadow duration-160 hover:shadow-accent`}>
       <p className="m-0 text-sm font-semibold text-muted">{label}</p>
-      <p className="mt-2 mb-0 font-display text-[1.65rem] leading-tight font-bold text-ink">{serviceName}</p>
+      <p className="mt-2 mb-0 font-display text-[1.65rem] leading-snug font-bold text-ink">{serviceName}</p>
       <p className="mt-2 mb-0 text-ink">
         {formatVisitDate(visit.startsAt, locale)} · {formatTime(visit.startsAt)}
       </p>

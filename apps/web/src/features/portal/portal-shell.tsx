@@ -143,7 +143,7 @@ function NavLink({
       >
         {item.icon}
       </span>
-      <span className="truncate">{item.label}</span>
+      <span className="min-w-0 break-words">{item.label}</span>
       {item.badge && item.badge > 0 ? (
         <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[0.72rem] font-bold text-white">
           {item.badge}
@@ -188,7 +188,7 @@ function SidebarNav({
           }}
           className="inline-flex flex-col gap-1.5"
         >
-          <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">Hippocrates</span>
+          <span className="font-display text-[1.75rem] leading-snug font-bold tracking-[-0.02em] text-white">Hippocrates</span>
           <p className={plainLabels ? "m-0 text-sm font-medium text-white/70" : "m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase"}>{subtitle}</p>
         </Link>
       </div>
@@ -262,7 +262,7 @@ function PortalHeader({
         {portrait}
         <div className="min-w-0">
           {eyebrow ? <p className={eyebrowClass}>{eyebrow}</p> : null}
-          <h1 className="truncate text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
+          <h1 className="break-words text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
         </div>
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-2.5">

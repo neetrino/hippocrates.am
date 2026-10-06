@@ -176,7 +176,7 @@ export function SettingsPhoto({
         </button>
         <div className="min-w-0">
           <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-accent uppercase">{roleLabel}</p>
-          <p className="m-0 truncate font-display text-[1.45rem] leading-tight font-bold text-ink">{name}</p>
+          <p className="m-0 font-display text-[1.45rem] leading-snug font-bold break-words text-ink">{name}</p>
         </div>
         </div>
         {action}

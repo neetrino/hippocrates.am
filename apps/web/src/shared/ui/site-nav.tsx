@@ -131,7 +131,7 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
               active ? "font-semibold text-accent" : "text-muted hover:text-accent",
             )}
           >
-            <span className="relative leading-none">
+            <span className="relative leading-snug">
               {item.label}
               <span
                 aria-hidden="true"

@@ -93,7 +93,7 @@ function VisitCard({ visit, rail, quiet }: { visit: VisitRow; rail: string; quie
         <p className={`m-0 text-sm font-medium ${quiet ? "text-muted" : "text-ink/70"}`}>
           {visit.date}
         </p>
-        <p className={`mt-1 mb-0 font-display text-[1.45rem] leading-none font-bold ${quiet ? "text-muted line-through decoration-danger/50" : "text-ink"}`}>
+        <p className={`mt-1 mb-0 font-display text-[1.45rem] leading-snug font-bold ${quiet ? "text-muted line-through decoration-danger/50" : "text-ink"}`}>
           {visit.time}
         </p>
       </div>

@@ -86,7 +86,7 @@ export function DoctorTile({ doctor }: { doctor: DoctorCard }) {
             <p className="m-0 mt-1 text-[0.9rem] leading-snug text-muted">{doctor.specialty}</p>
             <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[0.78rem] font-semibold tracking-[0.01em] text-accent">
               <ClinicIcon />
-              <span className="truncate">{doctor.clinic.name}</span>
+              <span className="min-w-0 break-words">{doctor.clinic.name}</span>
             </span>
           </div>
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition-[background,transform] duration-300 group-hover:bg-accent group-hover:scale-105">

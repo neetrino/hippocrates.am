@@ -202,6 +202,7 @@ model Notification {
   userId        String
   appointmentId String?
   body          String
+  dedupeKey     String?  @unique
   readAt        DateTime?
   createdAt     DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)

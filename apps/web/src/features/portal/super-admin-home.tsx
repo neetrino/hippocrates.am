@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { AdminPortalShell } from "@/features/portal/admin-portal-shell";
 import { Link } from "@/i18n/navigation";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
-import { asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
+import { asVisitStatus, formatWhen } from "@/shared/format";
 import { noticeMessageKey } from "@/shared/notice-text";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
@@ -90,8 +90,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
                       {clinicDisplayName(item.clinic, locale)} · {doctorDisplayName(item.doctor, locale)}
                     </p>
                     <p className="m-0">
-                      {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} ·{" "}
-                      {common("price", { amount: formatAmount(item.priceAmd) })}
+                      {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status}
                     </p>
                   </article>
                 );

@@ -43,6 +43,7 @@ type PortalShellProps = {
   navLabel?: string;
   action?: ReactNode;
   portrait?: ReactNode;
+  plainLabels?: boolean;
 };
 
 function localeNeutralPath(pathname: string): string {
@@ -100,14 +101,20 @@ function usePortalChrome(): void {
   }, []);
 }
 
+function navText(plain: boolean): string {
+  return plain ? "text-[0.95rem] font-semibold tracking-normal" : "text-[0.82rem] font-semibold tracking-[0.06em] uppercase";
+}
+
 function NavLink({
   item,
   active,
+  plain,
   onNavigate,
   onActivate,
 }: {
   item: PortalNavItem;
   active: boolean;
+  plain: boolean;
   onNavigate?: () => void;
   onActivate?: (item: PortalNavItem) => void;
 }) {
@@ -120,7 +127,8 @@ function NavLink({
       }}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex w-full items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 text-[0.82rem] font-semibold tracking-[0.06em] uppercase transition-[background,color,box-shadow] duration-200",
+        "group flex w-full items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 transition-[background,color,box-shadow] duration-200",
+        navText(plain),
         active
           ? "-mr-3 rounded-r-none bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
           : "mr-0 text-white/78 hover:bg-white/10 hover:text-white",
@@ -152,6 +160,7 @@ function SidebarNav({
   homeHref,
   subtitle,
   navLabel,
+  plainLabels,
   onNavigate,
   onActivate,
 }: {
@@ -162,6 +171,7 @@ function SidebarNav({
   homeHref: PortalHref;
   subtitle: string;
   navLabel: string;
+  plainLabels: boolean;
   onNavigate?: () => void;
   onActivate?: (item: PortalNavItem) => void;
 }) {
@@ -178,7 +188,7 @@ function SidebarNav({
           className="inline-flex flex-col gap-1.5"
         >
           <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">Hippocrates</span>
-          <p className="m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase">{subtitle}</p>
+          <p className={plainLabels ? "m-0 text-sm font-medium text-white/70" : "m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase"}>{subtitle}</p>
         </Link>
       </div>
       <nav className="grid flex-1 content-start gap-1" aria-label={navLabel}>
@@ -186,6 +196,7 @@ function SidebarNav({
           <NavLink
             key={`${item.href}-${item.hash ?? "root"}`}
             item={item}
+            plain={plainLabels}
             active={isItemActive(pathname, hash, item)}
             onNavigate={onNavigate}
             onActivate={onActivate}
@@ -197,12 +208,13 @@ function SidebarNav({
           <NavLink
             key={`${item.href}-${item.hash ?? "root"}`}
             item={item}
+            plain={plainLabels}
             active={isItemActive(pathname, hash, item)}
             onNavigate={onNavigate}
             onActivate={onActivate}
           />
         ))}
-        <LogoutButton className="mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-[0.82rem] font-semibold tracking-[0.06em] text-white/78 uppercase transition-colors duration-200 hover:bg-white/10 hover:text-white" />
+        <LogoutButton className={cn("mt-1 flex w-full cursor-pointer items-center justify-start gap-3 rounded-l-full border-0 bg-transparent py-2.5 pr-4 pl-3.5 text-left text-white/78 transition-colors duration-200 hover:bg-white/10 hover:text-white", navText(plainLabels))} />
       </nav>
     </div>
   );
@@ -213,6 +225,7 @@ function PortalHeader({
   title,
   action,
   portrait,
+  plainLabels,
   open,
   menuId,
   onOpen,
@@ -221,14 +234,18 @@ function PortalHeader({
   title: string;
   action?: ReactNode;
   portrait?: ReactNode;
+  plainLabels: boolean;
   open: boolean;
   menuId: string;
   onOpen: () => void;
 }) {
   const t = useTranslations("portal");
+  const eyebrowClass = plainLabels
+    ? "m-0 text-xs font-semibold text-accent"
+    : "m-0 text-[0.72rem] font-semibold tracking-[0.12em] text-accent uppercase";
   return (
-    <header className="flex items-center justify-between gap-3 px-4 pt-4 pb-2 md:px-7 md:pt-6">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="flex flex-wrap items-center gap-x-3 gap-y-3 px-4 pt-4 pb-2 md:px-7 md:pt-6">
+      <div className="flex min-w-[min(100%,16rem)] flex-1 items-center gap-3">
         <button
           type="button"
           className="grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-full border border-line bg-white text-ink md:hidden"
@@ -241,11 +258,11 @@ function PortalHeader({
         </button>
         {portrait}
         <div className="min-w-0">
-          <p className="m-0 text-[0.72rem] font-semibold tracking-[0.12em] text-accent uppercase">{eyebrow}</p>
+          {eyebrow ? <p className={eyebrowClass}>{eyebrow}</p> : null}
           <h1 className="truncate text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-2.5">
+      <div className="ml-auto flex shrink-0 items-center gap-2.5">
         {action}
         <LocaleSwitch />
       </div>
@@ -253,7 +270,7 @@ function PortalHeader({
   );
 }
 
-export function PortalShell({ children, title, eyebrow, subtitle, homeHref, items, footerItems, navLabel, action, portrait }: PortalShellProps) {
+export function PortalShell({ children, title, eyebrow, subtitle, homeHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
   const t = useTranslations("portal");
   const pathname = localeNeutralPath(usePathname());
   const [hash, activate] = usePortalHash(pathname);
@@ -279,6 +296,7 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, item
     homeHref,
     subtitle,
     navLabel: navLabel ?? t("navLabel"),
+    plainLabels,
     onActivate: activate,
   };
 
@@ -299,7 +317,7 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, item
         </div>
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
-        <PortalHeader eyebrow={eyebrow} title={title} action={action} portrait={portrait} open={open} menuId={menuId} onOpen={() => setOpen(true)} />
+        <PortalHeader eyebrow={eyebrow} title={title} action={action} portrait={portrait} plainLabels={plainLabels} open={open} menuId={menuId} onOpen={() => setOpen(true)} />
         <div className="scrollbar-soft min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-8 md:px-7">{children}</div>
       </div>
     </div>

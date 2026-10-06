@@ -6,7 +6,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { formatWhen } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
-import { noticeMessageKey } from "@/shared/notice-text";
+import { noticeMessageKey, type NoticeMessageKey } from "@/shared/notice-text";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
@@ -47,7 +47,7 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
 function toRow(
   notice: NoticeItem,
   locale: string,
-  t: (key: "noticeRequested" | "noticeConfirmed" | "noticeCancelled" | "noticeRescheduled" | "noticeCompleted") => string,
+  t: (key: NoticeMessageKey) => string,
   arrivedLabel: string,
 ): NoticeRow {
   const messageKey = noticeMessageKey(notice.body);

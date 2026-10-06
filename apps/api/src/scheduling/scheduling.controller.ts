@@ -5,12 +5,17 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Public, Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { closeExpiredRequests } from "../appointments/close-expired";
+import { NotificationsService } from "../notifications/notifications.service";
 import { daySlots, openWindows } from "./slots";
 import { windowsFrom } from "./windows";
 
 @Controller()
 export class SchedulingController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notices: NotificationsService,
+  ) {}
 
   @Post("clinics/:clinicId/doctors/:doctorId/windows")
   @Roles("ADMIN")
@@ -83,6 +88,7 @@ export class SchedulingController {
       include: { clinic: { include: { windows: true } }, doctor: { include: { windows: true } } },
     });
     if (!offering) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");
+    await closeExpiredRequests(this.prisma, this.notices);
     const dayStart = new Date(`${date}T00:00:00.000Z`);
     const dayEnd = new Date(dayStart.getTime() + 48 * 60 * 60_000);
     const [appointments, exceptions] = await Promise.all([

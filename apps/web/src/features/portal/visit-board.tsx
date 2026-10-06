@@ -19,7 +19,7 @@ export async function VisitBoard({ visits, locale }: { visits: AppointmentCard[]
 
   const groups = groupVisits(visits);
   const sections: { tone: Tone; title: string; items: AppointmentCard[] }[] = [
-    { tone: "waiting", title: common("REQUESTED"), items: groups.waiting },
+    { tone: "waiting", title: me("upcoming"), items: groups.waiting },
     { tone: "completed", title: common("COMPLETED"), items: groups.completed },
     { tone: "cancelled", title: common("CANCELLED"), items: groups.cancelled },
   ];
@@ -60,5 +60,6 @@ function toRow(
     statusLabel: status ? common(status) : visit.status,
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
     needsReview: visit.status === "COMPLETED" && !visit.review,
+    startsAt: visit.startsAt,
   };
 }

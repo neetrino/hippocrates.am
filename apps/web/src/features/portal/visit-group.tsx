@@ -4,15 +4,16 @@ import { useState } from "react";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
 import { visitPreviewLimit } from "@/features/portal/visit-order";
 import { ReviewForm } from "@/features/portal/review-form";
-import { asVisitStatus, type VisitStatus } from "@/shared/format";
+import { visitStatusClass } from "@/features/portal/visit-status-style";
+import { asVisitStatus } from "@/shared/format";
 
 type Tone = keyof typeof visitPreviewLimit;
 
 const toneClass: Record<Tone, { band: string; count: string; rail: string }> = {
   waiting: {
-    band: "bg-accent text-white",
-    count: "bg-white/20 text-white",
-    rail: "border-l-accent",
+    band: "bg-waiting text-waiting-ink",
+    count: "bg-white/70 text-waiting-ink",
+    rail: "border-l-waiting",
   },
   completed: {
     band: "bg-[#2a4a47] text-white",
@@ -26,13 +27,6 @@ const toneClass: Record<Tone, { band: string; count: string; rail: string }> = {
   },
 };
 
-const pillClass: Record<VisitStatus, string> = {
-  REQUESTED: "bg-accent-soft text-accent",
-  CONFIRMED: "bg-accent text-white",
-  COMPLETED: "bg-white text-ink",
-  CANCELLED: "bg-danger/10 text-danger",
-};
-
 export type VisitRow = {
   id: string;
   status: string;
@@ -43,6 +37,7 @@ export type VisitRow = {
   statusLabel: string;
   price: string;
   needsReview: boolean;
+  startsAt: string;
 };
 
 export function VisitGroup({
@@ -67,7 +62,7 @@ export function VisitGroup({
   return (
     <section className={`overflow-hidden rounded-[1.6rem] bg-white shadow-soft ${tone === "cancelled" ? "ring-1 ring-danger/15" : ""}`}>
       <header className={`flex items-center justify-between px-5 py-4 ${toneStyle.band}`}>
-        <h2 className="m-0 text-[0.78rem] font-bold tracking-[0.14em] uppercase">{title}</h2>
+        <h2 className="m-0 text-sm font-semibold">{title}</h2>
         <span className={`grid h-7 min-w-7 place-items-center rounded-full px-2 text-sm font-bold ${toneStyle.count}`}>{visits.length}</span>
       </header>
       <div className="grid gap-3 p-4">
@@ -95,7 +90,7 @@ function VisitCard({ visit, rail, quiet }: { visit: VisitRow; rail: string; quie
   return (
     <article className={`grid gap-3 rounded-[1.15rem] border border-line border-l-4 bg-sand/70 px-4 py-4 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:items-start ${rail}`}>
       <div>
-        <p className={`m-0 text-[0.72rem] font-semibold tracking-wide uppercase ${quiet ? "text-muted" : "text-ink/70"}`}>
+        <p className={`m-0 text-sm font-medium ${quiet ? "text-muted" : "text-ink/70"}`}>
           {visit.date}
         </p>
         <p className={`mt-1 mb-0 font-display text-[1.45rem] leading-none font-bold ${quiet ? "text-muted line-through decoration-danger/50" : "text-ink"}`}>
@@ -106,12 +101,12 @@ function VisitCard({ visit, rail, quiet }: { visit: VisitRow; rail: string; quie
         <strong className={quiet ? "text-muted" : "text-ink"}>{visit.service}</strong>
         <p className="m-0 text-sm text-muted">{visit.place}</p>
         <p className="m-0 flex flex-wrap items-center gap-2">
-          <span className={`inline-flex rounded-full px-2.5 py-1 text-[0.78rem] font-semibold ${status ? pillClass[status] : "bg-white text-ink"}`}>
+          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${status ? visitStatusClass[status] : "bg-sand text-ink"}`}>
             {visit.statusLabel}
           </span>
-          <span className="text-sm text-muted">{visit.price}</span>
+          <span className="text-xs text-muted">{visit.price}</span>
         </p>
-        <AppointmentActions id={visit.id} status={visit.status} mode="patient" />
+        <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode="patient" />
         {visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
     </article>

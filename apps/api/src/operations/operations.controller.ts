@@ -4,21 +4,28 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Controller()
 export class OperationsController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notices: NotificationsService,
+  ) {}
 
   @Get("clinics/:clinicId/dashboard")
   @Roles("ADMIN")
   async dashboard(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
+    const now = new Date();
+    await closeExpiredRequests(this.prisma, this.notices, now);
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     const end = new Date(start.getTime() + 24 * 60 * 60_000);
     const [pending, today, patients] = await Promise.all([
-      this.prisma.appointment.count({ where: { clinicId, status: "REQUESTED" } }),
+      this.prisma.appointment.count({ where: { clinicId, status: "REQUESTED", startsAt: { gt: now } } }),
       this.prisma.appointment.count({ where: { clinicId, startsAt: { gte: start, lt: end } } }),
       this.prisma.appointment.findMany({
         where: { clinicId },
@@ -52,7 +59,14 @@ export class OperationsController {
     const appointments = await this.prisma.appointment.findMany({
       where: { clinicId, patientId },
       orderBy: { startsAt: "desc" },
-      select: { id: true, startsAt: true, status: true, priceAmd: true, isEstimate: true },
+      select: {
+        id: true,
+        startsAt: true,
+        status: true,
+        priceAmd: true,
+        isEstimate: true,
+        offering: { select: { name: true } },
+      },
     });
     if (appointments.length === 0) throw new AppError("NOT_FOUND", 404, "Պացիենտը չի գտնվել");
     const patient = await this.prisma.user.findUnique({

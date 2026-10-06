@@ -12,7 +12,17 @@ import { publicGet } from "@/shared/public-api";
 import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
-type Notice = { id: string; body: string; createdAt: string; readAt: string | null };
+type Notice = {
+  id: string;
+  body: string;
+  createdAt: string;
+  readAt: string | null;
+  appointment: {
+    startsAt: string;
+    clinic: { name: string; locales?: { locale: string; name: string }[] };
+    doctor: { user: { displayName: string }; locales?: { locale: string; name: string }[] };
+  } | null;
+};
 
 export default async function MePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -93,16 +103,20 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
         {notices.length === 0 ? <p className="m-0 text-muted">{t("noNotices")}</p> : null}
         {notices.map((notice) => {
           const messageKey = noticeMessageKey(notice.body);
+          const visit = notice.appointment;
+          const context = visit
+            ? `${clinicDisplayName(visit.clinic, displayLocale)} · ${doctorDisplayName(visit.doctor, displayLocale)} · ${formatWhen(visit.startsAt, displayLocale)}`
+            : "";
           return (
-            <p
-              className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5"
-              key={notice.id}
-            >
-              <span>{messageKey ? t(messageKey) : notice.body}</span>
-              <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
-                {formatWhen(notice.createdAt, displayLocale)}
-              </time>
-            </p>
+            <div className="grid gap-1 rounded-[14px] border border-line bg-white px-4 py-3.5" key={notice.id}>
+              <div className="flex items-center justify-between gap-3">
+                <span>{messageKey ? t(messageKey) : notice.body}</span>
+                <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
+                  {formatWhen(notice.createdAt, displayLocale)}
+                </time>
+              </div>
+              {context ? <p className="m-0 text-sm text-muted">{context}</p> : null}
+            </div>
           );
         })}
       </section>

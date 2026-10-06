@@ -4,7 +4,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
   DashboardIcon,
-  FavoritesIcon,
   NoticesIcon,
   QuestionsIcon,
   ReviewsIcon,
@@ -54,12 +53,11 @@ export function PatientPortalShell({ children, title, eyebrow, action, portrait 
   const items: PortalNavItem[] = [
     { href: "/me", label: t("dashboard"), icon: <DashboardIcon />, match: "exact" },
     { href: "/me/visits", label: me("visits"), icon: <VisitsIcon />, match: "exact" },
-    { href: "/me/favorites", label: me("favorites"), icon: <FavoritesIcon />, match: "exact" },
+    { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact", badge: unreadNotices },
     { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "exact" },
     { href: "/me/reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "exact" },
   ];
   const footerItems: PortalNavItem[] = [
-    { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact", badge: unreadNotices },
     { href: "/me/settings", label: me("settings"), icon: <SettingsIcon />, match: "exact" },
   ];
 
@@ -74,6 +72,7 @@ export function PatientPortalShell({ children, title, eyebrow, action, portrait 
       eyebrow={eyebrow}
       action={action}
       portrait={portrait}
+      plainLabels
     >
       {children}
     </PortalShell>

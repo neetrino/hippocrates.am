@@ -6,8 +6,11 @@ export const appointmentNotice = {
   requested: "notice.requested",
   confirmed: "notice.confirmed",
   cancelled: "notice.cancelled",
+  expired: "notice.expired",
   rescheduled: "notice.rescheduled",
   completed: "notice.completed",
+  reminderDay: "notice.reminderDay",
+  reminderHour: "notice.reminderHour",
 } as const;
 
 @Injectable()

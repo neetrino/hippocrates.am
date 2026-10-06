@@ -63,6 +63,31 @@ export function NoticesIcon(props: IconProps) {
   );
 }
 
+export function FavoritesIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M12 19.2s-6.2-3.9-6.2-8.1A3.4 3.4 0 0 1 12 8.6a3.4 3.4 0 0 1 6.2 2.5c0 4.2-6.2 8.1-6.2 8.1z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </BaseIcon>
+  );
+}
+
+export function ReviewsIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M12 4.5l1.8 3.7 4.1.6-3 2.9.7 4.1L12 13.8 8.4 15.8l.7-4.1-3-2.9 4.1-.6z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </BaseIcon>
+  );
+}
+
+export function SettingsIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 4.5v2M12 17.5v2M4.5 12h2M17.5 12h2M6.7 6.7l1.4 1.4M15.9 15.9l1.4 1.4M17.3 6.7l-1.4 1.4M8.1 15.9l-1.4 1.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </BaseIcon>
+  );
+}
+
 export function MenuIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

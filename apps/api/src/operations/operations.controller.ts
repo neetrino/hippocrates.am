@@ -1,23 +1,31 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { closeExpiredRequests } from "../appointments/close-expired";
+import { readNoticeIds } from "../notifications/notice-ids";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Controller()
 export class OperationsController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notices: NotificationsService,
+  ) {}
 
   @Get("clinics/:clinicId/dashboard")
   @Roles("ADMIN")
   async dashboard(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
+    const now = new Date();
+    await closeExpiredRequests(this.prisma, this.notices, now);
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     const end = new Date(start.getTime() + 24 * 60 * 60_000);
     const [pending, today, patients] = await Promise.all([
-      this.prisma.appointment.count({ where: { clinicId, status: "REQUESTED" } }),
+      this.prisma.appointment.count({ where: { clinicId, status: "REQUESTED", startsAt: { gt: now } } }),
       this.prisma.appointment.count({ where: { clinicId, startsAt: { gte: start, lt: end } } }),
       this.prisma.appointment.findMany({
         where: { clinicId },
@@ -51,7 +59,14 @@ export class OperationsController {
     const appointments = await this.prisma.appointment.findMany({
       where: { clinicId, patientId },
       orderBy: { startsAt: "desc" },
-      select: { id: true, startsAt: true, status: true, priceAmd: true, isEstimate: true },
+      select: {
+        id: true,
+        startsAt: true,
+        status: true,
+        priceAmd: true,
+        isEstimate: true,
+        offering: { select: { name: true } },
+      },
     });
     if (appointments.length === 0) throw new AppError("NOT_FOUND", 404, "Պացիենտը չի գտնվել");
     const patient = await this.prisma.user.findUnique({
@@ -85,6 +100,49 @@ export class OperationsController {
       where: { userId: actor.id },
       orderBy: { createdAt: "desc" },
       take: 50,
+      select: {
+        id: true,
+        body: true,
+        createdAt: true,
+        readAt: true,
+        appointment: {
+          select: {
+            startsAt: true,
+            clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
+            doctor: {
+              select: {
+                user: { select: { displayName: true } },
+                locales: { select: { locale: true, name: true } },
+              },
+            },
+          },
+        },
+      },
     });
+  }
+
+  @Post("me/notifications/read")
+  async readNotifications(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
+    await this.prisma.notification.updateMany({
+      where: { userId: actor.id, readAt: null },
+      data: { readAt: new Date() },
+    });
+    return { ok: true };
+  }
+
+  @Delete("me/notifications")
+  async deleteNotifications(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ deleted: number }> {
+    const result = await this.prisma.notification.deleteMany({
+      where: { userId: actor.id, id: { in: readNoticeIds(body) } },
+    });
+    return { deleted: result.count };
+  }
+
+  @Delete("me/notifications/read")
+  async deleteReadNotifications(@CurrentActor() actor: Actor): Promise<{ deleted: number }> {
+    const result = await this.prisma.notification.deleteMany({
+      where: { userId: actor.id, readAt: { not: null } },
+    });
+    return { deleted: result.count };
   }
 }

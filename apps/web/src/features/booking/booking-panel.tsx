@@ -1,49 +1,60 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import type { TimeSlot } from "@/features/booking/initial-slots";
+import { localizedServiceName } from "@/shared/service-name";
 import { formatAmount, formatTime } from "@/shared/format";
 import type { OfferingCard } from "@/shared/public-types";
 import { cn } from "@/shared/ui/cn";
 
-type SlotResponse = { data: { startsAt: string[] } };
+type SlotResponse = { data: { startsAt: string[]; slots?: TimeSlot[] } };
+type Tone = "muted" | "success" | "danger";
 
 function todayIso(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Yerevan" }).format(new Date());
 }
 
-export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingCard[]; initialSlots: string[] }) {
+function slotsFrom(body: SlotResponse): TimeSlot[] {
+  if (body.data.slots) return body.data.slots;
+  return body.data.startsAt.map((startsAt) => ({ startsAt, busy: false }));
+}
+
+export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingCard[]; initialSlots: TimeSlot[] }) {
   const t = useTranslations("booking");
   const common = useTranslations("common");
+  const services = useTranslations("services");
   const [offeringId, setOfferingId] = useState(offerings[0]?.id ?? "");
   const [date, setDate] = useState(todayIso());
   const [slots, setSlots] = useState(initialSlots);
   const [selected, setSelected] = useState("");
   const [message, setMessage] = useState(initialSlots.length === 0 ? t("noSlots") : "");
+  const [tone, setTone] = useState<Tone>("muted");
   const [pending, setPending] = useState(false);
-  const router = useRouter();
   const offering = offerings.find((item) => item.id === offeringId);
 
-  async function loadSlots(nextOfferingId: string, nextDate: string): Promise<void> {
+  async function loadSlots(nextOfferingId: string, nextDate: string): Promise<TimeSlot[]> {
     const next = offerings.find((item) => item.id === nextOfferingId);
-    if (!next || !nextDate) return;
+    if (!next || !nextDate) return [];
     const params = new URLSearchParams({ doctorId: next.doctorId, offeringId: next.id, date: nextDate });
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/public/availability?${params}`);
     if (!response.ok) {
+      setTone("danger");
       setMessage(t("slotsFailed"));
-      return;
+      return [];
     }
     const body = (await response.json()) as SlotResponse;
+    const nextSlots = slotsFrom(body);
     setSelected("");
-    setSlots(body.data.startsAt);
-    setMessage(body.data.startsAt.length === 0 ? t("noSlots") : "");
+    setSlots(nextSlots);
+    setTone("muted");
+    setMessage(nextSlots.length === 0 ? t("noSlots") : "");
+    return nextSlots;
   }
 
   async function book(): Promise<void> {
     if (!offering || !selected) return;
     setPending(true);
-    setMessage("");
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/appointments`, {
       method: "POST",
       credentials: "include",
@@ -52,25 +63,29 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
     });
     setPending(false);
     if (response.status === 401 || response.status === 403) {
+      setTone("danger");
       setMessage(t("signIn"));
       return;
     }
     if (!response.ok) {
+      await loadSlots(offering.id, date);
+      setTone("danger");
       setMessage(t("taken"));
       return;
     }
-    router.push("/me");
-    router.refresh();
+    await loadSlots(offering.id, date);
+    setTone("success");
+    setMessage(t("booked"));
   }
 
   if (!offering) return <p className="m-0 text-muted">{t("noService")}</p>;
 
   const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
   const controlClass =
-    "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
+    "w-full min-w-0 max-w-full rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 
   return (
-    <div className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft">
+    <div className="grid min-w-0 gap-3.5 overflow-hidden rounded-card border border-line bg-white p-5 shadow-soft">
       <h2>{t("title")}</h2>
       <label className={fieldClass}>
         {t("service")}
@@ -85,7 +100,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
           {offerings.map((item) => (
             <option key={item.id} value={item.id}>
               {item.doctor ? `${item.doctor.user.displayName} · ` : ""}
-              {item.name} · {common("price", { amount: formatAmount(item.priceAmd) })}
+              {localizedServiceName(item.name, services)} · {common("price", { amount: formatAmount(item.priceAmd) })}
             </option>
           ))}
         </select>
@@ -105,23 +120,26 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
       </label>
       <div className="flex flex-wrap gap-2">
         {slots.map((slot) => (
-          <button
-            key={slot}
-            type="button"
-            className={cn(
-              "cursor-pointer rounded-full border border-line bg-white px-3 py-2",
-              selected === slot && "border-accent bg-accent text-white",
-            )}
-            aria-pressed={selected === slot}
-            onClick={() => setSelected(slot)}
-          >
-            {formatTime(slot)}
-          </button>
+          <TimeButton
+            key={slot.startsAt}
+            slot={slot}
+            selected={selected === slot.startsAt}
+            busyLabel={t("busy")}
+            onSelect={(startsAt) => {
+              setSelected(startsAt);
+              setTone("muted");
+              setMessage("");
+            }}
+          />
         ))}
       </div>
-      {message ? <p className="m-0 text-muted">{message}</p> : null}
+      {message ? (
+        <p className={cn("m-0", tone === "success" && "text-accent", tone === "danger" && "text-danger", tone === "muted" && "text-muted")}>
+          {message}
+        </p>
+      ) : null}
       <button
-        className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:cursor-not-allowed disabled:opacity-55"
+        className="inline-flex w-full cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:cursor-not-allowed disabled:opacity-55"
         type="button"
         disabled={!selected || pending}
         onClick={() => void book()}
@@ -129,5 +147,36 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
         {t("book")}
       </button>
     </div>
+  );
+}
+
+function TimeButton({
+  slot,
+  selected,
+  busyLabel,
+  onSelect,
+}: {
+  slot: TimeSlot;
+  selected: boolean;
+  busyLabel: string;
+  onSelect: (startsAt: string) => void;
+}) {
+  const time = formatTime(slot.startsAt);
+  return (
+    <button
+      type="button"
+      disabled={slot.busy}
+      aria-pressed={!slot.busy && selected}
+      aria-label={slot.busy ? `${time}, ${busyLabel}` : time}
+      className={cn(
+        "inline-flex h-10 w-[4.75rem] shrink-0 items-center justify-center rounded-full border text-sm tabular-nums disabled:opacity-100",
+        slot.busy && "cursor-not-allowed border-danger/35 bg-danger/10 text-danger line-through",
+        !slot.busy && selected && "border-accent bg-accent text-white",
+        !slot.busy && !selected && "cursor-pointer border-line bg-white text-ink",
+      )}
+      onClick={() => onSelect(slot.startsAt)}
+    >
+      {time}
+    </button>
   );
 }

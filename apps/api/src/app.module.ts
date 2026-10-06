@@ -14,6 +14,7 @@ import { SessionService } from "./identity/session.service";
 import { PrismaModule } from "./infrastructure/prisma.module";
 import { MarketplaceController } from "./marketplace/marketplace.controller";
 import { NotificationsService } from "./notifications/notifications.service";
+import { VisitRemindersService } from "./notifications/visit-reminders.service";
 import { OperationsController } from "./operations/operations.controller";
 import { QuestionsController } from "./questions/questions.controller";
 import { ReviewsController } from "./reviews/reviews.controller";
@@ -38,6 +39,7 @@ import { SchedulingController } from "./scheduling/scheduling.controller";
     SessionService,
     RateLimitService,
     NotificationsService,
+    VisitRemindersService,
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_INTERCEPTOR, useClass: RequestLogInterceptor },
   ],

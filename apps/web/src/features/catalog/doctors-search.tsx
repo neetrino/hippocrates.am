@@ -9,6 +9,9 @@ export type DoctorFilterOptions = {
   specialties: string[];
   cities: string[];
   clinics: string[];
+  specialtyLabels?: Record<string, string>;
+  cityLabels?: Record<string, string>;
+  clinicLabels?: Record<string, string>;
 };
 
 type DoctorsSearchProps = {
@@ -147,6 +150,7 @@ export function DoctorsSearch({
             label={labels.specialty}
             name="specialty"
             options={options.specialties}
+            labelsByValue={options.specialtyLabels}
             selected={specialty}
             onChange={setSpecialty}
             placeholder={labels.specialty}
@@ -157,6 +161,7 @@ export function DoctorsSearch({
             label={labels.city}
             name="city"
             options={options.cities}
+            labelsByValue={options.cityLabels}
             selected={city}
             onChange={setCity}
             placeholder={labels.city}
@@ -167,6 +172,7 @@ export function DoctorsSearch({
             label={labels.clinic}
             name="clinic"
             options={options.clinics}
+            labelsByValue={options.clinicLabels}
             selected={clinic}
             onChange={setClinic}
             placeholder={labels.clinic}

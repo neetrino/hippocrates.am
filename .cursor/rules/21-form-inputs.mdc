@@ -8,10 +8,11 @@ alwaysApply: false
 
 ## Phone fields
 
-- Allow digits and an optional leading `+` only. Strip letters and other symbols on input.
-- Prefer the shared `PhoneField` + `buildPhoneNumber` pattern (`+374` prefix + local digits) over a free-text phone with a `+374…` placeholder.
-- Do not put the dial code inside the editable placeholder when a fixed prefix UI is used — that causes overlapping `+` / placeholder visuals.
+- Allow digits only in the local part. Strip letters and other symbols on input.
+- Prefer the shared `PhoneField`: fixed `+374` prefix and exactly 8 local digits.
+- Do not put the dial code inside the editable placeholder — the prefix is already shown beside the field.
 - Use `inputMode="numeric"` / `type="tel"` for the editable local part.
+- Server validation is the authority and accepts only `+374` plus 8 digits.
 
 ## Name fields
 

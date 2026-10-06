@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
-import { buildPhoneNumber, PhoneField } from "@/features/auth/phone-field";
+import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { useRouter } from "@/i18n/navigation";
 import { isNameFieldName, isPhoneFieldName, sanitizeNameInput } from "@/shared/input-constraints";
 
@@ -25,6 +25,7 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
   const [error, setError] = useState("");
   const router = useRouter();
   const t = useTranslations("common");
+  const auth = useTranslations("auth");
   const usesPhoneField = props.fields.some((field) => fieldKind(field) === "phone");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -38,8 +39,12 @@ export function JsonForm(props: { action: string; fields: Field[]; label: string
       payload[key] = /Amd|Minute|weekday|rating|duration/.test(key) ? Number(value) : value;
     }
     if (usesPhoneField) {
-      const phoneLocal = String(form.get("phoneLocal") ?? "").trim();
-      payload.phone = buildPhoneNumber(phoneLocal);
+      const phone = armeniaPhone(String(form.get("phoneLocal") ?? ""));
+      if (!phone) {
+        setError(auth("phoneInvalid"));
+        return;
+      }
+      payload.phone = phone;
     }
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1${props.action}`, {
       method: "POST",

@@ -5,9 +5,11 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
-import { NotificationsService } from "../notifications/notifications.service";
-import { bookableStarts } from "../scheduling/slots";
+import { appointmentNotice, NotificationsService } from "../notifications/notifications.service";
+import { bookableStarts, openWindows } from "../scheduling/slots";
 import { Prisma } from "../generated/prisma/client";
+import { closeExpiredRequests } from "./close-expired";
+import { rescheduleStatus, visitHasStarted } from "./visit-window";
 
 const appointmentCard = {
   id: true,
@@ -16,8 +18,8 @@ const appointmentCard = {
   priceAmd: true,
   isEstimate: true,
   offering: { select: { name: true } },
-  clinic: { select: { name: true } },
-  doctor: { select: { user: { select: { displayName: true } } } },
+  clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
+  doctor: { select: { user: { select: { displayName: true } }, locales: { select: { locale: true, name: true } } } },
   patient: { select: { displayName: true } },
   review: { select: { id: true } },
 } as const;
@@ -52,50 +54,72 @@ export class AppointmentsController {
     }
     const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
     const created = await this.insertAppointment(actor.id, offering, startsAt, endsAt, idempotencyKey);
-    await this.notices.afterAppointment(created, "Նոր ամրագրման հայտ");
+    await this.notices.afterAppointment(created, appointmentNotice.requested);
     return { id: created.id };
   }
 
   @Post(":id/confirm")
   @Roles("ADMIN")
   async confirm(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+    const now = new Date();
+    if ((await closeExpiredRequests(this.prisma, this.notices, now)).includes(id)) {
+      throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
+    }
     const appointment = await this.owned(actor, id, "REQUESTED");
-    const updated = await this.prisma.appointment.update({ where: { id: appointment.id }, data: { status: "CONFIRMED" } });
-    await this.notices.afterAppointment(updated, "Ամրագրումը հաստատված է");
+    if (visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
+    const changed = await this.prisma.appointment.updateMany({
+      where: { id: appointment.id, status: "REQUESTED", startsAt: { gt: now } },
+      data: { status: "CONFIRMED" },
+    });
+    if (changed.count !== 1) throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
+    const updated = await this.prisma.appointment.findUniqueOrThrow({ where: { id: appointment.id } });
+    await this.notices.afterAppointment(updated, appointmentNotice.confirmed);
     return { id: updated.id };
   }
 
   @Post(":id/cancel")
   async cancel(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
-    const appointment = await this.prisma.appointment.findUnique({ where: { id } });
-    if (!appointment || !["REQUESTED", "CONFIRMED"].includes(appointment.status)) {
-      throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    const now = new Date();
+    if ((await closeExpiredRequests(this.prisma, this.notices, now)).includes(id)) {
+      throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
     }
+    const appointment = await this.openVisit(id);
     const isPatient = actor.role === "PATIENT" && actor.id === appointment.patientId;
     const isAdmin = actor.role === "ADMIN" && actor.clinicId === appointment.clinicId;
     if (!isPatient && !isAdmin) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    if (isPatient && visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Այցն արդեն սկսվել է");
     const updated = await this.prisma.appointment.update({ where: { id }, data: { status: "CANCELLED" } });
-    await this.notices.afterAppointment(updated, "Ամրագրումը չեղարկված է");
+    await this.notices.afterAppointment(updated, appointmentNotice.cancelled);
     return { id: updated.id };
   }
 
   @Post(":id/complete")
   @Roles("ADMIN")
   async complete(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+    const now = new Date();
     const appointment = await this.owned(actor, id, "CONFIRMED");
-    const updated = await this.prisma.appointment.update({ where: { id: appointment.id }, data: { status: "COMPLETED" } });
+    if (!visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_NOT_STARTED", 409, "Այցը դեռ չի սկսվել");
+    const changed = await this.prisma.appointment.updateMany({
+      where: { id: appointment.id, status: "CONFIRMED", startsAt: { lte: now } },
+      data: { status: "COMPLETED" },
+    });
+    if (changed.count !== 1) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    const updated = await this.prisma.appointment.findUniqueOrThrow({ where: { id: appointment.id } });
+    await this.notices.afterAppointment(updated, appointmentNotice.completed);
     return { id: updated.id };
   }
 
   @Post(":id/reschedule")
   async reschedule(@CurrentActor() actor: Actor, @Param("id") id: string, @Body() body: unknown): Promise<{ id: string }> {
-    const appointment = await this.prisma.appointment.findUnique({ where: { id } });
-    if (!appointment || !["REQUESTED", "CONFIRMED"].includes(appointment.status)) {
-      throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    const now = new Date();
+    if ((await closeExpiredRequests(this.prisma, this.notices, now)).includes(id)) {
+      throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
     }
+    const appointment = await this.openVisit(id);
     const isPatient = actor.role === "PATIENT" && actor.id === appointment.patientId;
     const isAdmin = actor.role === "ADMIN" && actor.clinicId === appointment.clinicId;
     if (!isPatient && !isAdmin) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    if (isPatient && visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Այցն արդեն սկսվել է");
     const startsAt = new Date(requiredString(recordOf(body).startsAt, "Ժամ"));
     const offering = await this.loadOffering(appointment.offeringId);
     const isoDate = clinicDate(startsAt, offering.clinic.timeZone);
@@ -104,13 +128,15 @@ export class AppointmentsController {
       throw new AppError("SLOT_UNAVAILABLE", 409, "Այդ ժամը ազատ չէ");
     }
     const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
-    const updated = await this.prisma.appointment.update({ where: { id }, data: { startsAt, endsAt } });
-    await this.notices.afterAppointment(updated, "Ամրագրումը տեղափոխված է");
+    const status = rescheduleStatus(isPatient, appointment.status as "REQUESTED" | "CONFIRMED");
+    const updated = await this.prisma.appointment.update({ where: { id }, data: { startsAt, endsAt, status } });
+    await this.notices.afterAppointment(updated, appointmentNotice.rescheduled);
     return { id: updated.id };
   }
 
   @Get("mine")
   async mine(@CurrentActor() actor: Actor) {
+    await closeExpiredRequests(this.prisma, this.notices);
     if (actor.role === "PATIENT") {
       return this.prisma.appointment.findMany({
         where: { patientId: actor.id },
@@ -137,6 +163,14 @@ export class AppointmentsController {
     throw new AppError("FORBIDDEN", 403, "Այս գործողությունը թույլատրված չէ");
   }
 
+  private async openVisit(id: string) {
+    const appointment = await this.prisma.appointment.findUnique({ where: { id } });
+    if (!appointment || (appointment.status !== "REQUESTED" && appointment.status !== "CONFIRMED")) {
+      throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    }
+    return appointment;
+  }
+
   private async owned(actor: Actor, id: string, status: "REQUESTED" | "CONFIRMED") {
     const appointment = await this.prisma.appointment.findUnique({ where: { id } });
     if (!appointment || appointment.status !== status) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
@@ -147,7 +181,7 @@ export class AppointmentsController {
   private async loadOffering(offeringId: string) {
     const offering = await this.prisma.serviceOffering.findFirst({
       where: { id: offeringId, published: true, doctor: { published: true }, clinic: { published: true } },
-      include: { clinic: true, doctor: { include: { windows: true } } },
+      include: { clinic: { include: { windows: true } }, doctor: { include: { windows: true } } },
     });
     if (!offering) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");
     return offering;
@@ -158,6 +192,7 @@ export class AppointmentsController {
     isoDate: string,
     ignoreAppointmentId?: string,
   ): Promise<Date[]> {
+    await closeExpiredRequests(this.prisma, this.notices);
     const dayStart = new Date(`${isoDate}T00:00:00.000Z`);
     const dayEnd = new Date(dayStart.getTime() + 48 * 60 * 60_000);
     const appointments = await this.prisma.appointment.findMany({
@@ -175,10 +210,11 @@ export class AppointmentsController {
     return bookableStarts({
       isoDate,
       timeZone: offering.clinic.timeZone,
-      windows: offering.doctor.windows,
+      windows: openWindows(offering.clinic.windows, offering.doctor.windows),
       durationMinutes: offering.durationMinutes,
       busy: appointments.map((item) => ({ start: item.startsAt, end: item.endsAt })),
       blocked: exceptions.map((item) => ({ start: item.startsAt, end: item.endsAt })),
+      now: new Date(),
     });
   }
 

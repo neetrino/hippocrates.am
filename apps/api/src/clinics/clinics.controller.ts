@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Put } from "@nestjs/common";
+import { loadClinicLocales, saveClinicLocale } from "../catalog/clinic-locale-store";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, passwordOf, recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
@@ -71,6 +72,20 @@ export class ClinicsController {
       },
     });
     return { id: clinicId };
+  }
+
+  @Get("clinics/:clinicId/locales")
+  @Roles("ADMIN")
+  async locales(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+    requireClinicAdmin(actor, clinicId);
+    return loadClinicLocales(this.prisma, clinicId);
+  }
+
+  @Put("clinics/:clinicId/locales")
+  @Roles("ADMIN")
+  async saveLocales(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Body() body: unknown) {
+    requireClinicAdmin(actor, clinicId);
+    return saveClinicLocale(this.prisma, clinicId, body);
   }
 
   @Post("clinics/:clinicId/branches")

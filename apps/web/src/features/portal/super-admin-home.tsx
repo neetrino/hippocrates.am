@@ -1,7 +1,10 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdminPortalShell } from "@/features/portal/admin-portal-shell";
 import { Link } from "@/i18n/navigation";
-import { asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
+import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
+import { asVisitStatus, formatWhen } from "@/shared/format";
+import { noticeMessageKey } from "@/shared/notice-text";
+import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 
 type Notice = { id: string; body: string; createdAt: string };
@@ -17,6 +20,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
   const t = await getTranslations("me");
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
+  const services = await getTranslations("services");
   const visitCount = appointments.length;
   const noticeCount = notices.length;
 
@@ -81,13 +85,12 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
                     className="grid gap-2 rounded-[1.15rem] border border-line bg-sand/70 px-4 py-4"
                     key={item.id}
                   >
-                    <strong>{item.offering.name}</strong>
+                    <strong>{localizedServiceName(item.offering.name, services)}</strong>
                     <p className="m-0 text-muted">
-                      {item.clinic.name} · {item.doctor.user.displayName}
+                      {clinicDisplayName(item.clinic, locale)} · {doctorDisplayName(item.doctor, locale)}
                     </p>
                     <p className="m-0">
-                      {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} ·{" "}
-                      {common("price", { amount: formatAmount(item.priceAmd) })}
+                      {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status}
                     </p>
                   </article>
                 );
@@ -105,14 +108,17 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
             <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
           ) : (
             <div className="grid gap-3">
-              {notices.map((notice) => (
-                <p
-                  className="m-0 rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5"
-                  key={notice.id}
-                >
-                  {notice.body}
-                </p>
-              ))}
+              {notices.map((notice) => {
+                const messageKey = noticeMessageKey(notice.body);
+                return (
+                  <p className="m-0 rounded-[1.1rem] border border-line bg-sand/70 px-4 py-3.5" key={notice.id}>
+                    {messageKey ? t(messageKey) : notice.body}
+                    <time className="mt-1 block text-sm text-muted" dateTime={notice.createdAt}>
+                      {formatWhen(notice.createdAt, locale)}
+                    </time>
+                  </p>
+                );
+              })}
             </div>
           )}
         </section>

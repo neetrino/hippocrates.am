@@ -19,7 +19,7 @@ export default async function ClinicsPage({
   const t = await getTranslations("catalog");
   const common = await getTranslations("common");
   const query = name ? `?name=${encodeURIComponent(name)}` : "";
-  const clinics = await publicGet<ClinicCard[]>(`/public/clinics${query}`);
+  const clinics = await publicGet<ClinicCard[]>(`/public/clinics${query}`, locale);
   return (
     <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))] max-md:pt-[18px]">
       <h1>{t("clinicsTitle")}</h1>

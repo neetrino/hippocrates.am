@@ -9,6 +9,7 @@ type PasswordFieldProps = {
   autoComplete: string;
   showLabel: string;
   hideLabel: string;
+  variant?: "auth" | "portal";
 };
 
 export function PasswordField({
@@ -18,19 +19,33 @@ export function PasswordField({
   autoComplete,
   showLabel,
   hideLabel,
+  variant = "auth",
 }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
+  const portal = variant === "portal";
   return (
-    <label className="grid w-full min-w-0 gap-1.5 text-[0.86rem] font-semibold">
+    <label
+      className={
+        portal
+          ? "grid w-full min-w-0 gap-1.5 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase"
+          : "grid w-full min-w-0 gap-1.5 text-[0.86rem] font-semibold"
+      }
+    >
       {label}
-      <span className="flex w-full max-w-full min-w-0 items-center gap-0.5 overflow-hidden rounded-[14px] border-0 bg-auth-field pr-1 focus-within:bg-auth-field-focus focus-within:shadow-[0_0_0_3px_rgba(0,167,157,0.18)]">
+      <span
+        className={
+          portal
+            ? "flex w-full min-w-0 items-center overflow-hidden rounded-xl border border-line bg-white pr-1 focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(0,167,157,0.16)]"
+            : "flex w-full max-w-full min-w-0 items-center gap-0.5 overflow-hidden rounded-[14px] border-0 bg-auth-field pr-1 focus-within:bg-auth-field-focus focus-within:shadow-[0_0_0_3px_rgba(0,167,157,0.18)]"
+        }
+      >
         <input
           name={name}
           type={visible ? "text" : "password"}
           placeholder={placeholder}
           required
           autoComplete={autoComplete}
-          className="min-w-0 w-full flex-1 border-0 bg-transparent px-3 py-[11px] pr-1 text-[0.92rem] font-normal shadow-none placeholder:text-[#9aa6a5] focus:outline-none"
+          className={`min-w-0 w-full flex-1 border-0 bg-transparent pr-1 font-normal normal-case shadow-none placeholder:text-[#9aa6a5] focus:outline-none ${portal ? "px-3.5 py-3 text-base tracking-normal text-ink" : "px-3 py-[11px] text-[0.92rem]"}`}
         />
         <button
           type="button"

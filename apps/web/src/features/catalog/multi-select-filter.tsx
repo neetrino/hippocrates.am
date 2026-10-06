@@ -7,6 +7,7 @@ type MultiSelectFilterProps = {
   label: string;
   name: string;
   options: string[];
+  labelsByValue?: Record<string, string>;
   selected: string[];
   onChange: (next: string[]) => void;
   placeholder: string;
@@ -75,6 +76,7 @@ export function MultiSelectFilter({
   label,
   name,
   options,
+  labelsByValue,
   selected,
   onChange,
   placeholder,
@@ -115,10 +117,14 @@ export function MultiSelectFilter({
     onChange([...selected, option]);
   }
 
+  function optionLabel(option: string): string {
+    return labelsByValue?.[option] || option;
+  }
+
   const summary = allSelected
     ? allLabel
     : selected.length === 1
-      ? selected[0]
+      ? optionLabel(selected[0] ?? "")
       : selectedCountLabel(selected.length);
 
   return (
@@ -158,7 +164,7 @@ export function MultiSelectFilter({
           {options.map((option) => (
             <OptionRow
               key={option}
-              label={option}
+              label={optionLabel(option)}
               checked={selectedSet.has(option)}
               onClick={() => toggle(option)}
             />

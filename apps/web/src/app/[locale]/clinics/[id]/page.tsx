@@ -5,6 +5,7 @@ import { initialSlots } from "@/features/booking/initial-slots";
 import { Link } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { formatAmount } from "@/shared/format";
+import { localizedServiceName } from "@/shared/service-name";
 import { publicGet } from "@/shared/public-api";
 import type { ClinicCard, DoctorCard, OfferingCard, ReviewCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
@@ -19,11 +20,12 @@ type ClinicPageData = ClinicCard & {
 
 export default async function ClinicPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale: raw, id } = await params;
-  prepareLocale(raw);
-  const clinic = await publicGet<ClinicPageData>(`/public/clinics/${id}`).catch(() => null);
+  const locale = prepareLocale(raw);
+  const clinic = await publicGet<ClinicPageData>(`/public/clinics/${id}`, locale).catch(() => null);
   if (!clinic) notFound();
   const t = await getTranslations("clinicPage");
   const common = await getTranslations("common");
+  const services = await getTranslations("services");
   const slots = await initialSlots(clinic.offerings[0]);
   return (
     <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
@@ -39,12 +41,12 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
           <p className="m-0 text-muted">{clinic.phone}</p>
         </div>
       </div>
-      <div className="grid gap-5 md:grid-cols-[1.3fr_0.7fr] md:items-start">
+      <div className="grid gap-5 md:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] md:items-start">
         <div className="grid gap-3.5">
           <section className="grid gap-[18px] pt-7">
             <h2>{t("branches")}</h2>
             {clinic.branches.map((branch) => (
-              <p key={branch.id}>{branch.name} · {branch.address}</p>
+              <p key={branch.id}>{branch.name === "Հիմնական" ? t("mainBranch") : branch.name} · {branch.address}</p>
             ))}
           </section>
           <section className="grid gap-[18px] pt-7">
@@ -63,7 +65,7 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
             <div className="grid gap-3">
               {clinic.offerings.map((item) => (
                 <div key={item.id} className="flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5">
-                  <span>{item.doctor?.user.displayName} · {item.name}</span>
+                  <span>{item.doctor?.user.displayName} · {localizedServiceName(item.name, services)}</span>
                   <span>
                     {common("price", { amount: formatAmount(item.priceAmd) })}
                     {item.isEstimate ? ` · ${common("estimate")}` : ""}

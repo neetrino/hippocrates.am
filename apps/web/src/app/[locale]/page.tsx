@@ -15,7 +15,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("home");
   const nav = await getTranslations("nav");
   const common = await getTranslations("common");
-  const data = await publicGet<HomeData>("/public/home");
+  const data = await publicGet<HomeData>("/public/home", locale);
   const action = getPathname({ locale, href: "/clinics" });
   return (
     <div className="mx-auto w-[min(var(--max-width-shell),calc(100%-48px))] max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">

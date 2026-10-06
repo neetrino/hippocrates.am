@@ -30,7 +30,6 @@ export function AskQuestionForm() {
 
   return (
     <form className="grid gap-3.5" onSubmit={(event) => void onSubmit(event)}>
-      <h2>{t("ask")}</h2>
       <label className={fieldClass}>{t("askTitle")}<input name="title" required className={controlClass} /></label>
       <label className={fieldClass}>{t("askBody")}<textarea name="body" required className={`${controlClass} min-h-[110px] resize-y`} /></label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}

@@ -73,7 +73,7 @@ A clinic-admin UI for doctor management does not grant authority to self-verify 
 | `GET /me/appointments` | Patient's own appointment/history | Own records only |
 | `GET /doctors/me/appointments` | Doctor's own assigned appointments | Own records only |
 
-**States:** `REQUESTED -> CONFIRMED -> COMPLETED`, or `REQUESTED`/`CONFIRMED -> CANCELLED`. A `REQUESTED` appointment reserves the interval. There is no cutoff and no automatic expiry. No reschedule endpoint.
+**States:** `REQUESTED -> CONFIRMED -> COMPLETED`, or `REQUESTED`/`CONFIRMED -> CANCELLED`. A `REQUESTED` appointment reserves the interval. When its start time passes unanswered, it becomes `CANCELLED` and sends `notice.expired`. Confirm is rejected after the start. Complete is allowed only once the start has arrived and sends `notice.completed`. The patient can cancel or reschedule only before the start. A patient reschedule of a confirmed visit returns it to `REQUESTED`. The clinic can cancel after the start and can move a confirmed visit without returning it to `REQUESTED`. There is no separate arrival state. A short delay keeps the confirmed visit and its booked time.
 
 ## Clinic operations (P5)
 

@@ -29,6 +29,14 @@ export type ClinicOverview = {
 
 const localeTitle = { hy: "armenian", en: "english", ru: "russian" } as const;
 
+function BackArrow() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-4 w-4">
+      <path d="M12.5 4.5 7 10l5.5 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <p className="m-0">
@@ -198,7 +206,13 @@ export async function ClinicOverviewView({ clinic, locale }: { clinic: ClinicOve
   const source = clinic.copies.find((copy) => copy.locale === "hy");
   return (
     <div className="grid gap-5">
-      <Link href="/super-admin/clinics" className="w-fit text-sm font-semibold text-accent hover:text-accent-hover">
+      <Link
+        href="/super-admin/clinics"
+        className="group inline-flex w-fit items-center gap-2.5 rounded-full border border-line bg-white py-1.5 pr-4 pl-1.5 text-sm font-semibold text-ink shadow-soft transition-[border-color,box-shadow,color] duration-160 hover:border-accent/30 hover:text-accent hover:shadow-[0_10px_24px_rgba(0,167,157,0.16)]"
+      >
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent transition-[background,color] duration-160 group-hover:bg-accent group-hover:text-white">
+          <BackArrow />
+        </span>
         {portal("backToClinics")}
       </Link>
       <ClinicHero clinic={clinic} source={source} />

@@ -30,8 +30,7 @@ export async function PatientHome({ me, appointments }: PatientHomeProps) {
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const services = await getTranslations("services");
-  const now = Date.now();
-  const { hero, listed } = splitOpen(appointments, now);
+  const { hero, listed, now } = splitOpen(appointments);
   const review = reviewWaiting(appointments);
   const rows = listed.map((visit) => toListed(visit, locale, now, services, common, t("visitPassed")));
 
@@ -175,13 +174,14 @@ function statusText(
   return known ? common(known) : "";
 }
 
-function splitOpen(appointments: AppointmentCard[], now: number): { hero: AppointmentCard | null; listed: AppointmentCard[] } {
+function splitOpen(appointments: AppointmentCard[]): { hero: AppointmentCard | null; listed: AppointmentCard[]; now: number } {
+  const now = Date.now();
   const open = appointments
     .filter((item) => item.status === "REQUESTED" || item.status === "CONFIRMED")
     .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
   const future = open.filter((item) => Date.parse(item.startsAt) > now);
   const past = open.filter((item) => Date.parse(item.startsAt) <= now);
-  return { hero: future[0] ?? null, listed: [...past, ...future.slice(1)].slice(0, 3) };
+  return { hero: future[0] ?? null, listed: [...past, ...future.slice(1)].slice(0, 3), now };
 }
 
 function reviewWaiting(appointments: AppointmentCard[]): AppointmentCard | null {

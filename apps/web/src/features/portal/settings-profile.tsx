@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { PasswordField } from "@/features/auth/password-field";
@@ -35,12 +35,13 @@ export function SettingsProfile({ displayName, email, phone, editing, onCancel, 
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
-  const emailChanged = emailValue.trim().toLowerCase() !== email.trim().toLowerCase();
-
-  useEffect(() => {
+  const [snapshot, setSnapshot] = useState({ email, editing });
+  if (snapshot.email !== email || snapshot.editing !== editing) {
+    setSnapshot({ email, editing });
     setEmailValue(email);
     if (editing) setSaved(false);
-  }, [editing, email]);
+  }
+  const emailChanged = emailValue.trim().toLowerCase() !== email.trim().toLowerCase();
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();

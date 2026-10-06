@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/shared/ui/cn";
 
 const ARMENIA_DIAL = "374";
@@ -29,12 +29,13 @@ export function armeniaPhone(localDigits: string): string | null {
 
 export function PhoneField({ label, variant = "form", phone = null, required = true }: PhoneFieldProps) {
   const [local, setLocal] = useState(localArmeniaDigits(phone));
+  const [source, setSource] = useState(phone);
+  if (phone !== source) {
+    setSource(phone);
+    setLocal(localArmeniaDigits(phone));
+  }
   const isAuth = variant === "auth";
   const isSettings = variant === "settings";
-
-  useEffect(() => {
-    setLocal(localArmeniaDigits(phone));
-  }, [phone]);
 
   return (
     <div

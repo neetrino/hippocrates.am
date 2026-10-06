@@ -14,7 +14,7 @@ type AppointmentActionsProps = {
 export function AppointmentActions(props: AppointmentActionsProps) {
   const t = useTranslations("common");
   const [error, setError] = useState("");
-  const started = Date.parse(props.startsAt) <= Date.now();
+  const started = visitStarted(props.startsAt);
   const open = props.status === "REQUESTED" || props.status === "CONFIRMED";
   const canConfirm = props.mode === "admin" && props.status === "REQUESTED" && !started;
   const canComplete = props.mode === "admin" && props.status === "CONFIRMED" && started;
@@ -57,4 +57,8 @@ export function AppointmentActions(props: AppointmentActionsProps) {
       {error ? <p className="m-0 text-sm text-danger">{error}</p> : null}
     </div>
   );
+}
+
+function visitStarted(startsAt: string): boolean {
+  return Date.parse(startsAt) <= Date.now();
 }

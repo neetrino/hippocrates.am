@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { deleteNotices, deleteReadNotices, markNoticesRead } from "@/features/portal/notice-api";
 import { NoticeToolbar, type NoticePending } from "@/features/portal/notice-toolbar";
@@ -77,6 +77,23 @@ function useNoticeList(initial: NoticeRow[]) {
     readTask.current = markNoticesRead();
   }, [unreadIds]);
 
+  async function confirm(): Promise<void> {
+    await confirmDelete(
+      pending,
+      busy,
+      rows,
+      selected,
+      readTask.current,
+      unreadIds,
+      setRows,
+      setSelected,
+      setPending,
+      setBusy,
+      setFailed,
+      setSelecting,
+    );
+  }
+
   return {
     unreadIds,
     rows,
@@ -92,7 +109,6 @@ function useNoticeList(initial: NoticeRow[]) {
       busy,
       rows,
       selected,
-      readTask,
       unreadIds,
       setRows,
       setSelected,
@@ -101,6 +117,7 @@ function useNoticeList(initial: NoticeRow[]) {
       setFailed,
       setSelecting,
     }),
+    confirm,
   };
 }
 
@@ -109,7 +126,6 @@ type NoticeActionInput = {
   busy: boolean;
   rows: NoticeRow[];
   selected: Set<string>;
-  readTask: RefObject<Promise<boolean>>;
   unreadIds: Set<string>;
   setRows: (rows: NoticeRow[]) => void;
   setSelected: (selected: Set<string>) => void;
@@ -141,25 +157,36 @@ function noticeActions(input: NoticeActionInput) {
       input.setSelected(every ? new Set() : new Set(input.rows.map((row) => row.id)));
     },
     toggle: (id: string) => input.setSelected(toggleId(input.selected, id)),
-    confirm: () => confirmDelete(input),
   };
 }
 
-async function confirmDelete(input: NoticeActionInput): Promise<void> {
-  const pending = input.pending;
-  if (!pending || input.busy) return;
-  input.setBusy(true);
-  input.setFailed(false);
-  const next = await nextRows(pending, input.readTask.current, input.unreadIds, input.rows, input.selected);
-  input.setBusy(false);
+async function confirmDelete(
+  pending: NoticePending,
+  busy: boolean,
+  rows: NoticeRow[],
+  selected: Set<string>,
+  readTask: Promise<boolean>,
+  unreadIds: Set<string>,
+  setRows: (rows: NoticeRow[]) => void,
+  setSelected: (selected: Set<string>) => void,
+  setPending: (pending: NoticePending) => void,
+  setBusy: (busy: boolean) => void,
+  setFailed: (failed: boolean) => void,
+  setSelecting: (selecting: boolean) => void,
+): Promise<void> {
+  if (!pending || busy) return;
+  setBusy(true);
+  setFailed(false);
+  const next = await nextRows(pending, readTask, unreadIds, rows, selected);
+  setBusy(false);
   if (!next) {
-    input.setFailed(true);
+    setFailed(true);
     return;
   }
-  input.setRows(next);
-  input.setSelected(new Set());
-  input.setPending(null);
-  if (next.length === 0) input.setSelecting(false);
+  setRows(next);
+  setSelected(new Set());
+  setPending(null);
+  if (next.length === 0) setSelecting(false);
 }
 
 async function nextRows(

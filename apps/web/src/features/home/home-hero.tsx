@@ -12,7 +12,6 @@ type HomeHeroProps = {
   eyebrow: string;
   placeholder: string;
   searchLabel: string;
-  doctorsLabel: string;
   clinics: ClinicCard[];
 };
 
@@ -23,7 +22,6 @@ export function HomeHero({
   eyebrow,
   placeholder,
   searchLabel,
-  doctorsLabel,
   clinics,
 }: HomeHeroProps) {
   const featured = clinics.find((clinic) => clinic.coverUrl) ?? clinics[0] ?? null;
@@ -41,9 +39,6 @@ export function HomeHero({
             ariaLabel={placeholder}
             submitLabel={searchLabel}
           />
-          <Link href="/doctors" className="btn btn-ghost w-fit px-0 text-white hover:text-white/80">
-            {doctorsLabel}
-          </Link>
         </div>
         {featured ? (
           <Link

@@ -282,7 +282,14 @@
     "phonePlaceholder": "+374 XX XXX XXX",
     "adminNamePlaceholder": "напр. Анна Григорян",
     "adminEmailPlaceholder": "admin@clinic.am",
-    "adminPasswordPlaceholder": "Не менее 8 символов"
+    "adminPasswordPlaceholder": "Не менее 8 символов",
+    "armenian": "Армянский",
+    "english": "Английский",
+    "russian": "Русский",
+    "district": "Район",
+    "description": "Описание",
+    "localeHint": "Пустое поле на английском или русском останется на армянском.",
+    "armenianRequired": "Заполните армянское название и адрес."
   },
   "services": {
     "consult": "Консультация",

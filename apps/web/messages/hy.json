@@ -282,7 +282,14 @@
     "phonePlaceholder": "+374 XX XXX XXX",
     "adminNamePlaceholder": "օր. Աննա Գրիգորյան",
     "adminEmailPlaceholder": "admin@clinic.am",
-    "adminPasswordPlaceholder": "Առնվազն 8 նիշ"
+    "adminPasswordPlaceholder": "Առնվազն 8 նիշ",
+    "armenian": "Հայերեն",
+    "english": "Անգլերեն",
+    "russian": "Ռուսերեն",
+    "district": "Շրջան",
+    "description": "Նկարագրություն",
+    "localeHint": "Անգլերենի կամ ռուսերենի դատարկ դաշտը կմնա հայերեն։",
+    "armenianRequired": "Լրացրեք հայերեն անունը և հասցեն։"
   },
   "services": {
     "consult": "Խորհրդատվություն",

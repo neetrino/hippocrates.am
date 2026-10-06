@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Put } from "@nestjs/common";
-import { loadClinicLocales, saveClinicLocale } from "../catalog/clinic-locale-store";
+import { loadClinicLocales, localeCopies, saveClinicLocale, sourceClinicText } from "../catalog/clinic-locale-store";
 import { AppError } from "../common/app-error";
-import { emailOf, optionalString, passwordOf, recordOf, requiredString } from "../common/input";
+import { emailOf, optionalString, passwordOf, recordOf, requiredPhoneOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
@@ -23,7 +23,10 @@ export class ClinicsController {
     const email = emailOf(input.adminEmail);
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
+    const text = sourceClinicText(input);
+    const copies = localeCopies(input.locales);
     const passwordHash = await this.sessions.hashPassword(passwordOf(input.adminPassword));
+    const phone = requiredPhoneOf(input.phone);
     const clinic = await this.prisma.$transaction(async (tx) => {
       const admin = await tx.user.create({
         data: {
@@ -34,19 +37,15 @@ export class ClinicsController {
         },
       });
       const created = await tx.clinic.create({
-        data: {
-          name: requiredString(input.name, "Կլինիկայի անուն"),
-          address: optionalString(input.address),
-          phone: optionalString(input.phone),
-          description: optionalString(input.description),
-          ownerId: admin.id,
-          published: true,
-        },
+        data: { ...text, phone, ownerId: admin.id, published: true },
       });
       await tx.user.update({ where: { id: admin.id }, data: { clinicId: created.id } });
-      await tx.branch.create({
-        data: { clinicId: created.id, name: "Հիմնական", address: optionalString(input.address) },
-      });
+      await tx.branch.create({ data: { clinicId: created.id, name: "Հիմնական", address: text.address } });
+      if (copies.length > 0) {
+        await tx.clinicLocale.createMany({
+          data: copies.map((item) => ({ clinicId: created.id, locale: item.locale, ...item.text })),
+        });
+      }
       return created;
     });
     return { clinicId: clinic.id };

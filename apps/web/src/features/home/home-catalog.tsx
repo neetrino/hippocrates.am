@@ -16,7 +16,7 @@ export function HomeCatalog({
   clinics: ClinicCard[];
 }) {
   return (
-    <section className="grid gap-6 pt-2 max-md:gap-4">
+    <section className="page-shell-wide grid gap-6 pt-10 pb-2 max-md:gap-4 max-md:pt-7">
       <SectionHeader
         title={clinicsTitle}
         action={

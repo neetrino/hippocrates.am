@@ -8,6 +8,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
+import { PageStack } from "@/shared/ui/page-frame";
 import { sessionGet } from "@/shared/session-api";
 
 type StaffDoctor = { id: string; specialty: string; user: { displayName: string; email: string } };
@@ -28,9 +29,9 @@ export default async function ClinicDeskPage({ params }: { params: Promise<{ loc
   const me = await sessionGet<Me>("/auth/me");
   if (!me || me.role !== "ADMIN" || !me.clinicId) {
     return (
-      <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+      <PageStack>
         <p>{t("denied")}</p>
-      </div>
+      </PageStack>
     );
   }
   const clinicId = me.clinicId;
@@ -45,7 +46,7 @@ export default async function ClinicDeskPage({ params }: { params: Promise<{ loc
     sessionGet<FinanceTotals>(`/clinics/${clinicId}/finance`),
   ]);
   return (
-    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-3.5 pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+    <PageStack>
       <h1>{t("title")}</h1>
       <div className="flex flex-wrap gap-7 text-muted">
         <p>{t.rich("pending", { count: dashboard?.pending ?? 0, strong: (chunks) => <strong className="block text-lg text-ink">{chunks}</strong> })}</p>
@@ -103,7 +104,7 @@ export default async function ClinicDeskPage({ params }: { params: Promise<{ loc
         doctors={(doctors ?? []).map((doctor) => ({ id: doctor.id, name: doctor.user.displayName }))}
       />
       {locales ? <ClinicLocaleForm clinicId={clinicId} texts={locales} /> : null}
-    </div>
+    </PageStack>
   );
 }
 

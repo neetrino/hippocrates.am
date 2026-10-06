@@ -7,10 +7,10 @@ import { Link } from "@/i18n/navigation";
 export type AccountHref = "/login" | "/me" | "/super-admin";
 
 const circleClass =
-  "grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border-0 bg-accent p-0 text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:h-[38px] max-md:w-[38px]";
+  "grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-accent p-0 text-white transition-[background] duration-160 hover:bg-accent-hover max-md:h-[38px] max-md:w-[38px]";
 
 const rowClass =
-  "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 text-left font-sans text-[0.78rem] font-medium whitespace-nowrap text-ink/80 transition-colors duration-160 hover:bg-accent-soft hover:text-accent";
+  "inline-flex h-9 w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-2.5 text-left font-sans text-[0.86rem] font-medium text-ink/85 transition-colors duration-160 hover:bg-accent-soft hover:text-accent";
 
 type AccountMenuProps = {
   href: AccountHref;
@@ -49,7 +49,7 @@ function useDismiss(open: boolean, close: () => void, rootRef: RefObject<HTMLDiv
   }, [open, close, rootRef]);
 }
 
-function SignedInMenu({ label }: { label: string }) {
+function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; label: string }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -71,10 +71,13 @@ function SignedInMenu({ label }: { label: string }) {
       </button>
       {open ? (
         <div
-          className="absolute top-[calc(100%+6px)] right-0 z-30 w-max rounded-xl border border-line bg-white p-1 shadow-[0_8px_20px_rgba(20,36,40,0.08)]"
+          className="absolute top-[calc(100%+8px)] right-0 z-30 grid w-max min-w-[10.5rem] gap-0.5 rounded-xl border border-line bg-surface p-1.5 shadow-soft"
           id={menuId}
           role="menu"
         >
+          <Link href={href} role="menuitem" className={rowClass} onClick={close}>
+            {label}
+          </Link>
           <LogoutButton className={rowClass} showIcon />
         </div>
       ) : null}
@@ -85,10 +88,15 @@ function SignedInMenu({ label }: { label: string }) {
 export function AccountMenu({ href, label }: AccountMenuProps) {
   if (href === "/login") {
     return (
-      <Link href={href} className={circleClass} aria-label={label}>
-        <UserIcon />
-      </Link>
+      <>
+        <Link href={href} className="btn btn-secondary h-10 px-4 max-md:hidden">
+          {label}
+        </Link>
+        <Link href={href} className={`${circleClass} md:hidden`} aria-label={label}>
+          <UserIcon />
+        </Link>
+      </>
     );
   }
-  return <SignedInMenu label={label} />;
+  return <SignedInMenu href={href} label={label} />;
 }

@@ -111,7 +111,7 @@ export function ClinicLocaleForm({
       ))}
       <div className="flex flex-wrap items-center gap-3">
         <button
-          className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent"
+          className="btn btn-primary w-fit"
           type="button"
           onClick={() => void save()}
         >

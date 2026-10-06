@@ -10,6 +10,7 @@ import { noticeMessageKey } from "@/shared/notice-text";
 import { localizedServiceName } from "@/shared/service-name";
 import { publicGet } from "@/shared/public-api";
 import type { AppointmentCard, Me, QuestionCard } from "@/shared/public-types";
+import { PageStack } from "@/shared/ui/page-frame";
 import { sessionGet } from "@/shared/session-api";
 
 type Notice = {
@@ -36,11 +37,14 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const me = await sessionGet<Me>("/auth/me");
   if (!me) {
     return (
-      <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+      <PageStack>
         <p>
-          {t("signIn")} <Link href="/login">{nav("login")}</Link>
+          {t("signIn")}{" "}
+          <Link href="/login" className="font-semibold text-accent hover:text-accent-hover">
+            {nav("login")}
+          </Link>
         </p>
-      </div>
+      </PageStack>
     );
   }
 
@@ -58,10 +62,9 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
 
   const role = asRole(me.role);
   const questions = me.role === "DOCTOR" ? await publicGet<QuestionCard[]>("/questions") : [];
-  const btn =
-    "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
+  const btn = "btn btn-primary w-fit";
   return (
-    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-3.5 pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+    <PageStack>
       <div className="flex items-end justify-between gap-3 max-md:items-center">
         <div>
           <p className="mb-3 text-[0.78rem] font-semibold tracking-[0.08em] text-accent uppercase">
@@ -82,7 +85,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           {appointments.map((item) => {
             const status = asVisitStatus(item.status);
             return (
-              <article className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" key={item.id}>
+              <article className="grid gap-3.5 rounded-card bg-surface p-5 shadow-soft" key={item.id}>
                 <strong>{localizedServiceName(item.offering.name, services)}</strong>
                 <p className="m-0 text-muted">
                   {me.role === "DOCTOR"
@@ -108,7 +111,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
             ? `${clinicDisplayName(visit.clinic, displayLocale)} · ${doctorDisplayName(visit.doctor, displayLocale)} · ${formatWhen(visit.startsAt, displayLocale)}`
             : "";
           return (
-            <div className="grid gap-1 rounded-[14px] border border-line bg-white px-4 py-3.5" key={notice.id}>
+            <div className="grid gap-1 rounded-[var(--radius-control)] bg-surface px-4 py-3.5" key={notice.id}>
               <div className="flex items-center justify-between gap-3">
                 <span>{messageKey ? t(messageKey) : notice.body}</span>
                 <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
@@ -124,7 +127,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
         <section className="grid gap-3.5 pt-7">
           <h2>{questionsCopy("public")}</h2>
           {questions.map((question) => (
-            <article className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" key={question.id}>
+            <article className="grid gap-3.5 rounded-card bg-surface p-5 shadow-soft" key={question.id}>
               <h3>{question.title}</h3>
               <p>{question.body}</p>
               <AnswerForm questionId={question.id} />
@@ -132,6 +135,6 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           ))}
         </section>
       ) : null}
-    </div>
+    </PageStack>
   );
 }

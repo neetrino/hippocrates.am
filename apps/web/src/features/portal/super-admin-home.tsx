@@ -58,7 +58,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
           </article>
         </section>
 
-        <section id="visits" className="scroll-mt-6 rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
+        <section id="visits" className="scroll-mt-6 rounded-card bg-surface p-5 shadow-soft md:p-6">
           <div className="mb-4 flex items-end justify-between gap-3">
             <h2>{t("visits")}</h2>
             <p className="m-0 text-sm text-muted">{portal("sectionCount", { count: visitCount })}</p>
@@ -88,7 +88,7 @@ export async function SuperAdminHome({ me, appointments, notices }: SuperAdminHo
           )}
         </section>
 
-        <section id="notices" className="scroll-mt-6 rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
+        <section id="notices" className="scroll-mt-6 rounded-card bg-surface p-5 shadow-soft md:p-6">
           <div className="mb-4 flex items-end justify-between gap-3">
             <h2>{t("notices")}</h2>
             <p className="m-0 text-sm text-muted">{portal("sectionCount", { count: noticeCount })}</p>

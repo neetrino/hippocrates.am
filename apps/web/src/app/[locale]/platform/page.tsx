@@ -3,6 +3,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { redirect, Link } from "@/i18n/navigation";
 import { JsonForm } from "@/shared/json-form";
 import type { Me } from "@/shared/public-types";
+import { PageStack } from "@/shared/ui/page-frame";
 import { sessionGet } from "@/shared/session-api";
 
 export default async function PlatformPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -17,13 +18,15 @@ export default async function PlatformPage({ params }: { params: Promise<{ local
   }
 
   return (
-    <section className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+    <PageStack>
       {!me ? (
         <p className="m-0">
-          <Link href="/login">{nav("login")}</Link>
+          <Link href="/login" className="font-semibold text-accent hover:text-accent-hover">
+            {nav("login")}
+          </Link>
         </p>
       ) : null}
-      <div className="mx-auto my-12 grid w-[min(440px,100%)] gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft">
+      <div className="mx-auto my-8 grid w-[min(440px,100%)] gap-4 rounded-card bg-surface p-7 shadow-soft max-sm:p-5">
         <h1>{t("title")}</h1>
         <p className="m-0 text-muted">{t("hint")}</p>
         <JsonForm
@@ -40,6 +43,6 @@ export default async function PlatformPage({ params }: { params: Promise<{ local
           ]}
         />
       </div>
-    </section>
+    </PageStack>
   );
 }

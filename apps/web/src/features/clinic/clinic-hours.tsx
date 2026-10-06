@@ -104,7 +104,7 @@ function HoursEditor({ title, windows, savePath }: { title: string; windows: Hou
         />
       ))}
       <button
-        className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white disabled:opacity-55"
+        className="btn btn-primary w-fit"
         type="submit"
         disabled={pending}
       >

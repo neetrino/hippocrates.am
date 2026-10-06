@@ -28,7 +28,7 @@ export function SiteHeaderShell({ children }: { children: ReactNode }) {
       <div className="relative mx-auto w-[min(var(--max-width-shell),calc(100%-48px))] max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
         <div
           className={cn(
-            "pointer-events-none absolute inset-0 rounded-full border border-accent/14 bg-white/94 opacity-0 shadow-[0_12px_34px_rgba(20,36,40,0.08)] backdrop-blur-[18px] transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-md:rounded-[22px]",
+            "pointer-events-none absolute inset-0 rounded-full border border-line bg-surface/92 opacity-0 shadow-soft backdrop-blur-xl transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-md:rounded-[1.25rem]",
             scrolled && "opacity-100",
           )}
           aria-hidden="true"

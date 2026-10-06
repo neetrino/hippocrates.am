@@ -23,7 +23,7 @@ type ListedVisit = {
   passed: string;
 };
 
-const card = "rounded-[1.6rem] bg-white shadow-soft";
+const card = "rounded-card bg-surface shadow-soft";
 
 export async function PatientHome({ me, appointments }: PatientHomeProps) {
   const locale = await getLocale();
@@ -64,7 +64,7 @@ function BookVisit({ label }: { label: string }) {
   return (
     <Link
       href="/clinics"
-      className="inline-flex whitespace-nowrap rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-160 hover:bg-accent-hover"
+      className="btn btn-primary"
     >
       {label}
     </Link>

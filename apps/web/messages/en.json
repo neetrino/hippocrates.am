@@ -14,7 +14,9 @@
     "closeMenu": "Close menu"
   },
   "footer": {
-    "tagline": "Dental clinics and doctors in Armenia."
+    "tagline": "Dental clinics and doctors in Armenia.",
+    "explore": "Explore",
+    "account": "Account"
   },
   "home": {
     "eyebrow": "Armenia",
@@ -23,9 +25,28 @@
     "clinicPlaceholder": "Clinic name",
     "clinicStat": "{count, plural, one {<strong>#</strong> clinic} other {<strong>#</strong> clinics}}",
     "doctorStat": "{count, plural, one {<strong>#</strong> doctor} other {<strong>#</strong> doctors}}",
-    "allDoctors": "All doctors",
+    "allDoctors": "Browse doctors",
     "emptyClinics": "No published clinic yet.",
-    "emptyDoctors": "No published doctor yet."
+    "emptyDoctors": "No published doctor yet.",
+    "trust1Title": "Published clinics",
+    "trust1Body": "Only verified, published clinics appear in the catalog.",
+    "trust2Title": "Open times",
+    "trust2Body": "Availability is calculated on the server, not guessed in the browser.",
+    "trust3Title": "Armenian, Russian, English",
+    "trust3Body": "Read the same clinics and doctors in your language.",
+    "howTitle": "From search to the chair",
+    "how1Title": "Find a clinic",
+    "how1Body": "Browse published clinics and doctors in Armenia.",
+    "how2Title": "Choose a time",
+    "how2Body": "See open slots and pick a visit that fits your day.",
+    "how3Title": "Book in one step",
+    "how3Body": "Request the appointment. The clinic confirms.",
+    "questionsTitle": "Ask a dentist",
+    "questionsLede": "Public questions. The author stays hidden.",
+    "ctaTitle": "Ready to book a visit?",
+    "ctaBody": "Choose a clinic or a doctor, then pick an open time.",
+    "ctaClinics": "Browse clinics",
+    "ctaDoctors": "Browse doctors"
   },
   "common": {
     "search": "Search",

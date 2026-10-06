@@ -14,7 +14,7 @@ const inputClass =
 const outlineButton =
   "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border border-line bg-white px-3.5 py-2 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent disabled:opacity-60";
 const confirmButton =
-  "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-3.5 py-2 text-sm font-semibold tracking-normal text-white normal-case transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:opacity-60";
+  "btn btn-primary min-h-9 px-3.5 py-2 text-sm";
 
 type SettingsProfileProps = {
   displayName: string;

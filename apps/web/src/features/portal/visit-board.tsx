@@ -14,7 +14,7 @@ export async function VisitBoard({ visits, locale }: { visits: AppointmentCard[]
   const services = await getTranslations("services");
   const me = await getTranslations("me");
   if (visits.length === 0) {
-    return <p className="m-0 rounded-[1.6rem] bg-white px-5 py-8 text-muted shadow-soft">{portal("emptyVisits")}</p>;
+    return <p className="m-0 rounded-card bg-surface px-5 py-8 text-muted shadow-soft">{portal("emptyVisits")}</p>;
   }
 
   const groups = groupVisits(visits);

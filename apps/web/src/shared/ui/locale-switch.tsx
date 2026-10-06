@@ -62,7 +62,7 @@ export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
     <div className={cn("relative", hideOnMobile && "max-md:hidden")} ref={rootRef}>
       <button
         type="button"
-        className="grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border border-line bg-white p-0 text-ink transition-[color,border-color,box-shadow] duration-160 hover:border-accent hover:text-accent hover:shadow-[0_6px_16px_rgba(0,167,157,0.14)] aria-expanded:border-accent aria-expanded:text-accent aria-expanded:shadow-[0_6px_16px_rgba(0,167,157,0.14)]"
+        className="grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-line bg-surface p-0 text-ink transition-[color,border-color] duration-160 hover:border-accent hover:text-accent aria-expanded:border-accent aria-expanded:text-accent"
         aria-label={t("language")}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -73,7 +73,7 @@ export function LocaleSwitch({ hideOnMobile = false }: LocaleSwitchProps) {
       </button>
       {open ? (
         <div
-          className="absolute top-[calc(100%+10px)] right-0 z-30 grid min-w-[140px] gap-0.5 rounded-[14px] border border-line bg-white p-2 shadow-soft"
+          className="absolute top-[calc(100%+10px)] right-0 z-30 grid min-w-[140px] gap-0.5 rounded-xl border border-line bg-surface p-1.5 shadow-soft"
           id={menuId}
           role="menu"
         >

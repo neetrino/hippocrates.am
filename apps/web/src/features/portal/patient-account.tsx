@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect, Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import type { Me } from "@/shared/public-types";
+import { PageStack } from "@/shared/ui/page-frame";
 import { sessionGet } from "@/shared/session-api";
 
 /** Patient session for `/me/*` pages. Other roles are sent to their own home. */
@@ -17,10 +18,13 @@ export async function PatientSignIn() {
   const t = await getTranslations("me");
   const nav = await getTranslations("nav");
   return (
-    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+    <PageStack>
       <p>
-        {t("signIn")} <Link href="/login">{nav("login")}</Link>
+        {t("signIn")}{" "}
+        <Link href="/login" className="font-semibold text-accent hover:text-accent-hover">
+          {nav("login")}
+        </Link>
       </p>
-    </div>
+    </PageStack>
   );
 }

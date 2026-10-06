@@ -45,7 +45,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${sans.variable} ${armenian.variable} ${serif.variable} ${serifArmenian.variable}`}
       data-scroll-behavior="smooth"
     >
-      <body className="bg-white pb-6">{children}</body>
+      <body className="bg-background">{children}</body>
     </html>
   );
 }

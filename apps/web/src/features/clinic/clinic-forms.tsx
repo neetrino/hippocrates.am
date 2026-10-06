@@ -48,12 +48,10 @@ export function ClinicForms({ clinicId, doctors }: { clinicId: string; doctors: 
     else setMessage(t("serviceFailed"));
   }
 
-  const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
-  const controlClass =
-    "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
-  const panelClass = "grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft";
-  const btnClass =
-    "inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
+  const fieldClass = "field-label";
+  const controlClass = "field-control";
+  const panelClass = "grid gap-3.5 rounded-card bg-surface p-5 shadow-soft";
+  const btnClass = "btn btn-primary";
 
   return (
     <div className="grid gap-5 md:grid-cols-[1.3fr_0.7fr] md:items-start">

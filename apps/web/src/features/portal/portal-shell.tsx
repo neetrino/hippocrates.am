@@ -131,14 +131,14 @@ function NavLink({
         "group flex w-full items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3.5 transition-[background,color,box-shadow] duration-200",
         navText(plain),
         active
-          ? "-mr-3 rounded-r-none bg-white text-[#1e3a38] shadow-[0_8px_22px_rgba(0,0,0,0.12)]"
+          ? "-mr-3 rounded-r-none bg-surface text-ink shadow-soft"
           : "mr-0 text-white/78 hover:bg-white/10 hover:text-white",
       )}
     >
       <span
         className={cn(
           "grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors duration-200",
-          active ? "bg-[#1e3a38]/10 text-[#1e3a38]" : "bg-white/10 text-white",
+          active ? "bg-ink/8 text-ink" : "bg-white/10 text-white",
         )}
       >
         {item.icon}
@@ -305,14 +305,14 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, acco
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex bg-[#eef3f2]">
-      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-[#2a4a47] px-3 pt-7 pb-6 md:flex md:flex-col">
+    <div className="fixed inset-0 z-[60] flex bg-background">
+      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.25rem] rounded-br-[2.25rem] bg-secondary px-3 pt-7 pb-6 md:flex md:flex-col">
         <SidebarNav {...sidebar} />
       </aside>
       {open ? (
         <div className="fixed inset-0 z-20 md:hidden">
           <button type="button" className="absolute inset-0 cursor-pointer border-0 bg-[rgba(14,20,20,0.5)] p-0 backdrop-blur-[6px]" aria-label={t("closeMenu")} onClick={close} />
-          <aside id={menuId} className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-[#2a4a47] px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+          <aside id={menuId} className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.25rem] rounded-br-[2.25rem] bg-secondary px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
             <button type="button" className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white" aria-label={t("closeMenu")} onClick={close}>
               <CloseIcon />
             </button>

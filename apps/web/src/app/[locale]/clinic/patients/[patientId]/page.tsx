@@ -26,7 +26,7 @@ export default async function ClinicPatientPage({ params }: { params: Promise<{ 
   if (!card?.patient) return <DeskNote>{t("patientMissing")}</DeskNote>;
 
   return (
-    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-4 pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+    <div className="page-shell grid gap-5 pt-8 pb-10">
       <Link href="/clinic" className="w-fit text-sm font-semibold text-accent">
         {t("backDesk")}
       </Link>
@@ -41,7 +41,7 @@ export default async function ClinicPatientPage({ params }: { params: Promise<{ 
           const status = asVisitStatus(item.status);
           const price = common("price", { amount: formatAmount(item.priceAmd) });
           return (
-            <article className="rounded-[14px] border border-line bg-white px-4 py-3.5" key={item.id}>
+            <article className="rounded-card bg-surface px-4 py-3.5" key={item.id}>
               <strong>{localizedServiceName(item.offering.name, services)}</strong>
               <p className="m-0 text-muted">
                 {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} · {price}
@@ -57,7 +57,7 @@ export default async function ClinicPatientPage({ params }: { params: Promise<{ 
 
 function DeskNote({ children }: { children: string }) {
   return (
-    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
+    <div className="page-shell grid gap-5 pt-8 pb-10">
       <p>{children}</p>
     </div>
   );

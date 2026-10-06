@@ -5,7 +5,7 @@ import { formatAmount } from "@/shared/format";
 export type ClinicPatient = { id: string; displayName: string; email: string; phone: string | null };
 export type FinanceTotals = { REQUESTED: number; CONFIRMED: number; COMPLETED: number };
 
-const row = "flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5";
+const row = "flex items-center justify-between gap-3 border-b border-line px-1 py-3.5 last:border-b-0";
 
 export async function ClinicOverview({ patients, totals }: { patients: ClinicPatient[]; totals: FinanceTotals }) {
   const t = await getTranslations("desk");

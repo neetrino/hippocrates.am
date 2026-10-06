@@ -28,7 +28,7 @@ export function PasswordField({
       className={
         portal
           ? "grid w-full min-w-0 gap-1.5 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase"
-          : "grid w-full min-w-0 gap-1.5 text-[0.86rem] font-semibold"
+          : "field-label"
       }
     >
       {label}
@@ -36,7 +36,7 @@ export function PasswordField({
         className={
           portal
             ? "flex w-full min-w-0 items-center overflow-hidden rounded-xl border border-line bg-white pr-1 focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(0,167,157,0.16)]"
-            : "flex w-full max-w-full min-w-0 items-center gap-0.5 overflow-hidden rounded-[14px] border-0 bg-auth-field pr-1 focus-within:bg-auth-field-focus focus-within:shadow-[0_0_0_3px_rgba(0,167,157,0.18)]"
+            : "flex w-full max-w-full min-w-0 items-center gap-0.5 overflow-hidden rounded-[0.9rem] border-0 bg-auth-field pr-1 focus-within:bg-auth-field-focus focus-within:shadow-[0_0_0_3px_rgba(0,167,157,0.18)]"
         }
       >
         <input

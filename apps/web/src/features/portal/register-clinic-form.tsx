@@ -49,7 +49,7 @@ export function RegisterClinicForm({ submitLabel }: { submitLabel: string }) {
       />
       {form.error ? <p className="m-0 text-danger">{form.error}</p> : null}
       <button
-        className="inline-flex w-full cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent"
+        className="btn btn-primary w-full"
         type="submit"
       >
         {submitLabel}

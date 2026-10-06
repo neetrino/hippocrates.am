@@ -60,7 +60,7 @@ export function VisitGroup({
   const quiet = tone === "cancelled";
 
   return (
-    <section className={`overflow-hidden rounded-[1.6rem] bg-white shadow-soft ${tone === "cancelled" ? "ring-1 ring-danger/15" : ""}`}>
+    <section className={`overflow-hidden rounded-card bg-surface shadow-soft ${tone === "cancelled" ? "ring-1 ring-danger/15" : ""}`}>
       <header className={`flex items-center justify-between px-5 py-4 ${toneStyle.band}`}>
         <h2 className="m-0 text-sm font-semibold">{title}</h2>
         <span className={`grid h-7 min-w-7 place-items-center rounded-full px-2 text-sm font-bold ${toneStyle.count}`}>{visits.length}</span>

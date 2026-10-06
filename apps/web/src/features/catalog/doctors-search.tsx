@@ -116,7 +116,7 @@ export function DoctorsSearch({
       onSubmit={onSubmit}
       className="relative grid gap-3"
     >
-      <div className="flex items-center gap-3 rounded-full bg-[#eef2f2] px-4 py-[13px] shadow-[0_8px_22px_rgba(20,36,40,0.06)] transition-[box-shadow,background] duration-160 focus-within:bg-[#e8eded] focus-within:shadow-[0_10px_26px_rgba(0,167,157,0.12)]">
+      <div className="search-shell items-center gap-3 px-4 py-1.5 max-md:flex-row max-md:rounded-full">
         <SearchIcon />
         <input
           name="name"
@@ -143,7 +143,7 @@ export function DoctorsSearch({
       <div
         id={panelId}
         hidden={!filtersOpen}
-        className="overflow-visible rounded-[18px] border border-line bg-white p-4 shadow-soft max-md:p-3.5"
+        className="overflow-visible rounded-card bg-surface p-4 shadow-soft max-md:p-3.5"
       >
         <div className="grid gap-3 overflow-visible md:grid-cols-3 md:items-start">
           <MultiSelectFilter
@@ -184,13 +184,13 @@ export function DoctorsSearch({
           <button
             type="button"
             onClick={resetFilters}
-            className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-full border border-line bg-white px-4 py-2 text-[0.78rem] font-semibold tracking-[0.06em] text-ink uppercase transition-colors duration-160 hover:border-accent/35 hover:text-accent"
+            className="btn btn-secondary min-h-10 px-4 text-[0.82rem]"
           >
             {labels.resetFilters}
           </button>
           <button
             type="submit"
-            className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-4 py-2 text-[0.78rem] font-semibold tracking-[0.06em] text-white uppercase transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent"
+            className="btn btn-primary min-h-10 px-4 text-[0.82rem]"
           >
             {labels.applyFilters}
           </button>

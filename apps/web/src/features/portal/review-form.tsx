@@ -49,7 +49,7 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
       </label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button
-        className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-3.5 py-2 text-sm font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent"
+        className="btn btn-primary w-fit text-sm"
         type="submit"
       >
         {t("sendReview")}

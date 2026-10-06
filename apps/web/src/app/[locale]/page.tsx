@@ -36,7 +36,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         eyebrow={t("eyebrow")}
         placeholder={t("clinicPlaceholder")}
         searchLabel={common("search")}
-        clinics={data.clinics}
       />
       <HomeCatalog
         clinicsTitle={nav("clinics")}

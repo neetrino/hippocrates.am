@@ -218,7 +218,12 @@
     "sectionCount": "{count}",
     "emptyVisits": "Визитов пока нет.",
     "addClinic": "Добавить клинику",
-    "closeSheet": "Закрыть"
+    "closeSheet": "Закрыть",
+    "backToClinics": "Клиники",
+    "languages": "Языки",
+    "emptySection": "Пока нет.",
+    "hidden": "Скрыт",
+    "latestReviews": "Последние 20"
   },
   "desk": {
     "denied": "Эта страница для админа клиники.",

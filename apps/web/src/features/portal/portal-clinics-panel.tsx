@@ -135,7 +135,12 @@ export function PortalClinicsPanel({
           )}
         >
           {filtered.map((clinic, index) => (
-            <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
+            <ClinicTile
+              key={clinic.id}
+              clinic={clinic}
+              href={`/super-admin/clinics/${clinic.id}`}
+              loading={index === 0 ? "eager" : undefined}
+            />
           ))}
         </div>
       )}

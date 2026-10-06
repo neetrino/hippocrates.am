@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Put } from "@nestjs/common";
 import { loadClinicLocales, localeCopies, saveClinicLocale, sourceClinicText } from "../catalog/clinic-locale-store";
+import { loadClinicOverview } from "./clinic-overview";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, passwordOf, recordOf, requiredPhoneOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
@@ -71,6 +72,13 @@ export class ClinicsController {
       },
     });
     return { id: clinicId };
+  }
+
+  @Get("clinics/:clinicId/overview")
+  @Roles("SUPER_ADMIN")
+  async overview(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return loadClinicOverview(this.prisma, clinicId);
   }
 
   @Get("clinics/:clinicId/locales")

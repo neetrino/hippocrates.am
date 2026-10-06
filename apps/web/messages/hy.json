@@ -218,7 +218,12 @@
     "sectionCount": "{count}",
     "emptyVisits": "Այցեր դեռ չկան։",
     "addClinic": "Ավելացնել կլինիկա",
-    "closeSheet": "Փակել"
+    "closeSheet": "Փակել",
+    "backToClinics": "Կլինիկաներ",
+    "languages": "Լեզուներ",
+    "emptySection": "Դեռ չկա։",
+    "hidden": "Թաքնված",
+    "latestReviews": "Վերջին 20-ը"
   },
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",

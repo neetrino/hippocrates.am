@@ -49,7 +49,7 @@ function useDismiss(open: boolean, close: () => void, rootRef: RefObject<HTMLDiv
   }, [open, close, rootRef]);
 }
 
-function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; label: string }) {
+function SignedInMenu({ label }: { label: string }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -75,9 +75,6 @@ function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; l
           id={menuId}
           role="menu"
         >
-          <Link href={href} role="menuitem" className={rowClass} onClick={close}>
-            {label}
-          </Link>
           <LogoutButton className={rowClass} />
         </div>
       ) : null}
@@ -93,5 +90,5 @@ export function AccountMenu({ href, label }: AccountMenuProps) {
       </Link>
     );
   }
-  return <SignedInMenu href={href} label={label} />;
+  return <SignedInMenu label={label} />;
 }

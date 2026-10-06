@@ -26,63 +26,51 @@ export function HomeHero({
   doctorsLabel,
   clinics,
 }: HomeHeroProps) {
+  const featured = clinics.find((clinic) => clinic.coverUrl) ?? clinics[0] ?? null;
   return (
-    <section className="grid items-center gap-10 py-12 max-md:gap-8 max-md:py-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-      <div className="grid max-w-[38rem] gap-5">
-        <p className="kicker">{eyebrow}</p>
-        <h1>{title}</h1>
-        <p className="m-0 max-w-[34rem] text-[1.08rem] leading-[1.7] font-light text-muted max-md:text-base">{lede}</p>
-        <SearchBar
-          action={getPathname({ locale, href: "/clinics" })}
-          placeholder={placeholder}
-          ariaLabel={placeholder}
-          submitLabel={searchLabel}
-        />
-        <Link href="/doctors" className="btn btn-ghost w-fit px-0">
-          {doctorsLabel}
-        </Link>
+    <section className="relative mt-3 mb-8 overflow-hidden rounded-card max-md:mt-1 max-md:mb-6">
+      <HeroBackdrop clinic={featured} />
+      <div className="relative z-1 grid min-h-[28rem] content-end gap-6 px-6 py-8 max-md:min-h-[32rem] md:min-h-[32rem] md:content-center md:px-12 md:py-14">
+        <div className="grid max-w-[36rem] gap-5">
+          <p className="kicker">{eyebrow}</p>
+          <h1 className="text-white">{title}</h1>
+          <p className="m-0 max-w-[32rem] text-[1.06rem] leading-[1.7] font-light text-white/82 max-md:text-base">{lede}</p>
+          <SearchBar
+            action={getPathname({ locale, href: "/clinics" })}
+            placeholder={placeholder}
+            ariaLabel={placeholder}
+            submitLabel={searchLabel}
+          />
+          <Link href="/doctors" className="btn btn-ghost w-fit px-0 text-white hover:text-white/80">
+            {doctorsLabel}
+          </Link>
+        </div>
+        {featured ? (
+          <Link
+            href={`/clinics/${featured.id}`}
+            className="justify-self-start text-[0.82rem] tracking-[0.04em] text-white/70 transition-colors duration-160 hover:text-white md:absolute md:right-8 md:bottom-7 md:justify-self-auto"
+          >
+            {featured.name}
+          </Link>
+        ) : null}
       </div>
-      <HeroGallery clinics={clinics} />
     </section>
   );
 }
 
-function HeroGallery({ clinics }: { clinics: ClinicCard[] }) {
-  const featured = clinics.slice(0, 3);
-  const first = featured[0];
-  if (!first) {
-    return <div className="min-h-[22rem] rounded-card bg-linear-to-br from-accent-soft via-sand to-surface-muted max-md:min-h-[16rem]" />;
-  }
-  const rest = featured.slice(1);
+function HeroBackdrop({ clinic }: { clinic: ClinicCard | null }) {
   return (
-    <div className="grid gap-3 max-md:grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)] md:min-h-[26rem]">
-      <HeroShot clinic={first} eager className="min-h-[22rem] max-md:min-h-[16rem]" />
-      {rest.length > 0 ? (
-        <div className="grid gap-3 max-md:hidden">
-          {rest.map((clinic) => (
-            <HeroShot key={clinic.id} clinic={clinic} className="min-h-[12.4rem]" />
-          ))}
-        </div>
+    <div className="absolute inset-0 bg-linear-to-br from-secondary to-ink">
+      {clinic ? (
+        <Photo
+          src={clinic.coverUrl}
+          alt={clinic.name}
+          loading="eager"
+          sizes="(max-width: 960px) 100vw, 1240px"
+        />
       ) : null}
+      <div className="absolute inset-0 hidden bg-linear-to-r from-ink/82 via-ink/48 to-ink/18 md:block" />
+      <div className="absolute inset-0 bg-linear-to-t from-ink/88 via-ink/42 to-ink/22 md:hidden" />
     </div>
-  );
-}
-
-function HeroShot({
-  clinic,
-  className,
-  eager,
-}: {
-  clinic: ClinicCard;
-  className?: string;
-  eager?: boolean;
-}) {
-  return (
-    <Link href={`/clinics/${clinic.id}`} className={`group relative overflow-hidden rounded-card bg-sand ${className ?? ""}`}>
-      <Photo src={clinic.coverUrl} alt={clinic.name} loading={eager ? "eager" : "lazy"} sizes="(max-width: 768px) 100vw, 50vw" />
-      <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-ink/70 to-transparent px-4 py-3 font-display text-[1.02rem] text-white">
-        {clinic.name}
-      </span>
-    </Link>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { BrandLogo } from "@/shared/ui/brand-logo";
 import { LocaleFlag } from "@/shared/ui/locale-flag";
 import { LocaleSwitch } from "@/shared/ui/locale-switch";
 import { cn } from "@/shared/ui/cn";
@@ -249,13 +249,7 @@ export function SiteNav({
               />
               <div className="relative z-1 mx-auto grid w-[min(100%,420px)] gap-[18px] [animation:mobile-menu-in_280ms_cubic-bezier(0.22,1,0.36,1)]">
                 <div className="flex items-center justify-between gap-3 px-0.5 py-1">
-                  <Image
-                    src="/brand/hippocrates-logo.png"
-                    alt="Hippocrates"
-                    width={160}
-                    height={98}
-                    className="h-12 w-auto object-contain"
-                  />
+                  <BrandLogo size="menu" />
                   <button
                     type="button"
                     className="grid h-11 w-11 cursor-pointer place-items-center rounded-full border-0 bg-white/16 text-white"

@@ -16,7 +16,7 @@ export function HomeCatalog({
   clinics: ClinicCard[];
 }) {
   return (
-    <section className="grid gap-6 pt-16 max-md:gap-4 max-md:pt-10">
+    <section className="grid gap-6 pt-2 max-md:gap-4">
       <SectionHeader
         title={clinicsTitle}
         action={
@@ -26,9 +26,9 @@ export function HomeCatalog({
         }
       />
       {clinics.length === 0 ? <EmptyState>{emptyClinics}</EmptyState> : null}
-      <div className="grid gap-4 max-md:gap-3 md:grid-cols-3">
+      <div className="grid gap-6 max-md:gap-4 md:grid-cols-2">
         {clinics.map((clinic, index) => (
-          <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
+          <ClinicTile key={clinic.id} clinic={clinic} size="large" loading={index === 0 ? "eager" : undefined} />
         ))}
       </div>
     </section>

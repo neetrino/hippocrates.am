@@ -6,21 +6,36 @@ export function ClinicTile({
   clinic,
   loading,
   href = `/clinics/${clinic.id}`,
+  size = "default",
 }: {
   clinic: ClinicCard;
   loading?: "eager" | "lazy";
   href?: `/clinics/${string}` | `/super-admin/clinics/${string}`;
+  size?: "default" | "large";
 }) {
   const place = [clinic.district, clinic.address].filter(Boolean).join(" · ");
+  const large = size === "large";
   return (
     <article className="group overflow-hidden rounded-card bg-surface shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(20,36,40,0.08)]">
       <Link href={href} className="grid">
-        <div className="relative aspect-16/10 overflow-hidden bg-sand">
+        <div className={large ? "relative aspect-3/2 min-h-64 overflow-hidden bg-sand" : "relative aspect-16/10 overflow-hidden bg-sand"}>
           <Photo src={clinic.coverUrl} alt={clinic.name} loading={loading} />
         </div>
-        <div className="grid gap-1.5 px-5 py-4">
-          <h3 className="font-display text-[1.15rem] leading-snug font-semibold tracking-[-0.02em]">{clinic.name}</h3>
-          {place ? <p className="m-0 text-[0.92rem] leading-relaxed text-muted">{place}</p> : null}
+        <div className={large ? "grid gap-2 px-6 py-5" : "grid gap-1.5 px-5 py-4"}>
+          <h3
+            className={
+              large
+                ? "font-display text-[1.4rem] leading-snug font-semibold tracking-[-0.02em]"
+                : "font-display text-[1.15rem] leading-snug font-semibold tracking-[-0.02em]"
+            }
+          >
+            {clinic.name}
+          </h3>
+          {place ? (
+            <p className={large ? "m-0 text-[1rem] leading-relaxed text-muted" : "m-0 text-[0.92rem] leading-relaxed text-muted"}>
+              {place}
+            </p>
+          ) : null}
         </div>
       </Link>
     </article>

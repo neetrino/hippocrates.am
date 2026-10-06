@@ -40,6 +40,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         clinics={data.clinics}
       />
       <PageFrame className="pt-10 pb-6 max-md:pt-7">
+        <HomeCatalog
+          clinicsTitle={nav("clinics")}
+          seeAll={common("seeAll")}
+          emptyClinics={t("emptyClinics")}
+          clinics={data.clinics.slice(0, 6)}
+        />
         <HomeTrust
           items={[
             { title: t("trust1Title"), body: t("trust1Body") },
@@ -54,12 +60,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             { title: t("forPatientsTitle"), body: t("forPatientsBody") },
             { title: t("forClinicsTitle"), body: t("forClinicsBody") },
           ]}
-        />
-        <HomeCatalog
-          clinicsTitle={nav("clinics")}
-          seeAll={common("seeAll")}
-          emptyClinics={t("emptyClinics")}
-          clinics={data.clinics.slice(0, 6)}
         />
         <HomeServices
           title={t("servicesTitle")}

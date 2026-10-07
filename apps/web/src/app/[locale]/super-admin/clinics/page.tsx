@@ -19,7 +19,7 @@ export default async function PortalClinicsPage({
   const platform = await getTranslations("platform");
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
-  const clinics = await publicGet<ClinicCard[]>("/public/clinics");
+  const clinics = await publicGet<ClinicCard[]>("/public/clinics", locale);
 
   return (
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={t("clinicsTitle")}>

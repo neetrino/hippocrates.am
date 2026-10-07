@@ -1,3 +1,9 @@
+export type ClinicCopy = {
+  name: string;
+  district: string;
+  address: string;
+};
+
 export type ClinicCard = {
   id: string;
   name: string;
@@ -7,6 +13,8 @@ export type ClinicCard = {
   description: string;
   coverUrl: string | null;
   logoUrl: string | null;
+  /** Official Armenian spelling plus every saved translation. Present on clinic lists. */
+  copies?: ClinicCopy[];
 };
 
 export type DoctorCard = {

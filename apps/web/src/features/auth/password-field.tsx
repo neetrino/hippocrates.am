@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FocusEvent, PointerEvent, useState } from "react";
 
 type PasswordFieldProps = {
   name: string;
@@ -10,6 +10,9 @@ type PasswordFieldProps = {
   showLabel: string;
   hideLabel: string;
   variant?: "auth" | "portal";
+  readOnly?: boolean;
+  onPointerDown?: (event: PointerEvent<HTMLInputElement>) => void;
+  onFocus?: (event: FocusEvent<HTMLInputElement>) => void;
 };
 
 export function PasswordField({
@@ -20,6 +23,9 @@ export function PasswordField({
   showLabel,
   hideLabel,
   variant = "auth",
+  readOnly = false,
+  onPointerDown,
+  onFocus,
 }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
   const portal = variant === "portal";
@@ -44,7 +50,10 @@ export function PasswordField({
           type={visible ? "text" : "password"}
           placeholder={placeholder}
           required
+          readOnly={readOnly}
           autoComplete={autoComplete}
+          onPointerDown={onPointerDown}
+          onFocus={onFocus}
           className={`min-w-0 w-full flex-1 border-0 bg-transparent pr-1 font-normal normal-case shadow-none placeholder:text-[#9aa6a5] focus:outline-none ${portal ? "px-3.5 py-3 text-base tracking-normal text-ink" : "px-3 py-[11px] text-[0.92rem]"}`}
         />
         <button

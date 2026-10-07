@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FocusEvent, FormEvent, PointerEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
@@ -11,6 +11,7 @@ type LoginPayload = {
 
 export function LoginForm() {
   const [error, setError] = useState("");
+  const [locked, setLocked] = useState(true);
   const router = useRouter();
   const t = useTranslations("auth");
   const common = useTranslations("common");
@@ -37,8 +38,13 @@ export function LoginForm() {
     router.refresh();
   }
 
+  function unlock(event: PointerEvent<HTMLInputElement> | FocusEvent<HTMLInputElement>): void {
+    event.currentTarget.readOnly = false;
+    setLocked(false);
+  }
+
   return (
-    <form className="grid min-w-0 gap-3" onSubmit={(event) => void onSubmit(event)}>
+    <form className="grid min-w-0 gap-3" autoComplete="on" onSubmit={(event) => void onSubmit(event)}>
       <label className="grid w-full min-w-0 gap-1.5 text-[0.86rem] font-semibold">
         {t("email")}
         <input
@@ -46,7 +52,10 @@ export function LoginForm() {
           type="email"
           placeholder="john.doe@gmail.com"
           required
-          autoComplete="email"
+          readOnly={locked}
+          autoComplete="username"
+          onPointerDown={unlock}
+          onFocus={unlock}
           className="w-full min-w-0 rounded-[14px] border-0 bg-auth-field px-3 py-[11px] text-[0.92rem] font-normal placeholder:text-[#9aa6a5] focus:bg-auth-field-focus focus:shadow-[0_0_0_3px_rgba(0,167,157,0.18)] focus:outline-none"
         />
       </label>
@@ -57,6 +66,9 @@ export function LoginForm() {
         autoComplete="current-password"
         showLabel={t("showPassword")}
         hideLabel={t("hidePassword")}
+        readOnly={locked}
+        onPointerDown={unlock}
+        onFocus={unlock}
       />
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button

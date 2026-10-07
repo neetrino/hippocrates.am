@@ -11,6 +11,7 @@ export type NoticeItem = {
   readAt: string | null;
   appointment: {
     startsAt: string;
+    patient: { displayName: string };
     clinic: { name: string; locales?: { locale: string; name: string }[] };
     doctor: { user: { displayName: string }; locales?: { locale: string; name: string }[] };
   } | null;

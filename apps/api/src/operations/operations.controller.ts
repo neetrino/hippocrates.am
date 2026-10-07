@@ -121,6 +121,7 @@ export class OperationsController {
         appointment: {
           select: {
             startsAt: true,
+            patient: { select: { displayName: true } },
             clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
             doctor: {
               select: {

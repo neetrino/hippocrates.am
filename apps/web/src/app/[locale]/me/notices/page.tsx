@@ -36,7 +36,9 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
       {notices.length === 0 ? (
         <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
       ) : (
-        <NoticeList rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived")))} />
+          <NoticeList
+            rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived"), me.role === "DOCTOR"))}
+          />
       )}
     </section>
   );
@@ -60,11 +62,13 @@ function toRow(
   locale: string,
   t: (key: NoticeMessageKey) => string,
   arrivedLabel: string,
+  forDoctor: boolean,
 ): NoticeRow {
   const messageKey = noticeMessageKey(notice.body);
   const visit = notice.appointment;
+  const person = visit ? (forDoctor ? visit.patient.displayName : doctorDisplayName(visit.doctor, locale)) : "";
   const context = visit
-    ? `${clinicDisplayName(visit.clinic, locale)} · ${doctorDisplayName(visit.doctor, locale)} · ${formatWhen(visit.startsAt, locale)}`
+    ? `${clinicDisplayName(visit.clinic, locale)} · ${person} · ${formatWhen(visit.startsAt, locale)}`
     : "";
   return {
     id: notice.id,

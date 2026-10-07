@@ -3,14 +3,18 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/shared/ui/cn";
 
-const SCROLL_ACTIVATE_Y = 16;
+// Compact mode changes the sticky header height. A single threshold lets scroll
+// anchoring pull scrollY back across that line and the header oscillates.
+const SCROLL_COMPACT_ON_Y = 48;
+const SCROLL_COMPACT_OFF_Y = 8;
 
 export function SiteHeaderShell({ children }: { children: ReactNode }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     function syncScrolled(): void {
-      setScrolled(window.scrollY > SCROLL_ACTIVATE_Y);
+      const y = window.scrollY;
+      setScrolled((current) => (current ? y > SCROLL_COMPACT_OFF_Y : y > SCROLL_COMPACT_ON_Y));
     }
     syncScrolled();
     window.addEventListener("scroll", syncScrolled, { passive: true });

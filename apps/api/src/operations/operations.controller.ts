@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { PrismaService } from "../infrastructure/prisma.service";
-import { requireClinicAdmin, type Actor } from "../identity/access";
+import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
@@ -34,6 +34,18 @@ export class OperationsController {
       }),
     ]);
     return { pending, today, patientCount: patients.length };
+  }
+
+  @Get("platform/summary")
+  @Roles("SUPER_ADMIN")
+  async platformSummary(@CurrentActor() actor: Actor) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    const [clinics, pendingQuestions, publishedDoctors] = await Promise.all([
+      this.prisma.clinic.count(),
+      this.prisma.question.count({ where: { status: "PENDING" } }),
+      this.prisma.doctorProfile.count({ where: { published: true } }),
+    ]);
+    return { clinics, pendingQuestions, publishedDoctors };
   }
 
   @Get("clinics/:clinicId/patients")

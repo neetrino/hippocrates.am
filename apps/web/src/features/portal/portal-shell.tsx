@@ -252,7 +252,7 @@ function PortalHeader({
         {portrait}
         <div className="min-w-0">
           {eyebrow ? <p className={eyebrowClass}>{eyebrow}</p> : null}
-          <h1 className="truncate text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
+          <h1 className="truncate pb-[0.12em] leading-[1.45] text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
         </div>
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-2.5">

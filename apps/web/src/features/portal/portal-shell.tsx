@@ -194,18 +194,20 @@ function SidebarNav({
           />
         ))}
       </nav>
-      <nav className="grid gap-1 border-t border-white/12 pt-5" aria-label={t("accountNav")}>
-        {footerItems.map((item) => (
-          <NavLink
-            key={`${item.href}-${item.hash ?? "root"}`}
-            item={item}
-            plain={plainLabels}
-            active={isItemActive(pathname, hash, item)}
-            onNavigate={onNavigate}
-            onActivate={onActivate}
-          />
-        ))}
-      </nav>
+      {footerItems.length > 0 ? (
+        <nav className="grid gap-1 border-t border-white/12 pt-5" aria-label={t("accountNav")}>
+          {footerItems.map((item) => (
+            <NavLink
+              key={`${item.href}-${item.hash ?? "root"}`}
+              item={item}
+              plain={plainLabels}
+              active={isItemActive(pathname, hash, item)}
+              onNavigate={onNavigate}
+              onActivate={onActivate}
+            />
+          ))}
+        </nav>
+      ) : null}
     </div>
   );
 }

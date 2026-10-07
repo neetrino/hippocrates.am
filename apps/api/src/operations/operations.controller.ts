@@ -96,6 +96,7 @@ export class OperationsController {
 
   @Get("me/notifications")
   async notifications(@CurrentActor() actor: Actor) {
+    if (actor.role === "SUPER_ADMIN") return [];
     return this.prisma.notification.findMany({
       where: { userId: actor.id },
       orderBy: { createdAt: "desc" },
@@ -123,6 +124,7 @@ export class OperationsController {
 
   @Post("me/notifications/read")
   async readNotifications(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
+    if (actor.role === "SUPER_ADMIN") return { ok: true };
     await this.prisma.notification.updateMany({
       where: { userId: actor.id, readAt: null },
       data: { readAt: new Date() },
@@ -132,6 +134,7 @@ export class OperationsController {
 
   @Delete("me/notifications")
   async deleteNotifications(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ deleted: number }> {
+    if (actor.role === "SUPER_ADMIN") return { deleted: 0 };
     const result = await this.prisma.notification.deleteMany({
       where: { userId: actor.id, id: { in: readNoticeIds(body) } },
     });
@@ -140,6 +143,7 @@ export class OperationsController {
 
   @Delete("me/notifications/read")
   async deleteReadNotifications(@CurrentActor() actor: Actor): Promise<{ deleted: number }> {
+    if (actor.role === "SUPER_ADMIN") return { deleted: 0 };
     const result = await this.prisma.notification.deleteMany({
       where: { userId: actor.id, readAt: { not: null } },
     });

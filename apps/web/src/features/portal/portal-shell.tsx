@@ -37,7 +37,6 @@ type PortalShellProps = {
   title: string;
   eyebrow: string;
   subtitle: string;
-  homeHref: PortalHref;
   accountHref: AccountHref;
   items: PortalNavItem[];
   footerItems: PortalNavItem[];
@@ -158,7 +157,6 @@ function SidebarNav({
   footerItems,
   pathname,
   hash,
-  homeHref,
   subtitle,
   navLabel,
   plainLabels,
@@ -169,7 +167,6 @@ function SidebarNav({
   footerItems: PortalNavItem[];
   pathname: string;
   hash: string;
-  homeHref: PortalHref;
   subtitle: string;
   navLabel: string;
   plainLabels: boolean;
@@ -180,14 +177,7 @@ function SidebarNav({
   return (
     <div className="flex h-full flex-col gap-8">
       <div className="px-1">
-        <Link
-          href={homeHref}
-          onClick={() => {
-            onActivate?.({ href: homeHref, label: "", icon: null });
-            onNavigate?.();
-          }}
-          className="inline-flex flex-col gap-1.5"
-        >
+        <Link href="/" onClick={() => onNavigate?.()} aria-label="Hippocrates" className="inline-flex flex-col gap-1.5">
           <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">Hippocrates</span>
           <p className={plainLabels ? "m-0 text-sm font-medium text-white/70" : "m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase"}>{subtitle}</p>
         </Link>
@@ -274,7 +264,7 @@ function PortalHeader({
   );
 }
 
-export function PortalShell({ children, title, eyebrow, subtitle, homeHref, accountHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
+export function PortalShell({ children, title, eyebrow, subtitle, accountHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
   const t = useTranslations("portal");
   const pathname = localeNeutralPath(usePathname());
   const [hash, activate] = usePortalHash(pathname);
@@ -297,7 +287,6 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, acco
     footerItems,
     pathname,
     hash,
-    homeHref,
     subtitle,
     navLabel: navLabel ?? t("navLabel"),
     plainLabels,

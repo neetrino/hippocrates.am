@@ -28,7 +28,6 @@ export function AdminPortalShell({ children, title, eyebrow, action }: AdminPort
 
   return (
     <PortalShell
-      homeHref="/super-admin"
       accountHref="/super-admin"
       subtitle={t("subtitle")}
       items={items}

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { SettingsCard } from "@/features/portal/settings-card";
 import { Link, redirect } from "@/i18n/navigation";
@@ -23,6 +24,19 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
     );
   }
   if (me.role === "SUPER_ADMIN") redirect({ href: "/super-admin", locale });
+  if (me.role === "DOCTOR") {
+    return (
+      <DoctorPortalShell eyebrow={common("DOCTOR")} title={t("settings")}>
+        <SettingsCard
+          displayName={me.displayName}
+          email={me.email}
+          phone={me.phone}
+          photoUrl={me.photoUrl}
+          roleLabel={common("DOCTOR")}
+        />
+      </DoctorPortalShell>
+    );
+  }
   if (me.role !== "PATIENT") redirect({ href: "/me", locale });
 
   return (

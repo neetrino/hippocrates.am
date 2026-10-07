@@ -7,6 +7,7 @@ import {
   NoticesIcon,
   QuestionsIcon,
   ScheduleIcon,
+  SettingsIcon,
   VisitsIcon,
 } from "@/features/portal/admin-sidebar-icons";
 import { PortalShell, type PortalNavItem } from "@/features/portal/portal-shell";
@@ -31,6 +32,9 @@ export function DoctorPortalShell({ children, title, eyebrow, portrait }: Doctor
     { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact", badge: unreadNotices },
     { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "exact" },
   ];
+  const footerItems: PortalNavItem[] = [
+    { href: "/me/settings", label: me("settings"), icon: <SettingsIcon />, match: "exact" },
+  ];
 
   return (
     <PortalShell
@@ -38,7 +42,7 @@ export function DoctorPortalShell({ children, title, eyebrow, portrait }: Doctor
       subtitle={t("patientSubtitle")}
       navLabel={t("patientNavLabel")}
       items={items}
-      footerItems={[]}
+      footerItems={footerItems}
       title={title}
       eyebrow={eyebrow}
       portrait={portrait}

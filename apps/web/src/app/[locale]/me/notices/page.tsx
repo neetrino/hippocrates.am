@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
 import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { Link, redirect } from "@/i18n/navigation";
@@ -28,18 +29,28 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
     );
   }
   if (me.role === "SUPER_ADMIN") redirect({ href: "/super-admin", locale });
-  if (me.role !== "PATIENT") redirect({ href: "/me", locale });
+  if (me.role !== "PATIENT" && me.role !== "DOCTOR") redirect({ href: "/me", locale });
   const notices = (await sessionGet<NoticeItem[]>("/me/notifications")) ?? [];
+  const list = (
+    <section className="rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
+      {notices.length === 0 ? (
+        <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
+      ) : (
+        <NoticeList rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived")))} />
+      )}
+    </section>
+  );
+  if (me.role === "DOCTOR") {
+    return (
+      <DoctorPortalShell eyebrow="" title={t("notices")}>
+        {list}
+      </DoctorPortalShell>
+    );
+  }
 
   return (
     <PatientPortalShell eyebrow={common("PATIENT")} title={t("notices")}>
-      <section className="rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
-        {notices.length === 0 ? (
-          <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
-        ) : (
-          <NoticeList rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived")))} />
-        )}
-      </section>
+      {list}
     </PatientPortalShell>
   );
 }

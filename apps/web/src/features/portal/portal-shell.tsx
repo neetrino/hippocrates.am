@@ -11,6 +11,7 @@ import { cn } from "@/shared/ui/cn";
 
 export type PortalHref =
   | "/me"
+  | "/me/schedule"
   | "/me/visits"
   | "/me/favorites"
   | "/me/questions"

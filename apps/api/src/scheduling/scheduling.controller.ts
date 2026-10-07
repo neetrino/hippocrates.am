@@ -2,13 +2,13 @@ import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
-import { requireClinicAdmin, type Actor } from "../identity/access";
+import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Public, Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { NotificationsService } from "../notifications/notifications.service";
 import { daySlots, openWindows } from "./slots";
-import { windowsFrom } from "./windows";
+import { windowsFrom, type StoredWindow } from "./windows";
 
 @Controller()
 export class SchedulingController {
@@ -73,6 +73,37 @@ export class SchedulingController {
     return { count: data.length };
   }
 
+  @Get("doctors/me/hours")
+  @Roles("DOCTOR")
+  async myHours(@CurrentActor() actor: Actor): Promise<{ clinic: StoredWindow[]; doctor: StoredWindow[] }> {
+    const doctor = await this.ownDoctor(actor);
+    const [clinic, windows] = await Promise.all([
+      this.prisma.clinicWindow.findMany({
+        where: { clinicId: doctor.clinicId },
+        select: { weekday: true, startMinute: true, endMinute: true },
+        orderBy: { weekday: "asc" },
+      }),
+      this.prisma.scheduleWindow.findMany({
+        where: { doctorId: doctor.id },
+        select: { weekday: true, startMinute: true, endMinute: true },
+        orderBy: { weekday: "asc" },
+      }),
+    ]);
+    return { clinic, doctor: windows };
+  }
+
+  @Post("doctors/me/windows")
+  @Roles("DOCTOR")
+  async setMyWindows(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ count: number }> {
+    const doctor = await this.ownDoctor(actor);
+    const data = windowsFrom(body).map((window) => ({ doctorId: doctor.id, ...window }));
+    await this.prisma.$transaction(async (tx) => {
+      await tx.scheduleWindow.deleteMany({ where: { doctorId: doctor.id } });
+      if (data.length > 0) await tx.scheduleWindow.createMany({ data });
+    });
+    return { count: data.length };
+  }
+
   @Public()
   @Get("public/availability")
   async availability(
@@ -114,6 +145,16 @@ export class SchedulingController {
       now: new Date(),
     }).map((slot) => ({ startsAt: slot.start.toISOString(), busy: slot.busy }));
     return { startsAt: slots.filter((slot) => !slot.busy).map((slot) => slot.startsAt), slots };
+  }
+
+  private async ownDoctor(actor: Actor): Promise<{ id: string; clinicId: string }> {
+    requireRoles(actor, ["DOCTOR"]);
+    const doctor = await this.prisma.doctorProfile.findUnique({
+      where: { userId: actor.id },
+      select: { id: true, clinicId: true },
+    });
+    if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
+    return doctor;
   }
 }
 

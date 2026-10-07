@@ -45,6 +45,15 @@ export function RegisterClinicIcon(props: IconProps) {
   );
 }
 
+export function ScheduleIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 7.5V12l3 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </BaseIcon>
+  );
+}
+
 export function VisitsIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

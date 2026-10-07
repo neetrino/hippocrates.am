@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
-import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
+import { requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { appointmentNotice, NotificationsService } from "../notifications/notifications.service";
@@ -59,7 +59,7 @@ export class AppointmentsController {
   }
 
   @Post(":id/confirm")
-  @Roles("ADMIN")
+  @Roles("ADMIN", "DOCTOR")
   async confirm(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
     const now = new Date();
     if ((await closeExpiredRequests(this.prisma, this.notices, now)).includes(id)) {
@@ -85,8 +85,9 @@ export class AppointmentsController {
     }
     const appointment = await this.openVisit(id);
     const isPatient = actor.role === "PATIENT" && actor.id === appointment.patientId;
-    const isAdmin = actor.role === "ADMIN" && actor.clinicId === appointment.clinicId;
-    if (!isPatient && !isAdmin) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    if (!isPatient && !(await this.managesVisit(actor, appointment))) {
+      throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    }
     if (isPatient && visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Այցն արդեն սկսվել է");
     const updated = await this.prisma.appointment.update({ where: { id }, data: { status: "CANCELLED" } });
     await this.notices.afterAppointment(updated, appointmentNotice.cancelled);
@@ -94,7 +95,7 @@ export class AppointmentsController {
   }
 
   @Post(":id/complete")
-  @Roles("ADMIN")
+  @Roles("ADMIN", "DOCTOR")
   async complete(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
     const now = new Date();
     const appointment = await this.owned(actor, id, "CONFIRMED");
@@ -173,9 +174,18 @@ export class AppointmentsController {
 
   private async owned(actor: Actor, id: string, status: "REQUESTED" | "CONFIRMED") {
     const appointment = await this.prisma.appointment.findUnique({ where: { id } });
-    if (!appointment || appointment.status !== status) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
-    requireClinicAdmin(actor, appointment.clinicId);
+    if (!appointment || appointment.status !== status || !(await this.managesVisit(actor, appointment))) {
+      throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
+    }
     return appointment;
+  }
+
+  /** Clinic admin for that clinic, or the doctor assigned to this visit. */
+  private async managesVisit(actor: Actor, appointment: { clinicId: string; doctorId: string }): Promise<boolean> {
+    if (actor.role === "ADMIN") return actor.clinicId === appointment.clinicId;
+    if (actor.role !== "DOCTOR") return false;
+    const doctor = await this.prisma.doctorProfile.findUnique({ where: { userId: actor.id }, select: { id: true } });
+    return doctor?.id === appointment.doctorId;
   }
 
   private async loadOffering(offeringId: string) {

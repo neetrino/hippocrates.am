@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, type ReactNode } from "react";
+import { FormEvent, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { useRouter } from "@/i18n/navigation";
@@ -22,11 +22,15 @@ const EXAMPLES: Record<ContentLocale, Pick<Copy, "name" | "district" | "address"
 const controlClass =
   "rounded-xl border border-line bg-white px-3.5 py-3 font-normal placeholder:text-[#9aa6a5] focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 
+function blockFieldEnter(event: KeyboardEvent<HTMLFormElement>): void {
+  if (event.key === "Enter" && event.target instanceof HTMLInputElement) event.preventDefault();
+}
+
 export function RegisterClinicForm({ submitLabel }: { submitLabel: string }) {
   const platform = useTranslations("platform");
   const form = useClinicDraft(platform("armenianRequired"));
   return (
-    <form className="grid gap-3.5" onSubmit={(event) => void form.onSubmit(event)}>
+    <form className="grid gap-3.5" onKeyDown={blockFieldEnter} onSubmit={(event) => void form.onSubmit(event)}>
       <LocaleTabs locale={form.locale} labels={form.labels} hint={platform("localeHint")} onSelect={form.setLocale} />
       <CopyFields
         copy={form.copies[form.locale]}

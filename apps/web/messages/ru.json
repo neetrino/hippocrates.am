@@ -226,7 +226,11 @@
     "languages": "Языки",
     "emptySection": "Пока нет.",
     "hidden": "Скрыт",
-    "latestReviews": "Последние 20"
+    "latestReviews": "Последние 20",
+    "deleteClinic": "Удалить клинику",
+    "deleteClinicBody": "Вместе с клиникой удаляются админ, врачи и визиты.",
+    "deleteClinicAction": "Удалить",
+    "deleteClinicFailed": "Клинику не удалось удалить."
   },
   "desk": {
     "denied": "Эта страница для админа клиники.",

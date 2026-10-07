@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Patch, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from "@nestjs/common";
 import { loadClinicLocales, localeCopies, saveClinicLocale, sourceClinicText } from "../catalog/clinic-locale-store";
+import { deleteClinicRecord } from "./delete-clinic";
 import { loadClinicOverview } from "./clinic-overview";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, passwordOf, recordOf, requiredPhoneOf, requiredString } from "../common/input";
@@ -71,6 +72,14 @@ export class ClinicsController {
         published: typeof input.published === "boolean" ? input.published : undefined,
       },
     });
+    return { id: clinicId };
+  }
+
+  @Delete("clinics/:clinicId")
+  @Roles("SUPER_ADMIN")
+  async removeClinic(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string): Promise<{ id: string }> {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    await deleteClinicRecord(this.prisma, clinicId);
     return { id: clinicId };
   }
 

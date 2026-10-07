@@ -226,7 +226,11 @@
     "languages": "Լեզուներ",
     "emptySection": "Դեռ չկա։",
     "hidden": "Թաքնված",
-    "latestReviews": "Վերջին 20-ը"
+    "latestReviews": "Վերջին 20-ը",
+    "deleteClinic": "Ջնջել կլինիկան",
+    "deleteClinicBody": "Կլինիկայի հետ ջնջվում են ադմինը, բժիշկները և այցերը։",
+    "deleteClinicAction": "Ջնջել",
+    "deleteClinicFailed": "Կլինիկան չջնջվեց"
   },
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",

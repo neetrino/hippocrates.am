@@ -226,7 +226,11 @@
     "languages": "Languages",
     "emptySection": "None yet.",
     "hidden": "Hidden",
-    "latestReviews": "Latest 20"
+    "latestReviews": "Latest 20",
+    "deleteClinic": "Delete clinic",
+    "deleteClinicBody": "The admin, doctors, and visits are removed with the clinic.",
+    "deleteClinicAction": "Delete",
+    "deleteClinicFailed": "The clinic could not be deleted."
   },
   "desk": {
     "denied": "This page is for the clinic admin.",

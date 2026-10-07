@@ -21,9 +21,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <div className="mx-auto w-[min(var(--max-width-shell),calc(100%-48px))] max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
       <section className="grid gap-7 py-14 pb-7 max-md:gap-7 max-md:py-7 max-md:pb-[18px]">
         <div className="grid max-w-[720px] gap-4">
-          <h1 className="bg-linear-to-br from-ink via-[#1a3d3a] to-accent bg-clip-text text-transparent">
-            {t("title")}
-          </h1>
+          <h1 className="leading-[1.35]">{t("title")}</h1>
           <p className="m-0 max-w-[42rem] text-lg leading-[1.7] font-light tracking-[0.01em] text-muted max-md:text-base">
             {t("lede")}
           </p>

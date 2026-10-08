@@ -106,6 +106,17 @@ export class OperationsController {
     return totals;
   }
 
+  @Get("clinics/:clinicId/reviews")
+  @Roles("ADMIN")
+  async reviews(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+    requireClinicAdmin(actor, clinicId);
+    return this.prisma.review.findMany({
+      where: { clinicId },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, rating: true, body: true, reply: true, createdAt: true },
+    });
+  }
+
   @Get("me/notifications")
   async notifications(@CurrentActor() actor: Actor) {
     if (actor.role === "SUPER_ADMIN") return [];

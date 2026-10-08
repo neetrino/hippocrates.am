@@ -20,7 +20,15 @@ export type PortalHref =
   | "/me/settings"
   | "/super-admin"
   | "/super-admin/clinics"
-  | "/super-admin/questions";
+  | "/super-admin/questions"
+  | "/clinic"
+  | "/clinic/profile"
+  | "/clinic/staff"
+  | "/clinic/services"
+  | "/clinic/visits"
+  | "/clinic/patients"
+  | "/clinic/reviews"
+  | "/clinic/finance";
 
 export type PortalHash = "visits" | "notices" | "favorites" | "questions" | "reviews" | "settings";
 

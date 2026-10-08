@@ -9,6 +9,12 @@ type LoginPayload = {
   data: { id: string; role: string };
 };
 
+function accountHome(role: string): "/super-admin" | "/clinic" | "/me" {
+  if (role === "SUPER_ADMIN") return "/super-admin";
+  if (role === "ADMIN") return "/clinic";
+  return "/me";
+}
+
 export function LoginForm() {
   const [error, setError] = useState("");
   const [locked, setLocked] = useState(true);
@@ -33,7 +39,7 @@ export function LoginForm() {
       return;
     }
     const body = (await response.json()) as LoginPayload;
-    const next = body.data.role === "SUPER_ADMIN" ? "/super-admin" : "/me";
+    const next = accountHome(body.data.role);
     router.push(next);
     router.refresh();
   }

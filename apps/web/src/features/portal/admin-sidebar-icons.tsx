@@ -97,6 +97,43 @@ export function SettingsIcon(props: IconProps) {
   );
 }
 
+export function StaffIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <circle cx="12" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M6.5 18.5v-1.2a3.5 3.5 0 0 1 3.5-3.5h4a3.5 3.5 0 0 1 3.5 3.5v1.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </BaseIcon>
+  );
+}
+
+export function ServicesIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M8 7.5h8M8 12h8M8 16.5h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <rect x="4.5" y="4.5" width="15" height="15" rx="3" stroke="currentColor" strokeWidth="1.6" />
+    </BaseIcon>
+  );
+}
+
+export function PatientsIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <circle cx="9" cy="9" r="2.3" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="15.5" cy="9.5" r="1.8" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M4.8 18v-.8A3.2 3.2 0 0 1 8 14h2.2a3.2 3.2 0 0 1 3.2 3.2V18M14 14.2h1.2a2.8 2.8 0 0 1 2.8 2.8V18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </BaseIcon>
+  );
+}
+
+export function FinanceIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <rect x="4.5" y="6" width="15" height="12" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M4.5 10h15" stroke="currentColor" strokeWidth="1.6" />
+    </BaseIcon>
+  );
+}
+
 export function MenuIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

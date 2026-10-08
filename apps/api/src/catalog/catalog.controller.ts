@@ -40,6 +40,17 @@ export class CatalogController {
   @Roles("ADMIN")
   async list(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
-    return this.prisma.serviceOffering.findMany({ where: { clinicId }, orderBy: { name: "asc" } });
+    return this.prisma.serviceOffering.findMany({
+      where: { clinicId },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        priceAmd: true,
+        durationMinutes: true,
+        isEstimate: true,
+        doctor: { select: { user: { select: { displayName: true } } } },
+      },
+    });
   }
 }

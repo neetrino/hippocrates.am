@@ -53,6 +53,18 @@ export class ClinicsController {
     return { clinicId: clinic.id };
   }
 
+  @Get("clinics/:clinicId/profile")
+  @Roles("ADMIN")
+  async profile(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+    requireClinicAdmin(actor, clinicId);
+    const clinic = await this.prisma.clinic.findUnique({
+      where: { id: clinicId },
+      select: { id: true, name: true, description: true, address: true, phone: true, district: true },
+    });
+    if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
+    return clinic;
+  }
+
   @Patch("clinics/:clinicId")
   @Roles("ADMIN")
   async updateClinic(
@@ -68,7 +80,8 @@ export class ClinicsController {
         name: typeof input.name === "string" ? input.name.trim() : undefined,
         description: typeof input.description === "string" ? input.description.trim() : undefined,
         address: typeof input.address === "string" ? input.address.trim() : undefined,
-        phone: typeof input.phone === "string" ? input.phone.trim() : undefined,
+        phone: typeof input.phone === "string" ? requiredPhoneOf(input.phone) : undefined,
+        district: typeof input.district === "string" ? input.district.trim() : undefined,
         published: typeof input.published === "boolean" ? input.published : undefined,
       },
     });

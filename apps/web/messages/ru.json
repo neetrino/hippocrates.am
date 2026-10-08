@@ -232,7 +232,11 @@
     "deleteClinic": "Удалить клинику",
     "deleteClinicBody": "Вместе с клиникой удаляются админ, врачи и визиты.",
     "deleteClinicAction": "Удалить",
-    "deleteClinicFailed": "Клинику не удалось удалить."
+    "deleteClinicFailed": "Клинику не удалось удалить.",
+    "clinicProfile": "Клиника",
+    "staff": "Персонал",
+    "services": "Услуги",
+    "finance": "Сумма"
   },
   "desk": {
     "denied": "Эта страница для админа клиники.",
@@ -279,7 +283,27 @@
     "weekThu": "Четверг",
     "weekFri": "Пятница",
     "weekSat": "Суббота",
-    "weekSun": "Воскресенье"
+    "weekSun": "Воскресенье",
+    "pendingLabel": "Ожидающие заявки",
+    "todayLabel": "Визиты сегодня",
+    "saved": "Сохранено",
+    "saveFailed": "Не сохранилось",
+    "newBranch": "Новый филиал",
+    "branchName": "Название филиала",
+    "dayOff": "Выходной",
+    "dayOffHint": "В выбранный день врач не принимает.",
+    "closeDay": "Закрыть день",
+    "openDay": "Открыть",
+    "dayOffFailed": "День не закрылся",
+    "noReviews": "Отзывов пока нет.",
+    "reply": "Ответ",
+    "sendReply": "Сохранить ответ",
+    "replyFailed": "Ответ не сохранился",
+    "reschedule": "Перенести",
+    "pickDate": "Дата",
+    "noSlots": "В этот день свободного времени нет.",
+    "noVisits": "Визитов пока нет.",
+    "save": "Сохранить"
   },
   "platform": {
     "title": "Регистрация клиники",

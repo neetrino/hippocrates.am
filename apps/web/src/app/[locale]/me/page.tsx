@@ -45,6 +45,9 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   if (me.role === "SUPER_ADMIN") {
     redirect({ href: "/super-admin", locale });
   }
+  if (me.role === "ADMIN") {
+    redirect({ href: "/clinic", locale });
+  }
 
   const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
 
@@ -59,8 +62,6 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
   const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
 
   const role = asRole(me.role);
-  const btn =
-    "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
   return (
     <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-3.5 pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
       <div className="flex items-end justify-between gap-3 max-md:items-center">
@@ -72,11 +73,6 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
         </div>
         <LogoutButton />
       </div>
-      {me.role === "ADMIN" ? (
-        <Link className={btn} href="/clinic">
-          {t("openClinic")}
-        </Link>
-      ) : null}
       <section className="grid gap-[18px] pt-7">
         <h2>{t("visits")}</h2>
         <div className="grid gap-3">

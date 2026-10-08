@@ -232,7 +232,11 @@
     "deleteClinic": "Ջնջել կլինիկան",
     "deleteClinicBody": "Կլինիկայի հետ ջնջվում են ադմինը, բժիշկները և այցերը։",
     "deleteClinicAction": "Ջնջել",
-    "deleteClinicFailed": "Կլինիկան չջնջվեց"
+    "deleteClinicFailed": "Կլինիկան չջնջվեց",
+    "clinicProfile": "Կլինիկա",
+    "staff": "Անձնակազմ",
+    "services": "Ծառայություններ",
+    "finance": "Գումար"
   },
   "desk": {
     "denied": "Այս էջը կլինիկայի ադմինի համար է։",
@@ -279,7 +283,27 @@
     "weekThu": "Հինգշաբթի",
     "weekFri": "Ուրբաթ",
     "weekSat": "Շաբաթ",
-    "weekSun": "Կիրակի"
+    "weekSun": "Կիրակի",
+    "pendingLabel": "Սպասող հայտեր",
+    "todayLabel": "Այսօրվա այցեր",
+    "saved": "Պահված է",
+    "saveFailed": "Չպահվեց",
+    "newBranch": "Նոր մասնաճյուղ",
+    "branchName": "Մասնաճյուղի անուն",
+    "dayOff": "Բացակայություն",
+    "dayOffHint": "Ընտրված օրը բժիշկը չի ընդունում։",
+    "closeDay": "Փակել օրը",
+    "openDay": "Բացել",
+    "dayOffFailed": "Օրը չփակվեց",
+    "noReviews": "Կարծիք դեռ չկա։",
+    "reply": "Պատասխան",
+    "sendReply": "Պահել պատասխանը",
+    "replyFailed": "Պատասխանը չպահվեց",
+    "reschedule": "Տեղափոխել",
+    "pickDate": "Ամսաթիվ",
+    "noSlots": "Այդ օրը ազատ ժամ չկա։",
+    "noVisits": "Այց դեռ չկա։",
+    "save": "Պահել"
   },
   "platform": {
     "title": "Կլինիկայի գրանցում",

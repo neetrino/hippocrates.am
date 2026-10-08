@@ -58,9 +58,9 @@ export type AppointmentCard = {
   status: string;
   priceAmd: number;
   isEstimate: boolean;
-  offering: { name: string };
+  offering: { id: string; name: string };
   clinic: { name: string; locales?: { locale: string; name: string }[] };
-  doctor: { user: { displayName: string }; locales?: { locale: string; name: string }[] };
+  doctor: { id: string; user: { displayName: string }; locales?: { locale: string; name: string }[] };
   patient: { displayName: string };
   review: { id: string } | null;
 };

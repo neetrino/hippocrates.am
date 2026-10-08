@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState, type RefObject } from 
 import { LogoutButton } from "@/features/portal/logout-button";
 import { Link } from "@/i18n/navigation";
 
-export type AccountHref = "/login" | "/me" | "/super-admin";
+export type AccountHref = "/login" | "/me" | "/clinic" | "/super-admin";
 
 const circleClass =
   "grid h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border-0 bg-accent p-0 text-white shadow-accent transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.28)] max-md:h-[38px] max-md:w-[38px]";

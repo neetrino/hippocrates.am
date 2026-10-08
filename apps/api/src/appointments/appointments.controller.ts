@@ -17,9 +17,9 @@ const appointmentCard = {
   status: true,
   priceAmd: true,
   isEstimate: true,
-  offering: { select: { name: true } },
+  offering: { select: { id: true, name: true } },
   clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
-  doctor: { select: { user: { select: { displayName: true } }, locales: { select: { locale: true, name: true } } } },
+  doctor: { select: { id: true, user: { select: { displayName: true } }, locales: { select: { locale: true, name: true } } } },
   patient: { select: { displayName: true } },
   review: { select: { id: true } },
 } as const;

@@ -232,7 +232,11 @@
     "deleteClinic": "Delete clinic",
     "deleteClinicBody": "The admin, doctors, and visits are removed with the clinic.",
     "deleteClinicAction": "Delete",
-    "deleteClinicFailed": "The clinic could not be deleted."
+    "deleteClinicFailed": "The clinic could not be deleted.",
+    "clinicProfile": "Clinic",
+    "staff": "Staff",
+    "services": "Services",
+    "finance": "Totals"
   },
   "desk": {
     "denied": "This page is for the clinic admin.",
@@ -279,7 +283,27 @@
     "weekThu": "Thursday",
     "weekFri": "Friday",
     "weekSat": "Saturday",
-    "weekSun": "Sunday"
+    "weekSun": "Sunday",
+    "pendingLabel": "Waiting requests",
+    "todayLabel": "Today's visits",
+    "saved": "Saved",
+    "saveFailed": "Could not save",
+    "newBranch": "New branch",
+    "branchName": "Branch name",
+    "dayOff": "Day off",
+    "dayOffHint": "The doctor does not see patients on the chosen day.",
+    "closeDay": "Close the day",
+    "openDay": "Reopen",
+    "dayOffFailed": "The day was not closed",
+    "noReviews": "No reviews yet.",
+    "reply": "Reply",
+    "sendReply": "Save reply",
+    "replyFailed": "The reply was not saved",
+    "reschedule": "Reschedule",
+    "pickDate": "Date",
+    "noSlots": "That day has no free time.",
+    "noVisits": "No visits yet.",
+    "save": "Save"
   },
   "platform": {
     "title": "Register a clinic",

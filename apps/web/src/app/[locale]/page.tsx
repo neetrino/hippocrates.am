@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { HomeClinicSearch } from "@/features/catalog/home-clinic-search";
 import { getPathname } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
@@ -15,7 +16,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("home");
   const nav = await getTranslations("nav");
   const common = await getTranslations("common");
-  const data = await publicGet<HomeData>("/public/home", locale);
+  const catalog = await getTranslations("catalog");
+  const [data, clinics] = await Promise.all([
+    publicGet<HomeData>("/public/home", locale),
+    publicGet<ClinicCard[]>("/public/clinics", locale),
+  ]);
   const action = getPathname({ locale, href: "/clinics" });
   return (
     <div className="mx-auto w-[min(var(--max-width-shell),calc(100%-48px))] max-md:w-[min(var(--max-width-shell),calc(100%-20px))]">
@@ -25,23 +30,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="m-0 max-w-[42rem] text-lg leading-[1.7] font-light tracking-[0.01em] text-muted max-md:text-base">
             {t("lede")}
           </p>
-          <form
-            className="flex gap-2 rounded-full border border-line bg-white p-2 shadow-soft focus-within:border-accent/45 focus-within:shadow-[0_14px_36px_rgba(0,167,157,0.12)] max-md:flex-col max-md:rounded-[18px]"
+          <HomeClinicSearch
+            clinics={clinics}
             action={action}
-          >
-            <input
-              name="name"
-              placeholder={t("clinicPlaceholder")}
-              aria-label={t("clinicPlaceholder")}
-              className="flex-1 border-0 bg-transparent px-4 py-3 outline-none"
-            />
-            <button
-              className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent max-md:w-full"
-              type="submit"
-            >
-              {common("search")}
-            </button>
-          </form>
+            placeholder={t("clinicPlaceholder")}
+            searchLabel={common("search")}
+            emptyLabel={catalog("emptyClinicSearch")}
+          />
         </div>
       </section>
       <section className="grid gap-[18px] pt-7 max-md:pt-[18px]">

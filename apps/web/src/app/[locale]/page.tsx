@@ -39,6 +39,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         prevSlide={t("prevSlide")}
         nextSlide={t("nextSlide")}
         images={data.clinics.map((clinic) => clinic.coverUrl).filter((url): url is string => Boolean(url))}
+        howTitle={t("howTitle")}
+        steps={[
+          { title: t("how1Title"), body: t("how1Body") },
+          { title: t("how2Title"), body: t("how2Body") },
+          { title: t("how3Title"), body: t("how3Body") },
+        ]}
+        clinicsLabel={nav("clinics")}
+        seeAll={common("seeAll")}
+        clinics={data.clinics.slice(0, 2).map((clinic) => ({
+          id: clinic.id,
+          name: clinic.name,
+          district: clinic.district,
+        }))}
       />
       <HomeCatalog
         clinicsTitle={nav("clinics")}

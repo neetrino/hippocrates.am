@@ -1,6 +1,7 @@
 import { getPathname } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { HomeHeroSlides } from "@/features/home/home-hero-slides";
+import { HomeHeroMobileFill, type HeroMobileClinic, type HeroMobileStep } from "@/features/home/home-hero-mobile";
 import { SearchBar } from "@/shared/ui/search-bar";
 
 type HomeHeroProps = {
@@ -13,6 +14,11 @@ type HomeHeroProps = {
   prevSlide: string;
   nextSlide: string;
   images: string[];
+  howTitle: string;
+  steps: HeroMobileStep[];
+  clinicsLabel: string;
+  seeAll: string;
+  clinics: HeroMobileClinic[];
 };
 
 export function HomeHero({
@@ -25,6 +31,11 @@ export function HomeHero({
   prevSlide,
   nextSlide,
   images,
+  howTitle,
+  steps,
+  clinicsLabel,
+  seeAll,
+  clinics,
 }: HomeHeroProps) {
   return (
     <section className="relative -mt-[6.75rem] h-dvh min-h-[32rem] w-full overflow-hidden max-md:-mt-[4.75rem] max-md:min-h-[100svh]">
@@ -45,6 +56,13 @@ export function HomeHero({
           />
         </div>
       </HomeHeroSlides>
+      <HomeHeroMobileFill
+        howTitle={howTitle}
+        steps={steps}
+        clinicsLabel={clinicsLabel}
+        seeAll={seeAll}
+        clinics={clinics}
+      />
     </section>
   );
 }

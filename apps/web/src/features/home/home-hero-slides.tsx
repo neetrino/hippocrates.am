@@ -8,7 +8,7 @@ const FALLBACK_IMAGE = "/home/hero.jpg";
 const SLIDE_MS = 6500;
 
 const slideButtonClass =
-  "pointer-events-auto grid size-9 place-items-center rounded-full border border-white/45 bg-white/5 text-white shadow-none transition-[background-color,border-color,transform] duration-160 hover:border-white/70 hover:bg-white/15 active:scale-95 md:size-11";
+  "pointer-events-auto grid size-9 place-items-center rounded-full border border-white/40 bg-transparent text-white/70 transition-[background-color,border-color,color,transform] duration-160 hover:border-white/70 hover:bg-white/10 hover:text-white active:scale-95 md:size-11";
 
 type HomeHeroSlidesProps = {
   images: string[];

@@ -28,6 +28,7 @@ export type PortalHref =
   | "/clinic/visits"
   | "/clinic/patients"
   | "/clinic/reviews"
+  | "/clinic/notices"
   | "/clinic/finance";
 
 export type PortalHash = "visits" | "notices" | "favorites" | "questions" | "reviews" | "settings";

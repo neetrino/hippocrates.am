@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
@@ -7,6 +7,7 @@ import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
+import { financeWindow } from "./finance-range";
 
 @Controller()
 export class OperationsController {
@@ -90,11 +91,24 @@ export class OperationsController {
 
   @Get("clinics/:clinicId/finance")
   @Roles("ADMIN")
-  async finance(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async finance(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Query("from") from?: string,
+    @Query("to") to?: string,
+  ) {
     requireClinicAdmin(actor, clinicId);
+    const clinic = await this.prisma.clinic.findUnique({ where: { id: clinicId }, select: { timeZone: true } });
+    if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
+    const window = financeWindow(from, to, clinic.timeZone);
     const rows = await this.prisma.appointment.groupBy({
       by: ["status"],
-      where: { clinicId, isEstimate: false, status: { in: ["REQUESTED", "CONFIRMED", "COMPLETED"] } },
+      where: {
+        clinicId,
+        isEstimate: false,
+        status: { in: ["REQUESTED", "CONFIRMED", "COMPLETED"] },
+        ...(window ? { startsAt: window } : {}),
+      },
       _sum: { priceAmd: true },
     });
     const totals = { REQUESTED: 0, CONFIRMED: 0, COMPLETED: 0 };

@@ -1,5 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ClinicBranches, type ClinicBranch } from "@/features/clinic/clinic-branches";
+import { ClinicCover } from "@/features/clinic/clinic-cover";
 import { ClinicProfileForm, type ClinicLocaleDraft, type ClinicProfile } from "@/features/clinic/clinic-profile-form";
 import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
@@ -11,6 +12,7 @@ type ClinicLocales = { en: ClinicLocaleDraft; ru: ClinicLocaleDraft };
 export default async function ClinicProfilePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   prepareLocale(raw);
+  const locale = await getLocale();
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
   const me = await requireClinicAdmin();
@@ -23,6 +25,7 @@ export default async function ClinicProfilePage({ params }: { params: Promise<{ 
   return (
     <ClinicManagerShell eyebrow={common("ADMIN")} title={portal("clinicProfile")}>
       <div className="grid gap-8">
+        {profile ? <ClinicCover clinicId={me.clinicId} coverUrl={profile.coverUrl} name={profile.name} /> : null}
         {profile && locales ? (
           <ClinicProfileForm
             clinicId={me.clinicId}
@@ -30,8 +33,18 @@ export default async function ClinicProfilePage({ params }: { params: Promise<{ 
             locales={locales}
           />
         ) : null}
-        <ClinicBranches clinicId={me.clinicId} branches={branches ?? []} />
+        <ClinicBranches
+          clinicId={me.clinicId}
+          branches={branches ?? []}
+          clinicAddress={profile?.address ?? ""}
+          localeAddress={localeAddress(locale, profile?.address ?? "", locales)}
+        />
       </div>
     </ClinicManagerShell>
   );
+}
+
+function localeAddress(locale: string, address: string, locales: ClinicLocales | null): string {
+  const foreign = locale === "en" ? locales?.en.address : locale === "ru" ? locales?.ru.address : "";
+  return foreign?.trim() ? foreign : address;
 }

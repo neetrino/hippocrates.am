@@ -29,6 +29,7 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
     );
   }
   if (me.role === "SUPER_ADMIN") redirect({ href: "/super-admin", locale });
+  if (me.role === "ADMIN") redirect({ href: "/clinic/notices", locale });
   if (me.role !== "PATIENT" && me.role !== "DOCTOR") redirect({ href: "/me", locale });
   const notices = (await sessionGet<NoticeItem[]>("/me/notifications")) ?? [];
   const list = (

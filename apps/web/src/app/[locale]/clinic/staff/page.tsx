@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { ClinicDayOff } from "@/features/clinic/clinic-day-off";
+import { DoctorList, type DoctorRow } from "@/features/clinic/clinic-doctor-editor";
 import { ClinicDoctorForm } from "@/features/clinic/clinic-forms";
 import { ClinicHours, type HourWindow } from "@/features/clinic/clinic-hours";
 import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
@@ -8,7 +9,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { formatVisitDate } from "@/shared/format";
 import { sessionGet } from "@/shared/session-api";
 
-type StaffDoctor = { id: string; specialty: string; user: { displayName: string } };
+type StaffDoctor = DoctorRow;
 type DayOff = { id: string; doctorId: string; startsAt: string };
 type ClinicHourBook = { clinic: HourWindow[]; doctors: { id: string; windows: HourWindow[] }[]; exceptions: DayOff[] };
 
@@ -28,14 +29,7 @@ export default async function ClinicStaffPage({ params }: { params: Promise<{ lo
   return (
     <ClinicManagerShell eyebrow={common("ADMIN")} title={portal("staff")}>
       <div className="grid gap-8">
-        <div className="grid gap-3">
-          {staff.map((doctor) => (
-            <p className="m-0 flex items-center justify-between gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={doctor.id}>
-              <span className="font-semibold">{doctor.name}</span>
-              <span className="text-muted">{doctors?.find((item) => item.id === doctor.id)?.specialty}</span>
-            </p>
-          ))}
-        </div>
+        <DoctorList clinicId={me.clinicId} doctors={doctors ?? []} />
         <ClinicDoctorForm clinicId={me.clinicId} />
         {hours ? (
           <ClinicHours

@@ -10,6 +10,7 @@ export type ClinicProfile = {
   address: string;
   phone: string;
   district: string;
+  coverUrl: string | null;
 };
 
 export type ClinicCopy = {

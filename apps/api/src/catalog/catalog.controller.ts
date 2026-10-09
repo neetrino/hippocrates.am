@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { intOf, recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { updateOffering } from "./offering-edit";
 
 @Controller()
 export class CatalogController {
@@ -52,5 +53,17 @@ export class CatalogController {
         doctor: { select: { user: { select: { displayName: true } } } },
       },
     });
+  }
+
+  @Patch("clinics/:clinicId/offerings/:offeringId")
+  @Roles("ADMIN")
+  async edit(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Param("offeringId") offeringId: string,
+    @Body() body: unknown,
+  ): Promise<{ id: string }> {
+    requireClinicAdmin(actor, clinicId);
+    return updateOffering(this.prisma, clinicId, offeringId, body);
   }
 }

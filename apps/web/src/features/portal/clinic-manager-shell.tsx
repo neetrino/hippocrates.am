@@ -6,6 +6,7 @@ import {
   ClinicsIcon,
   DashboardIcon,
   FinanceIcon,
+  NoticesIcon,
   PatientsIcon,
   ReviewsIcon,
   ServicesIcon,
@@ -32,6 +33,7 @@ export function ClinicManagerShell({ children, title, eyebrow }: ClinicManagerSh
     { href: "/clinic/visits", label: me("visits"), icon: <VisitsIcon />, match: "exact" },
     { href: "/clinic/patients", label: desk("patientList"), icon: <PatientsIcon />, match: "prefix" },
     { href: "/clinic/reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "exact" },
+    { href: "/clinic/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact" },
     { href: "/clinic/finance", label: portal("finance"), icon: <FinanceIcon />, match: "exact" },
   ];
 

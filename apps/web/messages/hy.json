@@ -303,7 +303,19 @@
     "pickDate": "Ամսաթիվ",
     "noSlots": "Այդ օրը ազատ ժամ չկա։",
     "noVisits": "Այց դեռ չկա։",
-    "save": "Պահել"
+    "save": "Պահել",
+    "edit": "Խմբագրել",
+    "remove": "Հանել",
+    "cover": "Շապիկ",
+    "changeCover": "Փոխել շապիկը",
+    "removeCover": "Հանել շապիկը",
+    "coverFailed": "Շապիկը չպահվեց",
+    "doctorArmenianRequired": "Լրացրեք հայերեն անունը և մասնագիտությունը։",
+    "fromDate": "Սկսած",
+    "toDate": "Մինչև",
+    "applyRange": "Ցույց տալ",
+    "allDates": "Ամբողջ ժամանակը",
+    "rangeInvalid": "Ընտրեք սկիզբը և վերջը։"
   },
   "platform": {
     "title": "Կլինիկայի գրանցում",

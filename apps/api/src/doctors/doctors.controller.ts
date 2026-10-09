@@ -1,17 +1,23 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
+import type { Request } from "express";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, passwordOf, recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
+import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { RateLimitService } from "../identity/rate-limit.service";
 import { SessionService } from "../identity/session.service";
+import { saveDoctorLocale, updateDoctor } from "./doctor-edit";
+import { clearDoctorPhoto, saveDoctorPhoto } from "./doctor-photo";
 
 @Controller()
 export class DoctorsController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sessions: SessionService,
+    private readonly limits: RateLimitService,
   ) {}
 
   @Post("clinics/:clinicId/doctors")
@@ -54,10 +60,75 @@ export class DoctorsController {
   @Roles("ADMIN")
   async listDoctors(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
-    return this.prisma.doctorProfile.findMany({
+    const rows = await this.prisma.doctorProfile.findMany({
       where: { clinicId },
-      include: { user: { select: { displayName: true, email: true } } },
       orderBy: { specialty: "asc" },
+      select: {
+        id: true,
+        specialty: true,
+        bio: true,
+        photoKey: true,
+        user: { select: { displayName: true, email: true } },
+        locales: { select: { locale: true, name: true, specialty: true, bio: true } },
+      },
     });
+    return rows.map((doctor) => ({
+      id: doctor.id,
+      specialty: doctor.specialty,
+      bio: doctor.bio,
+      photoUrl: publicAssetUrl(doctor.photoKey),
+      user: doctor.user,
+      locales: doctor.locales,
+    }));
+  }
+
+  @Patch("clinics/:clinicId/doctors/:doctorId")
+  @Roles("ADMIN")
+  async editDoctor(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Param("doctorId") doctorId: string,
+    @Body() body: unknown,
+  ): Promise<{ id: string }> {
+    requireClinicAdmin(actor, clinicId);
+    return updateDoctor(this.prisma, clinicId, doctorId, body);
+  }
+
+  @Put("clinics/:clinicId/doctors/:doctorId/locales")
+  @Roles("ADMIN")
+  async editLocale(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Param("doctorId") doctorId: string,
+    @Body() body: unknown,
+  ): Promise<{ ok: true }> {
+    requireClinicAdmin(actor, clinicId);
+    return saveDoctorLocale(this.prisma, clinicId, doctorId, body);
+  }
+
+  @Post("clinics/:clinicId/doctors/:doctorId/photo")
+  @Roles("ADMIN")
+  async uploadPhoto(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Param("doctorId") doctorId: string,
+    @Req() request: Request,
+  ): Promise<{ photoUrl: string }> {
+    requireClinicAdmin(actor, clinicId);
+    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    return { photoUrl: await saveDoctorPhoto(this.prisma, clinicId, doctorId, request) };
+  }
+
+  @Delete("clinics/:clinicId/doctors/:doctorId/photo")
+  @Roles("ADMIN")
+  async removePhoto(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Param("doctorId") doctorId: string,
+  ): Promise<{ ok: true }> {
+    requireClinicAdmin(actor, clinicId);
+    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    await clearDoctorPhoto(this.prisma, clinicId, doctorId);
+    return { ok: true };
   }
 }

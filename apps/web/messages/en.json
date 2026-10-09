@@ -303,7 +303,19 @@
     "pickDate": "Date",
     "noSlots": "That day has no free time.",
     "noVisits": "No visits yet.",
-    "save": "Save"
+    "save": "Save",
+    "edit": "Edit",
+    "remove": "Remove",
+    "cover": "Cover",
+    "changeCover": "Change cover",
+    "removeCover": "Remove cover",
+    "coverFailed": "The cover was not saved",
+    "doctorArmenianRequired": "Fill in the Armenian name and specialty.",
+    "fromDate": "From",
+    "toDate": "To",
+    "applyRange": "Show",
+    "allDates": "All time",
+    "rangeInvalid": "Choose a start and an end."
   },
   "platform": {
     "title": "Register a clinic",

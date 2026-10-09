@@ -27,27 +27,24 @@ export function HomeHero({
   images,
 }: HomeHeroProps) {
   return (
-    <section className="relative -mt-[6.75rem] h-dvh min-h-[32rem] w-full overflow-hidden max-md:-mt-[4.75rem]">
-      <HomeHeroSlides images={images} prevLabel={prevSlide} nextLabel={nextSlide} />
-      <div className="page-shell pointer-events-none relative z-2 flex h-full items-end pt-28 pb-10 md:items-center md:pt-36 md:pb-16">
-        <div className="pointer-events-auto grid w-full max-w-[44rem] gap-6 max-md:gap-5">
-          <p className="kicker tracking-[0.18em] text-accent">{eyebrow}</p>
-          <h1 className="max-w-[18ch] text-[clamp(2.65rem,5.6vw,4.35rem)] leading-[1.08] font-semibold tracking-[-0.03em] text-balance text-white max-md:max-w-none">
-            {title}
-          </h1>
-          <p className="m-0 max-w-[28rem] text-[1.12rem] leading-[1.65] font-light text-white/84 max-md:text-[1.02rem]">
-            {lede}
-          </p>
-          <div className="pt-1">
-            <SearchBar
-              action={getPathname({ locale, href: "/clinics" })}
-              placeholder={placeholder}
-              ariaLabel={placeholder}
-              submitLabel={searchLabel}
-            />
-          </div>
+    <section className="relative -mt-[6.75rem] h-dvh min-h-[32rem] w-full overflow-hidden max-md:-mt-[4.75rem] max-md:min-h-[100svh]">
+      <HomeHeroSlides images={images} prevLabel={prevSlide} nextLabel={nextSlide}>
+        <p className="kicker tracking-[0.18em] text-accent">{eyebrow}</p>
+        <h1 className="max-w-[18ch] text-[clamp(2.65rem,5.6vw,4.35rem)] leading-[1.08] font-semibold tracking-[-0.03em] text-balance text-white max-md:max-w-[14ch] max-md:text-[2.05rem] max-md:leading-[1.16]">
+          {title}
+        </h1>
+        <p className="m-0 max-w-[28rem] text-[1.12rem] leading-[1.65] font-light text-white/84 max-md:max-w-[34ch] max-md:text-[0.98rem] max-md:leading-normal">
+          {lede}
+        </p>
+        <div className="pt-1 max-md:pt-0.5">
+          <SearchBar
+            action={getPathname({ locale, href: "/clinics" })}
+            placeholder={placeholder}
+            ariaLabel={placeholder}
+            submitLabel={searchLabel}
+          />
         </div>
-      </div>
+      </HomeHeroSlides>
     </section>
   );
 }

@@ -465,8 +465,9 @@
   }
 
   .search-shell {
-    flex-direction: column;
-    border-radius: 1.15rem;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.28rem 0.28rem 0.28rem 0.35rem;
   }
 
   .section-y {

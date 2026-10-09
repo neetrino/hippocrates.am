@@ -154,4 +154,20 @@
   .scrollbar-soft::-webkit-scrollbar-corner {
     background: transparent;
   }
+
+  .scrollbar-sidebar::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  .scrollbar-sidebar::-webkit-scrollbar-track {
+    margin-block: 3.25rem;
+    background: transparent;
+  }
+
+  .scrollbar-sidebar::-webkit-scrollbar-thumb {
+    border: 5px solid transparent;
+    border-radius: 999px;
+    background-color: rgba(0, 167, 157, 0.7);
+    background-clip: padding-box;
+  }
 }

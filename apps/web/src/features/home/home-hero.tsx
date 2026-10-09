@@ -1,10 +1,9 @@
 import { HomeClinicSearch } from "@/features/catalog/home-clinic-search";
+import { HomeHeroMobileFill, type HeroMobileClinic, type HeroMobileStep } from "@/features/home/home-hero-mobile";
 import { HomeHeroSlides } from "@/features/home/home-hero-slides";
 import { getPathname } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
-import { HomeHeroSlides } from "@/features/home/home-hero-slides";
-import { HomeHeroMobileFill, type HeroMobileClinic, type HeroMobileStep } from "@/features/home/home-hero-mobile";
-import { SearchBar } from "@/shared/ui/search-bar";
+import type { ClinicCard } from "@/shared/public-types";
 
 type HomeHeroProps = {
   locale: AppLocale;
@@ -22,7 +21,7 @@ type HomeHeroProps = {
   steps: HeroMobileStep[];
   clinicsLabel: string;
   seeAll: string;
-  clinics: HeroMobileClinic[];
+  previewClinics: HeroMobileClinic[];
 };
 
 export function HomeHero({
@@ -41,7 +40,7 @@ export function HomeHero({
   steps,
   clinicsLabel,
   seeAll,
-  clinics,
+  previewClinics,
 }: HomeHeroProps) {
   return (
     <section className="relative -mt-[6.75rem] h-dvh min-h-[32rem] w-full overflow-hidden max-md:-mt-[4.75rem] max-md:min-h-[100svh]">
@@ -54,11 +53,12 @@ export function HomeHero({
           {lede}
         </p>
         <div className="pt-1 max-md:pt-0.5 md:max-w-[42rem]">
-          <SearchBar
+          <HomeClinicSearch
+            clinics={clinics}
             action={getPathname({ locale, href: "/clinics" })}
             placeholder={placeholder}
-            ariaLabel={placeholder}
-            submitLabel={searchLabel}
+            searchLabel={searchLabel}
+            emptyLabel={emptyLabel}
           />
         </div>
       </HomeHeroSlides>
@@ -67,7 +67,7 @@ export function HomeHero({
         steps={steps}
         clinicsLabel={clinicsLabel}
         seeAll={seeAll}
-        clinics={clinics}
+        clinics={previewClinics}
       />
     </section>
   );

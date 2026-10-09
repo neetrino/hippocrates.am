@@ -49,7 +49,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         ]}
         clinicsLabel={nav("clinics")}
         seeAll={common("seeAll")}
-        clinics={data.clinics.slice(0, 2).map((clinic) => ({
+        previewClinics={data.clinics.slice(0, 2).map((clinic) => ({
           id: clinic.id,
           name: clinic.name,
           district: clinic.district,

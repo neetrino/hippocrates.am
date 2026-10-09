@@ -46,12 +46,14 @@ export function VisitGroup({
   visits,
   moreLabel,
   lessLabel,
+  actions = "patient",
 }: {
   tone: Tone;
   title: string;
   visits: VisitRow[];
   moreLabel: string;
   lessLabel: string;
+  actions?: "patient" | "doctor";
 }) {
   const [open, setOpen] = useState(false);
   const toneStyle = toneClass[tone];
@@ -67,7 +69,7 @@ export function VisitGroup({
       </header>
       <div className="grid gap-3 p-4">
         {shown.map((visit) => (
-          <VisitCard key={visit.id} visit={visit} rail={toneStyle.rail} quiet={quiet} />
+          <VisitCard key={visit.id} visit={visit} rail={toneStyle.rail} quiet={quiet} actions={actions} />
         ))}
         {hidden > 0 ? (
           <button
@@ -85,7 +87,17 @@ export function VisitGroup({
   );
 }
 
-function VisitCard({ visit, rail, quiet }: { visit: VisitRow; rail: string; quiet: boolean }) {
+function VisitCard({
+  visit,
+  rail,
+  quiet,
+  actions,
+}: {
+  visit: VisitRow;
+  rail: string;
+  quiet: boolean;
+  actions: "patient" | "doctor";
+}) {
   const status = asVisitStatus(visit.status);
   return (
     <article className={`grid gap-3 rounded-[1.15rem] border border-line border-l-4 bg-sand/70 px-4 py-4 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:items-start ${rail}`}>
@@ -106,8 +118,8 @@ function VisitCard({ visit, rail, quiet }: { visit: VisitRow; rail: string; quie
           </span>
           <span className="text-xs text-muted">{visit.price}</span>
         </p>
-        <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode="patient" />
-        {visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
+        <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode={actions} />
+        {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
     </article>
   );

@@ -4,6 +4,7 @@ import { AppError } from "../common/app-error";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
+import { clinicCopies, clinicNameSearch } from "./clinic-search";
 
 const clinicFields = {
   id: true,
@@ -103,12 +104,18 @@ export class MarketplaceController {
     const rows = await this.prisma.clinic.findMany({
       where: {
         published: true,
-        ...(needle ? { OR: clinicNameSearch(needle, language) } : {}),
+        ...(needle ? { OR: clinicNameSearch(needle) } : {}),
       },
       orderBy: { name: "asc" },
-      select: clinicSelect(language),
+      select: {
+        ...clinicFields,
+        locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
+      },
     });
-    return rows.map((clinic) => clinicView(applyClinic(clinic, language)));
+    return rows.map((clinic) => ({
+      ...clinicView(applyClinic(clinic, language)),
+      copies: clinicCopies(clinic),
+    }));
   }
 
   @Public()
@@ -264,13 +271,6 @@ export class MarketplaceController {
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
     return doctorView(applyDoctor(doctor, catalogLocale(locale)));
   }
-}
-
-function clinicNameSearch(name: string, locale: CatalogLocale | null) {
-  const contains = { contains: name, mode: "insensitive" as const };
-  const official = { name: contains };
-  if (!locale) return [official];
-  return [official, { locales: { some: { locale, name: contains } } }];
 }
 
 function doctorNameSearch(name: string, locale: CatalogLocale | null) {

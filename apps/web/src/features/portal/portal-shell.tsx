@@ -11,6 +11,7 @@ import { cn } from "@/shared/ui/cn";
 
 export type PortalHref =
   | "/me"
+  | "/me/schedule"
   | "/me/visits"
   | "/me/favorites"
   | "/me/questions"
@@ -19,7 +20,17 @@ export type PortalHref =
   | "/me/settings"
   | "/super-admin"
   | "/super-admin/clinics"
-  | "/super-admin/questions";
+  | "/super-admin/questions"
+  | "/clinic"
+  | "/clinic/profile"
+  | "/clinic/staff"
+  | "/clinic/services"
+  | "/clinic/visits"
+  | "/clinic/patients"
+  | "/clinic/reviews"
+  | "/clinic/notices"
+  | "/clinic/finance"
+  | "/clinic/settings";
 
 export type PortalHash = "visits" | "notices" | "favorites" | "questions" | "reviews" | "settings";
 
@@ -37,7 +48,6 @@ type PortalShellProps = {
   title: string;
   eyebrow: string;
   subtitle: string;
-  homeHref: PortalHref;
   accountHref: AccountHref;
   items: PortalNavItem[];
   footerItems: PortalNavItem[];
@@ -158,7 +168,6 @@ function SidebarNav({
   footerItems,
   pathname,
   hash,
-  homeHref,
   subtitle,
   navLabel,
   plainLabels,
@@ -169,7 +178,6 @@ function SidebarNav({
   footerItems: PortalNavItem[];
   pathname: string;
   hash: string;
-  homeHref: PortalHref;
   subtitle: string;
   navLabel: string;
   plainLabels: boolean;
@@ -178,16 +186,9 @@ function SidebarNav({
 }) {
   const t = useTranslations("portal");
   return (
-    <div className="flex h-full flex-col gap-8">
+    <div className="flex min-h-full flex-col gap-8">
       <div className="px-1">
-        <Link
-          href={homeHref}
-          onClick={() => {
-            onActivate?.({ href: homeHref, label: "", icon: null });
-            onNavigate?.();
-          }}
-          className="inline-flex flex-col gap-1.5"
-        >
+        <Link href="/" onClick={() => onNavigate?.()} aria-label="Hippocrates" className="inline-flex flex-col gap-1.5">
           <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">Hippocrates</span>
           <p className={plainLabels ? "m-0 text-sm font-medium text-white/70" : "m-0 text-[0.68rem] font-bold tracking-[0.16em] text-white/55 uppercase"}>{subtitle}</p>
         </Link>
@@ -204,18 +205,20 @@ function SidebarNav({
           />
         ))}
       </nav>
-      <nav className="grid gap-1 border-t border-white/12 pt-5" aria-label={t("accountNav")}>
-        {footerItems.map((item) => (
-          <NavLink
-            key={`${item.href}-${item.hash ?? "root"}`}
-            item={item}
-            plain={plainLabels}
-            active={isItemActive(pathname, hash, item)}
-            onNavigate={onNavigate}
-            onActivate={onActivate}
-          />
-        ))}
-      </nav>
+      {footerItems.length > 0 ? (
+        <nav className="grid gap-1 border-t border-white/12 pt-5" aria-label={t("accountNav")}>
+          {footerItems.map((item) => (
+            <NavLink
+              key={`${item.href}-${item.hash ?? "root"}`}
+              item={item}
+              plain={plainLabels}
+              active={isItemActive(pathname, hash, item)}
+              onNavigate={onNavigate}
+              onActivate={onActivate}
+            />
+          ))}
+        </nav>
+      ) : null}
     </div>
   );
 }
@@ -262,7 +265,7 @@ function PortalHeader({
         {portrait}
         <div className="min-w-0">
           {eyebrow ? <p className={eyebrowClass}>{eyebrow}</p> : null}
-          <h1 className="truncate text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
+          <h1 className="truncate pb-[0.12em] leading-[1.45] text-[clamp(1.55rem,3vw,2.15rem)]">{title}</h1>
         </div>
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-2.5">
@@ -274,7 +277,7 @@ function PortalHeader({
   );
 }
 
-export function PortalShell({ children, title, eyebrow, subtitle, homeHref, accountHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
+export function PortalShell({ children, title, eyebrow, subtitle, accountHref, items, footerItems, navLabel, action, portrait, plainLabels = false }: PortalShellProps) {
   const t = useTranslations("portal");
   const pathname = localeNeutralPath(usePathname());
   const [hash, activate] = usePortalHash(pathname);
@@ -297,7 +300,6 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, acco
     footerItems,
     pathname,
     hash,
-    homeHref,
     subtitle,
     navLabel: navLabel ?? t("navLabel"),
     plainLabels,
@@ -306,17 +308,21 @@ export function PortalShell({ children, title, eyebrow, subtitle, homeHref, acco
 
   return (
     <div className="fixed inset-0 z-[60] flex bg-[#eef3f2]">
-      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-[#2a4a47] px-3 pt-7 pb-6 md:flex md:flex-col">
-        <SidebarNav {...sidebar} />
+      <aside className="relative hidden min-h-0 w-[272px] shrink-0 overflow-hidden rounded-tr-[2.75rem] rounded-br-[2.75rem] [clip-path:inset(0_round_2.75rem)] bg-[#2a4a47] md:flex md:flex-col">
+        <div className="scrollbar-sidebar min-h-0 flex-1 overflow-y-auto px-3 pt-7 pb-6">
+          <SidebarNav {...sidebar} />
+        </div>
       </aside>
       {open ? (
         <div className="fixed inset-0 z-20 md:hidden">
           <button type="button" className="absolute inset-0 cursor-pointer border-0 bg-[rgba(14,20,20,0.5)] p-0 backdrop-blur-[6px]" aria-label={t("closeMenu")} onClick={close} />
-          <aside id={menuId} className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-[#2a4a47] px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
-            <button type="button" className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white" aria-label={t("closeMenu")} onClick={close}>
+          <aside id={menuId} className="relative z-1 flex h-full min-h-0 w-[min(288px,86vw)] flex-col overflow-hidden rounded-tr-[2.5rem] rounded-br-[2.5rem] [clip-path:inset(0_round_2.5rem)] bg-[#2a4a47] pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+            <button type="button" className="mb-4 mr-3 ml-auto grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white" aria-label={t("closeMenu")} onClick={close}>
               <CloseIcon />
             </button>
-            <SidebarNav {...sidebar} onNavigate={close} />
+            <div className="scrollbar-sidebar min-h-0 flex-1 overflow-y-auto px-3 pb-5">
+              <SidebarNav {...sidebar} onNavigate={close} />
+            </div>
           </aside>
         </div>
       ) : null}

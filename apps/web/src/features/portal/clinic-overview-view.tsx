@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { DeleteClinic } from "@/features/portal/delete-clinic";
 import { Link } from "@/i18n/navigation";
 import { formatAmount, formatWhen } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
@@ -222,6 +223,7 @@ export async function ClinicOverviewView({ clinic, locale }: { clinic: ClinicOve
       <DoctorSection doctors={clinic.doctors} />
       <ServiceSection offerings={clinic.offerings} />
       <ReviewSection reviews={clinic.reviews} reviewCount={clinic.reviewCount} locale={locale} />
+      <DeleteClinic clinicId={clinic.id} clinicName={source?.name || ""} />
     </div>
   );
 }

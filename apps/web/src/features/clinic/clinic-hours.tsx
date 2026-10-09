@@ -64,7 +64,7 @@ export function ClinicHours({
   );
 }
 
-function HoursEditor({ title, windows, savePath }: { title: string; windows: HourWindow[]; savePath: string }) {
+export function HoursEditor({ title, windows, savePath }: { title: string; windows: HourWindow[]; savePath: string }) {
   const t = useTranslations("desk");
   const [days, setDays] = useState(() => dayFields(windows));
   const [message, setMessage] = useState("");

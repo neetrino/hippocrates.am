@@ -1,12 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { PrismaService } from "../infrastructure/prisma.service";
-import { requireClinicAdmin, type Actor } from "../identity/access";
+import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
+import { financeWindow } from "./finance-range";
 
 @Controller()
 export class OperationsController {
@@ -34,6 +35,18 @@ export class OperationsController {
       }),
     ]);
     return { pending, today, patientCount: patients.length };
+  }
+
+  @Get("platform/summary")
+  @Roles("SUPER_ADMIN")
+  async platformSummary(@CurrentActor() actor: Actor) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    const [clinics, pendingQuestions, publishedDoctors] = await Promise.all([
+      this.prisma.clinic.count(),
+      this.prisma.question.count({ where: { status: "PENDING" } }),
+      this.prisma.doctorProfile.count({ where: { published: true } }),
+    ]);
+    return { clinics, pendingQuestions, publishedDoctors };
   }
 
   @Get("clinics/:clinicId/patients")
@@ -78,11 +91,24 @@ export class OperationsController {
 
   @Get("clinics/:clinicId/finance")
   @Roles("ADMIN")
-  async finance(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async finance(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Query("from") from?: string,
+    @Query("to") to?: string,
+  ) {
     requireClinicAdmin(actor, clinicId);
+    const clinic = await this.prisma.clinic.findUnique({ where: { id: clinicId }, select: { timeZone: true } });
+    if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
+    const window = financeWindow(from, to, clinic.timeZone);
     const rows = await this.prisma.appointment.groupBy({
       by: ["status"],
-      where: { clinicId, isEstimate: false, status: { in: ["REQUESTED", "CONFIRMED", "COMPLETED"] } },
+      where: {
+        clinicId,
+        isEstimate: false,
+        status: { in: ["REQUESTED", "CONFIRMED", "COMPLETED"] },
+        ...(window ? { startsAt: window } : {}),
+      },
       _sum: { priceAmd: true },
     });
     const totals = { REQUESTED: 0, CONFIRMED: 0, COMPLETED: 0 };
@@ -94,8 +120,20 @@ export class OperationsController {
     return totals;
   }
 
+  @Get("clinics/:clinicId/reviews")
+  @Roles("ADMIN")
+  async reviews(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+    requireClinicAdmin(actor, clinicId);
+    return this.prisma.review.findMany({
+      where: { clinicId },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, rating: true, body: true, reply: true, createdAt: true },
+    });
+  }
+
   @Get("me/notifications")
   async notifications(@CurrentActor() actor: Actor) {
+    if (actor.role === "SUPER_ADMIN") return [];
     return this.prisma.notification.findMany({
       where: { userId: actor.id },
       orderBy: { createdAt: "desc" },
@@ -108,6 +146,7 @@ export class OperationsController {
         appointment: {
           select: {
             startsAt: true,
+            patient: { select: { displayName: true } },
             clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
             doctor: {
               select: {
@@ -123,6 +162,7 @@ export class OperationsController {
 
   @Post("me/notifications/read")
   async readNotifications(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
+    if (actor.role === "SUPER_ADMIN") return { ok: true };
     await this.prisma.notification.updateMany({
       where: { userId: actor.id, readAt: null },
       data: { readAt: new Date() },
@@ -132,6 +172,7 @@ export class OperationsController {
 
   @Delete("me/notifications")
   async deleteNotifications(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ deleted: number }> {
+    if (actor.role === "SUPER_ADMIN") return { deleted: 0 };
     const result = await this.prisma.notification.deleteMany({
       where: { userId: actor.id, id: { in: readNoticeIds(body) } },
     });
@@ -140,6 +181,7 @@ export class OperationsController {
 
   @Delete("me/notifications/read")
   async deleteReadNotifications(@CurrentActor() actor: Actor): Promise<{ deleted: number }> {
+    if (actor.role === "SUPER_ADMIN") return { deleted: 0 };
     const result = await this.prisma.notification.deleteMany({
       where: { userId: actor.id, readAt: { not: null } },
     });

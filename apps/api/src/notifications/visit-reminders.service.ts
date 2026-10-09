@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { PrismaService } from "../infrastructure/prisma.service";
-import { appointmentNotice } from "./notifications.service";
+import { appointmentNotice, noticeAudience } from "./notifications.service";
 import { dueReminder, reminderKey } from "./reminder-window";
 
 const MINUTE_MS = 60 * 1000;
@@ -37,7 +37,9 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
     });
     if (visits.length === 0) return;
     const bookedAt = await this.bookedAt(visits.map((visit) => visit.id));
-    const data = visits.flatMap((visit) => this.rowsFor(visit, now, bookedAt.get(visit.id) ?? null));
+    const drafted = visits.flatMap((visit) => this.rowsFor(visit, now, bookedAt.get(visit.id) ?? null));
+    const allowed = new Set(await noticeAudience(this.prisma, drafted.map((row) => row.userId)));
+    const data = drafted.filter((row) => allowed.has(row.userId));
     if (data.length === 0) return;
     await this.prisma.notification.createMany({ data, skipDuplicates: true });
   }

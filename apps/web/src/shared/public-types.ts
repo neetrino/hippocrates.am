@@ -1,3 +1,9 @@
+export type ClinicCopy = {
+  name: string;
+  district: string;
+  address: string;
+};
+
 export type ClinicCard = {
   id: string;
   name: string;
@@ -7,6 +13,8 @@ export type ClinicCard = {
   description: string;
   coverUrl: string | null;
   logoUrl: string | null;
+  /** Official Armenian spelling plus every saved translation. Present on clinic lists. */
+  copies?: ClinicCopy[];
 };
 
 export type DoctorCard = {
@@ -50,9 +58,9 @@ export type AppointmentCard = {
   status: string;
   priceAmd: number;
   isEstimate: boolean;
-  offering: { name: string };
+  offering: { id: string; name: string };
   clinic: { name: string; locales?: { locale: string; name: string }[] };
-  doctor: { user: { displayName: string }; locales?: { locale: string; name: string }[] };
+  doctor: { id: string; user: { displayName: string }; locales?: { locale: string; name: string }[] };
   patient: { displayName: string };
   review: { id: string } | null;
 };

@@ -34,10 +34,15 @@ async function readLimited(request: Request): Promise<Buffer> {
   return Buffer.concat(chunks);
 }
 
+/** Reads one JPG, PNG, or WebP body, at most 2 MB. */
+export async function readUploadedImage(request: Request): Promise<Buffer> {
+  assertPhotoType(request);
+  return readLimited(request);
+}
+
 /** Stores the current user's photo and returns its public URL. */
 export async function saveUserPhoto(prisma: PrismaService, userId: string, request: Request): Promise<string> {
-  assertPhotoType(request);
-  const source = await readLimited(request);
+  const source = await readUploadedImage(request);
   let key: string;
   try {
     key = await uploadAvatar(`users/${userId}/avatar-${Date.now()}.webp`, source);

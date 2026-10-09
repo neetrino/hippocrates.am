@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
   DashboardIcon,
@@ -11,7 +11,7 @@ import {
   VisitsIcon,
 } from "@/features/portal/admin-sidebar-icons";
 import { PortalShell, type PortalNavItem } from "@/features/portal/portal-shell";
-import { noticesReadEvent } from "@/shared/notice";
+import { useUnreadNotices } from "@/features/portal/use-unread-notices";
 
 type PatientPortalShellProps = {
   children: ReactNode;
@@ -20,30 +20,6 @@ type PatientPortalShellProps = {
   action?: ReactNode;
   portrait?: ReactNode;
 };
-
-function useUnreadNotices(): number {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    let ignore = false;
-    void fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/me/notifications`, { credentials: "include" })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((body: { data?: { readAt: string | null }[] } | null) => {
-        if (ignore || !body?.data) return;
-        setCount(body.data.filter((item) => item.readAt === null).length);
-      })
-      .catch(() => undefined);
-    function onRead(): void {
-      ignore = true;
-      setCount(0);
-    }
-    window.addEventListener(noticesReadEvent, onRead);
-    return () => {
-      ignore = true;
-      window.removeEventListener(noticesReadEvent, onRead);
-    };
-  }, []);
-  return count;
-}
 
 export function PatientPortalShell({ children, title, eyebrow, action, portrait }: PatientPortalShellProps) {
   const t = useTranslations("portal");
@@ -63,7 +39,6 @@ export function PatientPortalShell({ children, title, eyebrow, action, portrait 
 
   return (
     <PortalShell
-      homeHref="/me"
       accountHref="/me"
       subtitle={t("patientSubtitle")}
       navLabel={t("patientNavLabel")}

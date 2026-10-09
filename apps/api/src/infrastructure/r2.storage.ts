@@ -74,3 +74,10 @@ export async function uploadAvatar(key: string, source: Buffer): Promise<string>
   const body = await sharp(source).rotate().resize(512, 512, { fit: "cover" }).webp({ quality: 82 }).toBuffer();
   return storeWebp(key, body);
 }
+
+/** Wide WebP cover from an in-memory image. Rejects files sharp cannot read. */
+export async function uploadCover(key: string, source: Buffer): Promise<string> {
+  const { default: sharp } = await import("sharp");
+  const body = await sharp(source).rotate().resize(1600, 1000, { fit: "cover" }).webp({ quality: 82 }).toBuffer();
+  return storeWebp(key, body);
+}

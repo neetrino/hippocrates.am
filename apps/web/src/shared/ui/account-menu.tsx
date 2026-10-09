@@ -9,6 +9,9 @@ export type AccountHref = "/login" | "/me" | "/clinic" | "/super-admin";
 const circleClass =
   "grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-accent p-0 text-white transition-[background] duration-160 hover:bg-accent-hover max-md:h-[38px] max-md:w-[38px]";
 
+const profileIconClass =
+  "grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-line bg-surface p-0 text-ink transition-[color,border-color] duration-160 hover:border-accent hover:text-accent max-md:h-[38px] max-md:w-[38px]";
+
 const rowClass =
   "inline-flex h-9 w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-2.5 text-left font-sans text-[0.86rem] font-medium text-ink/85 transition-colors duration-160 hover:bg-accent-soft hover:text-accent";
 
@@ -88,14 +91,9 @@ function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; l
 export function AccountMenu({ href, label }: AccountMenuProps) {
   if (href === "/login") {
     return (
-      <>
-        <Link href={href} className="btn btn-secondary h-10 px-4 max-md:hidden">
-          {label}
-        </Link>
-        <Link href={href} className={`${circleClass} md:hidden`} aria-label={label}>
-          <UserIcon />
-        </Link>
-      </>
+      <Link href={href} className={profileIconClass} aria-label={label}>
+        <UserIcon />
+      </Link>
     );
   }
   return <SignedInMenu href={href} label={label} />;

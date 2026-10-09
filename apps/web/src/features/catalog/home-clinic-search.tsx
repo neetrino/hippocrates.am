@@ -31,6 +31,7 @@ export function HomeClinicSearch({ clinics, action, placeholder, searchLabel, em
       >
         <input
           name="name"
+          role="combobox"
           value={query}
           placeholder={placeholder}
           aria-label={placeholder}
@@ -67,7 +68,7 @@ function SuggestionList({ id, clinics, emptyLabel }: { id: string; clinics: Clin
     >
       {clinics.length === 0 ? <li className="px-4 py-3 text-muted">{emptyLabel}</li> : null}
       {clinics.map((clinic) => (
-        <li key={clinic.id} role="option">
+        <li key={clinic.id} role="option" aria-selected={false}>
           <Link href={`/clinics/${clinic.id}`} className="grid gap-0.5 px-4 py-3 transition-colors duration-160 hover:bg-sand">
             <span className="font-semibold text-ink">{clinic.name}</span>
             <span className="text-sm text-muted">{[clinic.district, clinic.address].filter(Boolean).join(" · ")}</span>

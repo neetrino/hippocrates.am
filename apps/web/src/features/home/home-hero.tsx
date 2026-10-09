@@ -46,7 +46,7 @@ export function HomeHero({
     <section className="relative -mt-[6.75rem] h-dvh min-h-[32rem] w-full overflow-hidden max-md:-mt-[4.75rem] max-md:min-h-[100svh]">
       <HomeHeroSlides images={images} prevLabel={prevSlide} nextLabel={nextSlide}>
         <p className="kicker tracking-[0.18em] text-accent md:text-[0.84rem]">{eyebrow}</p>
-        <h1 className="max-w-[16ch] text-[clamp(3.5rem,5.6vw,6rem)] leading-[1.02] font-semibold tracking-[-0.035em] text-balance text-white max-md:max-w-[11em] max-md:text-[2.2rem] max-md:leading-[1.15]">
+        <h1 className="max-w-[16ch] text-[clamp(3.5rem,5.6vw,6rem)] leading-[1.28] font-semibold tracking-[-0.02em] text-balance text-white max-md:max-w-[11em] max-md:text-[2.2rem] max-md:leading-[1.32]">
           {title}
         </h1>
         <p className="m-0 max-w-[36rem] text-[1.4rem] leading-[1.55] font-light text-white/84 max-md:max-w-[36ch] max-md:text-[1.02rem] max-md:leading-[1.55]">

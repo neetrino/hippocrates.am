@@ -1,3 +1,5 @@
+import { HomeClinicSearch } from "@/features/catalog/home-clinic-search";
+import { HomeHeroSlides } from "@/features/home/home-hero-slides";
 import { getPathname } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { HomeHeroSlides } from "@/features/home/home-hero-slides";
@@ -11,6 +13,8 @@ type HomeHeroProps = {
   eyebrow: string;
   placeholder: string;
   searchLabel: string;
+  emptyLabel: string;
+  clinics: ClinicCard[];
   prevSlide: string;
   nextSlide: string;
   images: string[];
@@ -28,6 +32,8 @@ export function HomeHero({
   eyebrow,
   placeholder,
   searchLabel,
+  emptyLabel,
+  clinics,
   prevSlide,
   nextSlide,
   images,

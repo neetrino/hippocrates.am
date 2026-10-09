@@ -43,12 +43,22 @@ export function HomeClinicSearch({ clinics, action, placeholder, searchLabel, em
           onFocus={() => setOpen(true)}
           className="min-w-0 flex-1 border-0 bg-transparent px-4 py-2.5 text-base outline-none placeholder:text-text-muted"
         />
-        <button className="btn btn-primary shrink-0" type="submit">
+        <button className="btn btn-primary shrink-0 gap-1.5" type="submit">
+          <SearchIcon />
           {searchLabel}
         </button>
       </form>
       {show ? <SuggestionList id={listId} clinics={suggestions} emptyLabel={emptyLabel} /> : null}
     </div>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="size-4 shrink-0">
+      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M16.2 16.2 20 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }
 

@@ -15,9 +15,9 @@ export function HomeHeroMobileFill({ howTitle, steps, clinicsLabel, seeAll, clin
   const preview = clinics.slice(0, 2);
 
   return (
-    <div className="absolute inset-x-0 top-[calc(50%+2.6rem)] bottom-3 z-3 hidden flex-col gap-3 px-3 [@media(max-width:768px)_and_(min-height:740px)]:flex">
-      <p className="kicker tracking-[0.14em] text-white/80">{howTitle}</p>
-      <ol className="grid min-h-0 flex-1 grid-rows-3 gap-2">
+    <div className="relative z-3 mx-3 mb-5 hidden flex-col gap-3 [@media(max-width:768px)_and_(min-height:740px)]:flex">
+      <p className="kicker leading-normal tracking-[0.14em] text-white/80">{howTitle}</p>
+      <ol className="grid gap-2.5">
         {steps.map((step, index) => (
           <StepRow key={step.title} index={index} step={step} />
         ))}
@@ -31,13 +31,13 @@ export function HomeHeroMobileFill({ howTitle, steps, clinicsLabel, seeAll, clin
 
 function StepRow({ index, step }: { index: number; step: HeroMobileStep }) {
   return (
-    <li className="flex min-h-0 items-center gap-3 rounded-2xl border border-white/25 bg-ink/40 px-3 py-2.5">
+    <li className="flex items-center gap-3 rounded-2xl border border-white/25 bg-ink/40 px-3.5 py-3">
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-[0.8rem] font-semibold text-white">
         {index + 1}
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-[0.95rem] font-semibold text-white">{step.title}</span>
-        <span className="mt-0.5 line-clamp-2 text-[0.8rem] leading-snug text-white/72">{step.body}</span>
+        <span className="block text-[0.95rem] leading-snug font-semibold text-white">{step.title}</span>
+        <span className="mt-1 block text-[0.8rem] leading-relaxed text-white/75">{step.body}</span>
       </span>
     </li>
   );

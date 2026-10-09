@@ -43,7 +43,7 @@ export function HomeHeroSlides({ images, prevLabel, nextLabel, children }: HomeH
           nextLabel={nextLabel}
           onPrev={goPrev}
           onNext={goNext}
-          className="pointer-events-none absolute inset-0 z-4 flex items-center justify-between px-3 md:px-6 xl:px-8"
+          className="pointer-events-none z-4 flex items-center justify-between px-3 max-md:relative max-md:mb-3 max-md:h-auto max-md:justify-center max-md:gap-3 md:absolute md:inset-x-0 md:top-0 md:h-dvh md:px-6 xl:px-8"
         />
       ) : null}
     </>

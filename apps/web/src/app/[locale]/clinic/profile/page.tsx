@@ -1,7 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { ClinicBranches, type ClinicBranch } from "@/features/clinic/clinic-branches";
-import { ClinicCover } from "@/features/clinic/clinic-cover";
-import { ClinicProfileForm, type ClinicLocaleDraft, type ClinicProfile } from "@/features/clinic/clinic-profile-form";
+import { ClinicProfilePanel, type ClinicLocaleDraft, type ClinicProfile } from "@/features/clinic/clinic-profile-form";
 import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
@@ -25,14 +24,7 @@ export default async function ClinicProfilePage({ params }: { params: Promise<{ 
   return (
     <ClinicManagerShell eyebrow={common("ADMIN")} title={portal("clinicProfile")}>
       <div className="grid gap-8">
-        {profile ? <ClinicCover clinicId={me.clinicId} coverUrl={profile.coverUrl} name={profile.name} /> : null}
-        {profile && locales ? (
-          <ClinicProfileForm
-            clinicId={me.clinicId}
-            clinic={profile}
-            locales={locales}
-          />
-        ) : null}
+        {profile && locales ? <ClinicProfilePanel clinicId={me.clinicId} clinic={profile} locales={locales} /> : null}
         <ClinicBranches
           clinicId={me.clinicId}
           branches={branches ?? []}

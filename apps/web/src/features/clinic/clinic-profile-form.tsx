@@ -1,8 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useTranslations } from "next-intl";
-import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
+import { useLocale, useTranslations } from "next-intl";
+import { PhoneField, armeniaPhone } from "@/features/auth/phone-field";
+import { ClinicCover } from "@/features/clinic/clinic-cover";
+import { clinicSend } from "@/features/clinic/clinic-api";
 
 export type ClinicProfile = {
   name: string;
@@ -29,7 +31,42 @@ const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
 const controlClass =
   "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 
-export function ClinicProfileForm({
+export function ClinicProfilePanel({
+  clinicId,
+  clinic,
+  locales,
+}: {
+  clinicId: string;
+  clinic: ClinicProfile;
+  locales: Record<ForeignLocale, ClinicLocaleDraft>;
+}) {
+  const t = useTranslations("desk");
+  const [editing, setEditing] = useState(false);
+  const copy = visibleCopy(useLocale(), clinic, locales);
+  return (
+    <div className="grid max-w-xl gap-8">
+      <div className="grid gap-4">
+        <button className="w-fit cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setEditing((value) => !value)}>{t("edit")}</button>
+        <ClinicCover clinicId={clinicId} coverUrl={clinic.coverUrl} name={copy.name} editing={editing} />
+        {editing ? <ClinicProfileForm clinicId={clinicId} clinic={clinic} locales={locales} /> : <ClinicProfileRead copy={copy} />}
+      </div>
+      <ClinicPhoneForm clinicId={clinicId} phone={clinic.phone} />
+    </div>
+  );
+}
+
+function ClinicProfileRead({ copy }: { copy: ClinicCopy }) {
+  return (
+    <div className="grid gap-2">
+      <h2 className="m-0">{copy.name}</h2>
+      {copy.district ? <p className="m-0 text-muted">{copy.district}</p> : null}
+      <p className="m-0">{copy.address}</p>
+      {copy.description ? <p className="m-0 max-w-[42rem] leading-relaxed text-muted">{copy.description}</p> : null}
+    </div>
+  );
+}
+
+function ClinicProfileForm({
   clinicId,
   clinic,
   locales,
@@ -55,13 +92,13 @@ export function ClinicProfileForm({
       form.setResult(platform("armenianRequired"), true);
       return;
     }
-    const phone = armeniaPhone(String(new FormData(event.currentTarget).get("phoneLocal") ?? ""));
-    const ok = phone ? await saveClinic(clinicId, form.hy, phone, form.copies) : false;
-    form.setResult(ok ? t("saved") : t("saveFailed"), !ok);
+    const ok = await saveClinic(clinicId, form.hy, form.copies);
+    if (ok) window.location.reload();
+    else form.setResult(t("saveFailed"), true);
   }
 
   return (
-    <form className="grid max-w-xl gap-4 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
+    <form className="grid gap-4 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
       <LanguageTabs
         locale={form.locale}
         hint={t("localeHint")}
@@ -69,7 +106,6 @@ export function ClinicProfileForm({
         onSelect={form.setLocale}
       />
       <CopyFields copy={shownCopy(form.locale, form.hy, form.copies)} labels={labels} required={form.locale === "hy"} onChange={form.setField} />
-      <PhoneField label={platform("phone")} phone={clinic.phone} />
       <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
       {form.message ? <p className={form.failed ? "m-0 text-danger" : "m-0 text-muted"}>{form.message}</p> : null}
     </form>
@@ -173,13 +209,49 @@ function CopyFields({
   );
 }
 
-async function saveClinic(
-  clinicId: string,
-  hy: ClinicCopy,
-  phone: string,
-  copies: Record<ForeignLocale, ClinicLocaleDraft>,
-): Promise<boolean> {
-  const profile = await send(`/clinics/${clinicId}`, "PATCH", { ...hy, phone });
+function ClinicPhoneForm({ clinicId, phone }: { clinicId: string; phone: string }) {
+  const t = useTranslations("desk");
+  const platform = useTranslations("platform");
+  const [failed, setFailed] = useState(false);
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    const next = armeniaPhone(String(new FormData(event.currentTarget).get("phoneLocal") ?? ""));
+    if (!next) {
+      setFailed(true);
+      return;
+    }
+    const ok = await clinicSend(`/clinics/${clinicId}`, "PATCH", { phone: next });
+    if (ok) window.location.reload();
+    else setFailed(true);
+  }
+
+  return (
+    <form className="grid gap-4 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
+      <PhoneField label={platform("phone")} phone={phone} />
+      <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
+      {failed ? <p className="m-0 text-danger">{t("saveFailed")}</p> : null}
+    </form>
+  );
+}
+
+function visibleCopy(locale: string, clinic: ClinicProfile, locales: Record<ForeignLocale, ClinicLocaleDraft>): ClinicCopy {
+  const source = locale === "en" || locale === "ru" ? locales[locale] : null;
+  return {
+    name: filled(source?.name, clinic.name),
+    district: filled(source?.district, clinic.district),
+    address: filled(source?.address, clinic.address),
+    description: filled(source?.description, clinic.description),
+  };
+}
+
+function filled(value: string | undefined, base: string): string {
+  const text = value?.trim() ?? "";
+  return text || base;
+}
+
+async function saveClinic(clinicId: string, hy: ClinicCopy, copies: Record<ForeignLocale, ClinicLocaleDraft>): Promise<boolean> {
+  const profile = await send(`/clinics/${clinicId}`, "PATCH", hy);
   const english = await send(`/clinics/${clinicId}/locales`, "PUT", { locale: "en", ...copies.en });
   const russian = await send(`/clinics/${clinicId}/locales`, "PUT", { locale: "ru", ...copies.ru });
   return profile && english && russian;

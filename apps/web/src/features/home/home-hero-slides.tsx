@@ -8,7 +8,7 @@ const FALLBACK_IMAGE = "/home/hero.jpg";
 const SLIDE_MS = 6500;
 
 const slideButtonClass =
-  "pointer-events-auto grid size-9 place-items-center rounded-full border border-white/35 bg-white/15 text-white shadow-md backdrop-blur-[6px] transition-[background-color,border-color,transform] duration-160 hover:border-white/50 hover:bg-white/25 active:scale-95 md:size-11";
+  "pointer-events-auto grid size-9 place-items-center rounded-full border border-white/45 bg-white/5 text-white shadow-none transition-[background-color,border-color,transform] duration-160 hover:border-white/70 hover:bg-white/15 active:scale-95 md:size-11";
 
 type HomeHeroSlidesProps = {
   images: string[];
@@ -33,17 +33,8 @@ export function HomeHeroSlides({ images, prevLabel, nextLabel, children }: HomeH
     <>
       <HeroBackdrop slides={slides} index={index} />
       <div className="page-shell pointer-events-none relative z-2 flex h-full items-center pt-24 pb-8 md:pt-36 md:pb-16">
-        <div className="pointer-events-auto grid w-full max-w-[44rem] gap-6 max-md:gap-3.5">
+        <div className="pointer-events-auto grid w-full max-w-[44rem] gap-6 max-md:gap-3.5 max-md:px-12">
           {children}
-          {canNavigate ? (
-            <SlideNav
-              prevLabel={prevLabel}
-              nextLabel={nextLabel}
-              onPrev={goPrev}
-              onNext={goNext}
-              className="flex justify-center gap-3 pt-1 md:hidden"
-            />
-          ) : null}
         </div>
       </div>
       {canNavigate ? (
@@ -52,7 +43,7 @@ export function HomeHeroSlides({ images, prevLabel, nextLabel, children }: HomeH
           nextLabel={nextLabel}
           onPrev={goPrev}
           onNext={goNext}
-          className="pointer-events-none absolute inset-0 z-4 hidden items-center justify-between px-6 md:flex xl:px-8"
+          className="pointer-events-none absolute inset-0 z-4 flex items-center justify-between px-3 md:px-6 xl:px-8"
         />
       ) : null}
     </>

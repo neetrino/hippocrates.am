@@ -40,14 +40,14 @@ export function HomeHero({
   return (
     <section className="relative -mt-[6.75rem] h-dvh min-h-[32rem] w-full overflow-hidden max-md:-mt-[4.75rem] max-md:min-h-[100svh]">
       <HomeHeroSlides images={images} prevLabel={prevSlide} nextLabel={nextSlide}>
-        <p className="kicker tracking-[0.18em] text-accent">{eyebrow}</p>
-        <h1 className="max-w-[18ch] text-[clamp(2.65rem,5.6vw,4.35rem)] leading-[1.08] font-semibold tracking-[-0.03em] text-balance text-white max-md:max-w-[11em] max-md:text-[2.2rem] max-md:leading-[1.15]">
+        <p className="kicker tracking-[0.18em] text-accent md:text-[0.84rem]">{eyebrow}</p>
+        <h1 className="max-w-[16ch] text-[clamp(3.5rem,5.6vw,6rem)] leading-[1.02] font-semibold tracking-[-0.035em] text-balance text-white max-md:max-w-[11em] max-md:text-[2.2rem] max-md:leading-[1.15]">
           {title}
         </h1>
-        <p className="m-0 max-w-[28rem] text-[1.12rem] leading-[1.65] font-light text-white/84 max-md:max-w-[36ch] max-md:text-[1.02rem] max-md:leading-[1.55]">
+        <p className="m-0 max-w-[36rem] text-[1.4rem] leading-[1.55] font-light text-white/84 max-md:max-w-[36ch] max-md:text-[1.02rem] max-md:leading-[1.55]">
           {lede}
         </p>
-        <div className="pt-1 max-md:pt-0.5">
+        <div className="pt-1 max-md:pt-0.5 md:max-w-[42rem]">
           <SearchBar
             action={getPathname({ locale, href: "/clinics" })}
             placeholder={placeholder}

@@ -1,6 +1,11 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
+import type { Me } from "@/shared/public-types";
 
 type Envelope<T> = { data: T };
+
+/** One `/auth/me` read per request, shared by the header and layout. */
+export const getMe = cache((): Promise<Me | null> => sessionGet<Me>("/auth/me"));
 
 export async function sessionGet<T>(path: string): Promise<T | null> {
   const jar = await cookies();

@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { Me } from "@/shared/public-types";
-import { sessionGet } from "@/shared/session-api";
+import { getMe } from "@/shared/session-api";
 import { type AccountHref } from "@/shared/ui/account-menu";
 import { BrandLogo } from "@/shared/ui/brand-logo";
 import { SiteHeaderShell } from "@/shared/ui/site-header-shell";
@@ -16,7 +15,7 @@ function accountHref(role: string | null): AccountHref {
 
 export async function SiteHeader() {
   const t = await getTranslations("nav");
-  const me = await sessionGet<Me>("/auth/me");
+  const me = await getMe();
   const href = accountHref(me?.role ?? null);
   return (
     <SiteHeaderShell>

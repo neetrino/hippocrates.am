@@ -1,8 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, type RefObject } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
+import Image from "next/image";
 import { LogoutButton } from "@/features/portal/logout-button";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/shared/ui/cn";
+
+const AccountPhotoContext = createContext<string | null>(null);
+
+/** Signed-in portrait for every account button. `null` after logout. */
+export function AccountPhotoProvider({ photoUrl, children }: { photoUrl: string | null; children: ReactNode }) {
+  return <AccountPhotoContext.Provider value={photoUrl}>{children}</AccountPhotoContext.Provider>;
+}
 
 export type AccountHref = "/login" | "/me" | "/clinic" | "/super-admin";
 
@@ -34,6 +43,11 @@ function UserIcon() {
   );
 }
 
+function AccountMark({ photoUrl }: { photoUrl: string | null }) {
+  if (!photoUrl) return <UserIcon />;
+  return <Image src={photoUrl} alt="" fill sizes="40px" className="object-cover" />;
+}
+
 function useDismiss(open: boolean, close: () => void, rootRef: RefObject<HTMLDivElement | null>): void {
   useEffect(() => {
     if (!open) return;
@@ -53,6 +67,7 @@ function useDismiss(open: boolean, close: () => void, rootRef: RefObject<HTMLDiv
 }
 
 function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; label: string }) {
+  const photoUrl = useContext(AccountPhotoContext);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -63,14 +78,14 @@ function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; l
     <div className="relative" ref={rootRef}>
       <button
         type="button"
-        className={circleClass}
+        className={cn(circleClass, photoUrl && "relative overflow-hidden border border-line bg-surface")}
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => setOpen((value) => !value)}
       >
-        <UserIcon />
+        <AccountMark photoUrl={photoUrl} />
       </button>
       {open ? (
         <div

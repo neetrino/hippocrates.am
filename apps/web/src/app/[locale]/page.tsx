@@ -19,10 +19,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("home");
   const nav = await getTranslations("nav");
   const common = await getTranslations("common");
+  const catalog = await getTranslations("catalog");
   const questionsCopy = await getTranslations("questions");
-  const [data, questions] = await Promise.all([
+  const [data, questions, clinics] = await Promise.all([
     publicGet<HomeData>("/public/home", locale),
     publicGet<QuestionCard[]>("/questions").catch(() => [] as QuestionCard[]),
+    publicGet<ClinicCard[]>("/public/clinics", locale).catch(() => [] as ClinicCard[]),
   ]);
 
   return (
@@ -34,6 +36,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         eyebrow={t("eyebrow")}
         placeholder={t("clinicPlaceholder")}
         searchLabel={common("search")}
+        emptyLabel={catalog("emptyClinicSearch")}
+        clinics={clinics}
         prevSlide={t("prevSlide")}
         nextSlide={t("nextSlide")}
         images={data.clinics.map((clinic) => clinic.coverUrl).filter((url): url is string => Boolean(url))}

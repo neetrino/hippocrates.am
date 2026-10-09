@@ -39,8 +39,8 @@ const serifArmenian = Noto_Serif_Armenian({
 
 const catalogSerif = Cormorant_Garamond({
   subsets: ["latin", "latin-ext", "cyrillic"],
-  weight: ["500", "600"],
-  style: ["italic"],
+  weight: "600",
+  style: "italic",
   variable: "--font-cormorant",
   display: "swap",
 });

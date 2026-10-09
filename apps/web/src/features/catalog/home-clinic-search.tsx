@@ -41,9 +41,9 @@ export function HomeClinicSearch({ clinics, action, placeholder, searchLabel, em
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          className="min-w-0 flex-1 border-0 bg-transparent px-4 py-2.5 text-[0.98rem] outline-none placeholder:text-text-muted"
+          className="min-w-0 flex-1 border-0 bg-transparent px-4 py-2.5 text-base outline-none placeholder:text-text-muted"
         />
-        <button className="btn btn-primary max-md:w-full" type="submit">
+        <button className="btn btn-primary shrink-0" type="submit">
           {searchLabel}
         </button>
       </form>

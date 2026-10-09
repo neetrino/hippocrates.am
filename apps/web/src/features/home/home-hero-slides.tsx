@@ -32,8 +32,8 @@ export function HomeHeroSlides({ images, prevLabel, nextLabel, children }: HomeH
   return (
     <>
       <HeroBackdrop slides={slides} index={index} />
-      <div className="page-shell pointer-events-none relative z-2 flex h-full items-center pt-24 pb-8 md:pt-36 md:pb-16">
-        <div className="pointer-events-auto grid w-full max-w-[44rem] gap-6 max-md:gap-3.5 max-md:px-12">
+      <div className="page-shell pointer-events-none relative z-2 flex h-full items-start pt-[6.5rem] pb-8 md:items-center md:pt-36 md:pb-16">
+        <div className="pointer-events-auto grid w-full max-w-[44rem] gap-6 max-md:gap-4">
           {children}
         </div>
       </div>

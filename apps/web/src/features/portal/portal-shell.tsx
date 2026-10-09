@@ -29,7 +29,8 @@ export type PortalHref =
   | "/clinic/patients"
   | "/clinic/reviews"
   | "/clinic/notices"
-  | "/clinic/finance";
+  | "/clinic/finance"
+  | "/clinic/settings";
 
 export type PortalHash = "visits" | "notices" | "favorites" | "questions" | "reviews" | "settings";
 
@@ -185,7 +186,7 @@ function SidebarNav({
 }) {
   const t = useTranslations("portal");
   return (
-    <div className="flex h-full flex-col gap-8">
+    <div className="flex min-h-full flex-col gap-8">
       <div className="px-1">
         <Link href="/" onClick={() => onNavigate?.()} aria-label="Hippocrates" className="inline-flex flex-col gap-1.5">
           <span className="font-display text-[1.75rem] leading-none font-bold tracking-[-0.02em] text-white">Hippocrates</span>
@@ -307,13 +308,13 @@ export function PortalShell({ children, title, eyebrow, subtitle, accountHref, i
 
   return (
     <div className="fixed inset-0 z-[60] flex bg-[#eef3f2]">
-      <aside className="relative hidden w-[272px] shrink-0 rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-[#2a4a47] px-3 pt-7 pb-6 md:flex md:flex-col">
+      <aside className="scrollbar-soft relative hidden min-h-0 w-[272px] shrink-0 overflow-y-auto rounded-tr-[2.75rem] rounded-br-[2.75rem] bg-[#2a4a47] px-3 pt-7 pb-6 md:flex md:flex-col">
         <SidebarNav {...sidebar} />
       </aside>
       {open ? (
         <div className="fixed inset-0 z-20 md:hidden">
           <button type="button" className="absolute inset-0 cursor-pointer border-0 bg-[rgba(14,20,20,0.5)] p-0 backdrop-blur-[6px]" aria-label={t("closeMenu")} onClick={close} />
-          <aside id={menuId} className="relative z-1 flex h-full w-[min(288px,86vw)] flex-col rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-[#2a4a47] px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+          <aside id={menuId} className="scrollbar-soft relative z-1 flex h-full min-h-0 w-[min(288px,86vw)] flex-col overflow-y-auto rounded-tr-[2.5rem] rounded-br-[2.5rem] bg-[#2a4a47] px-3 pt-6 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
             <button type="button" className="mb-4 ml-auto grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white" aria-label={t("closeMenu")} onClick={close}>
               <CloseIcon />
             </button>

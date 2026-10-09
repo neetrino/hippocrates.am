@@ -10,6 +10,7 @@ import {
   PatientsIcon,
   ReviewsIcon,
   ServicesIcon,
+  SettingsIcon,
   StaffIcon,
   VisitsIcon,
 } from "@/features/portal/admin-sidebar-icons";
@@ -35,6 +36,7 @@ export function ClinicManagerShell({ children, title, eyebrow }: ClinicManagerSh
     { href: "/clinic/reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "exact" },
     { href: "/clinic/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact" },
     { href: "/clinic/finance", label: portal("finance"), icon: <FinanceIcon />, match: "exact" },
+    { href: "/clinic/settings", label: me("settings"), icon: <SettingsIcon />, match: "exact" },
   ];
 
   return (

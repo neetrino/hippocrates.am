@@ -24,6 +24,7 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
     );
   }
   if (me.role === "SUPER_ADMIN") redirect({ href: "/super-admin", locale });
+  if (me.role === "ADMIN") redirect({ href: "/clinic/settings", locale });
   if (me.role === "DOCTOR") {
     return (
       <DoctorPortalShell eyebrow={common("DOCTOR")} title={t("settings")}>

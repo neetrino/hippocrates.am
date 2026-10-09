@@ -1,13 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, type RefObject } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
+import Image from "next/image";
 import { LogoutButton } from "@/features/portal/logout-button";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/shared/ui/cn";
+
+const AccountPhotoContext = createContext<string | null>(null);
+
+/** Signed-in portrait for every account button. `null` after logout. */
+export function AccountPhotoProvider({ photoUrl, children }: { photoUrl: string | null; children: ReactNode }) {
+  return <AccountPhotoContext.Provider value={photoUrl}>{children}</AccountPhotoContext.Provider>;
+}
 
 export type AccountHref = "/login" | "/me" | "/clinic" | "/super-admin";
 
 const circleClass =
   "grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-accent p-0 text-white transition-[background] duration-160 hover:bg-accent-hover max-md:h-[38px] max-md:w-[38px]";
+
+const profileIconClass =
+  "grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-line bg-surface p-0 text-ink transition-[color,border-color] duration-160 hover:border-accent hover:text-accent max-md:h-[38px] max-md:w-[38px]";
 
 const rowClass =
   "inline-flex h-9 w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-2.5 text-left font-sans text-[0.86rem] font-medium text-ink/85 transition-colors duration-160 hover:bg-accent-soft hover:text-accent";
@@ -31,6 +43,11 @@ function UserIcon() {
   );
 }
 
+function AccountMark({ photoUrl }: { photoUrl: string | null }) {
+  if (!photoUrl) return <UserIcon />;
+  return <Image src={photoUrl} alt="" fill sizes="40px" className="object-cover" />;
+}
+
 function useDismiss(open: boolean, close: () => void, rootRef: RefObject<HTMLDivElement | null>): void {
   useEffect(() => {
     if (!open) return;
@@ -50,6 +67,7 @@ function useDismiss(open: boolean, close: () => void, rootRef: RefObject<HTMLDiv
 }
 
 function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; label: string }) {
+  const photoUrl = useContext(AccountPhotoContext);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -60,14 +78,14 @@ function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; l
     <div className="relative" ref={rootRef}>
       <button
         type="button"
-        className={circleClass}
+        className={cn(circleClass, photoUrl && "relative overflow-hidden border border-line bg-surface")}
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => setOpen((value) => !value)}
       >
-        <UserIcon />
+        <AccountMark photoUrl={photoUrl} />
       </button>
       {open ? (
         <div
@@ -88,14 +106,9 @@ function SignedInMenu({ href, label }: { href: Exclude<AccountHref, "/login">; l
 export function AccountMenu({ href, label }: AccountMenuProps) {
   if (href === "/login") {
     return (
-      <>
-        <Link href={href} className="btn btn-secondary h-10 px-4 max-md:hidden">
-          {label}
-        </Link>
-        <Link href={href} className={`${circleClass} md:hidden`} aria-label={label}>
-          <UserIcon />
-        </Link>
-      </>
+      <Link href={href} className={profileIconClass} aria-label={label}>
+        <UserIcon />
+      </Link>
     );
   }
   return <SignedInMenu href={href} label={label} />;

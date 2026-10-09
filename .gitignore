@@ -17,6 +17,7 @@ node_modules/
 dist/
 build/
 coverage/
+*.tsbuildinfo
 apps/api/src/generated/
 
 # Logs and temp

@@ -4,7 +4,9 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { getMe } from "@/shared/session-api";
 import { getSiteUrl } from "@/shared/site-url";
+import { AccountPhotoProvider } from "@/shared/ui/account-menu";
 import { DocumentLang } from "@/shared/ui/document-lang";
 import { SiteFooter } from "@/shared/ui/site-footer";
 import { SiteHeader } from "@/shared/ui/site-header";
@@ -76,13 +78,15 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const messages = await getMessages();
+  const [messages, me] = await Promise.all([getMessages(), getMe()]);
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <DocumentLang locale={locale} />
-      <SiteHeader />
-      <main>{children}</main>
-      <SiteFooter />
+      <AccountPhotoProvider photoUrl={me?.photoUrl ?? null}>
+        <DocumentLang locale={locale} />
+        <SiteHeader />
+        <main>{children}</main>
+        <SiteFooter />
+      </AccountPhotoProvider>
     </NextIntlClientProvider>
   );
 }

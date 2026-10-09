@@ -100,13 +100,30 @@ function BranchCard({
           <button className="cursor-pointer text-sm font-semibold text-danger" type="button" onClick={() => void remove()}>{t("remove")}</button>
         </span>
       </div>
-      {open ? <BranchForm clinicId={clinicId} branch={branch} /> : null}
+      {open ? (
+        <BranchForm
+          clinicId={clinicId}
+          branch={branch}
+          shownName={title}
+          shownAddress={shownAddress}
+        />
+      ) : null}
       {message ? <p className="m-0 px-4 pb-3 text-sm text-danger">{message}</p> : null}
     </article>
   );
 }
 
-function BranchForm({ clinicId, branch }: { clinicId: string; branch: ClinicBranch }) {
+function BranchForm({
+  clinicId,
+  branch,
+  shownName,
+  shownAddress,
+}: {
+  clinicId: string;
+  branch: ClinicBranch;
+  shownName: string;
+  shownAddress: string;
+}) {
   const t = useTranslations("desk");
   const platform = useTranslations("platform");
   const [message, setMessage] = useState("");
@@ -115,8 +132,8 @@ function BranchForm({ clinicId, branch }: { clinicId: string; branch: ClinicBran
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const ok = await clinicSend(`/clinics/${clinicId}/branches/${branch.id}`, "PATCH", {
-      name: String(form.get("name") ?? ""),
-      address: String(form.get("address") ?? ""),
+      name: storedValue(String(form.get("name") ?? ""), shownName, branch.name),
+      address: storedValue(String(form.get("address") ?? ""), shownAddress, branch.address),
     });
     if (ok) window.location.reload();
     else setMessage(t("saveFailed"));
@@ -124,10 +141,14 @@ function BranchForm({ clinicId, branch }: { clinicId: string; branch: ClinicBran
 
   return (
     <form className="grid gap-3.5 border-t border-line px-4 py-4" onSubmit={(event) => void onSubmit(event)}>
-      <label className={fieldClass}>{t("branchName")}<input name="name" required maxLength={80} defaultValue={branch.name} className={controlClass} /></label>
-      <label className={fieldClass}>{platform("address")}<input name="address" maxLength={160} defaultValue={branch.address} className={controlClass} /></label>
+      <label className={fieldClass}>{t("branchName")}<input name="name" required maxLength={80} defaultValue={shownName} className={controlClass} /></label>
+      <label className={fieldClass}>{platform("address")}<input name="address" maxLength={160} defaultValue={shownAddress} className={controlClass} /></label>
       <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
       {message ? <p className="m-0 text-danger">{message}</p> : null}
     </form>
   );
+}
+
+function storedValue(typed: string, shown: string, stored: string): string {
+  return typed.trim() === shown.trim() ? stored : typed.trim();
 }

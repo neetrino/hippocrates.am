@@ -20,7 +20,7 @@ export async function SiteHeader() {
   const href = accountHref(me?.role ?? null);
   return (
     <SiteHeaderShell>
-      <div className="relative z-1 grid min-h-22 grid-cols-[1fr_auto_1fr] items-center gap-6 px-[18px] transition-[min-height] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-[.is-scrolled]:min-h-18 max-md:min-h-16 max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-2.5 max-md:px-2.5 max-md:py-2 max-md:group-[.is-scrolled]:min-h-[58px]">
+      <div className="relative z-1 grid min-h-20 grid-cols-[1fr_auto_1fr] items-center gap-6 px-5 transition-[min-height] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-[.is-scrolled]:min-h-16 max-md:min-h-15 max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-2 max-md:px-2.5 max-md:py-1.5 max-md:group-[.is-scrolled]:min-h-[54px]">
         <Link href="/" className="inline-flex shrink-0 items-center justify-self-start" aria-label="Hippocrates">
           <BrandLogo priority />
         </Link>

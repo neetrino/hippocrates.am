@@ -44,10 +44,8 @@ export function RegisterForm() {
     window.location.assign(getPathname({ locale, href: "/me" }));
   }
 
-  const fieldClass =
-    "grid w-full min-w-0 gap-1.5 text-[0.86rem] font-semibold";
-  const inputClass =
-    "w-full min-w-0 rounded-[14px] border-0 bg-auth-field px-3 py-[11px] text-[0.92rem] font-normal placeholder:text-[#9aa6a5] focus:bg-auth-field-focus focus:shadow-[0_0_0_3px_rgba(0,167,157,0.18)] focus:outline-none";
+  const fieldClass = "field-label";
+  const inputClass = "field-control-soft";
 
   return (
     <form className="grid min-w-0 gap-3" onSubmit={(event) => void onSubmit(event)}>
@@ -105,10 +103,7 @@ export function RegisterForm() {
         />
       </div>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
-      <button
-        className="mt-0.5 inline-flex min-h-11 w-full max-w-full cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 text-[0.84rem] font-semibold tracking-[0.05em] text-white uppercase shadow-[0_10px_20px_rgba(0,167,157,0.18)] transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-[0_12px_24px_rgba(0,167,157,0.24)]"
-        type="submit"
-      >
+      <button className="btn btn-primary mt-1 w-full" type="submit">
         {t("registerAction")}
       </button>
     </form>

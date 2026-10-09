@@ -15,7 +15,7 @@ type SettingsCardProps = {
 };
 
 const editButton =
-  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-line bg-white px-3.5 py-2 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent";
+  "btn btn-secondary min-h-9 px-3.5 py-2 text-sm";
 
 export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel }: SettingsCardProps) {
   const t = useTranslations("me");
@@ -24,7 +24,7 @@ export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel }:
   const [editing, setEditing] = useState(false);
 
   return (
-    <section className="rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
+    <section className="rounded-card bg-surface p-5 shadow-soft md:p-6">
       <SettingsPhoto
         name={displayName}
         photoUrl={photoUrl}

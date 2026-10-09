@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { cn } from "@/shared/ui/cn";
 
 type AppointmentActionsProps = {
   id: string;
@@ -33,24 +32,21 @@ export function AppointmentActions(props: AppointmentActionsProps) {
     setError(body?.error?.message || t("failed"));
   }
 
-  const btn =
-    "inline-flex cursor-pointer items-center justify-center rounded-full border-0 px-3.5 py-2 text-sm font-semibold text-white transition-[background,box-shadow] duration-160";
-
   return (
     <div className="grid justify-items-start gap-2">
       <div className="flex flex-wrap gap-2">
         {canConfirm ? (
-          <button className={cn(btn, "bg-accent hover:bg-accent-hover hover:shadow-accent")} type="button" onClick={() => void post(`/appointments/${props.id}/confirm`)}>
+          <button className="btn btn-primary min-h-9 px-3.5 py-2 text-sm" type="button" onClick={() => void post(`/appointments/${props.id}/confirm`)}>
             {t("confirm")}
           </button>
         ) : null}
         {canComplete ? (
-          <button className={cn(btn, "bg-accent hover:bg-accent-hover hover:shadow-accent")} type="button" onClick={() => void post(`/appointments/${props.id}/complete`)}>
+          <button className="btn btn-primary min-h-9 px-3.5 py-2 text-sm" type="button" onClick={() => void post(`/appointments/${props.id}/complete`)}>
             {t("complete")}
           </button>
         ) : null}
         {canCancel ? (
-          <button className={cn(btn, "bg-danger")} type="button" onClick={() => void post(`/appointments/${props.id}/cancel`)}>
+          <button className="btn btn-danger min-h-9 px-3.5 py-2 text-sm" type="button" onClick={() => void post(`/appointments/${props.id}/cancel`)}>
             {t("cancel")}
           </button>
         ) : null}

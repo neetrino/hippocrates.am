@@ -67,7 +67,7 @@ function OptionRow({
           </svg>
         ) : null}
       </span>
-      <span className="min-w-0 truncate">{label}</span>
+      <span className="min-w-0 break-words">{label}</span>
     </button>
   );
 }
@@ -149,7 +149,7 @@ export function MultiSelectFilter({
         aria-controls={listId}
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="min-w-0 truncate">{summary || placeholder}</span>
+        <span className="min-w-0 break-words">{summary || placeholder}</span>
         <ChevronIcon open={open} />
       </button>
       {open ? (

@@ -16,7 +16,7 @@ export function Photo({
 }: PhotoProps) {
   if (!src) {
     return (
-      <div className="grid h-full w-full place-items-center bg-linear-to-br from-accent-soft to-sand text-2xl font-bold text-accent">
+      <div className="grid h-full w-full place-items-center bg-linear-to-br from-accent-soft to-sand font-display text-3xl font-semibold text-accent">
         {alt.slice(0, 1)}
       </div>
     );

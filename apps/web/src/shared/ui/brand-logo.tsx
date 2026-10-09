@@ -34,7 +34,7 @@ export function BrandLogo({ size = "header", priority = false }: BrandLogoProps)
         className={markClass[size]}
         priority={priority}
       />
-      <span className={cn("font-sans font-bold leading-[1.15] tracking-[-0.04em] text-accent", wordClass[size])}>
+      <span className={cn("font-sans font-bold leading-[1.35] tracking-[-0.04em] text-accent", wordClass[size])}>
         hippocrates
       </span>
     </span>

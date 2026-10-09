@@ -103,12 +103,12 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
   return (
     <nav
       ref={navRef}
-      className="relative justify-self-center gap-1.5 rounded-full border border-line bg-[#f5fafa] p-1.5 max-md:hidden md:flex md:items-center"
+      className="relative justify-self-center gap-1 rounded-full border border-line bg-surface-muted/80 p-1 max-md:hidden md:flex md:items-center"
     >
       <span
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute top-1.5 bottom-1.5 left-0 rounded-full bg-white shadow-[0_4px_14px_rgba(0,167,157,0.12)] transition-[transform,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-surface shadow-soft transition-[transform,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           indicator.ready ? "opacity-100" : "opacity-0",
         )}
         style={{
@@ -127,20 +127,11 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
             }}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative z-1 grid h-11 place-items-center rounded-full px-[18px] text-[0.98rem] font-medium tracking-[0.01em] transition-[color,font-weight] duration-300",
-              active ? "font-semibold text-accent" : "text-muted hover:text-accent",
+              "relative z-1 grid h-10 place-items-center rounded-full px-4 text-[0.92rem] font-medium tracking-[0.01em] transition-colors duration-200",
+              active ? "text-ink" : "text-muted hover:text-ink",
             )}
           >
-            <span className="relative leading-none">
-              {item.label}
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "absolute top-[calc(100%+3px)] right-0 left-0 h-0.5 rounded-full",
-                  active ? "bg-accent" : "bg-transparent",
-                )}
-              />
-            </span>
+            <span className="relative leading-snug">{item.label}</span>
           </Link>
         );
       })}
@@ -198,7 +189,7 @@ export function SiteNav({
         <AccountMenu href={accountHref} label={accountLabel} />
         <button
           type="button"
-          className="hidden h-[42px] w-[42px] cursor-pointer place-items-center rounded-full border border-line bg-white p-0 text-ink max-md:grid max-md:h-[38px] max-md:w-[38px]"
+          className="hidden h-10 w-10 cursor-pointer place-items-center rounded-full border border-line bg-surface p-0 text-ink max-md:grid max-md:h-[38px] max-md:w-[38px]"
           aria-label={openMenu}
           aria-expanded={open}
           aria-controls={menuId}
@@ -238,7 +229,7 @@ export function SiteNav({
                     <CloseIcon />
                   </button>
                 </div>
-                <div className="grid gap-[22px] rounded-[28px] bg-white px-[22px] pt-7 pb-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+                <div className="grid gap-6 rounded-card bg-surface px-6 pt-7 pb-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
                   <nav className="grid gap-1">
                     {links.map((item) => {
                       const active = isActivePath(pathname, item.href);
@@ -249,20 +240,34 @@ export function SiteNav({
                           onClick={() => setOpen(false)}
                           aria-current={active ? "page" : undefined}
                           className={cn(
-                            "rounded-xl px-1.5 py-3.5 text-[1.35rem] font-semibold tracking-[-0.02em] transition-colors duration-160",
-                            active
-                              ? "bg-accent-soft text-accent underline decoration-accent decoration-2 underline-offset-[6px]"
-                              : "text-ink active:bg-accent-soft active:text-accent",
+                            "rounded-xl px-2 py-3 text-[1.25rem] font-medium tracking-[-0.02em] transition-colors duration-160",
+                            active ? "bg-accent-soft text-accent" : "text-ink active:bg-accent-soft",
                           )}
                         >
                           {item.label}
                         </Link>
                       );
                     })}
+                    <Link
+                      href={accountHref}
+                      onClick={() => setOpen(false)}
+                      className="rounded-xl px-2 py-3 text-[1.25rem] font-medium tracking-[-0.02em] text-ink"
+                    >
+                      {accountLabel}
+                    </Link>
+                    {accountHref === "/login" ? (
+                      <Link
+                        href="/register"
+                        onClick={() => setOpen(false)}
+                        className="rounded-xl px-2 py-3 text-[1.25rem] font-medium tracking-[-0.02em] text-ink"
+                      >
+                        {t("register")}
+                      </Link>
+                    ) : null}
                   </nav>
                   <div className="grid gap-2.5 border-t border-line pt-[18px]">
-                    <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-muted uppercase">{t("language")}</p>
-                    <div className="grid grid-cols-3 gap-1 rounded-full bg-[#eef2f2] p-1" role="group" aria-label={t("language")}>
+                    <p className="kicker">{t("language")}</p>
+                    <div className="grid grid-cols-3 gap-1 rounded-full bg-surface-muted p-1" role="group" aria-label={t("language")}>
                       {routing.locales.map((item) => (
                         <Link
                           key={item}
@@ -270,8 +275,8 @@ export function SiteNav({
                           locale={item}
                           hrefLang={item}
                           className={cn(
-                            "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full text-[0.88rem] font-bold text-muted",
-                            item === locale && "bg-white text-ink shadow-[0_4px_14px_rgba(20,36,40,0.08)]",
+                            "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full text-[0.88rem] font-semibold text-muted",
+                            item === locale && "bg-surface text-ink shadow-soft",
                           )}
                           aria-current={item === locale ? "true" : undefined}
                           replace

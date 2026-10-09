@@ -49,7 +49,7 @@ function Field({ label, value }: { label: string; value: string }) {
 
 function Section({ title, extra, children }: { title: string; extra?: string; children: ReactNode }) {
   return (
-    <section className="grid gap-3 rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
+    <section className="grid gap-3 rounded-card bg-surface p-5 shadow-soft md:p-6">
       <div className="flex items-end justify-between gap-3">
         <h2 className="m-0">{title}</h2>
         {extra ? <p className="m-0 text-sm text-muted">{extra}</p> : null}
@@ -66,7 +66,7 @@ function EmptyNote({ children }: { children: ReactNode }) {
 async function ClinicHero({ clinic, source }: { clinic: ClinicOverview; source: ClinicCopyView | undefined }) {
   const platform = await getTranslations("platform");
   return (
-    <article className="overflow-hidden rounded-[1.6rem] bg-white shadow-soft">
+    <article className="overflow-hidden rounded-card bg-surface shadow-soft">
       <div className="relative aspect-16/10 max-h-[360px] bg-sand">
         <Photo src={clinic.coverUrl} alt={source?.name ?? ""} loading="eager" sizes="(max-width: 960px) 100vw, 720px" />
       </div>

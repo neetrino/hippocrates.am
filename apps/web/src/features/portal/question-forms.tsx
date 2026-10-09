@@ -24,19 +24,15 @@ export function AskQuestionForm() {
     window.location.reload();
   }
 
-  const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
-  const controlClass =
-    "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
+  const fieldClass = "field-label";
+  const controlClass = "field-control";
 
   return (
     <form className="grid gap-3.5" onSubmit={(event) => void onSubmit(event)}>
       <label className={fieldClass}>{t("askTitle")}<input name="title" required className={controlClass} /></label>
       <label className={fieldClass}>{t("askBody")}<textarea name="body" required className={`${controlClass} min-h-[110px] resize-y`} /></label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
-      <button
-        className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent"
-        type="submit"
-      >
+      <button className="btn btn-primary w-fit" type="submit">
         {common("send")}
       </button>
     </form>
@@ -70,14 +66,11 @@ export function AnswerForm({ questionId }: { questionId: string }) {
         <textarea
           name="body"
           required
-          className="min-h-[110px] resize-y rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none"
+        className="field-control min-h-[110px] resize-y"
         />
       </label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
-      <button
-        className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-3.5 py-2 text-sm font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent"
-        type="submit"
-      >
+      <button className="btn btn-primary w-fit text-sm" type="submit">
         {t("answerAction")}
       </button>
     </form>

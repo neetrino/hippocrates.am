@@ -80,12 +80,11 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
 
   if (!offering) return <p className="m-0 text-muted">{t("noService")}</p>;
 
-  const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
-  const controlClass =
-    "w-full min-w-0 max-w-full rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
+  const fieldClass = "field-label";
+  const controlClass = "field-control";
 
   return (
-    <div className="grid min-w-0 gap-3.5 overflow-hidden rounded-card border border-line bg-white p-5 shadow-soft">
+    <div className="grid min-w-0 gap-4 overflow-hidden rounded-card bg-surface p-6 shadow-soft max-md:p-5">
       <h2>{t("title")}</h2>
       <label className={fieldClass}>
         {t("service")}
@@ -139,7 +138,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
         </p>
       ) : null}
       <button
-        className="inline-flex w-full cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:cursor-not-allowed disabled:opacity-55"
+        className="btn btn-primary w-full"
         type="button"
         disabled={!selected || pending}
         onClick={() => void book()}
@@ -172,7 +171,7 @@ function TimeButton({
         "inline-flex h-10 w-[4.75rem] shrink-0 items-center justify-center rounded-full border text-sm tabular-nums disabled:opacity-100",
         slot.busy && "cursor-not-allowed border-danger/35 bg-danger/10 text-danger line-through",
         !slot.busy && selected && "border-accent bg-accent text-white",
-        !slot.busy && !selected && "cursor-pointer border-line bg-white text-ink",
+        !slot.busy && !selected && "cursor-pointer border-line bg-surface text-ink hover:border-accent/40",
       )}
       onClick={() => onSelect(slot.startsAt)}
     >

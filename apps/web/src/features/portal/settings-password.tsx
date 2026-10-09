@@ -6,7 +6,7 @@ import { PasswordField } from "@/features/auth/password-field";
 import { accountRequest } from "@/features/portal/settings-request";
 
 const submitClass =
-  "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-3.5 py-2 text-sm font-semibold tracking-normal text-white normal-case transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent disabled:opacity-60";
+  "btn btn-primary min-h-9 px-3.5 py-2 text-sm";
 
 export function SettingsPassword() {
   const t = useTranslations("me");

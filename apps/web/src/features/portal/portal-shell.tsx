@@ -307,8 +307,8 @@ export function PortalShell({ children, title, eyebrow, subtitle, accountHref, i
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex bg-[#eef3f2]">
-      <aside className="relative hidden min-h-0 w-[272px] shrink-0 overflow-hidden rounded-tr-[2.75rem] rounded-br-[2.75rem] [clip-path:inset(0_round_2.75rem)] bg-[#2a4a47] md:flex md:flex-col">
+    <div className="fixed inset-0 z-[60] flex bg-background">
+      <aside className="relative hidden min-h-0 w-[272px] shrink-0 overflow-hidden rounded-tr-[2.75rem] rounded-br-[2.75rem] [clip-path:inset(0_round_2.75rem)] bg-secondary md:flex md:flex-col">
         <div className="scrollbar-sidebar min-h-0 flex-1 overflow-y-auto px-3 pt-7 pb-6">
           <SidebarNav {...sidebar} />
         </div>
@@ -316,7 +316,7 @@ export function PortalShell({ children, title, eyebrow, subtitle, accountHref, i
       {open ? (
         <div className="fixed inset-0 z-20 md:hidden">
           <button type="button" className="absolute inset-0 cursor-pointer border-0 bg-[rgba(14,20,20,0.5)] p-0 backdrop-blur-[6px]" aria-label={t("closeMenu")} onClick={close} />
-          <aside id={menuId} className="relative z-1 flex h-full min-h-0 w-[min(288px,86vw)] flex-col overflow-hidden rounded-tr-[2.5rem] rounded-br-[2.5rem] [clip-path:inset(0_round_2.5rem)] bg-[#2a4a47] pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+          <aside id={menuId} className="relative z-1 flex h-full min-h-0 w-[min(288px,86vw)] flex-col overflow-hidden rounded-tr-[2.5rem] rounded-br-[2.5rem] [clip-path:inset(0_round_2.5rem)] bg-secondary pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
             <button type="button" className="mb-4 mr-3 ml-auto grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-white/12 text-white" aria-label={t("closeMenu")} onClick={close}>
               <CloseIcon />
             </button>

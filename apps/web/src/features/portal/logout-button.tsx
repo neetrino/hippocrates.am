@@ -5,9 +5,30 @@ import { useRouter } from "@/i18n/navigation";
 
 type LogoutButtonProps = {
   className?: string;
+  showIcon?: boolean;
 };
 
-export function LogoutButton({ className }: LogoutButtonProps) {
+function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-3.5 w-3.5 shrink-0">
+      <path
+        d="M10 6.5V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13.5 12H4m0 0 2.4-2.4M4 12l2.4 2.4"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function LogoutButton({ className, showIcon = false }: LogoutButtonProps) {
   const router = useRouter();
   const t = useTranslations("common");
 
@@ -29,6 +50,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
       type="button"
       onClick={() => void logout()}
     >
+      {showIcon ? <LogoutIcon /> : null}
       {t("logout")}
     </button>
   );

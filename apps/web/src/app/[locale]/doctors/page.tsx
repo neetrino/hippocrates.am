@@ -6,6 +6,7 @@ import { publicGet } from "@/shared/public-api";
 import type { DoctorCard } from "@/shared/public-types";
 import { DoctorTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { PageStack } from "@/shared/ui/page-frame";
 
 type DoctorFiltersResponse = {
   specialties: string[];
@@ -57,8 +58,10 @@ export default async function DoctorsPage({
   ]);
 
   return (
-    <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))] max-md:pt-[18px]">
-      <h1>{t("doctorsTitle")}</h1>
+    <PageStack>
+      <div className="grid max-w-[40rem] gap-3">
+        <h1>{t("doctorsTitle")}</h1>
+      </div>
       <DoctorsSearch
         action={getPathname({ locale, href: "/doctors" })}
         initialName={queryParams.name ?? ""}
@@ -90,6 +93,6 @@ export default async function DoctorsPage({
       <div className="grid gap-5 max-md:gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
         {doctors.map((doctor) => <DoctorTile key={doctor.id} doctor={doctor} />)}
       </div>
-    </div>
+    </PageStack>
   );
 }

@@ -1,3 +1,6 @@
+import Image from "next/image";
+import { HomeDisplayTitle } from "@/features/home/home-banner";
+
 export function HomeAbout({
   eyebrow,
   title,
@@ -8,12 +11,21 @@ export function HomeAbout({
   body: string;
 }) {
   return (
-    <section className="grid gap-8 pt-16 max-md:gap-5 max-md:pt-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-start">
-      <div className="grid gap-3">
-        <p className="kicker">{eyebrow}</p>
-        <h2>{title}</h2>
+    <section className="page-shell mt-16 overflow-hidden rounded-card bg-surface shadow-soft max-md:mt-10 md:mt-20 md:grid md:grid-cols-2">
+      <div className="relative min-h-72 md:min-h-[34rem]">
+        <Image
+          src="/home/home-about.jpg"
+          alt=""
+          fill
+          sizes="(max-width: 768px) 100vw, 40rem"
+          className="object-cover"
+        />
       </div>
-      <p className="m-0 max-w-[40rem] text-[1.05rem] leading-[1.75] text-muted">{body}</p>
+      <div className="grid content-center gap-5 px-6 py-10 md:px-12 md:py-14">
+        <p className="kicker">{eyebrow}</p>
+        <HomeDisplayTitle className="text-[clamp(2.05rem,3.4vw,3.05rem)]">{title}</HomeDisplayTitle>
+        <p className="m-0 text-[1.05rem] leading-[1.75] text-muted">{body}</p>
+      </div>
     </section>
   );
 }

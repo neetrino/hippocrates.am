@@ -11,8 +11,6 @@ import { HomeServices } from "@/features/home/home-services";
 import { HomeTrust } from "@/features/home/home-trust";
 import { publicGet } from "@/shared/public-api";
 import type { ClinicCard, DoctorCard, QuestionCard } from "@/shared/public-types";
-import { PageFrame } from "@/shared/ui/page-frame";
-
 type HomeData = { clinics: ClinicCard[]; doctors: DoctorCard[] };
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -21,10 +19,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("home");
   const nav = await getTranslations("nav");
   const common = await getTranslations("common");
+  const catalog = await getTranslations("catalog");
   const questionsCopy = await getTranslations("questions");
-  const [data, questions] = await Promise.all([
+  const [data, questions, clinics] = await Promise.all([
     publicGet<HomeData>("/public/home", locale),
     publicGet<QuestionCard[]>("/questions").catch(() => [] as QuestionCard[]),
+    publicGet<ClinicCard[]>("/public/clinics", locale).catch(() => [] as ClinicCard[]),
   ]);
 
   return (
@@ -36,6 +36,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         eyebrow={t("eyebrow")}
         placeholder={t("clinicPlaceholder")}
         searchLabel={common("search")}
+        emptyLabel={catalog("emptyClinicSearch")}
+        clinics={clinics}
         prevSlide={t("prevSlide")}
         nextSlide={t("nextSlide")}
         images={data.clinics.map((clinic) => clinic.coverUrl).filter((url): url is string => Boolean(url))}
@@ -46,52 +48,50 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         emptyClinics={t("emptyClinics")}
         clinics={data.clinics.slice(0, 6)}
       />
-      <PageFrame className="pt-10 pb-6 max-md:pt-7">
-        <HomeTrust
-          items={[
-            { title: t("trust1Title"), body: t("trust1Body") },
-            { title: t("trust2Title"), body: t("trust2Body") },
-            { title: t("trust3Title"), body: t("trust3Body") },
-          ]}
-        />
-        <HomeAbout eyebrow={t("aboutEyebrow")} title={t("aboutTitle")} body={t("aboutBody")} />
-        <HomeAudience
-          title={t("audienceTitle")}
-          items={[
-            { title: t("forPatientsTitle"), body: t("forPatientsBody") },
-            { title: t("forClinicsTitle"), body: t("forClinicsBody") },
-          ]}
-        />
-        <HomeServices
-          title={t("servicesTitle")}
-          items={[
-            { title: t("service1Title"), body: t("service1Body") },
-            { title: t("service2Title"), body: t("service2Body") },
-            { title: t("service3Title"), body: t("service3Body") },
-            { title: t("service4Title"), body: t("service4Body") },
-          ]}
-        />
-        <HomeHow
-          title={t("howTitle")}
-          steps={[
-            { title: t("how1Title"), body: t("how1Body") },
-            { title: t("how2Title"), body: t("how2Body") },
-            { title: t("how3Title"), body: t("how3Body") },
-          ]}
-        />
-        <HomeQuestions
-          title={t("questionsTitle")}
-          lede={t("questionsLede")}
-          actionLabel={questionsCopy("title")}
-          questions={questions}
-        />
-        <HomeCta
-          title={t("ctaTitle")}
-          body={t("ctaBody")}
-          clinicsLabel={t("ctaClinics")}
-          doctorsLabel={t("ctaDoctors")}
-        />
-      </PageFrame>
+      <HomeTrust
+        items={[
+          { title: t("trust1Title"), body: t("trust1Body") },
+          { title: t("trust2Title"), body: t("trust2Body") },
+          { title: t("trust3Title"), body: t("trust3Body") },
+        ]}
+      />
+      <HomeAbout eyebrow={t("aboutEyebrow")} title={t("aboutTitle")} body={t("aboutBody")} />
+      <HomeAudience
+        title={t("audienceTitle")}
+        items={[
+          { title: t("forPatientsTitle"), body: t("forPatientsBody") },
+          { title: t("forClinicsTitle"), body: t("forClinicsBody") },
+        ]}
+      />
+      <HomeServices
+        title={t("servicesTitle")}
+        items={[
+          { title: t("service1Title"), body: t("service1Body") },
+          { title: t("service2Title"), body: t("service2Body") },
+          { title: t("service3Title"), body: t("service3Body") },
+          { title: t("service4Title"), body: t("service4Body") },
+        ]}
+      />
+      <HomeHow
+        title={t("howTitle")}
+        steps={[
+          { title: t("how1Title"), body: t("how1Body") },
+          { title: t("how2Title"), body: t("how2Body") },
+          { title: t("how3Title"), body: t("how3Body") },
+        ]}
+      />
+      <HomeQuestions
+        title={t("questionsTitle")}
+        lede={t("questionsLede")}
+        actionLabel={questionsCopy("title")}
+        questions={questions}
+      />
+      <HomeCta
+        title={t("ctaTitle")}
+        body={t("ctaBody")}
+        clinicsLabel={t("ctaClinics")}
+        doctorsLabel={t("ctaDoctors")}
+      />
     </>
   );
 }

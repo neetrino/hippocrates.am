@@ -24,11 +24,7 @@ export function HomeClinicSearch({ clinics, action, placeholder, searchLabel, em
 
   return (
     <div className="relative" onBlur={(event) => closeUnlessInside(event, () => setOpen(false))}>
-      <form
-        className="flex gap-2 rounded-full border border-line bg-white p-2 shadow-soft focus-within:border-accent/45 focus-within:shadow-[0_14px_36px_rgba(0,167,157,0.12)] max-md:flex-col max-md:rounded-[18px]"
-        action={action}
-        role="search"
-      >
+      <form className="search-shell" action={action} role="search">
         <input
           name="name"
           role="combobox"
@@ -45,12 +41,9 @@ export function HomeClinicSearch({ clinics, action, placeholder, searchLabel, em
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          className="flex-1 border-0 bg-transparent px-4 py-3 outline-none"
+          className="min-w-0 flex-1 border-0 bg-transparent px-4 py-2.5 text-[0.98rem] outline-none placeholder:text-text-muted"
         />
-        <button
-          className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent max-md:w-full"
-          type="submit"
-        >
+        <button className="btn btn-primary max-md:w-full" type="submit">
           {searchLabel}
         </button>
       </form>
@@ -64,7 +57,8 @@ function SuggestionList({ id, clinics, emptyLabel }: { id: string; clinics: Clin
     <ul
       id={id}
       role="listbox"
-      className="absolute top-full right-0 left-0 z-20 mt-2 overflow-hidden rounded-[1.2rem] border border-line bg-white shadow-soft"
+      onMouseDown={(event) => event.preventDefault()}
+      className="absolute right-0 left-0 z-20 overflow-hidden rounded-card border border-line bg-surface shadow-soft max-md:bottom-[calc(100%+0.5rem)] md:top-[calc(100%+0.5rem)]"
     >
       {clinics.length === 0 ? <li className="px-4 py-3 text-muted">{emptyLabel}</li> : null}
       {clinics.map((clinic) => (

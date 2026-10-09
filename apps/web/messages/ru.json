@@ -23,6 +23,8 @@
     "title": "Найдите клинику и запишитесь на приём",
     "lede": "Клиники, врачи и свободное время на одной спокойной странице.",
     "clinicPlaceholder": "Название клиники",
+    "prevSlide": "Предыдущее фото",
+    "nextSlide": "Следующее фото",
     "clinicStat": "{count, plural, one {<strong>#</strong> клиника} few {<strong>#</strong> клиники} many {<strong>#</strong> клиник} other {<strong>#</strong> клиники}}",
     "doctorStat": "{count, plural, one {<strong>#</strong> врач} few {<strong>#</strong> врача} many {<strong>#</strong> врачей} other {<strong>#</strong> врача}}",
     "allDoctors": "Смотреть врачей",

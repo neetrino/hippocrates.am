@@ -23,6 +23,8 @@
     "title": "Find a clinic and book a visit",
     "lede": "Dental clinics, doctors, and open times on one calm page.",
     "clinicPlaceholder": "Clinic name",
+    "prevSlide": "Previous image",
+    "nextSlide": "Next image",
     "clinicStat": "{count, plural, one {<strong>#</strong> clinic} other {<strong>#</strong> clinics}}",
     "doctorStat": "{count, plural, one {<strong>#</strong> doctor} other {<strong>#</strong> doctors}}",
     "allDoctors": "Browse doctors",

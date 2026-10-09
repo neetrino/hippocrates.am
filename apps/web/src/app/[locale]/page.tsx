@@ -36,6 +36,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         eyebrow={t("eyebrow")}
         placeholder={t("clinicPlaceholder")}
         searchLabel={common("search")}
+        prevSlide={t("prevSlide")}
+        nextSlide={t("nextSlide")}
+        images={data.clinics.map((clinic) => clinic.coverUrl).filter((url): url is string => Boolean(url))}
       />
       <HomeCatalog
         clinicsTitle={nav("clinics")}

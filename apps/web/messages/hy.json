@@ -23,6 +23,8 @@
     "title": "Գտեք կլինիկա և գրանցվեք այցի",
     "lede": "Ատամնաբուժական կլինիկաներ, բժիշկներ և ազատ ժամեր մեկ հանգիստ էջում։",
     "clinicPlaceholder": "Կլինիկայի անուն",
+    "prevSlide": "Նախորդ նկար",
+    "nextSlide": "Հաջորդ նկար",
     "clinicStat": "{count, plural, one {<strong>#</strong> կլինիկա} other {<strong>#</strong> կլինիկա}}",
     "doctorStat": "{count, plural, one {<strong>#</strong> բժիշկ} other {<strong>#</strong> բժիշկ}}",
     "allDoctors": "Դիտել բժիշկներին",

@@ -350,6 +350,95 @@
   }
 }
 
+/* Home hero slideshow — matched to ToonExpo fade + Ken Burns motion */
+.home-hero-slide-fade {
+  transition-property: opacity, transform;
+  transition-duration: 1.8s;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: opacity, transform;
+}
+
+.home-hero-slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.home-hero-slide-idle {
+  opacity: 0;
+  transform: scale(1.045);
+}
+
+.home-hero-ken-layer {
+  position: absolute;
+  inset: -10%;
+  will-change: transform;
+}
+
+.home-hero-ken-drift {
+  animation: 28s linear infinite home-hero-ken-drift;
+}
+
+.home-hero-ken-drift-alt {
+  animation: 32s linear infinite home-hero-ken-drift-alt;
+}
+
+@keyframes home-hero-ken-drift {
+  0% {
+    transform: scale(1.14) translate(0);
+  }
+  20% {
+    transform: scale(1.2) translate(2.2%, -1.6%);
+  }
+  40% {
+    transform: scale(1.16) translate(1.8%, 2.1%);
+  }
+  60% {
+    transform: scale(1.22) translate(-2.1%, 1.5%);
+  }
+  80% {
+    transform: scale(1.17) translate(-1.7%, -2%);
+  }
+  100% {
+    transform: scale(1.14) translate(0);
+  }
+}
+
+@keyframes home-hero-ken-drift-alt {
+  0% {
+    transform: scale(1.16) translate(0);
+  }
+  20% {
+    transform: scale(1.21) translate(-2%, 1.8%);
+  }
+  40% {
+    transform: scale(1.15) translate(-1.6%, -2.2%);
+  }
+  60% {
+    transform: scale(1.2) translate(2.1%, -1.4%);
+  }
+  80% {
+    transform: scale(1.18) translate(1.5%, 2%);
+  }
+  100% {
+    transform: scale(1.16) translate(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-slide-fade {
+    transition-duration: 0s;
+  }
+
+  .home-hero-slide-idle {
+    transform: none;
+  }
+
+  .home-hero-ken-drift,
+  .home-hero-ken-drift-alt {
+    animation: none;
+  }
+}
+
 @media (max-width: 768px) {
   .page-shell {
     width: min(var(--max-width-shell), calc(100% - 1.25rem));

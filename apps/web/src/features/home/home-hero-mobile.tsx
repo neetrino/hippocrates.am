@@ -60,12 +60,12 @@ function ClinicPeek({
           {seeAll}
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid gap-2">
         {clinics.map((clinic) => (
           <Link
             key={clinic.id}
             href={`/clinics/${clinic.id}`}
-            className="grid min-w-0 gap-0.5 rounded-2xl bg-surface px-3 py-3 shadow-soft"
+            className="grid min-w-0 gap-0.5 rounded-2xl bg-surface px-3.5 py-2.5 shadow-soft"
           >
             <span className="truncate text-[0.92rem] font-semibold text-ink">{clinic.name}</span>
             <span className="truncate text-[0.78rem] text-muted">{clinic.district}</span>

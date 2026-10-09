@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useId, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { matchesClinic } from "@/features/catalog/match-clinic";
 import type { ClinicCard } from "@/shared/public-types";
 import { ClinicTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
@@ -15,31 +16,6 @@ type PortalClinicsPanelProps = {
   emptyLabel: string;
   action: ReactNode;
 };
-
-function normalizeText(value: string): string {
-  return value.trim().toLocaleLowerCase();
-}
-
-function normalizePhone(value: string): string {
-  return value.replace(/\D/g, "");
-}
-
-function matchesClinic(clinic: ClinicCard, query: string): boolean {
-  const raw = query.trim();
-  if (!raw) return true;
-
-  const tokens = normalizeText(raw).split(/\s+/).filter(Boolean);
-  const textHaystack = normalizeText(
-    [clinic.name, clinic.district, clinic.address, clinic.phone].join(" "),
-  );
-  const phoneHaystack = normalizePhone(clinic.phone);
-
-  return tokens.every((token) => {
-    const phoneToken = normalizePhone(token);
-    if (phoneToken.length >= 2 && phoneHaystack.includes(phoneToken)) return true;
-    return textHaystack.includes(token);
-  });
-}
 
 function SearchIcon() {
   return (

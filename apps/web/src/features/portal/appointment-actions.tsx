@@ -7,7 +7,7 @@ type AppointmentActionsProps = {
   id: string;
   status: string;
   startsAt: string;
-  mode: "patient" | "admin";
+  mode: "patient" | "admin" | "doctor";
 };
 
 export function AppointmentActions(props: AppointmentActionsProps) {
@@ -15,9 +15,10 @@ export function AppointmentActions(props: AppointmentActionsProps) {
   const [error, setError] = useState("");
   const started = visitStarted(props.startsAt);
   const open = props.status === "REQUESTED" || props.status === "CONFIRMED";
-  const canConfirm = props.mode === "admin" && props.status === "REQUESTED" && !started;
-  const canComplete = props.mode === "admin" && props.status === "CONFIRMED" && started;
-  const canCancel = open && (props.mode === "admin" || !started);
+  const staff = props.mode === "admin" || props.mode === "doctor";
+  const canConfirm = staff && props.status === "REQUESTED" && !started;
+  const canComplete = staff && props.status === "CONFIRMED" && started;
+  const canCancel = open && (staff || !started);
   if (!canConfirm && !canComplete && !canCancel) return null;
 
   async function post(path: string): Promise<void> {

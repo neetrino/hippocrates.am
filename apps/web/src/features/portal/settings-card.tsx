@@ -11,14 +11,16 @@ type SettingsCardProps = {
   email: string;
   phone: string | null;
   photoUrl: string | null;
+  roleLabel?: string;
 };
 
 const editButton =
   "btn btn-secondary min-h-9 px-3.5 py-2 text-sm";
 
-export function SettingsCard({ displayName, email, phone, photoUrl }: SettingsCardProps) {
+export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel }: SettingsCardProps) {
   const t = useTranslations("me");
   const common = useTranslations("common");
+  const role = roleLabel ?? common("PATIENT");
   const [editing, setEditing] = useState(false);
 
   return (
@@ -26,7 +28,7 @@ export function SettingsCard({ displayName, email, phone, photoUrl }: SettingsCa
       <SettingsPhoto
         name={displayName}
         photoUrl={photoUrl}
-        roleLabel={common("PATIENT")}
+        roleLabel={role}
         changeLabel={t("changePhoto")}
         changeAction={t("photoChange")}
         deleteAction={t("photoDelete")}

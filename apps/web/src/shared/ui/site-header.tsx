@@ -9,6 +9,7 @@ import { SiteNav } from "@/shared/ui/site-nav";
 
 function accountHref(role: string | null): AccountHref {
   if (role === "SUPER_ADMIN") return "/super-admin";
+  if (role === "ADMIN") return "/clinic";
   if (role) return "/me";
   return "/login";
 }

@@ -1,5 +1,7 @@
 packages:
   - "apps/*"
+overrides:
+  handlebars: 4.7.10
 allowBuilds:
   '@parcel/watcher': true
   '@prisma/engines': true

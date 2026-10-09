@@ -8,7 +8,15 @@ import type { AppointmentCard } from "@/shared/public-types";
 
 type Tone = keyof typeof visitPreviewLimit;
 
-export async function VisitBoard({ visits, locale }: { visits: AppointmentCard[]; locale: string }) {
+export async function VisitBoard({
+  visits,
+  locale,
+  viewer = "patient",
+}: {
+  visits: AppointmentCard[];
+  locale: string;
+  viewer?: "patient" | "doctor";
+}) {
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
   const services = await getTranslations("services");
@@ -33,7 +41,8 @@ export async function VisitBoard({ visits, locale }: { visits: AppointmentCard[]
             key={section.tone}
             tone={section.tone}
             title={section.title}
-            visits={section.items.map((visit) => toRow(visit, locale, services, common))}
+            visits={section.items.map((visit) => toRow(visit, locale, services, common, viewer))}
+            actions={viewer === "doctor" ? "doctor" : "patient"}
             moreLabel={me("showMore", { count: Math.max(section.items.length - visitPreviewLimit[section.tone], 0) })}
             lessLabel={me("showLess")}
           />
@@ -48,18 +57,20 @@ function toRow(
   locale: string,
   services: (key: ServiceMessageKey) => string,
   common: (key: "REQUESTED" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "price", values?: { amount: string }) => string,
+  viewer: "patient" | "doctor",
 ): VisitRow {
   const status = asVisitStatus(visit.status);
+  const clinic = `${clinicDisplayName(visit.clinic, locale)} · ${doctorDisplayName(visit.doctor, locale)}`;
   return {
     id: visit.id,
     status: visit.status,
     date: formatVisitDate(visit.startsAt, locale),
     time: formatTime(visit.startsAt),
     service: localizedServiceName(visit.offering.name, services),
-    place: `${clinicDisplayName(visit.clinic, locale)} · ${doctorDisplayName(visit.doctor, locale)}`,
+    place: viewer === "doctor" ? visit.patient.displayName : clinic,
     statusLabel: status ? common(status) : visit.status,
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
-    needsReview: visit.status === "COMPLETED" && !visit.review,
+    needsReview: viewer === "patient" && visit.status === "COMPLETED" && !visit.review,
     startsAt: visit.startsAt,
   };
 }

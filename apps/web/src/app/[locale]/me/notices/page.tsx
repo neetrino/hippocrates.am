@@ -7,7 +7,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { formatWhen } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
-import { noticeMessageKey, type NoticeMessageKey } from "@/shared/notice-text";
+import { noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
@@ -65,7 +65,6 @@ function toRow(
   arrivedLabel: string,
   forDoctor: boolean,
 ): NoticeRow {
-  const messageKey = noticeMessageKey(notice.body);
   const visit = notice.appointment;
   const person = visit ? (forDoctor ? visit.patient.displayName : doctorDisplayName(visit.doctor, locale)) : "";
   const context = visit
@@ -73,7 +72,7 @@ function toRow(
     : "";
   return {
     id: notice.id,
-    text: messageKey ? t(messageKey) : notice.body,
+    text: noticeLine(notice.body, notice.detail, t),
     when: `${arrivedLabel} · ${formatWhen(notice.createdAt, locale)}`,
     context,
     unread: notice.readAt === null,

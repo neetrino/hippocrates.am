@@ -7,6 +7,7 @@ export const noticesReadEvent = "hippocrates:notices-read";
 export type NoticeItem = {
   id: string;
   body: string;
+  detail?: string | null;
   createdAt: string;
   readAt: string | null;
   appointment: {

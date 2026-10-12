@@ -33,9 +33,16 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
                   {item.when} · {localizedServiceName(item.offering.name, services)} · {status ? common(status) : item.status}
                 </p>
               </div>
-              <AppointmentActions id={item.id} status={item.status} startsAt={item.startsAt} mode="admin" />
+              <AppointmentActions
+                id={item.id}
+                status={item.status}
+                startsAt={item.startsAt}
+                mode="admin"
+                proposedBy={item.proposedBy}
+              />
             </div>
             {open ? <RescheduleVisit visit={item} /> : null}
+            {item.cancelReason ? <p className="m-0 text-sm text-muted">{item.cancelReason}</p> : null}
           </article>
         );
       })}

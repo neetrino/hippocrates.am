@@ -3,13 +3,13 @@ import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { Link } from "@/i18n/navigation";
-import { asVisitStatus, formatTime, formatVisitDate } from "@/shared/format";
+import { asVisitStatus, formatTime, formatVisitDate, type VisitStatus } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 
 const card = "rounded-[1.6rem] bg-white shadow-soft";
 
-type StatusKey = "REQUESTED" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+type StatusKey = VisitStatus;
 
 export async function DoctorHome({ me, appointments }: { me: Me; appointments: AppointmentCard[] }) {
   const locale = await getLocale();

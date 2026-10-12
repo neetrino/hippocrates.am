@@ -1,4 +1,5 @@
 const active = new Set(["CONFIRMED", "REQUESTED"]);
+const closed = new Set(["CANCELLED", "EXPIRED", "NO_SHOW"]);
 
 /** How many visits stay visible before "More" in each section. */
 export const visitPreviewLimit = {
@@ -10,7 +11,7 @@ export const visitPreviewLimit = {
 function group(status: string): number {
   if (active.has(status)) return 0;
   if (status === "COMPLETED") return 1;
-  if (status === "CANCELLED") return 2;
+  if (closed.has(status)) return 2;
   return 3;
 }
 
@@ -28,7 +29,7 @@ export function groupVisits<T extends { status: string; startsAt: string }>(visi
   const cancelled: T[] = [];
   for (const visit of sorted) {
     if (visit.status === "COMPLETED") completed.push(visit);
-    else if (visit.status === "CANCELLED") cancelled.push(visit);
+    else if (closed.has(visit.status)) cancelled.push(visit);
     else waiting.push(visit);
   }
   return { waiting, completed, cancelled };

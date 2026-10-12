@@ -41,6 +41,8 @@ export type VisitRow = {
   startsAt: string;
   doctorId: string;
   offeringId: string;
+  proposedBy: "PATIENT" | "STAFF";
+  cancelReason: string | null;
 };
 
 export function VisitGroup({
@@ -123,6 +125,7 @@ function VisitCard({
             {visit.statusLabel}
           </span>
         </p>
+        {visit.cancelReason ? <p className="m-0 text-sm text-muted">{visit.cancelReason}</p> : null}
         <VisitTools visit={visit} actions={actions} />
         {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
@@ -131,12 +134,16 @@ function VisitCard({
 }
 
 function VisitTools({ visit, actions }: { visit: VisitRow; actions: "patient" | "doctor" }) {
-  if (actions !== "patient") {
-    return <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode={actions} />;
-  }
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode="patient" inline />
+      <AppointmentActions
+        id={visit.id}
+        status={visit.status}
+        startsAt={visit.startsAt}
+        mode={actions === "doctor" ? "doctor" : "patient"}
+        proposedBy={visit.proposedBy}
+        inline
+      />
       <PatientReschedule
         id={visit.id}
         status={visit.status}

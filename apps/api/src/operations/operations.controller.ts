@@ -141,6 +141,7 @@ export class OperationsController {
       select: {
         id: true,
         body: true,
+        detail: true,
         createdAt: true,
         readAt: true,
         appointment: {

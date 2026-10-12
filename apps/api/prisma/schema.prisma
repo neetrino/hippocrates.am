@@ -19,6 +19,13 @@ enum AppointmentStatus {
   CONFIRMED
   CANCELLED
   COMPLETED
+  EXPIRED
+  NO_SHOW
+}
+
+enum ScheduleProposal {
+  PATIENT
+  STAFF
 }
 
 enum QuestionStatus {
@@ -188,6 +195,8 @@ model Appointment {
   startsAt      DateTime
   endsAt        DateTime
   status        AppointmentStatus @default(REQUESTED)
+  proposedBy    ScheduleProposal  @default(PATIENT)
+  cancelReason  String?
   priceAmd      Int
   isEstimate    Boolean
   idempotencyKey String?
@@ -206,6 +215,7 @@ model Notification {
   userId        String
   appointmentId String?
   body          String
+  detail        String?
   dedupeKey     String?  @unique
   readAt        DateTime?
   createdAt     DateTime @default(now())

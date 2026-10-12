@@ -6,7 +6,7 @@ const localeTag: Record<string, string> = {
   ru: "ru-RU",
 };
 
-const visitStatuses = ["REQUESTED", "CONFIRMED", "CANCELLED", "COMPLETED"] as const;
+const visitStatuses = ["REQUESTED", "CONFIRMED", "CANCELLED", "COMPLETED", "EXPIRED", "NO_SHOW"] as const;
 const roles = ["PATIENT", "DOCTOR", "ADMIN", "SUPER_ADMIN"] as const;
 
 export type VisitStatus = (typeof visitStatuses)[number];

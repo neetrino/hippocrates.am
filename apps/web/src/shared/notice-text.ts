@@ -2,8 +2,15 @@ const noticeMessages = {
   "notice.requested": "noticeRequested",
   "notice.confirmed": "noticeConfirmed",
   "notice.cancelled": "noticeCancelled",
+  "notice.cancelledByPatient": "noticeCancelledByPatient",
+  "notice.cancelledByDoctor": "noticeCancelledByDoctor",
+  "notice.cancelledByClinic": "noticeCancelledByClinic",
   "notice.expired": "noticeExpired",
   "notice.rescheduled": "noticeRescheduled",
+  "notice.rescheduledByPatient": "noticeRescheduledByPatient",
+  "notice.rescheduledByDoctor": "noticeRescheduledByDoctor",
+  "notice.rescheduledByClinic": "noticeRescheduledByClinic",
+  "notice.noShow": "noticeNoShow",
   "notice.completed": "noticeCompleted",
   "notice.reminderDay": "noticeReminderDay",
   "notice.reminderHour": "noticeReminderHour",
@@ -22,4 +29,12 @@ export function noticeMessageKey(body: string): NoticeMessageKey | null {
     return noticeMessages[body as keyof typeof noticeMessages];
   }
   return null;
+}
+
+/** Appends a short reason when the visit notice stored one. */
+export function noticeLine(body: string, detail: string | null | undefined, translate: (key: NoticeMessageKey) => string): string {
+  const key = noticeMessageKey(body);
+  const text = key ? translate(key) : body;
+  const reason = detail?.trim();
+  return reason ? `${text} — ${reason}` : text;
 }

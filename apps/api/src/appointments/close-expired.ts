@@ -14,7 +14,7 @@ export async function closeExpiredRequests(
   for (const appointment of expired) {
     const closed = await prisma.appointment.updateMany({
       where: { id: appointment.id, status: "REQUESTED" },
-      data: { status: "CANCELLED" },
+      data: { status: "EXPIRED" },
     });
     if (closed.count !== 1) continue;
     closedIds.push(appointment.id);

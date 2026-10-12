@@ -5,7 +5,7 @@ import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { Link } from "@/i18n/navigation";
 import { Photo } from "@/shared/ui/photo";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
-import { asVisitStatus, formatTime, formatVisitDate } from "@/shared/format";
+import { asVisitStatus, formatTime, formatVisitDate, type VisitStatus } from "@/shared/format";
 import { localizedServiceName, type ServiceMessageKey } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 
@@ -157,7 +157,7 @@ function toListed(
   locale: string,
   now: number,
   services: (key: ServiceMessageKey) => string,
-  common: (key: "REQUESTED" | "CONFIRMED" | "CANCELLED" | "COMPLETED") => string,
+  common: (key: VisitStatus) => string,
   passedLabel: string,
 ): ListedVisit {
   const status = asVisitStatus(visit.status);
@@ -174,7 +174,7 @@ function toListed(
 
 function statusText(
   status: string,
-  common: (key: "REQUESTED" | "CONFIRMED" | "CANCELLED" | "COMPLETED") => string,
+  common: (key: VisitStatus) => string,
 ): string {
   const known = asVisitStatus(status);
   return known ? common(known) : "";

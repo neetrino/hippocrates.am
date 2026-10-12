@@ -56,6 +56,8 @@ export type AppointmentCard = {
   id: string;
   startsAt: string;
   status: string;
+  proposedBy?: "PATIENT" | "STAFF";
+  cancelReason?: string | null;
   priceAmd: number;
   isEstimate: boolean;
   offering: { id: string; name: string };

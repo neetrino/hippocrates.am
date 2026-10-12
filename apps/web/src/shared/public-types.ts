@@ -63,7 +63,9 @@ export type AppointmentCard = {
   offering: { id: string; name: string };
   clinic: { name: string; coverUrl?: string | null; locales?: { locale: string; name: string }[] };
   doctor: { id: string; user: { displayName: string }; locales?: { locale: string; name: string }[] };
-  patient: { displayName: string };
+  patient: { displayName: string } | null;
+  guestName?: string | null;
+  guestPhone?: string | null;
   review: { id: string } | null;
 };
 

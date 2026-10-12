@@ -11,6 +11,7 @@ type PhoneFieldProps = {
   variant?: "auth" | "form" | "settings";
   phone?: string | null;
   required?: boolean;
+  onChange?: (phone: string | null) => void;
 };
 
 /** Local digits from a stored Armenian number. An invalid length is kept so it can be corrected. */
@@ -27,7 +28,7 @@ export function armeniaPhone(localDigits: string): string | null {
   return `+${ARMENIA_DIAL}${local}`;
 }
 
-export function PhoneField({ label, variant = "form", phone = null, required = true }: PhoneFieldProps) {
+export function PhoneField({ label, variant = "form", phone = null, required = true, onChange }: PhoneFieldProps) {
   const [local, setLocal] = useState(localArmeniaDigits(phone));
   const [source, setSource] = useState(phone);
   if (phone !== source) {
@@ -76,7 +77,11 @@ export function PhoneField({ label, variant = "form", phone = null, required = t
           maxLength={ARMENIA_LENGTH}
           required={required}
           autoComplete="tel-national"
-          onChange={(event) => setLocal(limitArmeniaDigits(event.target.value))}
+          onChange={(event) => {
+            const next = limitArmeniaDigits(event.target.value);
+            setLocal(next);
+            onChange?.(armeniaPhone(next));
+          }}
         />
       </div>
     </div>

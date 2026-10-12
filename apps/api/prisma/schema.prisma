@@ -188,7 +188,7 @@ model ScheduleException {
 
 model Appointment {
   id            String            @id @default(cuid())
-  patientId     String
+  patientId     String?
   doctorId      String
   clinicId      String
   offeringId    String
@@ -200,7 +200,9 @@ model Appointment {
   priceAmd      Int
   isEstimate    Boolean
   idempotencyKey String?
-  patient       User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  guestName     String?
+  guestPhone    String?
+  patient       User?             @relation("PatientAppointments", fields: [patientId], references: [id])
   doctor        DoctorProfile     @relation(fields: [doctorId], references: [id])
   clinic        Clinic            @relation(fields: [clinicId], references: [id])
   offering      ServiceOffering   @relation(fields: [offeringId], references: [id])

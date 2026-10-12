@@ -257,6 +257,7 @@
     "noticeRescheduledByDoctor": "The doctor proposed a new time",
     "noticeRescheduledByClinic": "The clinic proposed a new time",
     "noticeNoShow": "The patient did not come",
+    "noticeDeskBooked": "The clinic booked a visit",
     "noticeCompleted": "Visit completed",
     "noticeReminderDay": "The visit is tomorrow",
     "noticeReminderHour": "The visit is in one hour",
@@ -387,7 +388,13 @@
     "toDate": "To",
     "applyRange": "Show",
     "allDates": "All time",
-    "rangeInvalid": "Choose a start and an end."
+    "rangeInvalid": "Choose a start and an end.",
+    "book": "Book",
+    "service": "Service",
+    "date": "Date",
+    "patientName": "Name",
+    "phone": "Phone",
+    "bookFailed": "The visit was not booked"
   },
   "platform": {
     "title": "Register a clinic",

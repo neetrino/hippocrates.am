@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { VisitGroup, type VisitRow } from "@/features/portal/visit-group";
 import { groupVisits, visitPreviewLimit } from "@/features/portal/visit-order";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
-import { asVisitStatus, formatAmount, formatTime, formatVisitDate, type VisitStatus } from "@/shared/format";
+import { asVisitStatus, formatAmount, formatTime, formatVisitDate, patientLabel, type VisitStatus } from "@/shared/format";
 import { localizedServiceName, type ServiceMessageKey } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
 
@@ -67,7 +67,7 @@ function toRow(
     date: formatVisitDate(visit.startsAt, locale),
     time: formatTime(visit.startsAt),
     service: localizedServiceName(visit.offering.name, services),
-    place: viewer === "doctor" ? visit.patient.displayName : clinic,
+    place: viewer === "doctor" ? patientLabel(visit) : clinic,
     statusLabel: status ? common(status) : visit.status,
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
     needsReview: viewer === "patient" && visit.status === "COMPLETED" && !visit.review,

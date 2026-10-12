@@ -5,7 +5,7 @@ import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
-import { formatWhen } from "@/shared/format";
+import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import type { Me } from "@/shared/public-types";
@@ -66,7 +66,7 @@ function toRow(
   forDoctor: boolean,
 ): NoticeRow {
   const visit = notice.appointment;
-  const person = visit ? (forDoctor ? visit.patient.displayName : doctorDisplayName(visit.doctor, locale)) : "";
+  const person = visit ? (forDoctor ? patientLabel(visit) : doctorDisplayName(visit.doctor, locale)) : "";
   const context = visit
     ? `${clinicDisplayName(visit.clinic, locale)} · ${person} · ${formatWhen(visit.startsAt, locale)}`
     : "";

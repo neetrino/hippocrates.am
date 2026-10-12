@@ -11,6 +11,7 @@ const noticeMessages = {
   "notice.rescheduledByDoctor": "noticeRescheduledByDoctor",
   "notice.rescheduledByClinic": "noticeRescheduledByClinic",
   "notice.noShow": "noticeNoShow",
+  "notice.deskBooked": "noticeDeskBooked",
   "notice.completed": "noticeCompleted",
   "notice.reminderDay": "noticeReminderDay",
   "notice.reminderHour": "noticeReminderHour",

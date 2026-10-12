@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
-import { asVisitStatus, formatTime } from "@/shared/format";
+import { asVisitStatus, formatTime, patientLabel } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
 
@@ -28,7 +28,8 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
           <article className="grid gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={item.id}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <strong>{item.patient.displayName}</strong>
+                <strong>{patientLabel(item)}</strong>
+                {item.guestPhone ? <p className="m-0 text-sm text-muted">{item.guestPhone}</p> : null}
                 <p className="m-0 text-muted">
                   {item.when} · {localizedServiceName(item.offering.name, services)} · {status ? common(status) : item.status}
                 </p>

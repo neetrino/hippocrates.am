@@ -16,6 +16,7 @@ export const appointmentNotice = {
   rescheduledByDoctor: "notice.rescheduledByDoctor",
   rescheduledByClinic: "notice.rescheduledByClinic",
   noShow: "notice.noShow",
+  deskBooked: "notice.deskBooked",
   completed: "notice.completed",
   reminderDay: "notice.reminderDay",
   reminderHour: "notice.reminderHour",
@@ -37,7 +38,8 @@ export class NotificationsService {
         where: { id: appointment.doctorId },
         select: { userId: true },
       });
-      const userIds = new Set<string>([appointment.patientId, ...admins.map((admin) => admin.id)]);
+      const userIds = new Set<string>(admins.map((admin) => admin.id));
+      if (appointment.patientId) userIds.add(appointment.patientId);
       if (doctor) userIds.add(doctor.userId);
       const audience = await noticeAudience(this.prisma, [...userIds]);
       if (audience.length === 0) return;

@@ -55,3 +55,7 @@ export function asRole(value: string): AccountRole | null {
   }
   return null;
 }
+
+export function patientLabel(visit: { patient: { displayName: string } | null; guestName?: string | null }): string {
+  return visit.patient?.displayName || visit.guestName || "";
+}

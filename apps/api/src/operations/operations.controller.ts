@@ -7,6 +7,8 @@ import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
+import { bookDeskVisit } from "../appointments/desk-booking";
+import { countClinicPatients, listClinicPatients } from "../appointments/guest-visits";
 import { financeWindow } from "./finance-range";
 
 @Controller()
@@ -28,13 +30,9 @@ export class OperationsController {
     const [pending, today, patients] = await Promise.all([
       this.prisma.appointment.count({ where: { clinicId, status: "REQUESTED", startsAt: { gt: now } } }),
       this.prisma.appointment.count({ where: { clinicId, startsAt: { gte: start, lt: end } } }),
-      this.prisma.appointment.findMany({
-        where: { clinicId },
-        distinct: ["patientId"],
-        select: { patientId: true },
-      }),
+      countClinicPatients(this.prisma, clinicId),
     ]);
-    return { pending, today, patientCount: patients.length };
+    return { pending, today, patientCount: patients };
   }
 
   @Get("platform/summary")
@@ -53,12 +51,14 @@ export class OperationsController {
   @Roles("ADMIN")
   async patients(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
-    const rows = await this.prisma.appointment.findMany({
-      where: { clinicId },
-      distinct: ["patientId"],
-      select: { patient: { select: { id: true, displayName: true, email: true, phone: true } } },
-    });
-    return rows.map((row) => row.patient);
+    return listClinicPatients(this.prisma, clinicId);
+  }
+
+  @Post("clinics/:clinicId/visits")
+  @Roles("ADMIN")
+  bookVisit(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Body() body: unknown): Promise<{ id: string }> {
+    requireClinicAdmin(actor, clinicId);
+    return bookDeskVisit(this.prisma, this.notices, clinicId, body);
   }
 
   @Get("clinics/:clinicId/patients/:patientId")
@@ -147,6 +147,7 @@ export class OperationsController {
         appointment: {
           select: {
             startsAt: true,
+            guestName: true,
             patient: { select: { displayName: true } },
             clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
             doctor: {

@@ -12,6 +12,7 @@ import { assertResetMail } from "./password-mail";
 import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
 import { clearUserPhoto, saveUserPhoto } from "./user-photo";
+import { claimGuestVisits } from "../appointments/guest-visits";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 
 @Controller("auth")
@@ -52,6 +53,7 @@ export class AuthController {
         role: "PATIENT",
       },
     });
+    await claimGuestVisits(this.prisma, user.id, phone);
     await this.sessions.open(response, user.id);
     return { id: user.id };
   }

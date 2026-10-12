@@ -9,12 +9,16 @@ describe("visit window", () => {
   });
 
   it("asks the clinic to confirm a patient move", () => {
-    expect(rescheduleOutcome(true, "CONFIRMED")).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
-    expect(rescheduleOutcome(true, "REQUESTED")).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+    expect(rescheduleOutcome(true, "CONFIRMED", true)).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+    expect(rescheduleOutcome(true, "REQUESTED", true)).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
   });
 
   it("asks the patient to accept a staff move of a confirmed visit", () => {
-    expect(rescheduleOutcome(false, "CONFIRMED")).toEqual({ status: "REQUESTED", proposedBy: "STAFF" });
-    expect(rescheduleOutcome(false, "REQUESTED")).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+    expect(rescheduleOutcome(false, "CONFIRMED", true)).toEqual({ status: "REQUESTED", proposedBy: "STAFF" });
+    expect(rescheduleOutcome(false, "REQUESTED", true)).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+  });
+
+  it("keeps a phone guest confirmed when the clinic moves the visit", () => {
+    expect(rescheduleOutcome(false, "CONFIRMED", false)).toEqual({ status: "CONFIRMED", proposedBy: "STAFF" });
   });
 });

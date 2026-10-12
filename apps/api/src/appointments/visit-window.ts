@@ -4,12 +4,14 @@ export function visitHasStarted(startsAt: Date, now: Date): boolean {
 
 export type ScheduleProposal = "PATIENT" | "STAFF";
 
-/** A confirmed visit returns to a request. Staff proposals wait for the patient. */
+/** A confirmed visit on an account returns to a request. A phone guest stays confirmed. */
 export function rescheduleOutcome(
   byPatient: boolean,
   status: "REQUESTED" | "CONFIRMED",
-): { status: "REQUESTED"; proposedBy: ScheduleProposal } {
-  if (!byPatient && status === "CONFIRMED") return { status: "REQUESTED", proposedBy: "STAFF" };
+  linked: boolean,
+): { status: "REQUESTED" | "CONFIRMED"; proposedBy: ScheduleProposal } {
+  if (!byPatient && status === "CONFIRMED" && linked) return { status: "REQUESTED", proposedBy: "STAFF" };
+  if (!byPatient && status === "CONFIRMED") return { status: "CONFIRMED", proposedBy: "STAFF" };
   return { status: "REQUESTED", proposedBy: "PATIENT" };
 }
 

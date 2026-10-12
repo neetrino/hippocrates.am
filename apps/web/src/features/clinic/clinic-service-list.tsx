@@ -12,7 +12,8 @@ export type ClinicOffering = {
   priceAmd: number;
   durationMinutes: number;
   isEstimate: boolean;
-  doctor: { user: { displayName: string } };
+  published?: boolean;
+  doctor: { id?: string; published?: boolean; user: { displayName: string } };
 };
 
 const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";

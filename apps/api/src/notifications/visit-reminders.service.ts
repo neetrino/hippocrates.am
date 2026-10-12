@@ -45,14 +45,15 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
   }
 
   private rowsFor(
-    visit: { id: string; patientId: string; startsAt: Date; doctor: { userId: string } },
+    visit: { id: string; patientId: string | null; startsAt: Date; doctor: { userId: string } },
     now: Date,
     bookedAt: Date | null,
   ): { userId: string; appointmentId: string; body: string; dedupeKey: string }[] {
     const kind = dueReminder(visit.startsAt, now, bookedAt);
     if (!kind) return [];
     const body = kind === "day" ? appointmentNotice.reminderDay : appointmentNotice.reminderHour;
-    return [...new Set([visit.patientId, visit.doctor.userId])].map((userId) => ({
+    const ids = visit.patientId ? [visit.patientId, visit.doctor.userId] : [visit.doctor.userId];
+    return [...new Set(ids)].map((userId) => ({
       userId,
       appointmentId: visit.id,
       body,

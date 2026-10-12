@@ -4,7 +4,7 @@ import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
 import { doctorDisplayName } from "@/shared/clinic-label";
-import { formatWhen } from "@/shared/format";
+import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import { sessionGet } from "@/shared/session-api";
@@ -39,7 +39,7 @@ function toRow(
 ): NoticeRow {
   const visit = notice.appointment;
   const context = visit
-    ? `${visit.patient.displayName} · ${doctorDisplayName(visit.doctor, locale)} · ${formatWhen(visit.startsAt, locale)}`
+    ? `${patientLabel(visit)} · ${doctorDisplayName(visit.doctor, locale)} · ${formatWhen(visit.startsAt, locale)}`
     : "";
   return {
     id: notice.id,

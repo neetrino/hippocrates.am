@@ -113,7 +113,7 @@ export async function rescheduleVisit(prisma: PrismaService, notices: Notices, a
     throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
   }
   const appointment = await openVisit(prisma, id);
-  const isPatient = actor.role === "PATIENT" && actor.id === appointment.patientId;
+  const isPatient = appointment.patientId !== null && actor.role === "PATIENT" && actor.id === appointment.patientId;
   if (!isPatient && !(await managesVisit(prisma, actor, appointment))) {
     throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
   }
@@ -122,7 +122,7 @@ export async function rescheduleVisit(prisma: PrismaService, notices: Notices, a
   const offering = await loadOffering(prisma, appointment.offeringId);
   await assertBookable(prisma, notices, offering, startsAt, appointment.id);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
-  const outcome = rescheduleOutcome(isPatient, openStatus(appointment.status));
+  const outcome = rescheduleOutcome(isPatient, openStatus(appointment.status), appointment.patientId !== null);
   const updated = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, id, async (tx) => {
     const changed = await tx.appointment.updateMany({
       where: { id, status: { in: ["REQUESTED", "CONFIRMED"] } },
@@ -169,14 +169,14 @@ async function confirmedVisit(prisma: PrismaService, actor: Actor, id: string) {
   return appointment;
 }
 
-async function mayConfirm(prisma: PrismaService, actor: Actor, appointment: { patientId: string; proposedBy: "PATIENT" | "STAFF"; clinicId: string; doctorId: string }) {
-  const patientAccepts = actor.role === "PATIENT" && actor.id === appointment.patientId && patientMayAccept(appointment.proposedBy);
+async function mayConfirm(prisma: PrismaService, actor: Actor, appointment: { patientId: string | null; proposedBy: "PATIENT" | "STAFF"; clinicId: string; doctorId: string }) {
+  const patientAccepts = actor.role === "PATIENT" && appointment.patientId === actor.id && patientMayAccept(appointment.proposedBy);
   const staffConfirms = staffMayConfirm(appointment.proposedBy) && (await managesVisit(prisma, actor, appointment));
   return patientAccepts || staffConfirms;
 }
 
-async function mayCancel(prisma: PrismaService, actor: Actor, appointment: { patientId: string; clinicId: string; doctorId: string }) {
-  const isPatient = actor.role === "PATIENT" && actor.id === appointment.patientId;
+async function mayCancel(prisma: PrismaService, actor: Actor, appointment: { patientId: string | null; clinicId: string; doctorId: string }) {
+  const isPatient = appointment.patientId !== null && actor.role === "PATIENT" && actor.id === appointment.patientId;
   return isPatient || managesVisit(prisma, actor, appointment);
 }
 

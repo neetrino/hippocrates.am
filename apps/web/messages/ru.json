@@ -257,6 +257,7 @@
     "noticeRescheduledByDoctor": "Врач предлагает новое время",
     "noticeRescheduledByClinic": "Клиника предлагает новое время",
     "noticeNoShow": "Пациент не пришёл",
+    "noticeDeskBooked": "Клиника записала на визит",
     "noticeCompleted": "Визит завершён",
     "noticeReminderDay": "Визит завтра",
     "noticeReminderHour": "Визит через час",
@@ -387,7 +388,13 @@
     "toDate": "По",
     "applyRange": "Показать",
     "allDates": "Всё время",
-    "rangeInvalid": "Выберите начало и конец."
+    "rangeInvalid": "Выберите начало и конец.",
+    "book": "Записать",
+    "service": "Услуга",
+    "date": "Дата",
+    "patientName": "Имя",
+    "phone": "Телефон",
+    "bookFailed": "Запись не сохранилась"
   },
   "platform": {
     "title": "Регистрация клиники",

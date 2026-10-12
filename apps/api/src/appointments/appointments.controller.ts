@@ -21,6 +21,8 @@ const appointmentCard = {
   clinic: { select: { name: true, coverKey: true, locales: { select: { locale: true, name: true } } } },
   doctor: { select: { id: true, user: { select: { displayName: true } }, locales: { select: { locale: true, name: true } } } },
   patient: { select: { displayName: true } },
+  guestName: true,
+  guestPhone: true,
   review: { select: { id: true } },
 } as const;
 

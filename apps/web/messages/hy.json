@@ -257,6 +257,7 @@
     "noticeRescheduledByDoctor": "Բժիշկն առաջարկում է նոր ժամ",
     "noticeRescheduledByClinic": "Կլինիկան առաջարկում է նոր ժամ",
     "noticeNoShow": "Պացիենտը չի եկել",
+    "noticeDeskBooked": "Կլինիկան ամրագրել է այց",
     "noticeCompleted": "Այցն ավարտված է",
     "noticeReminderDay": "Այցը վաղն է",
     "noticeReminderHour": "Այցը մեկ ժամից է",
@@ -387,7 +388,13 @@
     "toDate": "Մինչև",
     "applyRange": "Ցույց տալ",
     "allDates": "Ամբողջ ժամանակը",
-    "rangeInvalid": "Ընտրեք սկիզբը և վերջը։"
+    "rangeInvalid": "Ընտրեք սկիզբը և վերջը։",
+    "book": "Ամրագրել",
+    "service": "Ծառայություն",
+    "date": "Ամսաթիվ",
+    "patientName": "Անուն",
+    "phone": "Հեռախոս",
+    "bookFailed": "Ամրագրումը չպահվեց"
   },
   "platform": {
     "title": "Կլինիկայի գրանցում",

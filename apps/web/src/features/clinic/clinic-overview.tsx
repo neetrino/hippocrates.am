@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { formatAmount } from "@/shared/format";
 
-export type ClinicPatient = { id: string; displayName: string; email: string; phone: string | null };
+export type ClinicPatient = { id: string | null; displayName: string; email: string | null; phone: string | null };
 export type FinanceTotals = { REQUESTED: number; CONFIRMED: number; COMPLETED: number };
 
 const row = "flex items-center justify-between gap-3 border-b border-line px-1 py-3.5 last:border-b-0";
@@ -34,12 +34,19 @@ export async function ClinicPatientList({ patients }: { patients: ClinicPatient[
   }
   return (
     <div className="grid gap-3">
-      {patients.map((patient) => (
-        <Link className={`${row} transition-shadow duration-160 hover:shadow-accent`} href={`/clinic/patients/${patient.id}`} key={patient.id}>
-          <span className="font-semibold">{patient.displayName}</span>
-          <span className="text-sm text-muted">{patient.phone ?? patient.email}</span>
-        </Link>
-      ))}
+      {patients.map((patient) =>
+        patient.id ? (
+          <Link className={`${row} transition-shadow duration-160 hover:shadow-accent`} href={`/clinic/patients/${patient.id}`} key={patient.id}>
+            <span className="font-semibold">{patient.displayName}</span>
+            <span className="text-sm text-muted">{patient.phone ?? patient.email}</span>
+          </Link>
+        ) : (
+          <div className={row} key={patient.phone ?? patient.displayName}>
+            <span className="font-semibold">{patient.displayName}</span>
+            <span className="text-sm text-muted">{patient.phone}</span>
+          </div>
+        ),
+      )}
     </div>
   );
 }

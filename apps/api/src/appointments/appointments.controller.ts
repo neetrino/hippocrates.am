@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { recordOf, requiredString } from "../common/input";
+import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
@@ -18,11 +19,16 @@ const appointmentCard = {
   priceAmd: true,
   isEstimate: true,
   offering: { select: { id: true, name: true } },
-  clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
+  clinic: { select: { name: true, coverKey: true, locales: { select: { locale: true, name: true } } } },
   doctor: { select: { id: true, user: { select: { displayName: true } }, locales: { select: { locale: true, name: true } } } },
   patient: { select: { displayName: true } },
   review: { select: { id: true } },
 } as const;
+
+function presentAppointment<T extends { clinic: { coverKey: string | null } }>(row: T) {
+  const { coverKey, ...clinic } = row.clinic;
+  return { ...row, clinic: { ...clinic, coverUrl: publicAssetUrl(coverKey) } };
+}
 
 @Controller("appointments")
 export class AppointmentsController {
@@ -139,27 +145,30 @@ export class AppointmentsController {
   async mine(@CurrentActor() actor: Actor) {
     await closeExpiredRequests(this.prisma, this.notices);
     if (actor.role === "PATIENT") {
-      return this.prisma.appointment.findMany({
+      const rows = await this.prisma.appointment.findMany({
         where: { patientId: actor.id },
         orderBy: { startsAt: "desc" },
         select: appointmentCard,
       });
+      return rows.map(presentAppointment);
     }
     if (actor.role === "DOCTOR") {
       const doctor = await this.prisma.doctorProfile.findUnique({ where: { userId: actor.id } });
       if (!doctor) return [];
-      return this.prisma.appointment.findMany({
+      const rows = await this.prisma.appointment.findMany({
         where: { doctorId: doctor.id },
         orderBy: { startsAt: "asc" },
         select: appointmentCard,
       });
+      return rows.map(presentAppointment);
     }
     if (actor.role === "ADMIN" && actor.clinicId) {
-      return this.prisma.appointment.findMany({
+      const rows = await this.prisma.appointment.findMany({
         where: { clinicId: actor.clinicId },
         orderBy: { startsAt: "asc" },
         select: appointmentCard,
       });
+      return rows.map(presentAppointment);
     }
     throw new AppError("FORBIDDEN", 403, "Այս գործողությունը թույլատրված չէ");
   }

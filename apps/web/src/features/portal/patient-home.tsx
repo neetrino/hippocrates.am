@@ -3,6 +3,7 @@ import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { Link } from "@/i18n/navigation";
+import { Photo } from "@/shared/ui/photo";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, formatVisitDate } from "@/shared/format";
 import { localizedServiceName, type ServiceMessageKey } from "@/shared/service-name";
@@ -46,12 +47,11 @@ export async function PatientHome({ me, appointments }: PatientHomeProps) {
           <NextVisit
             visit={hero}
             locale={locale}
-            label={t("nextVisit")}
             serviceName={localizedServiceName(hero.offering.name, services)}
             statusLabel={statusText(hero.status, common)}
           />
         ) : (
-          <EmptyNext title={t("noNextVisit")} hint={t("bookHint")} />
+          <EmptyNext title={t("noNextVisit")} hint={t("bookHint")} action={t("bookVisit")} />
         )}
         {review ? <ReviewLine clinic={clinicDisplayName(review.clinic, locale)} label={t("reviewWaiting")} /> : null}
         {rows.length > 0 ? <OtherVisits title={t("otherVisits")} rows={rows} /> : null}
@@ -71,18 +71,21 @@ function BookVisit({ label }: { label: string }) {
   );
 }
 
-function EmptyNext({ title, hint }: { title: string; hint: string }) {
+function EmptyNext({ title, hint, action }: { title: string; hint: string; action: string }) {
   return (
-    <article className={`${card} px-5 py-5`}>
-      <p className="m-0 font-display text-2xl font-bold text-ink">{title}</p>
-      <p className="mt-2 mb-0 text-muted">{hint}</p>
+    <article className={`${card} px-6 py-8 md:px-8 md:py-10`}>
+      <p className="m-0 font-display text-[clamp(2rem,4vw,2.8rem)] leading-[1.05] font-bold text-ink">{title}</p>
+      <p className="mt-3 mb-0 max-w-[28rem] text-muted">{hint}</p>
+      <Link href="/clinics" className="btn btn-primary mt-6">
+        {action}
+      </Link>
     </article>
   );
 }
 
 function ReviewLine({ clinic, label }: { clinic: string; label: string }) {
   return (
-    <Link href="/me/visits" className={`${card} flex items-center justify-between gap-3 px-5 py-3.5`}>
+    <Link href="/me/visits" className="flex items-center justify-between gap-3 rounded-card bg-sand px-5 py-3">
       <span className="min-w-0 break-words text-sm text-ink">{clinic}</span>
       <span className="shrink-0 text-sm font-semibold text-accent">{label}</span>
     </Link>
@@ -92,40 +95,54 @@ function ReviewLine({ clinic, label }: { clinic: string; label: string }) {
 function NextVisit({
   visit,
   locale,
-  label,
   serviceName,
   statusLabel,
 }: {
   visit: AppointmentCard;
   locale: string;
-  label: string;
   serviceName: string;
   statusLabel: string;
 }) {
   const status = asVisitStatus(visit.status);
+  const clinic = clinicDisplayName(visit.clinic, locale);
+  const doctor = doctorDisplayName(visit.doctor, locale);
   return (
-    <Link href="/me/visits" className={`${card} block px-5 py-5 transition-shadow duration-160 hover:shadow-accent`}>
-      <p className="m-0 text-sm font-semibold text-muted">{label}</p>
-      <p className="mt-2 mb-0 font-display text-[1.65rem] leading-snug font-bold text-ink">{serviceName}</p>
-      <p className="mt-2 mb-0 text-ink">
-        {formatVisitDate(visit.startsAt, locale)} · {formatTime(visit.startsAt)}
-      </p>
-      <p className="mt-1 mb-0 text-muted">
-        {clinicDisplayName(visit.clinic, locale)} · {doctorDisplayName(visit.doctor, locale)}
-      </p>
-      {statusLabel ? (
-        <span className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${status ? visitStatusClass[status] : "bg-sand text-ink"}`}>
-          {statusLabel}
-        </span>
-      ) : null}
+    <Link
+      href="/me/visits"
+      className={`${card} group grid overflow-hidden transition-shadow duration-160 hover:shadow-accent md:grid-cols-[minmax(0,1fr)_11.5rem]`}
+    >
+      <div className="grid content-start gap-2 px-6 py-7 md:px-8 md:py-8">
+        <p className="m-0 text-sm font-semibold text-muted">{formatVisitDate(visit.startsAt, locale)}</p>
+        <p className="m-0 font-display text-[clamp(2.6rem,5vw,3.5rem)] leading-none font-bold tracking-[-0.03em] text-ink">
+          {formatTime(visit.startsAt)}
+        </p>
+        <p className="m-0 pt-2 font-display text-[1.35rem] leading-snug font-semibold text-ink">{serviceName}</p>
+        <p className="m-0 font-catalog text-[1.35rem] leading-none font-medium text-muted italic">
+          {clinic} · {doctor}
+        </p>
+        {statusLabel ? (
+          <span className={`mt-3 inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${status ? visitStatusClass[status] : "bg-sand text-ink"}`}>
+            {statusLabel}
+          </span>
+        ) : null}
+      </div>
+      <VisitCover src={visit.clinic.coverUrl} alt={clinic} />
     </Link>
+  );
+}
+
+function VisitCover({ src, alt }: { src: string | null | undefined; alt: string }) {
+  return (
+    <div className="relative hidden overflow-hidden bg-sand md:block">
+      {src ? <Photo src={src} alt={alt} sizes="184px" /> : null}
+    </div>
   );
 }
 
 function OtherVisits({ title, rows }: { title: string; rows: ListedVisit[] }) {
   return (
     <section className={`${card} p-2`}>
-      <p className="m-0 px-3 pt-3 pb-1 text-sm font-semibold text-muted">{title}</p>
+      <p className="m-0 px-3 pt-4 pb-1 font-catalog text-[1.7rem] leading-none font-medium text-muted italic">{title}</p>
       <ul className="m-0 grid list-none p-0">
         {rows.map((row) => (
           <li key={row.id}>

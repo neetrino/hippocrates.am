@@ -1,10 +1,9 @@
 import { Logger } from "@nestjs/common";
 import { AppError } from "../common/app-error";
+import { resetLink, type ResetLocale } from "./password-link";
 
 const RESET_MINUTES = 30;
 const logger = new Logger("PasswordReset");
-
-type ResetLocale = "hy" | "en" | "ru";
 
 const copy: Record<ResetLocale, { subject: string; intro: string; expiry: string }> = {
   hy: {
@@ -24,15 +23,7 @@ const copy: Record<ResetLocale, { subject: string; intro: string; expiry: string
   },
 };
 
-export function resetLocale(value: unknown): ResetLocale {
-  return value === "en" || value === "ru" ? value : "hy";
-}
-
-export function resetLink(token: string, locale: ResetLocale): string {
-  const origin = (process.env.WEB_URL ?? "http://localhost:3000").replace(/\/$/, "");
-  const prefix = locale === "hy" ? "" : `/${locale}`;
-  return `${origin}${prefix}/reset-password?token=${encodeURIComponent(token)}`;
-}
+export { resetLocale } from "./password-link";
 
 /** Letters leave only when Resend is configured. Local development records the link in the API log. */
 export function assertResetMail(): void {

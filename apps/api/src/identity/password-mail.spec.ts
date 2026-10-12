@@ -1,4 +1,4 @@
-import { resetLink, resetLocale } from "./password-mail";
+import { resetLink, resetLocale } from "./password-link";
 
 describe("password reset mail", () => {
   const previous = process.env.WEB_URL;

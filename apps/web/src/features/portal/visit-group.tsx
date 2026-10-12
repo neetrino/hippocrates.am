@@ -121,19 +121,28 @@ function VisitCard({
           </span>
           <span className="text-xs text-muted">{visit.price}</span>
         </p>
-        <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode={actions} />
-        {actions === "patient" ? (
-          <PatientReschedule
-            id={visit.id}
-            status={visit.status}
-            startsAt={visit.startsAt}
-            doctorId={visit.doctorId}
-            offeringId={visit.offeringId}
-          />
-        ) : null}
+        <VisitTools visit={visit} actions={actions} />
         {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
     </article>
+  );
+}
+
+function VisitTools({ visit, actions }: { visit: VisitRow; actions: "patient" | "doctor" }) {
+  if (actions !== "patient") {
+    return <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode={actions} />;
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode="patient" inline />
+      <PatientReschedule
+        id={visit.id}
+        status={visit.status}
+        startsAt={visit.startsAt}
+        doctorId={visit.doctorId}
+        offeringId={visit.offeringId}
+      />
+    </div>
   );
 }
 

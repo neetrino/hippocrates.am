@@ -23,7 +23,7 @@ function RescheduleForm({ id, doctorId, offeringId }: { id: string; doctorId: st
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="grid justify-items-start gap-2">
+    <div className="contents">
       <button
         type="button"
         className="btn btn-secondary min-h-9 px-3.5 py-2 text-sm"
@@ -32,7 +32,11 @@ function RescheduleForm({ id, doctorId, offeringId }: { id: string; doctorId: st
       >
         {t("reschedule")}
       </button>
-      {open ? <MoveDay id={id} doctorId={doctorId} offeringId={offeringId} /> : null}
+      {open ? (
+        <div className="basis-full">
+          <MoveDay id={id} doctorId={doctorId} offeringId={offeringId} />
+        </div>
+      ) : null}
     </div>
   );
 }

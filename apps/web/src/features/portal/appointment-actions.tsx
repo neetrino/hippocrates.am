@@ -8,6 +8,8 @@ type AppointmentActionsProps = {
   status: string;
   startsAt: string;
   mode: "patient" | "admin" | "doctor";
+  /** Lets the buttons sit in a parent row. The date panel stays on the next line. */
+  inline?: boolean;
 };
 
 export function AppointmentActions(props: AppointmentActionsProps) {
@@ -33,7 +35,7 @@ export function AppointmentActions(props: AppointmentActionsProps) {
   }
 
   return (
-    <div className="grid justify-items-start gap-2">
+    <div className={props.inline ? "contents" : "grid justify-items-start gap-2"}>
       <div className="flex flex-wrap gap-2">
         {canConfirm ? (
           <button className="btn btn-primary min-h-9 px-3.5 py-2 text-sm" type="button" onClick={() => void post(`/appointments/${props.id}/confirm`)}>
@@ -51,7 +53,7 @@ export function AppointmentActions(props: AppointmentActionsProps) {
           </button>
         ) : null}
       </div>
-      {error ? <p className="m-0 text-sm text-danger">{error}</p> : null}
+      {error ? <p className="m-0 basis-full text-sm text-danger">{error}</p> : null}
     </div>
   );
 }

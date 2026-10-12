@@ -113,13 +113,15 @@ function VisitCard({
         </p>
       </div>
       <div className="grid min-w-0 gap-2">
-        <strong className={quiet ? "text-muted" : "text-ink"}>{visit.service}</strong>
+        <div className="flex items-baseline justify-between gap-3">
+          <strong className={`min-w-0 ${quiet ? "text-muted" : "text-ink"}`}>{visit.service}</strong>
+          <span className="shrink-0 text-[0.92rem] text-muted">{visit.price}</span>
+        </div>
         <p className="m-0 text-sm text-muted">{visit.place}</p>
-        <p className="m-0 flex flex-wrap items-center gap-2">
+        <p className="m-0">
           <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${status ? visitStatusClass[status] : "bg-sand text-ink"}`}>
             {visit.statusLabel}
           </span>
-          <span className="text-xs text-muted">{visit.price}</span>
         </p>
         <VisitTools visit={visit} actions={actions} />
         {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}

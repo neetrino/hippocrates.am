@@ -20,17 +20,36 @@ export function PatientReschedule(props: PatientRescheduleProps) {
 
 function RescheduleForm({ id, doctorId, offeringId }: { id: string; doctorId: string; offeringId: string }) {
   const t = useTranslations("desk");
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="grid justify-items-start gap-2">
+      <button
+        type="button"
+        className="btn btn-secondary min-h-9 px-3.5 py-2 text-sm"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {t("reschedule")}
+      </button>
+      {open ? <MoveDay id={id} doctorId={doctorId} offeringId={offeringId} /> : null}
+    </div>
+  );
+}
+
+function MoveDay({ id, doctorId, offeringId }: { id: string; doctorId: string; offeringId: string }) {
+  const t = useTranslations("desk");
   const common = useTranslations("common");
   const [slots, setSlots] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="grid gap-2 rounded-[1rem] bg-white p-3">
-      <label className="grid gap-1 text-sm font-semibold text-ink">
-        {t("reschedule")}
+    <div className="grid w-full gap-3 rounded-[1rem] bg-white px-3.5 py-3.5">
+      <label className="grid gap-1.5 text-sm text-muted">
+        {t("pickDate")}
         <input
-          className="field-control font-normal"
+          className="field-control bg-sand scheme-light"
           type="date"
           min={todayYerevan()}
           onChange={(event) => void loadDay(event.target.value, doctorId, offeringId, setSlots, setNote, setFailed, t("noSlots"))}

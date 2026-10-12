@@ -97,16 +97,16 @@ function NextVisit({
   return (
     <Link
       href="/me/visits"
-      className={`${card} group grid overflow-hidden transition-shadow duration-160 hover:shadow-accent md:grid-cols-[minmax(0,1fr)_11.5rem]`}
+      className={`${card} group grid overflow-hidden transition-shadow duration-160 hover:shadow-accent xl:grid-cols-[minmax(0,1.6fr)_minmax(18rem,22rem)]`}
     >
-      <div className="grid content-start gap-2 px-6 py-7 md:px-8 md:py-8">
+      <div className="order-2 grid content-start gap-2 px-6 py-6 md:px-8 md:py-8 xl:order-1">
         <p className="m-0 text-sm font-semibold text-muted">{formatVisitDate(visit.startsAt, locale)}</p>
         <p className="m-0 font-display text-[clamp(2.6rem,5vw,3.5rem)] leading-none font-bold tracking-[-0.03em] text-ink">
           {formatTime(visit.startsAt)}
         </p>
         <p className="m-0 pt-2 font-display text-[1.35rem] leading-snug font-semibold text-ink">{serviceName}</p>
-        <p className="m-0 font-catalog text-[1.35rem] leading-none font-medium text-muted italic">
-          {clinic} · {doctor}
+        <p className="m-0 font-catalog text-[1.35rem] leading-snug font-medium text-muted italic">
+          <span className="whitespace-nowrap">{clinic} ·</span> <span className="whitespace-nowrap">{doctor}</span>
         </p>
         {statusLabel ? (
           <span className={`mt-3 inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${status ? visitStatusClass[status] : "bg-sand text-ink"}`}>
@@ -120,9 +120,10 @@ function NextVisit({
 }
 
 function VisitCover({ src, alt }: { src: string | null | undefined; alt: string }) {
+  if (!src) return <div className="relative hidden bg-sand xl:order-2 xl:block xl:h-auto" />;
   return (
-    <div className="relative hidden overflow-hidden bg-sand md:block">
-      {src ? <Photo src={src} alt={alt} sizes="184px" /> : null}
+    <div className="relative order-1 h-44 overflow-hidden bg-sand sm:h-52 md:h-60 xl:order-2 xl:h-auto">
+      <Photo src={src} alt={alt} sizes="(max-width: 1280px) 100vw, 352px" />
     </div>
   );
 }

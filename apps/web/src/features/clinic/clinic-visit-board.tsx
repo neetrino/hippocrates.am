@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
+import { doctorDisplayName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, patientLabel } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
@@ -17,6 +18,7 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
   const t = useTranslations("desk");
   const common = useTranslations("common");
   const services = useTranslations("services");
+  const locale = useLocale();
   if (visits.length === 0) return <p className="m-0 text-muted">{t("noVisits")}</p>;
 
   return (
@@ -31,7 +33,8 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
                 <strong>{patientLabel(item)}</strong>
                 {item.guestPhone ? <p className="m-0 text-sm text-muted">{item.guestPhone}</p> : null}
                 <p className="m-0 text-muted">
-                  {item.when} · {localizedServiceName(item.offering.name, services)} · {status ? common(status) : item.status}
+                  {item.when} · {doctorDisplayName(item.doctor, locale)} · {localizedServiceName(item.offering.name, services)} ·{" "}
+                  {status ? common(status) : item.status}
                 </p>
               </div>
               <AppointmentActions

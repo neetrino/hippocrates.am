@@ -40,7 +40,6 @@ export async function PatientHome({ me, appointments }: PatientHomeProps) {
       eyebrow=""
       title={me.displayName}
       portrait={<PatientAvatar name={me.displayName} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
-      action={<BookVisit label={t("bookVisit")} />}
     >
       <div className="grid gap-3">
         {hero ? (
@@ -57,17 +56,6 @@ export async function PatientHome({ me, appointments }: PatientHomeProps) {
         {rows.length > 0 ? <OtherVisits title={t("otherVisits")} rows={rows} /> : null}
       </div>
     </PatientPortalShell>
-  );
-}
-
-function BookVisit({ label }: { label: string }) {
-  return (
-    <Link
-      href="/clinics"
-      className="btn btn-primary"
-    >
-      {label}
-    </Link>
   );
 }
 

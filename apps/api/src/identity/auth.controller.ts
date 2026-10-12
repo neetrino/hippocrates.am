@@ -8,6 +8,8 @@ import { Public } from "./auth.decorators";
 import { CurrentActor } from "./current-actor";
 import { RateLimitService } from "./rate-limit.service";
 import { SessionService } from "./session.service";
+import { assertResetMail } from "./password-mail";
+import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
 import { clearUserPhoto, saveUserPhoto } from "./user-photo";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
@@ -70,6 +72,28 @@ export class AuthController {
     if (!user || !valid) throw new AppError("INVALID_LOGIN", 401, "Էլ. փոստը կամ գաղտնաբառը սխալ է");
     await this.sessions.open(response, user.id);
     return { id: user.id, role: user.role };
+  }
+
+  @Public()
+  @Post("forgot-password")
+  async forgotPassword(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
+    this.limits.consume(`forgot:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
+    assertResetMail();
+    const input = recordOf(body);
+    const email = emailOf(input.email);
+    this.limits.consume(`forgot-mail:${email}`, 3, 60 * 60 * 1000);
+    await requestPasswordReset(this.prisma, email, input.locale);
+    return { ok: true };
+  }
+
+  @Public()
+  @Post("reset-password")
+  async resetPassword(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
+    this.limits.consume(`reset:${request.ip ?? "unknown"}`, 8, 10 * 60 * 1000);
+    const input = recordOf(body);
+    const token = requiredString(input.token, "Հղում");
+    await applyPasswordReset(this.prisma, this.sessions, token, input.password, input.confirmPassword);
+    return { ok: true };
   }
 
   @Public()

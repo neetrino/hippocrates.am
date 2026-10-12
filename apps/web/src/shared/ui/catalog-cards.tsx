@@ -1,3 +1,4 @@
+import { FavoriteButton } from "@/features/catalog/favorite-button";
 import { Link } from "@/i18n/navigation";
 import type { ClinicCard, DoctorCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
@@ -7,16 +8,21 @@ export function ClinicTile({
   loading,
   href = `/clinics/${clinic.id}`,
   size = "default",
+  saved,
 }: {
   clinic: ClinicCard;
   loading?: "eager" | "lazy";
   href?: `/clinics/${string}` | `/super-admin/clinics/${string}`;
   size?: "default" | "large";
+  saved?: boolean;
 }) {
   const place = [clinic.district, clinic.address].filter(Boolean).join(" · ");
   const large = size === "large";
   return (
-    <article className="group overflow-hidden rounded-card bg-surface shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(20,36,40,0.08)]">
+    <article className="group relative overflow-hidden rounded-card bg-surface shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(20,36,40,0.08)]">
+      {saved === undefined ? null : (
+        <FavoriteButton kind="clinic" id={clinic.id} saved={saved} className="absolute top-3 right-3 z-10" />
+      )}
       <Link href={href} className="grid">
         <div className={large ? "relative aspect-3/2 min-h-64 overflow-hidden bg-sand" : "relative aspect-16/10 overflow-hidden bg-sand"}>
           <Photo src={clinic.coverUrl} alt={clinic.name} loading={loading} />
@@ -56,9 +62,12 @@ function ArrowUpRightIcon() {
   );
 }
 
-export function DoctorTile({ doctor }: { doctor: DoctorCard }) {
+export function DoctorTile({ doctor, saved }: { doctor: DoctorCard; saved?: boolean }) {
   return (
-    <article className="group overflow-hidden rounded-card bg-sand shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(20,36,40,0.08)]">
+    <article className="group relative overflow-hidden rounded-card bg-sand shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(20,36,40,0.08)]">
+      {saved === undefined ? null : (
+        <FavoriteButton kind="doctor" id={doctor.id} saved={saved} className="absolute top-3 right-3 z-10" />
+      )}
       <Link href={`/doctors/${doctor.id}`} className="relative block aspect-3/4 overflow-hidden">
         <Photo
           src={doctor.photoUrl}

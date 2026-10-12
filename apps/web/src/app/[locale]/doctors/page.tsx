@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { getPathname } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { DoctorsSearch } from "@/features/catalog/doctors-search";
+import { loadFavoriteSet } from "@/features/portal/patient-favorites";
 import { publicGet } from "@/shared/public-api";
 import type { DoctorCard } from "@/shared/public-types";
 import { DoctorTile } from "@/shared/ui/catalog-cards";
@@ -52,9 +53,10 @@ export default async function DoctorsPage({
   appendAll(query, "clinic", clinics);
   const suffix = query.size > 0 ? `?${query}` : "";
 
-  const [doctors, filterOptions] = await Promise.all([
+  const [doctors, filterOptions, favorites] = await Promise.all([
     publicGet<DoctorCard[]>(`/public/doctors${suffix}`, locale),
     publicGet<DoctorFiltersResponse>("/public/doctor-filters", locale),
+    loadFavoriteSet(locale),
   ]);
 
   return (
@@ -91,7 +93,13 @@ export default async function DoctorsPage({
       />
       {doctors.length === 0 ? <EmptyState>{t("emptyDoctorSearch")}</EmptyState> : null}
       <div className="grid gap-5 max-md:gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-        {doctors.map((doctor) => <DoctorTile key={doctor.id} doctor={doctor} />)}
+        {doctors.map((doctor) => (
+          <DoctorTile
+            key={doctor.id}
+            doctor={doctor}
+            saved={favorites ? favorites.doctorIds.includes(doctor.id) : undefined}
+          />
+        ))}
       </div>
     </PageStack>
   );

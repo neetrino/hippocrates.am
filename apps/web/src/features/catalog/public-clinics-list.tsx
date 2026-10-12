@@ -12,6 +12,7 @@ type PublicClinicsListProps = {
   placeholder: string;
   ariaLabel: string;
   emptyLabel: string;
+  savedClinicIds: string[] | null;
 };
 
 export function PublicClinicsList({
@@ -20,6 +21,7 @@ export function PublicClinicsList({
   placeholder,
   ariaLabel,
   emptyLabel,
+  savedClinicIds,
 }: PublicClinicsListProps) {
   const [query, setQuery] = useState(initialQuery);
   const deferredQuery = useDeferredValue(query);
@@ -46,7 +48,12 @@ export function PublicClinicsList({
       {filtered.length === 0 ? <EmptyState>{emptyLabel}</EmptyState> : null}
       <div className="grid gap-4 max-md:gap-3 md:grid-cols-3">
         {filtered.map((clinic, index) => (
-          <ClinicTile key={clinic.id} clinic={clinic} loading={index === 0 ? "eager" : undefined} />
+          <ClinicTile
+            key={clinic.id}
+            clinic={clinic}
+            loading={index === 0 ? "eager" : undefined}
+            saved={savedClinicIds === null ? undefined : savedClinicIds.includes(clinic.id)}
+          />
         ))}
       </div>
     </>

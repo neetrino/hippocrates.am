@@ -72,5 +72,7 @@ function toRow(
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
     needsReview: viewer === "patient" && visit.status === "COMPLETED" && !visit.review,
     startsAt: visit.startsAt,
+    doctorId: visit.doctor.id,
+    offeringId: visit.offering.id,
   };
 }

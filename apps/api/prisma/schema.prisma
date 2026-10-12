@@ -46,6 +46,8 @@ model User {
   notifications Notification[]
   questions    Question[]
   reviews      Review[]
+  favorites      Favorite[]
+  passwordResets PasswordReset[]
 }
 
 model Session {
@@ -79,6 +81,7 @@ model Clinic {
   questions   Question[]
   locales     ClinicLocale[]
   windows     ClinicWindow[]
+  favorites   Favorite[]
 }
 
 model ClinicLocale {
@@ -119,6 +122,7 @@ model DoctorProfile {
   answers     Answer[]
   reviews     Review[]
   locales     DoctorLocale[]
+  favorites   Favorite[]
 }
 
 model DoctorLocale {
@@ -248,6 +252,33 @@ model Review {
   clinic        Clinic   @relation(fields: [clinicId], references: [id])
   doctor        DoctorProfile @relation(fields: [doctorId], references: [id])
   locales       ReviewLocale[]
+}
+
+model Favorite {
+  id        String         @id @default(cuid())
+  userId    String
+  clinicId  String?
+  doctorId  String?
+  createdAt DateTime       @default(now())
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic    Clinic?        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  doctor    DoctorProfile? @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clinicId])
+  @@unique([userId, doctorId])
+  @@index([userId])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model ReviewLocale {

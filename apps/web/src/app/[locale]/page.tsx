@@ -9,6 +9,7 @@ import { HomeHow } from "@/features/home/home-how";
 import { HomeQuestions } from "@/features/home/home-questions";
 import { HomeServices } from "@/features/home/home-services";
 import { HomeTrust } from "@/features/home/home-trust";
+import { loadFavoriteSet } from "@/features/portal/patient-favorites";
 import { publicGet } from "@/shared/public-api";
 import type { ClinicCard, DoctorCard, QuestionCard } from "@/shared/public-types";
 type HomeData = { clinics: ClinicCard[]; doctors: DoctorCard[] };
@@ -21,10 +22,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const common = await getTranslations("common");
   const catalog = await getTranslations("catalog");
   const questionsCopy = await getTranslations("questions");
-  const [data, questions, clinics] = await Promise.all([
+  const [data, questions, clinics, favorites] = await Promise.all([
     publicGet<HomeData>("/public/home", locale),
     publicGet<QuestionCard[]>("/questions").catch(() => [] as QuestionCard[]),
     publicGet<ClinicCard[]>("/public/clinics", locale).catch(() => [] as ClinicCard[]),
+    loadFavoriteSet(locale),
   ]);
 
   return (
@@ -60,6 +62,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         seeAll={common("seeAll")}
         emptyClinics={t("emptyClinics")}
         clinics={data.clinics.slice(0, 6)}
+        savedClinicIds={favorites?.clinicIds ?? null}
       />
       <HomeTrust
         items={[

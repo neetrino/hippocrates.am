@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { BookingPanel } from "@/features/booking/booking-panel";
+import { FavoriteButton } from "@/features/catalog/favorite-button";
+import { loadFavoriteSet } from "@/features/portal/patient-favorites";
 import { initialSlots } from "@/features/booking/initial-slots";
 import { Link } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
@@ -17,7 +19,10 @@ type DoctorPageData = DoctorCard & { offerings: OfferingCard[] };
 export default async function DoctorPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale: raw, id } = await params;
   const locale = prepareLocale(raw);
-  const doctor = await publicGet<DoctorPageData>(`/public/doctors/${id}`, locale).catch(() => null);
+  const [doctor, favorites] = await Promise.all([
+    publicGet<DoctorPageData>(`/public/doctors/${id}`, locale).catch(() => null),
+    loadFavoriteSet(locale),
+  ]);
   if (!doctor) notFound();
   const t = await getTranslations("common");
   const catalog = await getTranslations("catalog");
@@ -40,7 +45,12 @@ export default async function DoctorPage({ params }: { params: Promise<{ locale:
           </div>
           <div className="grid gap-3 px-6 py-6 max-md:px-5 max-md:py-5">
             <p className="kicker">{doctor.specialty}</p>
-            <h1>{doctor.user.displayName}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="m-0">{doctor.user.displayName}</h1>
+              {favorites ? (
+                <FavoriteButton kind="doctor" id={doctor.id} saved={favorites.doctorIds.includes(doctor.id)} tone="inline" />
+              ) : null}
+            </div>
             <p className="m-0">
               <Link href={`/clinics/${doctor.clinic.id}`} className="text-accent hover:text-accent-hover">
                 {doctor.clinic.name}

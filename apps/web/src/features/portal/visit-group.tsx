@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
+import { PatientReschedule } from "@/features/portal/patient-reschedule";
 import { visitPreviewLimit } from "@/features/portal/visit-order";
 import { ReviewForm } from "@/features/portal/review-form";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
@@ -38,6 +39,8 @@ export type VisitRow = {
   price: string;
   needsReview: boolean;
   startsAt: string;
+  doctorId: string;
+  offeringId: string;
 };
 
 export function VisitGroup({
@@ -119,6 +122,15 @@ function VisitCard({
           <span className="text-xs text-muted">{visit.price}</span>
         </p>
         <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode={actions} />
+        {actions === "patient" ? (
+          <PatientReschedule
+            id={visit.id}
+            status={visit.status}
+            startsAt={visit.startsAt}
+            doctorId={visit.doctorId}
+            offeringId={visit.offeringId}
+          />
+        ) : null}
         {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
     </article>

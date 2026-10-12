@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { PublicClinicsList } from "@/features/catalog/public-clinics-list";
+import { loadFavoriteSet } from "@/features/portal/patient-favorites";
 import { prepareLocale } from "@/i18n/locale";
 import { publicGet } from "@/shared/public-api";
 import type { ClinicCard } from "@/shared/public-types";
@@ -16,7 +17,10 @@ export default async function ClinicsPage({
   const { name } = await searchParams;
   const t = await getTranslations("catalog");
   const common = await getTranslations("common");
-  const clinics = await publicGet<ClinicCard[]>("/public/clinics", locale);
+  const [clinics, favorites] = await Promise.all([
+    publicGet<ClinicCard[]>("/public/clinics", locale),
+    loadFavoriteSet(locale),
+  ]);
 
   return (
     <div className="mx-auto grid w-[min(var(--max-width-shell),calc(100%-48px))] gap-[18px] pt-7 pb-6 max-md:w-[min(var(--max-width-shell),calc(100%-20px))] max-md:pt-[18px]">
@@ -27,6 +31,7 @@ export default async function ClinicsPage({
         placeholder={common("name")}
         ariaLabel={t("clinicName")}
         emptyLabel={t("emptyClinicSearch")}
+        savedClinicIds={favorites?.clinicIds ?? null}
       />
     </div>
   );

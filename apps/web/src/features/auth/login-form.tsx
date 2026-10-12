@@ -2,7 +2,7 @@
 
 import { FocusEvent, FormEvent, PointerEvent, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 
 type LoginPayload = {
@@ -76,6 +76,11 @@ export function LoginForm() {
         onPointerDown={unlock}
         onFocus={unlock}
       />
+      <div className="flex justify-end">
+        <Link href="/forgot-password" className="text-sm font-semibold text-accent hover:text-accent-hover">
+          {t("forgotPassword")}
+        </Link>
+      </div>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button className="btn btn-primary mt-1 w-full" type="submit">
         {t("enter")}

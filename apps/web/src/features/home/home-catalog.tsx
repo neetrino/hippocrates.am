@@ -1,3 +1,4 @@
+import { FavoriteButton } from "@/features/catalog/favorite-button";
 import { Link } from "@/i18n/navigation";
 import type { ClinicCard } from "@/shared/public-types";
 import { ClinicTile } from "@/shared/ui/catalog-cards";
@@ -9,11 +10,13 @@ export function HomeCatalog({
   seeAll,
   emptyClinics,
   clinics,
+  savedClinicIds,
 }: {
   clinicsTitle: string;
   seeAll: string;
   emptyClinics: string;
   clinics: ClinicCard[];
+  savedClinicIds: string[] | null;
 }) {
   const [featured, ...rest] = clinics;
 
@@ -31,11 +34,11 @@ export function HomeCatalog({
         </Link>
       </div>
       {clinics.length === 0 ? <EmptyState>{emptyClinics}</EmptyState> : null}
-      {featured ? <FeaturedClinic clinic={featured} /> : null}
+      {featured ? <FeaturedClinic clinic={featured} saved={savedOf(savedClinicIds, featured.id)} /> : null}
       {rest.length > 0 ? (
         <div className="grid gap-6 max-md:gap-4 md:grid-cols-2">
           {rest.map((clinic) => (
-            <ClinicTile key={clinic.id} clinic={clinic} size="large" />
+            <ClinicTile key={clinic.id} clinic={clinic} size="large" saved={savedOf(savedClinicIds, clinic.id)} />
           ))}
         </div>
       ) : null}
@@ -43,11 +46,18 @@ export function HomeCatalog({
   );
 }
 
-function FeaturedClinic({ clinic }: { clinic: ClinicCard }) {
+function savedOf(ids: string[] | null, id: string): boolean | undefined {
+  return ids === null ? undefined : ids.includes(id);
+}
+
+function FeaturedClinic({ clinic, saved }: { clinic: ClinicCard; saved?: boolean }) {
   const place = [clinic.district, clinic.address].filter(Boolean).join(" · ");
 
   return (
-    <article className="group">
+    <article className="group relative">
+      {saved === undefined ? null : (
+        <FavoriteButton kind="clinic" id={clinic.id} saved={saved} className="absolute top-4 right-4 z-10" />
+      )}
       <Link href={`/clinics/${clinic.id}`} className="block">
         <HomeBanner
           src={clinic.coverUrl}

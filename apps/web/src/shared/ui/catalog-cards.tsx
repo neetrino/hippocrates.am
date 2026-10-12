@@ -12,7 +12,7 @@ export function ClinicTile({
 }: {
   clinic: ClinicCard;
   loading?: "eager" | "lazy";
-  href?: `/clinics/${string}` | `/super-admin/clinics/${string}`;
+  href?: `/clinics/${string}` | `/super-admin/clinics/${string}` | `/me/favorites/clinics/${string}`;
   size?: "default" | "large";
   saved?: boolean;
 }) {
@@ -62,13 +62,21 @@ function ArrowUpRightIcon() {
   );
 }
 
-export function DoctorTile({ doctor, saved }: { doctor: DoctorCard; saved?: boolean }) {
+export function DoctorTile({
+  doctor,
+  saved,
+  href = `/doctors/${doctor.id}`,
+}: {
+  doctor: DoctorCard;
+  saved?: boolean;
+  href?: `/doctors/${string}` | `/me/favorites/doctors/${string}`;
+}) {
   return (
     <article className="group relative overflow-hidden rounded-card bg-sand shadow-soft transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(20,36,40,0.08)]">
       {saved === undefined ? null : (
         <FavoriteButton kind="doctor" id={doctor.id} saved={saved} className="absolute top-3 right-3 z-10" />
       )}
-      <Link href={`/doctors/${doctor.id}`} className="relative block aspect-3/4 overflow-hidden">
+      <Link href={href} className="relative block aspect-3/4 overflow-hidden">
         <Photo
           src={doctor.photoUrl}
           alt={doctor.user.displayName}

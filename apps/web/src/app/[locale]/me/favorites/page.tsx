@@ -22,14 +22,14 @@ export default async function PatientFavoritesPage({ params }: { params: Promise
         <FavoriteGroup title={t("favoriteClinics")} empty={favorites.clinics.length === 0}>
           <div className="grid gap-4 sm:grid-cols-2">
             {favorites.clinics.map((clinic) => (
-              <ClinicTile key={clinic.id} clinic={clinic} saved />
+              <ClinicTile key={clinic.id} clinic={clinic} saved href={`/me/favorites/clinics/${clinic.id}`} />
             ))}
           </div>
         </FavoriteGroup>
         <FavoriteGroup title={t("favoriteDoctors")} empty={favorites.doctors.length === 0}>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {favorites.doctors.map((doctor) => (
-              <DoctorTile key={doctor.id} doctor={doctor} saved />
+              <DoctorTile key={doctor.id} doctor={doctor} saved href={`/me/favorites/doctors/${doctor.id}`} />
             ))}
           </div>
         </FavoriteGroup>

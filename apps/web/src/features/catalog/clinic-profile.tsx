@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { BookingPanel } from "@/features/booking/booking-panel";
 import { initialSlots } from "@/features/booking/initial-slots";
@@ -100,14 +101,29 @@ async function DoctorList({ doctors, doctorHref }: { doctors: DoctorCard[]; doct
           <Link
             key={doctor.id}
             href={doctorHref(doctor.id)}
-            className="flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-160 hover:bg-sand"
+            className="flex items-center gap-3 px-5 py-3.5 transition-colors duration-160 hover:bg-sand"
           >
-            <span className="font-medium">{doctor.user.displayName}</span>
-            <span className="text-[0.92rem] text-muted">{doctor.specialty}</span>
+            <DoctorMark name={doctor.user.displayName} src={doctor.photoUrl} />
+            <span className="min-w-0">
+              <span className="block font-medium">{doctor.user.displayName}</span>
+              <span className="block text-[0.92rem] text-muted">{doctor.specialty}</span>
+            </span>
           </Link>
         ))}
       </div>
     </section>
+  );
+}
+
+function DoctorMark({ name, src }: { name: string; src: string | null }) {
+  return (
+    <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-linear-to-br from-accent-soft to-sand font-display text-sm font-semibold text-accent">
+      {src ? (
+        <Image src={src} alt="" fill sizes="44px" className="object-cover" />
+      ) : (
+        <span aria-hidden="true">{name.slice(0, 1)}</span>
+      )}
+    </span>
   );
 }
 

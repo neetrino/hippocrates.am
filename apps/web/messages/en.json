@@ -355,6 +355,8 @@
     "hoursClosed": "Closed",
     "hoursStart": "start",
     "hoursEnd": "end",
+    "hoursList": "Hour list",
+    "hoursTimePlaceholder": "09:00",
     "priceTotals": "Recorded prices",
     "patientList": "Patients",
     "noPatients": "This clinic has no patients yet.",

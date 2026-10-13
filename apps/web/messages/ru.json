@@ -355,6 +355,8 @@
     "hoursClosed": "Закрыто",
     "hoursStart": "начало",
     "hoursEnd": "конец",
+    "hoursList": "Список часов",
+    "hoursTimePlaceholder": "09:00",
     "priceTotals": "Записанные цены",
     "patientList": "Пациенты",
     "noPatients": "В этой клинике пациентов пока нет.",

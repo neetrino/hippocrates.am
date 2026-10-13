@@ -8,7 +8,7 @@ export type HourWindow = { weekday: number; startMinute: number; endMinute: numb
 const HOUR_STEP_MINUTES = 30;
 const FIRST_SLOT_MINUTE = 6 * 60;
 const LAST_SLOT_MINUTE = 22 * 60;
-const TIME_SELECT_CLASS = "field-control w-[8.75rem] shrink-0 cursor-pointer py-2 text-left";
+const TIME_FIELD_CLASS = "field-control w-[8.75rem] shrink-0 py-2 pr-8";
 
 const WEEKDAYS = [
   { day: 1, key: "weekMon" },
@@ -107,11 +107,25 @@ function DayRow({
     >
       <span className="min-w-[7.5rem] font-semibold">{label}</span>
       <span className="flex shrink-0 items-center gap-2">
-        <TimeSelect value={start} closedLabel={t("hoursClosed")} name={`${label} ${t("hoursStart")}`} onChange={onStart} />
+        <TimeSelect
+          value={start}
+          closedLabel={t("hoursClosed")}
+          name={`${label} ${t("hoursStart")}`}
+          listLabel={t("hoursList")}
+          placeholder={t("hoursTimePlaceholder")}
+          onChange={onStart}
+        />
         <span className="text-muted" aria-hidden="true">
           –
         </span>
-        <TimeSelect value={end} closedLabel={t("hoursClosed")} name={`${label} ${t("hoursEnd")}`} onChange={onEnd} />
+        <TimeSelect
+          value={end}
+          closedLabel={t("hoursClosed")}
+          name={`${label} ${t("hoursEnd")}`}
+          listLabel={t("hoursList")}
+          placeholder={t("hoursTimePlaceholder")}
+          onChange={onEnd}
+        />
       </span>
     </div>
   );
@@ -121,15 +135,24 @@ function TimeSelect({
   value,
   closedLabel,
   name,
+  listLabel,
+  placeholder,
   onChange,
 }: {
   value: string;
   closedLabel: string;
   name: string;
+  listLabel: string;
+  placeholder: string;
   onChange: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState(value);
   const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
 
   useEffect(() => {
     if (!open) return;
@@ -141,13 +164,86 @@ function TimeSelect({
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
+  function apply(raw: string): void {
+    const next = parseHourInput(raw);
+    const resolved = next === null ? value : next;
+    onChange(resolved);
+    setDraft(resolved);
+  }
+
   return (
     <div className="relative" ref={root}>
-      <button type="button" className={TIME_SELECT_CLASS} aria-expanded={open} aria-label={name} onClick={() => setOpen((current) => !current)}>
-        {value || closedLabel}
+      <TimeField
+        name={name}
+        draft={draft}
+        placeholder={placeholder}
+        onDraft={setDraft}
+        onApply={apply}
+        onOpenList={() => setOpen(true)}
+      />
+      <button
+        type="button"
+        className="absolute top-1/2 right-1.5 -translate-y-1/2 cursor-pointer border-0 bg-transparent p-1 text-muted"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-label={listLabel}
+        onClick={() => setOpen((current) => !current)}
+      >
+        ▾
       </button>
-      {open ? <TimeMenu value={value} closedLabel={closedLabel} onPick={(time) => { onChange(time); setOpen(false); }} /> : null}
+      {open ? (
+        <TimeMenu
+          value={value}
+          closedLabel={closedLabel}
+          onPick={(time) => {
+            apply(time);
+            setOpen(false);
+          }}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function TimeField({
+  name,
+  draft,
+  placeholder,
+  onDraft,
+  onApply,
+  onOpenList,
+}: {
+  name: string;
+  draft: string;
+  placeholder: string;
+  onDraft: (value: string) => void;
+  onApply: (value: string) => void;
+  onOpenList: () => void;
+}) {
+  return (
+    <input
+      className={TIME_FIELD_CLASS}
+      value={draft}
+      placeholder={placeholder}
+      inputMode="numeric"
+      autoComplete="off"
+      aria-label={name}
+      onChange={(event) => onDraft(event.target.value)}
+      onBlur={(event) => {
+        if (event.relatedTarget instanceof Node && event.currentTarget.parentElement?.contains(event.relatedTarget)) return;
+        onApply(draft);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          onApply(draft);
+        }
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          onOpenList();
+        }
+      }}
+    />
   );
 }
 
@@ -176,6 +272,17 @@ function TimeOption({ active, label, onPick }: { active: boolean; label: string;
       {label}
     </button>
   );
+}
+
+function parseHourInput(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+  const match = /^(\d{1,2})(?:[:.](\d{2}))?$/.exec(trimmed) ?? /^(\d{2})(\d{2})$/.exec(trimmed);
+  if (!match) return null;
+  const hour = Number(match[1]);
+  const minute = Number(match[2] ?? "00");
+  if (hour > 23 || minute > 59) return null;
+  return minutesToTime(hour * 60 + minute);
 }
 
 function timesFor(current: string): string[] {

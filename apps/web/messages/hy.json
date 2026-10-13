@@ -355,6 +355,8 @@
     "hoursClosed": "Փակ է",
     "hoursStart": "սկիզբ",
     "hoursEnd": "ավարտ",
+    "hoursList": "Ժամերի ցանկ",
+    "hoursTimePlaceholder": "09:00",
     "priceTotals": "Գրանցված գներ",
     "patientList": "Պացիենտներ",
     "noPatients": "Այս կլինիկայում պացիենտ դեռ չկա։",

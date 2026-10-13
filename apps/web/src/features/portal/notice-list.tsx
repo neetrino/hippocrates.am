@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { matchesNotice } from "@/features/portal/match-notice";
 import { deleteNotices, deleteReadNotices, markNoticesRead } from "@/features/portal/notice-api";
 import { NoticeToolbar, type NoticePending } from "@/features/portal/notice-toolbar";
 import { noticePreviewLimit } from "@/shared/notice";
+
+export type NoticeAudience = "clinic" | "doctor" | "patient";
 
 export type NoticeRow = {
   id: string;
@@ -14,29 +17,36 @@ export type NoticeRow = {
   unread: boolean;
 };
 
-export function NoticeList({ rows: initial }: { rows: NoticeRow[] }) {
+export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; audience: NoticeAudience }) {
   const list = useNoticeList(initial);
   const t = useTranslations("me");
+  const [query, setQuery] = useState("");
+  const visible = list.rows.filter((row) => matchesNotice(row, query));
+  const searching = query.trim().length > 0;
+  const hidden = searching ? 0 : visible.length - noticePreviewLimit;
+  const shown = searching || list.open || hidden <= 0 ? visible : visible.slice(0, noticePreviewLimit);
   if (list.rows.length === 0) {
     return <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>;
   }
-  const hidden = list.rows.length - noticePreviewLimit;
-  const shown = list.open || hidden <= 0 ? list.rows : list.rows.slice(0, noticePreviewLimit);
   return (
     <div className="grid gap-3">
       <NoticeToolbar
+        query={query}
+        placeholder={t(searchHint(audience))}
         selecting={list.selecting}
         selectedCount={list.selected.size}
-        allSelected={list.selected.size === list.rows.length}
+        allSelected={visible.length > 0 && visible.every((row) => list.selected.has(row.id))}
         pending={list.pending}
         busy={list.busy}
+        onQuery={setQuery}
         onStart={list.start}
         onCancel={list.cancel}
-        onToggleAll={list.toggleAll}
+        onToggleAll={() => list.toggleVisible(visible.map((row) => row.id))}
         onPending={list.setPending}
         onConfirm={() => void list.confirm()}
       />
       {list.failed ? <p className="m-0 text-sm text-danger">{t("deleteNoticesFailed")}</p> : null}
+      {visible.length === 0 ? <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noticeSearchEmpty")}</p> : null}
       {shown.map((row) => (
         <NoticeCard
           key={row.id}
@@ -59,6 +69,12 @@ export function NoticeList({ rows: initial }: { rows: NoticeRow[] }) {
       ) : null}
     </div>
   );
+}
+
+function searchHint(audience: NoticeAudience): "noticeSearchClinic" | "noticeSearchDoctor" | "noticeSearchPatient" {
+  if (audience === "doctor") return "noticeSearchDoctor";
+  if (audience === "patient") return "noticeSearchPatient";
+  return "noticeSearchClinic";
 }
 
 function useNoticeList(initial: NoticeRow[]) {
@@ -152,9 +168,9 @@ function noticeActions(input: NoticeActionInput) {
       input.setPending(null);
       input.setFailed(false);
     },
-    toggleAll: () => {
-      const every = input.selected.size === input.rows.length;
-      input.setSelected(every ? new Set() : new Set(input.rows.map((row) => row.id)));
+    toggleVisible: (ids: string[]) => {
+      const every = ids.length > 0 && ids.every((id) => input.selected.has(id));
+      input.setSelected(every ? new Set() : new Set(ids));
     },
     toggle: (id: string) => input.setSelected(toggleId(input.selected, id)),
   };

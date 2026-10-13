@@ -24,7 +24,7 @@ export default async function ClinicNoticesPage({ params }: { params: Promise<{ 
         {notices.length === 0 ? (
           <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
         ) : (
-          <NoticeList rows={notices.map((notice) => toRow(notice, locale, t, t("noticeArrived")))} />
+          <NoticeList audience="clinic" rows={notices.map((notice) => toRow(notice, locale, t, t("noticeArrived")))} />
         )}
       </section>
     </ClinicManagerShell>

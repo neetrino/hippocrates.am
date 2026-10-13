@@ -38,6 +38,7 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
         <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
       ) : (
           <NoticeList
+            audience={me.role === "DOCTOR" ? "doctor" : "patient"}
             rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived"), me.role === "DOCTOR"))}
           />
       )}

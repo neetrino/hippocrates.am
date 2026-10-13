@@ -37,7 +37,7 @@ export function ClinicServiceBoard({
     <div className="grid gap-6">
       {doctors.length > 0 ? (
         <button className="btn btn-primary min-h-10 w-fit px-4" type="button" onClick={() => addFor()}>
-          {t("add")}
+          {t("addService")}
         </button>
       ) : null}
       {open && doctors.length > 0 ? (

@@ -3,7 +3,8 @@ import type { Request } from "express";
 import { loadClinicLocales, localeCopies, saveClinicLocale, sourceClinicText } from "../catalog/clinic-locale-store";
 import { deleteClinicRecord } from "./delete-clinic";
 import { loadClinicOverview } from "./clinic-overview";
-import { deleteBranch, updateBranch } from "./branch-edit";
+import { deleteBranch, MAIN_BRANCH_NAME, updateBranch } from "./branch-edit";
+import { updateClinicProfile } from "./clinic-edit";
 import { clearClinicCover, saveClinicCover } from "./clinic-cover";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, passwordOf, recordOf, requiredPhoneOf, requiredString } from "../common/input";
@@ -48,7 +49,7 @@ export class ClinicsController {
         data: { ...text, phone, ownerId: admin.id, published: true },
       });
       await tx.user.update({ where: { id: admin.id }, data: { clinicId: created.id } });
-      await tx.branch.create({ data: { clinicId: created.id, name: "Հիմնական", address: text.address } });
+      await tx.branch.create({ data: { clinicId: created.id, name: MAIN_BRANCH_NAME, address: text.address } });
       if (copies.length > 0) {
         await tx.clinicLocale.createMany({
           data: copies.map((item) => ({ clinicId: created.id, locale: item.locale, ...item.text })),
@@ -65,7 +66,16 @@ export class ClinicsController {
     requireClinicAdmin(actor, clinicId);
     const clinic = await this.prisma.clinic.findUnique({
       where: { id: clinicId },
-      select: { id: true, name: true, description: true, address: true, phone: true, district: true, coverKey: true },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        address: true,
+        phone: true,
+        district: true,
+        published: true,
+        coverKey: true,
+      },
     });
     if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
     const { coverKey, ...profile } = clinic;
@@ -80,19 +90,7 @@ export class ClinicsController {
     @Body() body: unknown,
   ): Promise<{ id: string }> {
     requireClinicAdmin(actor, clinicId);
-    const input = recordOf(body);
-    await this.prisma.clinic.update({
-      where: { id: clinicId },
-      data: {
-        name: typeof input.name === "string" ? input.name.trim() : undefined,
-        description: typeof input.description === "string" ? input.description.trim() : undefined,
-        address: typeof input.address === "string" ? input.address.trim() : undefined,
-        phone: typeof input.phone === "string" ? requiredPhoneOf(input.phone) : undefined,
-        district: typeof input.district === "string" ? input.district.trim() : undefined,
-        published: typeof input.published === "boolean" ? input.published : undefined,
-      },
-    });
-    return { id: clinicId };
+    return updateClinicProfile(this.prisma, clinicId, body);
   }
 
   @Delete("clinics/:clinicId")
@@ -133,10 +131,14 @@ export class ClinicsController {
   ): Promise<{ id: string }> {
     requireClinicAdmin(actor, clinicId);
     const input = recordOf(body);
+    const name = requiredString(input.name, "Մասնաճյուղ");
+    if (name === MAIN_BRANCH_NAME) {
+      throw new AppError("VALIDATION_FAILED", 400, "Այս անունը վերապահված է գլխավոր հասցեի համար");
+    }
     const branch = await this.prisma.branch.create({
       data: {
         clinicId,
-        name: requiredString(input.name, "Մասնաճյուղ"),
+        name,
         address: optionalString(input.address),
       },
     });

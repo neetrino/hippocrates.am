@@ -29,7 +29,7 @@ export function ClinicStaffBoard({
   return (
     <div className="grid gap-6">
       <button className="btn btn-primary min-h-10 w-fit px-4" type="button" onClick={() => setOpen((value) => !value)}>
-        {t("add")}
+        {t("addDoctor")}
       </button>
       {open ? <ClinicDoctorForm clinicId={clinicId} onClose={() => setOpen(false)} /> : null}
       <ClinicHours clinicId={clinicId} clinicWindows={clinicWindows} />

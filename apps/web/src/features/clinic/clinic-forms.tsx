@@ -141,7 +141,7 @@ export function ClinicServiceForm({
         {common("estimate")}
       </label>
       <div className="flex flex-wrap gap-2">
-        <button className="btn btn-primary w-fit" type="submit">{t("add")}</button>
+        <button className="btn btn-primary w-fit" type="submit">{t("addService")}</button>
         <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>
           {common("cancel")}
         </button>

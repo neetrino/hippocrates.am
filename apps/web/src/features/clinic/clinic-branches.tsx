@@ -1,28 +1,23 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { clinicSend } from "@/features/clinic/clinic-api";
+import { EmptyState } from "@/shared/ui/empty-state";
 
 export type ClinicBranch = { id: string; name: string; address: string };
+export const MAIN_BRANCH_NAME = "Հիմնական";
 
 const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
-const controlClass =
-  "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 
-export function ClinicBranches({
-  clinicId,
-  branches,
-  clinicAddress,
-  localeAddress,
-}: {
-  clinicId: string;
-  branches: ClinicBranch[];
-  clinicAddress: string;
-  localeAddress: string;
-}) {
+export function extraBranches(branches: ClinicBranch[]): ClinicBranch[] {
+  return branches.filter((branch) => branch.name !== MAIN_BRANCH_NAME);
+}
+
+export function BranchCreateForm({ clinicId, onClose }: { clinicId: string; onClose: () => void }) {
   const t = useTranslations("desk");
   const platform = useTranslations("platform");
+  const common = useTranslations("common");
   const [message, setMessage] = useState("");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -42,25 +37,51 @@ export function ClinicBranches({
   }
 
   return (
-    <section className="grid gap-3">
-      <h2>{t("newBranch")}</h2>
-      <div className="grid gap-3">
-        {branches.map((branch) => (
-          <BranchCard
-            key={branch.id}
-            clinicId={clinicId}
-            branch={branch}
-            clinicAddress={clinicAddress}
-            localeAddress={localeAddress}
-          />
-        ))}
+    <form className="grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
+      <h2 className="m-0">{t("newBranch")}</h2>
+      <label className={fieldClass}>
+        {t("branchName")}
+        <input name="name" required maxLength={80} className="field-control" />
+      </label>
+      <label className={fieldClass}>
+        {platform("address")}
+        <input name="address" maxLength={160} className="field-control" />
+      </label>
+      <div className="flex flex-wrap gap-2">
+        <button className="btn btn-primary w-fit" type="submit">{t("addBranch")}</button>
+        <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>{common("cancel")}</button>
       </div>
-      <form className="grid max-w-xl gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
-        <label className={fieldClass}>{t("branchName")}<input name="name" required maxLength={80} className={controlClass} /></label>
-        <label className={fieldClass}>{platform("address")}<input name="address" maxLength={160} className={controlClass} /></label>
-        <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("add")}</button>
-        {message ? <p className="m-0 text-danger">{message}</p> : null}
-      </form>
+      {message ? <p className="m-0 text-danger">{message}</p> : null}
+    </form>
+  );
+}
+
+export function ClinicBranchList({
+  clinicId,
+  branches,
+  clinicAddress,
+  localeAddress,
+}: {
+  clinicId: string;
+  branches: ClinicBranch[];
+  clinicAddress: string;
+  localeAddress: string;
+}) {
+  const t = useTranslations("desk");
+  const extras = extraBranches(branches);
+  return (
+    <section className="grid gap-3">
+      <h2 className="m-0">{t("branches")}</h2>
+      {extras.length === 0 ? <EmptyState>{t("emptyBranches")}</EmptyState> : null}
+      {extras.map((branch) => (
+        <BranchCard
+          key={branch.id}
+          clinicId={clinicId}
+          branch={branch}
+          clinicAddress={clinicAddress}
+          localeAddress={localeAddress}
+        />
+      ))}
     </section>
   );
 }
@@ -77,38 +98,28 @@ function BranchCard({
   localeAddress: string;
 }) {
   const t = useTranslations("desk");
-  const clinicPage = useTranslations("clinicPage");
-  const locale = useLocale();
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const title = branch.name === "Հիմնական" && locale !== "hy" ? clinicPage("mainBranch") : branch.name;
   const shownAddress = branch.address === clinicAddress && localeAddress.trim() ? localeAddress : branch.address;
-
-  async function remove(): Promise<void> {
-    const ok = await clinicSend(`/clinics/${clinicId}/branches/${branch.id}`, "DELETE");
-    if (ok) window.location.reload();
-    else setMessage(t("saveFailed"));
-  }
-
   return (
-    <article className="rounded-[14px] border border-line bg-white">
-      <div className="flex items-center justify-between gap-3 px-4 py-3.5">
-        <span className="font-semibold">{title}</span>
-        <span className="text-sm text-muted">{shownAddress}</span>
-        <span className="flex gap-3">
-          <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setOpen((value) => !value)}>{t("edit")}</button>
-          <button className="cursor-pointer text-sm font-semibold text-danger" type="button" onClick={() => void remove()}>{t("remove")}</button>
+    <article className="rounded-card border border-line bg-white shadow-soft">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+        <span className="grid min-w-0">
+          <span className="font-semibold">{branch.name}</span>
+          {shownAddress ? <span className="text-sm text-muted">{shownAddress}</span> : null}
         </span>
+        <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setOpen((value) => !value)}>
+          {t("edit")}
+        </button>
       </div>
       {open ? (
         <BranchForm
           clinicId={clinicId}
           branch={branch}
-          shownName={title}
+          shownName={branch.name}
           shownAddress={shownAddress}
+          onClose={() => setOpen(false)}
         />
       ) : null}
-      {message ? <p className="m-0 px-4 pb-3 text-sm text-danger">{message}</p> : null}
     </article>
   );
 }
@@ -118,14 +129,17 @@ function BranchForm({
   branch,
   shownName,
   shownAddress,
+  onClose,
 }: {
   clinicId: string;
   branch: ClinicBranch;
   shownName: string;
   shownAddress: string;
+  onClose: () => void;
 }) {
   const t = useTranslations("desk");
   const platform = useTranslations("platform");
+  const common = useTranslations("common");
   const [message, setMessage] = useState("");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -139,11 +153,29 @@ function BranchForm({
     else setMessage(t("saveFailed"));
   }
 
+  async function remove(): Promise<void> {
+    const ok = await clinicSend(`/clinics/${clinicId}/branches/${branch.id}`, "DELETE");
+    if (ok) window.location.reload();
+    else setMessage(t("branchProtected"));
+  }
+
   return (
-    <form className="grid gap-3.5 border-t border-line px-4 py-4" onSubmit={(event) => void onSubmit(event)}>
-      <label className={fieldClass}>{t("branchName")}<input name="name" required maxLength={80} defaultValue={shownName} className={controlClass} /></label>
-      <label className={fieldClass}>{platform("address")}<input name="address" maxLength={160} defaultValue={shownAddress} className={controlClass} /></label>
-      <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
+    <form className="grid gap-3.5 border-t border-line px-5 py-4" onSubmit={(event) => void onSubmit(event)}>
+      <label className={fieldClass}>
+        {t("branchName")}
+        <input name="name" required maxLength={80} defaultValue={shownName} className="field-control" />
+      </label>
+      <label className={fieldClass}>
+        {platform("address")}
+        <input name="address" maxLength={160} defaultValue={shownAddress} className="field-control" />
+      </label>
+      <div className="flex flex-wrap items-center gap-2">
+        <button className="btn btn-primary w-fit" type="submit">{t("save")}</button>
+        <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>{common("cancel")}</button>
+        <button className="cursor-pointer text-sm font-semibold text-danger" type="button" onClick={() => void remove()}>
+          {t("remove")}
+        </button>
+      </div>
       {message ? <p className="m-0 text-danger">{message}</p> : null}
     </form>
   );

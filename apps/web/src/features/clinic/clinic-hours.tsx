@@ -5,6 +5,9 @@ import { useTranslations } from "next-intl";
 
 export type HourWindow = { weekday: number; startMinute: number; endMinute: number };
 
+const TIME_FIELD_CLASS =
+  "field-control w-fit min-w-fit shrink-0 px-3 py-2 [&::-webkit-calendar-picker-indicator]:ml-1";
+
 const WEEKDAYS = [
   { day: 1, key: "weekMon" },
   { day: 2, key: "weekTue" },
@@ -100,22 +103,12 @@ function DayRow({
       }`}
     >
       <span className="min-w-[7.5rem] font-semibold">{label}</span>
-      <span className="flex min-w-0 items-center gap-2">
-        <input
-          className="field-control w-[7.75rem] py-2"
-          type="time"
-          value={start}
-          onChange={(event) => onStart(event.target.value)}
-        />
+      <span className="flex shrink-0 items-center gap-2">
+        <input className={TIME_FIELD_CLASS} type="time" value={start} onChange={(event) => onStart(event.target.value)} />
         <span className="text-muted" aria-hidden="true">
           –
         </span>
-        <input
-          className="field-control w-[7.75rem] py-2"
-          type="time"
-          value={end}
-          onChange={(event) => onEnd(event.target.value)}
-        />
+        <input className={TIME_FIELD_CLASS} type="time" value={end} onChange={(event) => onEnd(event.target.value)} />
       </span>
     </div>
   );

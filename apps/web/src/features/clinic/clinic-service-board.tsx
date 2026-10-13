@@ -19,7 +19,16 @@ export function ClinicServiceBoard({
   const [open, setOpen] = useState(false);
   const [doctorId, setDoctorId] = useState("");
 
+  function closeForm(): void {
+    setOpen(false);
+    setDoctorId("");
+  }
+
   function addFor(id = ""): void {
+    if (open && doctorId === id) {
+      closeForm();
+      return;
+    }
     setDoctorId(id);
     setOpen(true);
   }
@@ -37,6 +46,7 @@ export function ClinicServiceBoard({
           clinicId={clinicId}
           doctors={doctors.map((doctor) => ({ id: doctor.id, name: doctor.user.displayName }))}
           initialDoctorId={doctorId}
+          onClose={closeForm}
         />
       ) : null}
       {doctors.length === 0 ? <EmptyState>{t("emptyServices")}</EmptyState> : null}

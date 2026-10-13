@@ -89,10 +89,12 @@ export function ClinicServiceForm({
   clinicId,
   doctors,
   initialDoctorId = "",
+  onClose,
 }: {
   clinicId: string;
   doctors: DoctorOption[];
   initialDoctorId?: string;
+  onClose: () => void;
 }) {
   const [message, setMessage] = useState("");
   const t = useTranslations("desk");
@@ -135,7 +137,12 @@ export function ClinicServiceForm({
         <input name="isEstimate" type="checkbox" />
         {common("estimate")}
       </label>
-      <button className="btn btn-primary w-fit" type="submit">{t("add")}</button>
+      <div className="flex flex-wrap gap-2">
+        <button className="btn btn-primary w-fit" type="submit">{t("add")}</button>
+        <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>
+          {common("cancel")}
+        </button>
+      </div>
       {message ? <p className="m-0 text-danger">{message}</p> : null}
     </form>
   );

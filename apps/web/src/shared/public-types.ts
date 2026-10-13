@@ -24,6 +24,8 @@ export type DoctorCard = {
   photoUrl: string | null;
   user: { displayName: string };
   clinic: { id: string; name: string };
+  /** Every spelling from the API, in any stored language. Present on doctor lists. */
+  searchText?: string[];
 };
 
 export type OfferingCard = {

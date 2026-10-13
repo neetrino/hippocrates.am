@@ -43,6 +43,7 @@ export default async function DoctorsPage({
   const locale = prepareLocale(raw);
   const queryParams = await searchParams;
   const t = await getTranslations("catalog");
+  const common = await getTranslations("common");
   const specialties = toList(queryParams.specialty);
   const cities = toList(queryParams.city);
   const clinics = toList(queryParams.clinic);
@@ -53,8 +54,9 @@ export default async function DoctorsPage({
   appendAll(query, "clinic", clinics);
   const suffix = query.size > 0 ? `?${query}` : "";
 
-  const [doctors, filterOptions, favorites] = await Promise.all([
+  const [doctors, suggestDoctors, filterOptions, favorites] = await Promise.all([
     publicGet<DoctorCard[]>(`/public/doctors${suffix}`, locale),
+    publicGet<DoctorCard[]>("/public/doctors", locale),
     publicGet<DoctorFiltersResponse>("/public/doctor-filters", locale),
     loadFavoriteSet(locale),
   ]);
@@ -66,6 +68,7 @@ export default async function DoctorsPage({
       </div>
       <DoctorsSearch
         action={getPathname({ locale, href: "/doctors" })}
+        suggestDoctors={suggestDoctors}
         initialName={queryParams.name ?? ""}
         initialSpecialty={specialties}
         initialCity={cities}
@@ -81,6 +84,8 @@ export default async function DoctorsPage({
         labels={{
           namePlaceholder: t("doctorSearchPlaceholder"),
           nameAria: t("doctorName"),
+          searchLabel: common("search"),
+          emptySuggest: t("emptyDoctorSearch"),
           specialty: t("specialty"),
           city: t("city"),
           clinic: t("clinic"),

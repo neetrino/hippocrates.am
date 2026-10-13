@@ -5,6 +5,7 @@ import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
 import { clinicCopies, clinicNameSearch } from "./clinic-search";
+import { doctorNameSearch, doctorSearchText } from "./doctor-search";
 
 const clinicFields = {
   id: true,
@@ -39,6 +40,25 @@ function doctorSelect(locale: CatalogLocale | null) {
         id: true,
         name: true,
         ...(locale ? { locales: { where: { locale }, select: { locale: true, name: true } } } : {}),
+      },
+    },
+  };
+}
+
+function doctorListSelect() {
+  return {
+    id: true,
+    specialty: true,
+    bio: true,
+    photoKey: true,
+    user: { select: { displayName: true } },
+    locales: { select: { locale: true, name: true, specialty: true, bio: true } },
+    clinic: {
+      select: {
+        id: true,
+        name: true,
+        district: true,
+        locales: { select: { locale: true, name: true, district: true } },
       },
     },
   };
@@ -247,12 +267,15 @@ export class MarketplaceController {
         published: true,
         clinic: clinicFilter,
         specialty: specialties.length > 0 ? { in: specialties } : undefined,
-        ...(name?.trim() ? { OR: doctorNameSearch(name.trim(), language) } : {}),
+        ...(name?.trim() ? { OR: doctorNameSearch(name.trim()) } : {}),
       },
       orderBy: { user: { displayName: "asc" } },
-      select: doctorSelect(language),
+      select: doctorListSelect(),
     });
-    return rows.map((doctor) => doctorView(applyDoctor(doctor, language)));
+    return rows.map((doctor) => ({
+      ...doctorView(applyDoctor(doctor, language)),
+      searchText: doctorSearchText(doctor),
+    }));
   }
 
   @Public()
@@ -271,11 +294,4 @@ export class MarketplaceController {
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
     return doctorView(applyDoctor(doctor, catalogLocale(locale)));
   }
-}
-
-function doctorNameSearch(name: string, locale: CatalogLocale | null) {
-  const contains = { contains: name, mode: "insensitive" as const };
-  const official = { user: { displayName: contains } };
-  if (!locale) return [official];
-  return [official, { locales: { some: { locale, name: contains } } }];
 }

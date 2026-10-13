@@ -85,7 +85,15 @@ export function ClinicDoctorForm({ clinicId }: { clinicId: string }) {
   );
 }
 
-export function ClinicServiceForm({ clinicId, doctors }: { clinicId: string; doctors: DoctorOption[] }) {
+export function ClinicServiceForm({
+  clinicId,
+  doctors,
+  initialDoctorId = "",
+}: {
+  clinicId: string;
+  doctors: DoctorOption[];
+  initialDoctorId?: string;
+}) {
   const [message, setMessage] = useState("");
   const t = useTranslations("desk");
   const common = useTranslations("common");
@@ -109,8 +117,15 @@ export function ClinicServiceForm({ clinicId, doctors }: { clinicId: string; doc
       <h2>{t("newService")}</h2>
       <label className={fieldClass}>
         {t("doctor")}
-        <select name="doctorId" required defaultValue={doctors[0]?.id ?? ""} className={controlClass}>
-          {doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.name}</option>)}
+        <select name="doctorId" required defaultValue={initialDoctorId} className={controlClass}>
+          <option value="" disabled>
+            {t("selectDoctor")}
+          </option>
+          {doctors.map((doctor) => (
+            <option key={doctor.id} value={doctor.id}>
+              {doctor.name}
+            </option>
+          ))}
         </select>
       </label>
       <label className={fieldClass}>{common("name")}<input name="name" required className={controlClass} /></label>
@@ -120,7 +135,7 @@ export function ClinicServiceForm({ clinicId, doctors }: { clinicId: string; doc
         <input name="isEstimate" type="checkbox" />
         {common("estimate")}
       </label>
-      <button className={btnClass} type="submit">{t("add")}</button>
+      <button className="btn btn-primary w-fit" type="submit">{t("add")}</button>
       {message ? <p className="m-0 text-danger">{message}</p> : null}
     </form>
   );

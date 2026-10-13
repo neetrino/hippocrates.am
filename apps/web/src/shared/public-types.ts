@@ -15,6 +15,8 @@ export type ClinicCard = {
   logoUrl: string | null;
   /** Official Armenian spelling plus every saved translation. Present on clinic lists. */
   copies?: ClinicCopy[];
+  /** Official name plus every saved translation. Present on clinic lists. */
+  nameSpellings?: string[];
 };
 
 export type DoctorCard = {

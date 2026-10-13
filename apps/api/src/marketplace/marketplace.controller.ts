@@ -4,7 +4,7 @@ import { AppError } from "../common/app-error";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
-import { clinicCopies, clinicNameSearch } from "./clinic-search";
+import { clinicCopies, clinicNameSearch, clinicNameSpellings, filterClinicsByName } from "./clinic-search";
 import { doctorNameSearch, doctorNameSpellings, filterDoctorsByName } from "./doctor-search";
 
 const clinicFields = {
@@ -119,7 +119,7 @@ export class MarketplaceController {
   @Get("clinics")
   async clinics(@Query("name") name?: string, @Query("locale") locale?: string) {
     const language = catalogLocale(locale);
-    const needle = name?.trim();
+    const needle = name?.trim() ?? "";
     const rows = await this.prisma.clinic.findMany({
       where: {
         published: true,
@@ -131,9 +131,10 @@ export class MarketplaceController {
         locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
       },
     });
-    return rows.map((clinic) => ({
+    return filterClinicsByName(rows, needle).map((clinic) => ({
       ...clinicView(applyClinic(clinic, language)),
       copies: clinicCopies(clinic),
+      nameSpellings: clinicNameSpellings(clinic),
     }));
   }
 

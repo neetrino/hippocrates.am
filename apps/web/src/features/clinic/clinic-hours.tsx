@@ -23,7 +23,9 @@ export function ClinicHours({ clinicId, clinicWindows }: { clinicId: string; cli
         <h2 className="m-0">{t("hours")}</h2>
         <p className="m-0 text-muted">{t("hoursHint")}</p>
       </div>
-      <HoursEditor title={t("clinicHours")} windows={clinicWindows} savePath={`/clinics/${clinicId}/windows`} />
+      <div className="rounded-card border border-line bg-white p-5 shadow-soft">
+        <HoursEditor title={t("clinicHours")} windows={clinicWindows} savePath={`/clinics/${clinicId}/windows`} />
+      </div>
     </section>
   );
 }
@@ -50,28 +52,26 @@ export function HoursEditor({ title, windows, savePath }: { title: string; windo
 
   return (
     <form
-      className="grid gap-3 rounded-card border border-line bg-white p-5 shadow-soft"
+      className="grid gap-3"
       onSubmit={(event) => {
         event.preventDefault();
         void save();
       }}
     >
       <h3 className="m-0">{title}</h3>
-      {WEEKDAYS.map((weekday) => (
-        <DayRow
-          key={weekday.day}
-          label={t(weekday.key)}
-          start={days[weekday.day]?.start ?? ""}
-          end={days[weekday.day]?.end ?? ""}
-          onStart={(start) => setDays((current) => ({ ...current, [weekday.day]: { start, end: current[weekday.day]?.end ?? "" } }))}
-          onEnd={(end) => setDays((current) => ({ ...current, [weekday.day]: { start: current[weekday.day]?.start ?? "", end } }))}
-        />
-      ))}
-      <button
-        className="btn btn-primary w-fit"
-        type="submit"
-        disabled={pending}
-      >
+      <div className="grid gap-2">
+        {WEEKDAYS.map((weekday) => (
+          <DayRow
+            key={weekday.day}
+            label={t(weekday.key)}
+            start={days[weekday.day]?.start ?? ""}
+            end={days[weekday.day]?.end ?? ""}
+            onStart={(start) => setDays((current) => ({ ...current, [weekday.day]: { start, end: current[weekday.day]?.end ?? "" } }))}
+            onEnd={(end) => setDays((current) => ({ ...current, [weekday.day]: { start: current[weekday.day]?.start ?? "", end } }))}
+          />
+        ))}
+      </div>
+      <button className="btn btn-primary mt-1 w-fit" type="submit" disabled={pending}>
         {t("saveHours")}
       </button>
       {message ? <p className={`m-0 text-sm ${failed ? "text-danger" : "text-accent"}`}>{message}</p> : null}
@@ -92,12 +92,31 @@ function DayRow({
   onStart: (value: string) => void;
   onEnd: (value: string) => void;
 }) {
-  const field = "rounded-xl border border-line bg-white px-3 py-2 font-normal";
+  const open = Boolean(start && end);
   return (
-    <div className="grid items-center gap-2 sm:grid-cols-[9rem_1fr_1fr]">
-      <span className="font-semibold">{label}</span>
-      <input className={field} type="time" value={start} onChange={(event) => onStart(event.target.value)} />
-      <input className={field} type="time" value={end} onChange={(event) => onEnd(event.target.value)} />
+    <div
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-[0.875rem] border px-4 py-3 ${
+        open ? "border-line bg-accent-soft" : "border-dashed border-line bg-sand"
+      }`}
+    >
+      <span className="min-w-[7.5rem] font-semibold">{label}</span>
+      <span className="flex min-w-0 items-center gap-2">
+        <input
+          className="field-control w-[7.75rem] py-2"
+          type="time"
+          value={start}
+          onChange={(event) => onStart(event.target.value)}
+        />
+        <span className="text-muted" aria-hidden="true">
+          –
+        </span>
+        <input
+          className="field-control w-[7.75rem] py-2"
+          type="time"
+          value={end}
+          onChange={(event) => onEnd(event.target.value)}
+        />
+      </span>
     </div>
   );
 }

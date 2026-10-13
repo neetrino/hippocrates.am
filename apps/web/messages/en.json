@@ -325,6 +325,7 @@
     "add": "Add",
     "selectDoctor": "Choose a doctor",
     "emptyServices": "No services yet.",
+    "emptyStaff": "No doctors yet.",
     "addForDoctor": "Add for this doctor",
     "published": "Published",
     "hidden": "Hidden",

@@ -325,6 +325,7 @@
     "add": "Ավելացնել",
     "selectDoctor": "Ընտրել բժիշկ",
     "emptyServices": "Ծառայություն դեռ չկա։",
+    "emptyStaff": "Բժիշկ դեռ չկա։",
     "addForDoctor": "Ավելացնել այս բժշկին",
     "published": "Հրապարակված",
     "hidden": "Թաքնված",

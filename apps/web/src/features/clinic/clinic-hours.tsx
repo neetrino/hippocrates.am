@@ -5,8 +5,6 @@ import { useTranslations } from "next-intl";
 
 export type HourWindow = { weekday: number; startMinute: number; endMinute: number };
 
-type DoctorHours = { id: string; name: string; windows: HourWindow[] };
-
 const WEEKDAYS = [
   { day: 1, key: "weekMon" },
   { day: 2, key: "weekTue" },
@@ -17,49 +15,15 @@ const WEEKDAYS = [
   { day: 0, key: "weekSun" },
 ] as const;
 
-export function ClinicHours({
-  clinicId,
-  clinicWindows,
-  doctors,
-}: {
-  clinicId: string;
-  clinicWindows: HourWindow[];
-  doctors: DoctorHours[];
-}) {
+export function ClinicHours({ clinicId, clinicWindows }: { clinicId: string; clinicWindows: HourWindow[] }) {
   const t = useTranslations("desk");
-  const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? "");
-  const doctor = doctors.find((item) => item.id === doctorId);
   return (
-    <section className="grid gap-5 pt-7">
+    <section className="grid gap-3">
       <div>
-        <h2>{t("hours")}</h2>
+        <h2 className="m-0">{t("hours")}</h2>
         <p className="m-0 text-muted">{t("hoursHint")}</p>
       </div>
       <HoursEditor title={t("clinicHours")} windows={clinicWindows} savePath={`/clinics/${clinicId}/windows`} />
-      {doctor ? (
-        <div className="grid gap-3">
-          <label className="grid max-w-sm gap-1.5 text-[0.92rem] font-semibold">
-            {t("doctor")}
-            <select
-              className="rounded-xl border border-line bg-white px-3.5 py-3 font-normal"
-              value={doctorId}
-              onChange={(event) => setDoctorId(event.target.value)}
-            >
-              {doctors.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <HoursEditor
-            key={doctor.id}
-            title={t("doctorHours")}
-            windows={doctor.windows}
-            savePath={`/clinics/${clinicId}/doctors/${doctor.id}/windows`}
-          />
-        </div>
-      ) : null}
     </section>
   );
 }

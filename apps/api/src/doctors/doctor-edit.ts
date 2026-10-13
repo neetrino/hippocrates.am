@@ -31,7 +31,14 @@ export async function updateDoctor(
   const bio = optionalText(input.bio, bioMax);
   await prisma.$transaction([
     prisma.user.update({ where: { id: doctor.userId }, data: { displayName } }),
-    prisma.doctorProfile.update({ where: { id: doctor.id }, data: { specialty, bio } }),
+    prisma.doctorProfile.update({
+      where: { id: doctor.id },
+      data: {
+        specialty,
+        bio,
+        ...(typeof input.published === "boolean" ? { published: input.published } : {}),
+      },
+    }),
   ]);
   return { id: doctor.id };
 }

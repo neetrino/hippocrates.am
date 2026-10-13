@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { acceptedImage, clinicImage, clinicSend } from "@/features/clinic/clinic-api";
@@ -12,6 +12,7 @@ export type DoctorRow = {
   id: string;
   specialty: string;
   bio: string;
+  published?: boolean;
   photoUrl: string | null;
   user: { displayName: string };
   locales: { locale: string; name: string; specialty: string; bio: string }[];
@@ -22,6 +23,7 @@ export type DoctorDraft = {
   displayName: string;
   specialty: string;
   bio: string;
+  published: boolean;
   photoUrl: string | null;
   en: Copy;
   ru: Copy;
@@ -37,28 +39,28 @@ export function toDoctorDraft(doctor: DoctorRow): DoctorDraft {
     displayName: doctor.user.displayName,
     specialty: doctor.specialty,
     bio: doctor.bio,
+    published: doctor.published !== false,
     photoUrl: doctor.photoUrl,
     en: copyOf(doctor, "en"),
     ru: copyOf(doctor, "ru"),
   };
 }
 
-export function DoctorList({ clinicId, doctors }: { clinicId: string; doctors: DoctorRow[] }) {
-  return (
-    <div className="grid gap-3">
-      {doctors.map((doctor) => (
-        <DoctorCard clinicId={clinicId} doctor={toDoctorDraft(doctor)} key={doctor.id} />
-      ))}
-    </div>
-  );
-}
-
-function DoctorCard({ clinicId, doctor }: { clinicId: string; doctor: DoctorDraft }) {
+export function DoctorCard({
+  clinicId,
+  doctor,
+  extra,
+}: {
+  clinicId: string;
+  doctor: DoctorDraft;
+  extra?: ReactNode;
+}) {
   const t = useTranslations("desk");
   const [open, setOpen] = useState(false);
+  const live = doctor.published;
   return (
-    <article className="rounded-[14px] border border-line bg-white">
-      <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+    <article className="rounded-card border border-line bg-white shadow-soft">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
         <span className="flex min-w-0 items-center gap-3">
           <PatientAvatar name={doctor.displayName} photoUrl={doctor.photoUrl} />
           <span className="grid min-w-0">
@@ -66,11 +68,21 @@ function DoctorCard({ clinicId, doctor }: { clinicId: string; doctor: DoctorDraf
             <span className="text-sm text-muted">{doctor.specialty}</span>
           </span>
         </span>
-        <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setOpen((value) => !value)}>
-          {t("edit")}
-        </button>
+        <span className="flex items-center gap-3">
+          <span className={live ? "rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white" : "rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted"}>
+            {live ? t("published") : t("hidden")}
+          </span>
+          <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setOpen((value) => !value)}>
+            {t("edit")}
+          </button>
+        </span>
       </div>
-      {open ? <DoctorForm clinicId={clinicId} doctor={doctor} /> : null}
+      {open ? (
+        <div className="grid gap-5 border-t border-line px-5 py-4">
+          <DoctorForm clinicId={clinicId} doctor={doctor} />
+          {extra}
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -89,7 +101,7 @@ function DoctorForm({ clinicId, doctor }: { clinicId: string; doctor: DoctorDraf
       form.setResult(t("doctorArmenianRequired"), true);
       return;
     }
-    const ok = await saveDoctor(clinicId, doctor.id, form.hy, form.copies);
+    const ok = await saveDoctor(clinicId, doctor.id, form.hy, form.copies, form.published);
     if (ok) window.location.reload();
     else form.setResult(t("saveFailed"), true);
   }
@@ -116,7 +128,11 @@ function DoctorForm({ clinicId, doctor }: { clinicId: string; doctor: DoctorDraf
         {t("bio")}
         <textarea className={`${controlClass} min-h-[96px] resize-y`} maxLength={600} rows={4} value={copy.bio} onChange={(event) => form.setField("bio", event.target.value)} />
       </label>
-      <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
+      <label className="flex items-center gap-2 text-[0.92rem] font-semibold">
+        <input type="checkbox" checked={form.published} onChange={(event) => form.setPublished(event.target.checked)} />
+        {t("published")}
+      </label>
+      <button className="btn btn-primary w-fit" type="submit">{t("save")}</button>
       {form.message ? <p className={form.failed ? "m-0 text-danger" : "m-0 text-muted"}>{form.message}</p> : null}
     </form>
   );
@@ -196,6 +212,7 @@ function LocaleTabs({
 function useDoctorCopies(doctor: DoctorDraft) {
   const [locale, setLocale] = useState<ContentLocale>("hy");
   const [hy, setHy] = useState<Copy>({ displayName: doctor.displayName, specialty: doctor.specialty, bio: doctor.bio });
+  const [published, setPublished] = useState(doctor.published);
   const [copies, setCopies] = useState({ en: doctor.en, ru: doctor.ru });
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
@@ -213,7 +230,7 @@ function useDoctorCopies(doctor: DoctorDraft) {
     setFailed(error);
   }
 
-  return { locale, setLocale, hy, copies, setField, message, failed, setResult };
+  return { locale, setLocale, hy, copies, published, setPublished, setField, message, failed, setResult };
 }
 
 function copyOf(doctor: DoctorRow, locale: "en" | "ru"): Copy {
@@ -221,8 +238,14 @@ function copyOf(doctor: DoctorRow, locale: "en" | "ru"): Copy {
   return { displayName: row?.name ?? "", specialty: row?.specialty ?? "", bio: row?.bio ?? "" };
 }
 
-async function saveDoctor(clinicId: string, doctorId: string, hy: Copy, copies: { en: Copy; ru: Copy }): Promise<boolean> {
-  const profile = await clinicSend(`/clinics/${clinicId}/doctors/${doctorId}`, "PATCH", hy);
+async function saveDoctor(
+  clinicId: string,
+  doctorId: string,
+  hy: Copy,
+  copies: { en: Copy; ru: Copy },
+  published: boolean,
+): Promise<boolean> {
+  const profile = await clinicSend(`/clinics/${clinicId}/doctors/${doctorId}`, "PATCH", { ...hy, published });
   const english = await clinicSend(`/clinics/${clinicId}/doctors/${doctorId}/locales`, "PUT", { locale: "en", ...copies.en });
   const russian = await clinicSend(`/clinics/${clinicId}/doctors/${doctorId}/locales`, "PUT", { locale: "ru", ...copies.ru });
   return profile && english && russian;

@@ -325,6 +325,7 @@
     "add": "Добавить",
     "selectDoctor": "Выберите врача",
     "emptyServices": "Услуг пока нет.",
+    "emptyStaff": "Врачей пока нет.",
     "addForDoctor": "Добавить этому врачу",
     "published": "Опубликовано",
     "hidden": "Скрыто",

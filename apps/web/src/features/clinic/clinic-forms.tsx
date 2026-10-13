@@ -14,8 +14,6 @@ const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
 const controlClass =
   "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 const panelClass = "grid gap-3.5 rounded-card border border-line bg-white p-5 shadow-soft";
-const btnClass =
-  "inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white transition-[background,box-shadow] duration-160 hover:bg-accent-hover hover:shadow-accent";
 
 async function postJson(path: string, payload: Record<string, string | number | boolean>): Promise<boolean> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1${path}`, {
@@ -27,7 +25,7 @@ async function postJson(path: string, payload: Record<string, string | number | 
   return response.ok;
 }
 
-export function ClinicDoctorForm({ clinicId }: { clinicId: string }) {
+export function ClinicDoctorForm({ clinicId, onClose }: { clinicId: string; onClose: () => void }) {
   const [message, setMessage] = useState("");
   const t = useTranslations("desk");
   const auth = useTranslations("auth");
@@ -79,7 +77,12 @@ export function ClinicDoctorForm({ clinicId }: { clinicId: string }) {
         />
       </label>
       <label className={fieldClass}>{catalog("specialty")}<input name="specialty" required className={controlClass} /></label>
-      <button className={btnClass} type="submit">{t("saveDoctor")}</button>
+      <div className="flex flex-wrap gap-2">
+        <button className="btn btn-primary w-fit" type="submit">{t("saveDoctor")}</button>
+        <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>
+          {common("cancel")}
+        </button>
+      </div>
       {message ? <p className="m-0 text-danger">{message}</p> : null}
     </form>
   );

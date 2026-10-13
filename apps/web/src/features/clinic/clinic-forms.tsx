@@ -1,9 +1,14 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, KeyboardEvent, PointerEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 
 type DoctorOption = { id: string; name: string };
+type FieldOpenEvent = PointerEvent<HTMLInputElement> | KeyboardEvent<HTMLInputElement>;
+
+function openNewAccountField(event: FieldOpenEvent): void {
+  event.currentTarget.readOnly = false;
+}
 
 const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
 const controlClass =
@@ -43,11 +48,36 @@ export function ClinicDoctorForm({ clinicId }: { clinicId: string }) {
   }
 
   return (
-    <form className={panelClass} onSubmit={(event) => void onDoctor(event)}>
+    <form className={panelClass} autoComplete="off" onSubmit={(event) => void onDoctor(event)}>
       <h2>{t("newDoctor")}</h2>
-      <label className={fieldClass}>{common("name")}<input name="displayName" required className={controlClass} /></label>
-      <label className={fieldClass}>{auth("email")}<input name="email" type="email" required className={controlClass} /></label>
-      <label className={fieldClass}>{auth("password")}<input name="password" type="password" required minLength={8} className={controlClass} /></label>
+      <label className={fieldClass}>{common("name")}<input name="displayName" autoComplete="off" required className={controlClass} /></label>
+      <label className={fieldClass}>
+        {auth("email")}
+        <input
+          name="email"
+          type="email"
+          required
+          autoComplete="off"
+          readOnly
+          onPointerDown={openNewAccountField}
+          onKeyDown={openNewAccountField}
+          className={controlClass}
+        />
+      </label>
+      <label className={fieldClass}>
+        {auth("password")}
+        <input
+          name="password"
+          type="password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          readOnly
+          onPointerDown={openNewAccountField}
+          onKeyDown={openNewAccountField}
+          className={controlClass}
+        />
+      </label>
       <label className={fieldClass}>{catalog("specialty")}<input name="specialty" required className={controlClass} /></label>
       <button className={btnClass} type="submit">{t("saveDoctor")}</button>
       {message ? <p className="m-0 text-danger">{message}</p> : null}

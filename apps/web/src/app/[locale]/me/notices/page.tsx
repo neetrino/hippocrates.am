@@ -7,7 +7,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
-import { noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
+import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
@@ -77,5 +77,8 @@ function toRow(
     when: `${arrivedLabel} · ${formatWhen(notice.createdAt, locale)}`,
     context,
     unread: notice.readAt === null,
+    startsAt: visit?.startsAt ?? null,
+    kind: noticeKind(notice.body),
+    people: person ? [person] : [],
   };
 }

@@ -1,11 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { matchesNotice } from "@/features/portal/match-notice";
 import { deleteNotices, deleteReadNotices, markNoticesRead } from "@/features/portal/notice-api";
+import { NoticeFilterPanel } from "@/features/portal/notice-filter-panel";
+import {
+  emptyNoticeFilters,
+  matchesNoticeFilters,
+  noticeFiltersActive,
+  noticePersonNames,
+  type NoticeFilters,
+} from "@/features/portal/notice-filters";
+import { NoticeCard, NoticeMore } from "@/features/portal/notice-card";
 import { NoticeToolbar, type NoticePending } from "@/features/portal/notice-toolbar";
 import { noticePreviewLimit } from "@/shared/notice";
+import type { NoticeKind } from "@/shared/notice-text";
 
 export type NoticeAudience = "clinic" | "doctor" | "patient";
 
@@ -15,38 +25,25 @@ export type NoticeRow = {
   when: string;
   context: string;
   unread: boolean;
+  startsAt: string | null;
+  kind: NoticeKind;
+  people: string[];
 };
 
 export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; audience: NoticeAudience }) {
   const list = useNoticeList(initial);
+  const view = useNoticeView(list.rows, list.unreadIds);
   const t = useTranslations("me");
-  const [query, setQuery] = useState("");
-  const visible = list.rows.filter((row) => matchesNotice(row, query));
-  const searching = query.trim().length > 0;
-  const hidden = searching ? 0 : visible.length - noticePreviewLimit;
-  const shown = searching || list.open || hidden <= 0 ? visible : visible.slice(0, noticePreviewLimit);
+  const hidden = view.narrowing ? 0 : view.visible.length - noticePreviewLimit;
+  const shown = view.narrowing || list.open || hidden <= 0 ? view.visible : view.visible.slice(0, noticePreviewLimit);
   if (list.rows.length === 0) {
     return <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>;
   }
   return (
     <div className="grid gap-3">
-      <NoticeToolbar
-        query={query}
-        placeholder={t(searchHint(audience))}
-        selecting={list.selecting}
-        selectedCount={list.selected.size}
-        allSelected={visible.length > 0 && visible.every((row) => list.selected.has(row.id))}
-        pending={list.pending}
-        busy={list.busy}
-        onQuery={setQuery}
-        onStart={list.start}
-        onCancel={list.cancel}
-        onToggleAll={() => list.toggleVisible(visible.map((row) => row.id))}
-        onPending={list.setPending}
-        onConfirm={() => void list.confirm()}
-      />
+      <NoticeCommands audience={audience} list={list} view={view} />
       {list.failed ? <p className="m-0 text-sm text-danger">{t("deleteNoticesFailed")}</p> : null}
-      {visible.length === 0 ? <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noticeSearchEmpty")}</p> : null}
+      {view.visible.length === 0 ? <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noticeSearchEmpty")}</p> : null}
       {shown.map((row) => (
         <NoticeCard
           key={row.id}
@@ -56,18 +53,80 @@ export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; aud
           onToggle={() => list.toggle(row.id)}
         />
       ))}
-      {hidden > 0 ? (
-        <button
-          type="button"
-          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent"
-          aria-expanded={list.open}
-          onClick={() => list.setOpen((value) => !value)}
-        >
-          {list.open ? t("showLess") : t("showMore", { count: hidden })}
-          <Chevron open={list.open} />
-        </button>
-      ) : null}
+      <NoticeMore
+        open={list.open}
+        hidden={hidden}
+        lessLabel={t("showLess")}
+        moreLabel={t("showMore", { count: hidden })}
+        onToggle={() => list.setOpen((value) => !value)}
+      />
     </div>
+  );
+}
+
+function useNoticeView(rows: NoticeRow[], unreadIds: Set<string>) {
+  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState<NoticeFilters>(emptyNoticeFilters);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const panelId = useId();
+  const visible = rows.filter(
+    (row) => matchesNotice(row, query) && matchesNoticeFilters(row, filters, unreadIds.has(row.id)),
+  );
+  return {
+    query,
+    setQuery,
+    filters,
+    setFilters,
+    filtersOpen,
+    setFiltersOpen,
+    panelId,
+    visible,
+    people: noticePersonNames(rows),
+    filtersActive: noticeFiltersActive(filters),
+    narrowing: query.trim().length > 0 || noticeFiltersActive(filters),
+  };
+}
+
+function NoticeCommands({
+  audience,
+  list,
+  view,
+}: {
+  audience: NoticeAudience;
+  list: ReturnType<typeof useNoticeList>;
+  view: ReturnType<typeof useNoticeView>;
+}) {
+  const t = useTranslations("me");
+  return (
+    <>
+      <NoticeToolbar
+        query={view.query}
+        placeholder={t(searchHint(audience))}
+        selecting={list.selecting}
+        selectedCount={list.selected.size}
+        allSelected={view.visible.length > 0 && view.visible.every((row) => list.selected.has(row.id))}
+        pending={list.pending}
+        busy={list.busy}
+        filtersOpen={view.filtersOpen}
+        filtersActive={view.filtersActive}
+        panelId={view.panelId}
+        onQuery={view.setQuery}
+        onStart={list.start}
+        onCancel={list.cancel}
+        onToggleAll={() => list.toggleVisible(view.visible.map((row) => row.id))}
+        onPending={list.setPending}
+        onConfirm={() => void list.confirm()}
+        onToggleFilters={() => view.setFiltersOpen((open) => !open)}
+      />
+      <NoticeFilterPanel
+        id={view.panelId}
+        open={view.filtersOpen}
+        filters={view.filters}
+        people={view.people}
+        onChange={view.setFilters}
+        onReset={() => view.setFilters(emptyNoticeFilters)}
+      />
+    </>
   );
 }
 
@@ -230,50 +289,4 @@ function toggleId(selected: Set<string>, id: string): Set<string> {
   if (next.has(id)) next.delete(id);
   else next.add(id);
   return next;
-}
-
-function NoticeCard({
-  row,
-  selecting,
-  checked,
-  onToggle,
-}: {
-  row: NoticeRow;
-  selecting: boolean;
-  checked: boolean;
-  onToggle: () => void;
-}) {
-  const body = (
-    <span className="min-w-0">
-      <span className="flex items-start gap-2">
-        {row.unread ? <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true" /> : null}
-        <span>{row.text}</span>
-      </span>
-      {row.context ? <span className="mt-1 block text-sm text-ink/80">{row.context}</span> : null}
-      <time className="mt-1 block text-sm text-muted">{row.when}</time>
-    </span>
-  );
-  const className = `rounded-[1.1rem] border px-4 py-3.5 ${cardTone(row.unread, checked)}`;
-  if (!selecting) return <article className={className}>{body}</article>;
-  return (
-    <label className={`${className} flex cursor-pointer items-start gap-3`}>
-      <input type="checkbox" className="mt-1 size-4 shrink-0 accent-accent" checked={checked} onChange={onToggle} />
-      {body}
-    </label>
-  );
-}
-
-function cardTone(unread: boolean, checked: boolean): string {
-  const edge = unread ? "border-l-4 border-l-accent" : "";
-  if (checked) return `border-accent bg-accent-soft/70 ${edge}`;
-  if (unread) return `border-line bg-accent-soft/70 ${edge}`;
-  return "border-line bg-sand/70";
-}
-
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg viewBox="0 0 20 20" className={`h-4 w-4 ${open ? "rotate-180" : ""}`} aria-hidden="true">
-      <path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
 }

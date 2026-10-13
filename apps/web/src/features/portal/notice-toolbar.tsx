@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { cn } from "@/shared/ui/cn";
 
 export type NoticePending = "selected" | "read" | null;
 
@@ -12,12 +13,16 @@ export function NoticeToolbar({
   allSelected,
   pending,
   busy,
+  filtersOpen,
+  filtersActive,
+  panelId,
   onQuery,
   onStart,
   onCancel,
   onToggleAll,
   onPending,
   onConfirm,
+  onToggleFilters,
 }: {
   query: string;
   placeholder: string;
@@ -26,17 +31,29 @@ export function NoticeToolbar({
   allSelected: boolean;
   pending: NoticePending;
   busy: boolean;
+  filtersOpen: boolean;
+  filtersActive: boolean;
+  panelId: string;
   onQuery: (value: string) => void;
   onStart: () => void;
   onCancel: () => void;
   onToggleAll: () => void;
   onPending: (pending: NoticePending) => void;
   onConfirm: () => void;
+  onToggleFilters: () => void;
 }) {
   const t = useTranslations("me");
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <NoticeSearch query={query} placeholder={placeholder} onQuery={onQuery} />
+      <NoticeSearch
+        query={query}
+        placeholder={placeholder}
+        filtersOpen={filtersOpen}
+        filtersActive={filtersActive}
+        panelId={panelId}
+        onQuery={onQuery}
+        onToggleFilters={onToggleFilters}
+      />
       {pending ? (
         <ConfirmActions pending={pending} count={selectedCount} busy={busy} onConfirm={onConfirm} onCancel={() => onPending(null)} />
       ) : selecting ? (
@@ -58,9 +75,26 @@ export function NoticeToolbar({
   );
 }
 
-function NoticeSearch({ query, placeholder, onQuery }: { query: string; placeholder: string; onQuery: (value: string) => void }) {
+function NoticeSearch({
+  query,
+  placeholder,
+  filtersOpen,
+  filtersActive,
+  panelId,
+  onQuery,
+  onToggleFilters,
+}: {
+  query: string;
+  placeholder: string;
+  filtersOpen: boolean;
+  filtersActive: boolean;
+  panelId: string;
+  onQuery: (value: string) => void;
+  onToggleFilters: () => void;
+}) {
+  const catalog = useTranslations("catalog");
   return (
-    <label className="search-shell min-w-0 flex-1">
+    <div className="search-shell min-w-0 flex-1">
       <span className="grid shrink-0 place-items-center pl-1 text-muted">
         <SearchIcon />
       </span>
@@ -73,7 +107,20 @@ function NoticeSearch({ query, placeholder, onQuery }: { query: string; placehol
         className="min-w-0 flex-1 border-0 bg-transparent py-2 outline-none placeholder:text-[#9aa6a5]"
         onChange={(event) => onQuery(event.target.value)}
       />
-    </label>
+      <button
+        type="button"
+        className={cn(
+          "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-muted transition-[background,color] duration-160 hover:bg-sand hover:text-accent",
+          (filtersOpen || filtersActive) && "bg-accent-soft text-accent",
+        )}
+        aria-label={catalog("openFilters")}
+        aria-expanded={filtersOpen}
+        aria-controls={panelId}
+        onClick={onToggleFilters}
+      >
+        <FilterIcon />
+      </button>
+    </div>
   );
 }
 
@@ -149,6 +196,19 @@ function SearchIcon() {
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-[18px] w-[18px]">
       <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
       <path d="M16.2 16.2L20 20" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FilterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-[18px] w-[18px]">
+      <path
+        d="M4.5 5.5h15l-5.8 7.2v4.8l-3.4 1.7v-6.5L4.5 5.5z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

@@ -6,7 +6,7 @@ import { prepareLocale } from "@/i18n/locale";
 import { doctorDisplayName } from "@/shared/clinic-label";
 import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
-import { noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
+import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import { sessionGet } from "@/shared/session-api";
 
 export default async function ClinicNoticesPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -38,14 +38,17 @@ function toRow(
   arrivedLabel: string,
 ): NoticeRow {
   const visit = notice.appointment;
-  const context = visit
-    ? `${patientLabel(visit)} · ${doctorDisplayName(visit.doctor, locale)} · ${formatWhen(visit.startsAt, locale)}`
-    : "";
+  const patient = visit ? patientLabel(visit) : "";
+  const doctor = visit ? doctorDisplayName(visit.doctor, locale) : "";
+  const context = visit ? `${patient} · ${doctor} · ${formatWhen(visit.startsAt, locale)}` : "";
   return {
     id: notice.id,
     text: noticeLine(notice.body, notice.detail, t),
     when: `${arrivedLabel} · ${formatWhen(notice.createdAt, locale)}`,
     context,
     unread: notice.readAt === null,
+    startsAt: visit?.startsAt ?? null,
+    kind: noticeKind(notice.body),
+    people: [patient, doctor].filter(Boolean),
   };
 }

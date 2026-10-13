@@ -23,6 +23,33 @@ const noticeMessages = {
 } as const;
 
 export type NoticeMessageKey = (typeof noticeMessages)[keyof typeof noticeMessages];
+export type NoticeKind = "request" | "confirmed" | "cancelled" | "rescheduled" | "other";
+
+const cancelledKinds: NoticeMessageKey[] = [
+  "noticeCancelled",
+  "noticeCancelledByPatient",
+  "noticeCancelledByDoctor",
+  "noticeCancelledByClinic",
+  "noticeExpired",
+  "noticeNoShow",
+];
+
+const rescheduledKinds: NoticeMessageKey[] = [
+  "noticeRescheduled",
+  "noticeRescheduledByPatient",
+  "noticeRescheduledByDoctor",
+  "noticeRescheduledByClinic",
+];
+
+/** Groups a stored notice body into the first-wave filter kinds. */
+export function noticeKind(body: string): NoticeKind {
+  const key = noticeMessageKey(body);
+  if (key === "noticeRequested") return "request";
+  if (key === "noticeConfirmed") return "confirmed";
+  if (key && cancelledKinds.includes(key)) return "cancelled";
+  if (key && rescheduledKinds.includes(key)) return "rescheduled";
+  return "other";
+}
 
 /** System notices are stored as a stable key. Older rows keep the Armenian sentence. */
 export function noticeMessageKey(body: string): NoticeMessageKey | null {

@@ -5,7 +5,7 @@ import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
 import { clinicCopies, clinicNameSearch } from "./clinic-search";
-import { doctorNameSearch, doctorSearchText } from "./doctor-search";
+import { doctorNameSearch, doctorNameSpellings, filterDoctorsByName } from "./doctor-search";
 
 const clinicFields = {
   id: true,
@@ -57,8 +57,7 @@ function doctorListSelect() {
       select: {
         id: true,
         name: true,
-        district: true,
-        locales: { select: { locale: true, name: true, district: true } },
+        locales: { select: { locale: true, name: true } },
       },
     },
   };
@@ -250,6 +249,7 @@ export class MarketplaceController {
     @Query("clinic") clinic?: string | string[],
   ) {
     const language = catalogLocale(locale);
+    const needle = name?.trim() ?? "";
     const specialties = parseMultiQuery(specialty);
     const cities = parseMultiQuery(city);
     const clinics = parseMultiQuery(clinic);
@@ -267,14 +267,14 @@ export class MarketplaceController {
         published: true,
         clinic: clinicFilter,
         specialty: specialties.length > 0 ? { in: specialties } : undefined,
-        ...(name?.trim() ? { OR: doctorNameSearch(name.trim()) } : {}),
+        ...(needle ? { OR: doctorNameSearch(needle) } : {}),
       },
       orderBy: { user: { displayName: "asc" } },
       select: doctorListSelect(),
     });
-    return rows.map((doctor) => ({
+    return filterDoctorsByName(rows, needle).map((doctor) => ({
       ...doctorView(applyDoctor(doctor, language)),
-      searchText: doctorSearchText(doctor),
+      nameSpellings: doctorNameSpellings(doctor),
     }));
   }
 

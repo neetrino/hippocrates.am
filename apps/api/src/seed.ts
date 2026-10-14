@@ -74,6 +74,7 @@ async function upsertClinic(prisma: Db, ownerId: string, clinic: ClinicFixture):
       district: clinic.district,
       ownerId,
       published: true,
+      verificationStatus: "APPROVED",
     },
   });
   await prisma.user.update({ where: { id: ownerId }, data: { clinicId: created.id } });
@@ -136,8 +137,8 @@ async function seedDoctor(prisma: Db, clinicId: string, doctor: DoctorFixture, p
   });
   const profile = await prisma.doctorProfile.upsert({
     where: { userId },
-    update: { specialty: doctor.specialty, bio: doctor.bio, published: true },
-    create: { userId, clinicId, specialty: doctor.specialty, bio: doctor.bio, published: true },
+    update: { specialty: doctor.specialty, bio: doctor.bio, published: true, verificationStatus: "APPROVED" },
+    create: { userId, clinicId, specialty: doctor.specialty, bio: doctor.bio, published: true, verificationStatus: "APPROVED" },
   });
   await ensureImage(prisma, "doctor", profile.id, doctor.photoFile, profile.photoKey);
   await ensureOfferings(prisma, clinicId, profile.id, doctor);

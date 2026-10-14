@@ -46,7 +46,7 @@ export class ClinicsController {
         },
       });
       const created = await tx.clinic.create({
-        data: { ...text, phone, ownerId: admin.id, published: true },
+        data: { ...text, phone, ownerId: admin.id, published: true, verificationStatus: "APPROVED" },
       });
       await tx.user.update({ where: { id: admin.id }, data: { clinicId: created.id } });
       await tx.branch.create({ data: { clinicId: created.id, name: MAIN_BRANCH_NAME, address: text.address } });

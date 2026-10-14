@@ -67,7 +67,9 @@ export class QuestionsController {
   @Roles("DOCTOR")
   async answer(@CurrentActor() actor: Actor, @Param("id") id: string, @Body() body: unknown): Promise<{ id: string }> {
     const doctor = await this.prisma.doctorProfile.findUnique({ where: { userId: actor.id } });
-    if (!doctor?.published) throw new AppError("FORBIDDEN", 403, "Բժիշկը հաստատված չէ");
+    if (!doctor?.published || doctor.verificationStatus !== "APPROVED") {
+      throw new AppError("FORBIDDEN", 403, "Բժիշկը հաստատված չէ");
+    }
     const question = await this.prisma.question.findFirst({ where: { id, status: "PUBLISHED" } });
     if (!question) throw new AppError("NOT_FOUND", 404, "Հարցը չի գտնվել");
     const answer = await this.prisma.answer.create({

@@ -106,7 +106,9 @@ async function openFixture(url: string): Promise<Fixture> {
   const owner = await prisma.user.create({
     data: { email: `${slug(mark)}-admin@hippocrates.test`, passwordHash: "test", displayName: mark, role: "ADMIN" },
   });
-  const clinic = await prisma.clinic.create({ data: { name: mark, ownerId: owner.id, published: false } });
+  const clinic = await prisma.clinic.create({
+    data: { name: mark, ownerId: owner.id, published: false, verificationStatus: "DRAFT" },
+  });
   const doctorUser = await prisma.user.create({
     data: {
       email: `${slug(mark)}-doctor@hippocrates.test`,
@@ -117,7 +119,7 @@ async function openFixture(url: string): Promise<Fixture> {
     },
   });
   const doctor = await prisma.doctorProfile.create({
-    data: { userId: doctorUser.id, clinicId: clinic.id, specialty: "Test", published: false },
+    data: { userId: doctorUser.id, clinicId: clinic.id, specialty: "Test", published: false, verificationStatus: "DRAFT" },
   });
   const offering = await prisma.serviceOffering.create({
     data: {

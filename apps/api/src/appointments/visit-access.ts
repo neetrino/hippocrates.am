@@ -2,6 +2,7 @@ import { AppError } from "../common/app-error";
 import { recordOf, requiredString } from "../common/input";
 import type { Actor } from "../identity/access";
 import type { PrismaService } from "../infrastructure/prisma.service";
+import { liveOffering } from "../catalog/public-visible";
 import { bookableStarts, openWindows } from "../scheduling/slots";
 import { closeExpiredRequests } from "./close-expired";
 
@@ -9,7 +10,7 @@ const reasonLimit = 200;
 
 export async function loadOffering(prisma: PrismaService, offeringId: string) {
   const offering = await prisma.serviceOffering.findFirst({
-    where: { id: offeringId, published: true, doctor: { published: true }, clinic: { published: true } },
+    where: { id: offeringId, ...liveOffering },
     include: { clinic: { include: { windows: true } }, doctor: { include: { windows: true } } },
   });
   if (!offering) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");

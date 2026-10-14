@@ -9,6 +9,7 @@ import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
 import { bookDeskVisit } from "../appointments/desk-booking";
 import { countClinicPatients, listClinicPatients } from "../appointments/guest-visits";
+import { liveListing } from "../catalog/public-visible";
 import { financeWindow } from "./finance-range";
 
 @Controller()
@@ -42,7 +43,7 @@ export class OperationsController {
     const [clinics, pendingQuestions, publishedDoctors] = await Promise.all([
       this.prisma.clinic.count(),
       this.prisma.question.count({ where: { status: "PENDING" } }),
-      this.prisma.doctorProfile.count({ where: { published: true } }),
+      this.prisma.doctorProfile.count({ where: liveListing }),
     ]);
     return { clinics, pendingQuestions, publishedDoctors };
   }

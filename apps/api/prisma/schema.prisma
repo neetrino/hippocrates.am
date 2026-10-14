@@ -34,6 +34,15 @@ enum QuestionStatus {
   REJECTED
 }
 
+enum VerificationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -76,7 +85,8 @@ model Clinic {
   coverKey    String?
   logoKey     String?
   timeZone    String   @default("Asia/Yerevan")
-  published   Boolean  @default(true)
+  published           Boolean            @default(true)
+  verificationStatus  VerificationStatus @default(APPROVED)
   ownerId     String
   owner       User     @relation("ClinicOwner", fields: [ownerId], references: [id])
   staff       User[]   @relation("ClinicStaff")
@@ -89,6 +99,8 @@ model Clinic {
   locales     ClinicLocale[]
   windows     ClinicWindow[]
   favorites   Favorite[]
+
+  @@index([published, verificationStatus])
 }
 
 model ClinicLocale {
@@ -119,7 +131,8 @@ model DoctorProfile {
   specialty   String
   bio         String   @default("")
   photoKey    String?
-  published   Boolean  @default(true)
+  published           Boolean            @default(true)
+  verificationStatus  VerificationStatus @default(APPROVED)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   clinic      Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   offerings   ServiceOffering[]
@@ -130,6 +143,8 @@ model DoctorProfile {
   reviews     Review[]
   locales     DoctorLocale[]
   favorites   Favorite[]
+
+  @@index([published, verificationStatus])
 }
 
 model DoctorLocale {

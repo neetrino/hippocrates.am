@@ -5,6 +5,7 @@ import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
 import { clinicCopies, clinicNameSearch, clinicNameSpellings, filterClinicsByName } from "./clinic-search";
+import { liveDoctor, liveListing } from "../catalog/public-visible";
 import { doctorNameSearch, doctorNameSpellings, filterDoctorsByName } from "./doctor-search";
 
 const clinicFields = {
@@ -97,13 +98,13 @@ export class MarketplaceController {
     const language = catalogLocale(locale);
     const [clinics, doctors] = await Promise.all([
       this.prisma.clinic.findMany({
-        where: { published: true },
+        where: liveListing,
         orderBy: { name: "asc" },
         take: 12,
         select: clinicSelect(language),
       }),
       this.prisma.doctorProfile.findMany({
-        where: { published: true, clinic: { published: true } },
+        where: liveDoctor,
         orderBy: { user: { displayName: "asc" } },
         take: 12,
         select: doctorSelect(language),
@@ -122,7 +123,7 @@ export class MarketplaceController {
     const needle = name?.trim() ?? "";
     const rows = await this.prisma.clinic.findMany({
       where: {
-        published: true,
+        ...liveListing,
         ...(needle ? { OR: clinicNameSearch(needle) } : {}),
       },
       orderBy: { name: "asc" },
@@ -143,13 +144,13 @@ export class MarketplaceController {
   async clinic(@Param("id") id: string, @Query("locale") locale?: string) {
     const language = catalogLocale(locale);
     const clinic = await this.prisma.clinic.findFirst({
-      where: { id, published: true },
+      where: { id, ...liveListing },
       select: {
         ...clinicSelect(language),
         branches: { select: { id: true, name: true, address: true } },
-        doctors: { where: { published: true }, select: doctorSelect(language) },
+        doctors: { where: liveListing, select: doctorSelect(language) },
         offerings: {
-          where: { published: true },
+          where: { published: true, doctor: liveListing },
           select: {
             id: true,
             name: true,
@@ -195,7 +196,7 @@ export class MarketplaceController {
     const language = catalogLocale(locale);
     const [specialtyRows, clinicRows] = await Promise.all([
       this.prisma.doctorProfile.findMany({
-        where: { published: true, clinic: { published: true } },
+        where: liveDoctor,
         orderBy: { specialty: "asc" },
         select: {
           specialty: true,
@@ -203,7 +204,7 @@ export class MarketplaceController {
         },
       }),
       this.prisma.clinic.findMany({
-        where: { published: true },
+        where: liveListing,
         orderBy: { name: "asc" },
         select: {
           id: true,
@@ -257,15 +258,16 @@ export class MarketplaceController {
 
     const clinicFilter: {
       published: true;
+      verificationStatus: "APPROVED";
       name?: { in: string[] };
       district?: { in: string[] };
-    } = { published: true };
+    } = { ...liveListing };
     if (clinics.length > 0) clinicFilter.name = { in: clinics };
     if (cities.length > 0) clinicFilter.district = { in: cities };
 
     const rows = await this.prisma.doctorProfile.findMany({
       where: {
-        published: true,
+        ...liveListing,
         clinic: clinicFilter,
         specialty: specialties.length > 0 ? { in: specialties } : undefined,
         ...(needle ? { OR: doctorNameSearch(needle) } : {}),
@@ -283,7 +285,7 @@ export class MarketplaceController {
   @Get("doctors/:id")
   async doctor(@Param("id") id: string, @Query("locale") locale?: string) {
     const doctor = await this.prisma.doctorProfile.findFirst({
-      where: { id, published: true, clinic: { published: true } },
+      where: { id, ...liveDoctor },
       select: {
         ...doctorSelect(catalogLocale(locale)),
         offerings: {

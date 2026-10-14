@@ -8,6 +8,7 @@ import { CurrentActor } from "../identity/current-actor";
 import { RateLimitService } from "../identity/rate-limit.service";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
+import { liveDoctor, liveListing } from "../catalog/public-visible";
 
 const windowMs = 10 * 60 * 1000;
 
@@ -21,6 +22,7 @@ function clinicSelect(locale: CatalogLocale | null) {
   return {
     id: true,
     published: true,
+    verificationStatus: true,
     name: true,
     address: true,
     district: true,
@@ -36,6 +38,7 @@ function doctorSelect(locale: CatalogLocale | null) {
   return {
     id: true,
     published: true,
+    verificationStatus: true,
     specialty: true,
     bio: true,
     photoKey: true,
@@ -45,6 +48,7 @@ function doctorSelect(locale: CatalogLocale | null) {
       select: {
         id: true,
         published: true,
+        verificationStatus: true,
         name: true,
         ...(locale ? { locales: { where: { locale }, select: { locale: true, name: true } } } : {}),
       },
@@ -55,6 +59,7 @@ function doctorSelect(locale: CatalogLocale | null) {
 type StoredClinic = {
   id: string;
   published: boolean;
+  verificationStatus: string;
   name: string;
   address: string;
   district: string;
@@ -68,26 +73,27 @@ type StoredClinic = {
 type StoredDoctor = {
   id: string;
   published: boolean;
+  verificationStatus: string;
   specialty: string;
   bio: string;
   photoKey: string | null;
   user: { displayName: string };
   locales?: DoctorLocaleRow[];
-  clinic: { id: string; published: boolean; name: string; locales?: { locale: string; name: string }[] };
+  clinic: { id: string; published: boolean; verificationStatus: string; name: string; locales?: { locale: string; name: string }[] };
 };
 
 function clinicCard(clinic: StoredClinic | null, locale: CatalogLocale | null) {
   if (!clinic) return null;
-  const { published, coverKey, logoKey, ...rest } = clinic;
-  if (!published) return null;
+  const { published, verificationStatus, coverKey, logoKey, ...rest } = clinic;
+  if (!published || verificationStatus !== "APPROVED") return null;
   return { ...applyClinic(rest, locale), coverUrl: publicAssetUrl(coverKey), logoUrl: publicAssetUrl(logoKey) };
 }
 
 function doctorCard(doctor: StoredDoctor | null, locale: CatalogLocale | null) {
   if (!doctor) return null;
-  const { published, photoKey, clinic, ...rest } = doctor;
-  const { published: clinicLive, ...clinicRest } = clinic;
-  if (!published || !clinicLive) return null;
+  const { published, verificationStatus, photoKey, clinic, ...rest } = doctor;
+  const { published: clinicLive, verificationStatus: clinicStatus, ...clinicRest } = clinic;
+  if (!published || verificationStatus !== "APPROVED" || !clinicLive || clinicStatus !== "APPROVED") return null;
   const applied = applyDoctor({ ...rest, clinic: clinicRest }, locale);
   return { ...applied, photoUrl: publicAssetUrl(photoKey) };
 }
@@ -156,13 +162,13 @@ export class FavoritesController {
   }
 
   private async requireClinic(id: string): Promise<void> {
-    const clinic = await this.prisma.clinic.findFirst({ where: { id, published: true }, select: { id: true } });
+    const clinic = await this.prisma.clinic.findFirst({ where: { id, ...liveListing }, select: { id: true } });
     if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
   }
 
   private async requireDoctor(id: string): Promise<void> {
     const doctor = await this.prisma.doctorProfile.findFirst({
-      where: { id, published: true, clinic: { published: true } },
+      where: { id, ...liveDoctor },
       select: { id: true },
     });
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");

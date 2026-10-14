@@ -50,6 +50,7 @@ export class DoctorsController {
           specialty: requiredString(input.specialty, "Մասնագիտություն"),
           bio: optionalString(input.bio),
           published: true,
+          verificationStatus: "APPROVED",
         },
       });
     });

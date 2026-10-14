@@ -6,6 +6,7 @@ import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access
 import { Public, Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
+import { liveOffering } from "../catalog/public-visible";
 import { NotificationsService } from "../notifications/notifications.service";
 import { dayBounds } from "./day-off";
 import { clipDoctorHours } from "./clip-doctor-hours";
@@ -163,7 +164,7 @@ export class SchedulingController {
       throw new AppError("VALIDATION_FAILED", 400, "Ամսաթիվը սխալ է");
     }
     const offering = await this.prisma.serviceOffering.findFirst({
-      where: { id: offeringId, doctorId, published: true, doctor: { published: true }, clinic: { published: true } },
+      where: { id: offeringId, doctorId, ...liveOffering },
       include: { clinic: { include: { windows: true } }, doctor: { include: { windows: true } } },
     });
     if (!offering) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");

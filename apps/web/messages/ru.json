@@ -98,7 +98,16 @@
     "cancelConfirmed": "Отменить визит?",
     "cancelReason": "Причина (необязательно)",
     "keepVisit": "Оставить",
-    "send": "Отправить"
+    "send": "Отправить",
+    "eventHistory": "История визита",
+    "eventCreated": "Записан",
+    "eventConfirmed": "Подтверждён",
+    "eventCancelled": "Отменён",
+    "eventRescheduled": "Перенесён",
+    "eventExpired": "Истёк",
+    "eventCompleted": "Завершён",
+    "eventNoShow": "Не пришёл",
+    "eventActorSystem": "Система"
   },
   "catalog": {
     "clinicsTitle": "Клиники",

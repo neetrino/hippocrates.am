@@ -98,7 +98,16 @@
     "cancelConfirmed": "Cancel this visit?",
     "cancelReason": "Reason (optional)",
     "keepVisit": "Keep",
-    "send": "Send"
+    "send": "Send",
+    "eventHistory": "Visit history",
+    "eventCreated": "Booked",
+    "eventConfirmed": "Confirmed",
+    "eventCancelled": "Cancelled",
+    "eventRescheduled": "Moved",
+    "eventExpired": "Expired",
+    "eventCompleted": "Completed",
+    "eventNoShow": "Did not come",
+    "eventActorSystem": "System"
   },
   "catalog": {
     "clinicsTitle": "Clinics",

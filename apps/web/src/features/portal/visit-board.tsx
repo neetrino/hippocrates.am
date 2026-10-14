@@ -76,5 +76,6 @@ function toRow(
     offeringId: visit.offering.id,
     proposedBy: visit.proposedBy ?? "PATIENT",
     cancelReason: visit.cancelReason ?? null,
+    events: visit.events ?? [],
   };
 }

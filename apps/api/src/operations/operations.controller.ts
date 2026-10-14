@@ -8,6 +8,7 @@ import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
 import { bookDeskVisit } from "../appointments/desk-booking";
+import { eventSelect, namedEventsForVisits, omitEvents } from "../appointments/present-events";
 import { countClinicPatients, listClinicPatients } from "../appointments/guest-visits";
 import { liveListing } from "../catalog/public-visible";
 import { financeWindow } from "./finance-range";
@@ -108,6 +109,7 @@ export class OperationsController {
         priceAmd: true,
         isEstimate: true,
         offering: { select: { name: true } },
+        events: { orderBy: { createdAt: "asc" }, select: eventSelect },
       },
     });
     if (appointments.length === 0) throw new AppError("NOT_FOUND", 404, "Պացիենտը չի գտնվել");
@@ -115,7 +117,14 @@ export class OperationsController {
       where: { id: patientId },
       select: { id: true, displayName: true, email: true, phone: true },
     });
-    return { patient, appointments };
+    const histories = await namedEventsForVisits(this.prisma, appointments);
+    return {
+      patient,
+      appointments: appointments.map((row, index) => ({
+        ...omitEvents(row),
+        events: histories[index] ?? [],
+      })),
+    };
   }
 
   @Get("clinics/:clinicId/finance")

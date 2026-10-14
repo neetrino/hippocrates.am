@@ -98,7 +98,16 @@
     "cancelConfirmed": "Հաստատե՞լ չեղարկումը",
     "cancelReason": "Պատճառ (ըստ ցանկության)",
     "keepVisit": "Թողնել",
-    "send": "Ուղարկել"
+    "send": "Ուղարկել",
+    "eventHistory": "Այցի պատմություն",
+    "eventCreated": "Ամրագրված",
+    "eventConfirmed": "Հաստատված",
+    "eventCancelled": "Չեղարկված",
+    "eventRescheduled": "Տեղափոխված",
+    "eventExpired": "Ժամկետը լրացել է",
+    "eventCompleted": "Ավարտված",
+    "eventNoShow": "Չի եկել",
+    "eventActorSystem": "Համակարգ"
   },
   "catalog": {
     "clinicsTitle": "Կլինիկաներ",

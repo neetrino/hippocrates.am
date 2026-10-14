@@ -7,6 +7,7 @@ import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { NotificationsService } from "../notifications/notifications.service";
 import { closeExpiredRequests } from "./close-expired";
+import { eventSelect, namedEventsForVisits, omitEvents } from "./present-events";
 import { bookVisit, cancelVisit, completeVisit, confirmVisit, missVisit, rescheduleVisit } from "./visit-commands";
 
 const appointmentCard = {
@@ -24,6 +25,7 @@ const appointmentCard = {
   guestName: true,
   guestPhone: true,
   review: { select: { id: true } },
+  events: { orderBy: { createdAt: "asc" as const }, select: eventSelect },
 } as const;
 
 function presentAppointment<T extends { clinic: { coverKey: string | null } }>(row: T) {
@@ -86,6 +88,10 @@ export class AppointmentsController {
 
   private async listed(where: { patientId: string } | { doctorId: string } | { clinicId: string }, direction: "asc" | "desc") {
     const rows = await this.prisma.appointment.findMany({ where, orderBy: { startsAt: direction }, select: appointmentCard });
-    return rows.map(presentAppointment);
+    const histories = await namedEventsForVisits(this.prisma, rows);
+    return rows.map((row, index) => ({
+      ...presentAppointment(omitEvents(row)),
+      events: histories[index] ?? [],
+    }));
   }
 }

@@ -56,6 +56,17 @@ export type QuestionCard = {
   answers: { id: string; body: string; doctor: { specialty: string; user: { displayName: string } } }[];
 };
 
+export type VisitEvent = {
+  id: string;
+  type: string;
+  actorRole: string;
+  actorName: string | null;
+  reason: string | null;
+  fromStartsAt: string | null;
+  toStartsAt: string | null;
+  createdAt: string;
+};
+
 export type AppointmentCard = {
   id: string;
   startsAt: string;
@@ -71,6 +82,7 @@ export type AppointmentCard = {
   guestName?: string | null;
   guestPhone?: string | null;
   review: { id: string } | null;
+  events?: VisitEvent[];
 };
 
 export type Me = {

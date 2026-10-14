@@ -6,7 +6,9 @@ import { PatientReschedule } from "@/features/portal/patient-reschedule";
 import { visitPreviewLimit } from "@/features/portal/visit-order";
 import { ReviewForm } from "@/features/portal/review-form";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
+import { VisitHistory } from "@/features/portal/visit-history";
 import { asVisitStatus } from "@/shared/format";
+import type { VisitEvent } from "@/shared/public-types";
 
 type Tone = keyof typeof visitPreviewLimit;
 
@@ -43,6 +45,7 @@ export type VisitRow = {
   offeringId: string;
   proposedBy: "PATIENT" | "STAFF";
   cancelReason: string | null;
+  events: VisitEvent[];
 };
 
 export function VisitGroup({
@@ -125,7 +128,9 @@ function VisitCard({
             {visit.statusLabel}
           </span>
         </p>
-        {visit.cancelReason ? <p className="m-0 text-sm text-muted">{visit.cancelReason}</p> : null}
+        {visit.events.length > 0 ? <VisitHistory events={visit.events} /> : visit.cancelReason ? (
+          <p className="m-0 text-sm text-muted">{visit.cancelReason}</p>
+        ) : null}
         <VisitTools visit={visit} actions={actions} />
         {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>

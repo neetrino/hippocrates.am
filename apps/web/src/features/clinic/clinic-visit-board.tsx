@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
+import { VisitHistory } from "@/features/portal/visit-history";
 import { doctorDisplayName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, patientLabel } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
@@ -46,7 +47,9 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
               />
             </div>
             {open ? <RescheduleVisit visit={item} /> : null}
-            {item.cancelReason ? <p className="m-0 text-sm text-muted">{item.cancelReason}</p> : null}
+            {item.events?.length ? <VisitHistory events={item.events} /> : item.cancelReason ? (
+              <p className="m-0 text-sm text-muted">{item.cancelReason}</p>
+            ) : null}
           </article>
         );
       })}

@@ -13,6 +13,8 @@ export function TimeSelect({
   name,
   listLabel,
   placeholder,
+  minMinute,
+  maxMinute,
   onChange,
 }: {
   value: string;
@@ -20,18 +22,25 @@ export function TimeSelect({
   name: string;
   listLabel: string;
   placeholder: string;
+  minMinute?: number;
+  maxMinute?: number;
   onChange: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const shown = draft ?? value;
+  const choices = timesFor(value, minMinute, maxMinute);
 
   useMenuDismiss(root, open, setOpen);
 
   function apply(raw: string): void {
     const next = parseHourInput(raw);
-    onChange(next === null ? value : next);
+    if (next === null || (next !== "" && !minuteAllowed(next, minMinute, maxMinute))) {
+      onChange(value);
+    } else {
+      onChange(next);
+    }
     setDraft(null);
   }
 
@@ -39,7 +48,17 @@ export function TimeSelect({
     <div className="relative" ref={root}>
       <TimeField name={name} draft={shown} placeholder={placeholder} onDraft={setDraft} onApply={apply} onOpenList={() => setOpen(true)} />
       <TimeToggle open={open} label={listLabel} onToggle={() => setOpen((current) => !current)} />
-      {open ? <TimeMenu value={value} closedLabel={closedLabel} onPick={(time) => { apply(time); setOpen(false); }} /> : null}
+      {open ? (
+        <TimeMenu
+          value={value}
+          closedLabel={closedLabel}
+          choices={choices}
+          onPick={(time) => {
+            apply(time);
+            setOpen(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -113,13 +132,23 @@ function TimeField({
   );
 }
 
-function TimeMenu({ value, closedLabel, onPick }: { value: string; closedLabel: string; onPick: (time: string) => void }) {
+function TimeMenu({
+  value,
+  closedLabel,
+  choices,
+  onPick,
+}: {
+  value: string;
+  closedLabel: string;
+  choices: string[];
+  onPick: (time: string) => void;
+}) {
   return (
     <ul className="absolute top-full z-20 mt-1 max-h-36 w-full overflow-y-auto rounded-xl border border-line bg-white p-1 shadow-soft">
       <li>
         <TimeOption active={!value} label={closedLabel} onPick={() => onPick("")} />
       </li>
-      {timesFor(value).map((time) => (
+      {choices.map((time) => (
         <li key={time}>
           <TimeOption active={value === time} label={time} onPick={() => onPick(time)} />
         </li>
@@ -151,9 +180,26 @@ function parseHourInput(raw: string): string | null {
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
-function timesFor(current: string): string[] {
-  if (!current || HOUR_CHOICES.includes(current)) return HOUR_CHOICES;
-  return [...HOUR_CHOICES, current].sort();
+function timesFor(current: string, minMinute?: number, maxMinute?: number): string[] {
+  const choices = HOUR_CHOICES.filter((time) => minuteAllowed(time, minMinute, maxMinute));
+  if (current && !choices.includes(current) && minuteAllowed(current, minMinute, maxMinute)) {
+    return [...choices, current].sort();
+  }
+  return choices;
+}
+
+function minuteAllowed(time: string, minMinute?: number, maxMinute?: number): boolean {
+  const minutes = timeToMinutes(time);
+  if (minutes === null) return false;
+  if (minMinute !== undefined && minutes < minMinute) return false;
+  if (maxMinute !== undefined && minutes > maxMinute) return false;
+  return true;
+}
+
+function timeToMinutes(value: string): number | null {
+  const match = /^(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
 }
 
 function slotLabel(minutes: number): string {

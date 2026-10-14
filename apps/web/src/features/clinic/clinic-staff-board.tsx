@@ -44,6 +44,7 @@ export function ClinicStaffBoard({
               clinicId={clinicId}
               doctorId={doctor.id}
               windows={doctorWindows.find((item) => item.id === doctor.id)?.windows ?? []}
+              clinicWindows={clinicWindows}
               days={days.filter((day) => day.doctorId === doctor.id)}
             />
           }
@@ -57,11 +58,13 @@ function DoctorSchedule({
   clinicId,
   doctorId,
   windows,
+  clinicWindows,
   days,
 }: {
   clinicId: string;
   doctorId: string;
   windows: HourWindow[];
+  clinicWindows: HourWindow[];
   days: { id: string; label: string }[];
 }) {
   const t = useTranslations("desk");
@@ -70,6 +73,8 @@ function DoctorSchedule({
       <HoursEditor
         title={t("doctorHours")}
         windows={windows}
+        bounds={clinicWindows}
+        hint={t("doctorHoursHint")}
         savePath={`/clinics/${clinicId}/doctors/${doctorId}/windows`}
       />
       <ClinicDayOff clinicId={clinicId} doctorId={doctorId} days={days} />

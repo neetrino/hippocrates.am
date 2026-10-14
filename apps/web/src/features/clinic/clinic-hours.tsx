@@ -31,9 +31,21 @@ export function ClinicHours({ clinicId, clinicWindows }: { clinicId: string; cli
   );
 }
 
-export function HoursEditor({ title, windows, savePath }: { title: string; windows: HourWindow[]; savePath: string }) {
+export function HoursEditor({
+  title,
+  windows,
+  savePath,
+  bounds,
+  hint,
+}: {
+  title: string;
+  windows: HourWindow[];
+  savePath: string;
+  bounds?: HourWindow[];
+  hint?: string;
+}) {
   const t = useTranslations("desk");
-  const [days, setDays] = useState(() => dayFields(windows));
+  const [days, setDays] = useState(() => dayFields(clipWindows(windows, bounds)));
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
@@ -60,18 +72,8 @@ export function HoursEditor({ title, windows, savePath }: { title: string; windo
       }}
     >
       <h3 className="m-0">{title}</h3>
-      <div className="grid gap-2">
-        {WEEKDAYS.map((weekday) => (
-          <DayRow
-            key={weekday.day}
-            label={t(weekday.key)}
-            start={days[weekday.day]?.start ?? ""}
-            end={days[weekday.day]?.end ?? ""}
-            onStart={(start) => setDays((current) => ({ ...current, [weekday.day]: { start, end: current[weekday.day]?.end ?? "" } }))}
-            onEnd={(end) => setDays((current) => ({ ...current, [weekday.day]: { start: current[weekday.day]?.start ?? "", end } }))}
-          />
-        ))}
-      </div>
+      {hint ? <p className="m-0 text-sm text-muted">{hint}</p> : null}
+      <HoursWeek days={days} bounds={bounds} onDays={setDays} />
       <button className="btn btn-primary mt-1 w-fit" type="submit" disabled={pending}>
         {t("saveHours")}
       </button>
@@ -80,19 +82,58 @@ export function HoursEditor({ title, windows, savePath }: { title: string; windo
   );
 }
 
+function HoursWeek({
+  days,
+  bounds,
+  onDays,
+}: {
+  days: DayFields;
+  bounds?: HourWindow[];
+  onDays: (next: DayFields | ((current: DayFields) => DayFields)) => void;
+}) {
+  const t = useTranslations("desk");
+  return (
+    <div className="grid gap-2">
+      {WEEKDAYS.map((weekday) => {
+        const bound = dayBound(weekday.day, bounds);
+        return (
+          <DayRow
+            key={weekday.day}
+            label={t(weekday.key)}
+            start={days[weekday.day]?.start ?? ""}
+            end={days[weekday.day]?.end ?? ""}
+            locked={bound === null}
+            minMinute={bound?.startMinute}
+            maxMinute={bound?.endMinute}
+            onStart={(start) => onDays((current) => ({ ...current, [weekday.day]: { start, end: current[weekday.day]?.end ?? "" } }))}
+            onEnd={(end) => onDays((current) => ({ ...current, [weekday.day]: { start: current[weekday.day]?.start ?? "", end } }))}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function DayRow({
   label,
   start,
   end,
+  locked,
+  minMinute,
+  maxMinute,
   onStart,
   onEnd,
 }: {
   label: string;
   start: string;
   end: string;
+  locked?: boolean;
+  minMinute?: number;
+  maxMinute?: number;
   onStart: (value: string) => void;
   onEnd: (value: string) => void;
 }) {
+  const t = useTranslations("desk");
   const open = Boolean(start && end);
   return (
     <div
@@ -101,18 +142,36 @@ function DayRow({
       }`}
     >
       <span className="min-w-[7.5rem] font-semibold">{label}</span>
-      <span className="flex shrink-0 items-center gap-2">
-        <HourField label={label} value={start} onChange={onStart} />
-        <span className="text-muted" aria-hidden="true">
-          –
+      {locked ? (
+        <span className="text-sm text-muted">{t("hoursClinicClosed")}</span>
+      ) : (
+        <span className="flex shrink-0 items-center gap-2">
+          <HourField label={label} value={start} minMinute={minMinute} maxMinute={maxMinute} onChange={onStart} />
+          <span className="text-muted" aria-hidden="true">
+            –
+          </span>
+          <HourField label={label} value={end} end minMinute={minMinute} maxMinute={maxMinute} onChange={onEnd} />
         </span>
-        <HourField label={label} value={end} end onChange={onEnd} />
-      </span>
+      )}
     </div>
   );
 }
 
-function HourField({ label, value, end, onChange }: { label: string; value: string; end?: boolean; onChange: (value: string) => void }) {
+function HourField({
+  label,
+  value,
+  end,
+  minMinute,
+  maxMinute,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  end?: boolean;
+  minMinute?: number;
+  maxMinute?: number;
+  onChange: (value: string) => void;
+}) {
   const t = useTranslations("desk");
   return (
     <TimeSelect
@@ -121,12 +180,30 @@ function HourField({ label, value, end, onChange }: { label: string; value: stri
       name={`${label} ${end ? t("hoursEnd") : t("hoursStart")}`}
       listLabel={t("hoursList")}
       placeholder={t("hoursTimePlaceholder")}
+      minMinute={minMinute}
+      maxMinute={maxMinute}
       onChange={onChange}
     />
   );
 }
 
 type DayFields = Record<number, { start: string; end: string }>;
+
+function dayBound(weekday: number, bounds?: HourWindow[]): HourWindow | null | undefined {
+  if (!bounds || bounds.length === 0) return undefined;
+  return bounds.find((window) => window.weekday === weekday) ?? null;
+}
+
+function clipWindows(windows: HourWindow[], bounds?: HourWindow[]): HourWindow[] {
+  if (!bounds || bounds.length === 0) return windows;
+  return windows.flatMap((window) => {
+    const bound = bounds.find((item) => item.weekday === window.weekday);
+    if (!bound) return [];
+    const startMinute = Math.max(window.startMinute, bound.startMinute);
+    const endMinute = Math.min(window.endMinute, bound.endMinute);
+    return startMinute < endMinute ? [{ weekday: window.weekday, startMinute, endMinute }] : [];
+  });
+}
 
 function dayFields(windows: HourWindow[]): DayFields {
   const fields: DayFields = {};

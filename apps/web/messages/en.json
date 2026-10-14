@@ -373,6 +373,8 @@
     "clinicHours": "Clinic",
     "doctorHours": "Doctor",
     "hoursHint": "A visit time appears only while both the clinic and the doctor are open. Leave the clinic hours empty to follow the doctor only.",
+    "doctorHoursHint": "Doctor hours can be set only on days and times when the clinic is open.",
+    "hoursClinicClosed": "Clinic closed",
     "saveHours": "Save hours",
     "hoursSaved": "Hours saved",
     "hoursFailed": "Hours were not saved",

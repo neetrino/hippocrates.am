@@ -21,7 +21,13 @@ export function DoctorSchedule({ clinic, doctor }: { clinic: HourWindow[]; docto
     <div className="grid gap-5">
       <p className="m-0 text-muted">{t("hoursHint")}</p>
       <ClinicHours windows={clinic} />
-      <HoursEditor title={t("doctorHours")} windows={doctor} savePath="/doctors/me/windows" />
+      <HoursEditor
+        title={t("doctorHours")}
+        windows={doctor}
+        bounds={clinic}
+        hint={t("doctorHoursHint")}
+        savePath="/doctors/me/windows"
+      />
     </div>
   );
 }

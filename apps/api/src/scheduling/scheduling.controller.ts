@@ -8,8 +8,9 @@ import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { NotificationsService } from "../notifications/notifications.service";
 import { dayBounds } from "./day-off";
+import { clipDoctorHours } from "./clip-doctor-hours";
 import { daySlots, openWindows } from "./slots";
-import { windowsFrom, type StoredWindow } from "./windows";
+import { assertInsideClinic, windowsFrom, type StoredWindow } from "./windows";
 
 @Controller()
 export class SchedulingController {
@@ -29,7 +30,9 @@ export class SchedulingController {
     requireClinicAdmin(actor, clinicId);
     const doctor = await this.prisma.doctorProfile.findFirst({ where: { id: doctorId, clinicId } });
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
-    const data = windowsFrom(body).map((window) => ({ doctorId, ...window }));
+    const windows = windowsFrom(body);
+    await this.assertDoctorWeek(clinicId, windows);
+    const data = windows.map((window) => ({ doctorId, ...window }));
     await this.prisma.$transaction(async (tx) => {
       await tx.scheduleWindow.deleteMany({ where: { doctorId } });
       if (data.length > 0) await tx.scheduleWindow.createMany({ data });
@@ -106,10 +109,12 @@ export class SchedulingController {
     @Body() body: unknown,
   ): Promise<{ count: number }> {
     requireClinicAdmin(actor, clinicId);
-    const data = windowsFrom(body).map((window) => ({ clinicId, ...window }));
+    const clinic = windowsFrom(body);
+    const data = clinic.map((window) => ({ clinicId, ...window }));
     await this.prisma.$transaction(async (tx) => {
       await tx.clinicWindow.deleteMany({ where: { clinicId } });
       if (data.length > 0) await tx.clinicWindow.createMany({ data });
+      await clipDoctorHours(tx, clinicId, clinic);
     });
     return { count: data.length };
   }
@@ -137,7 +142,9 @@ export class SchedulingController {
   @Roles("DOCTOR")
   async setMyWindows(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ count: number }> {
     const doctor = await this.ownDoctor(actor);
-    const data = windowsFrom(body).map((window) => ({ doctorId: doctor.id, ...window }));
+    const windows = windowsFrom(body);
+    await this.assertDoctorWeek(doctor.clinicId, windows);
+    const data = windows.map((window) => ({ doctorId: doctor.id, ...window }));
     await this.prisma.$transaction(async (tx) => {
       await tx.scheduleWindow.deleteMany({ where: { doctorId: doctor.id } });
       if (data.length > 0) await tx.scheduleWindow.createMany({ data });
@@ -200,6 +207,14 @@ export class SchedulingController {
     });
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
     return { timeZone: doctor.clinic.timeZone };
+  }
+
+  private async assertDoctorWeek(clinicId: string, windows: StoredWindow[]): Promise<void> {
+    const clinic = await this.prisma.clinicWindow.findMany({
+      where: { clinicId },
+      select: { weekday: true, startMinute: true, endMinute: true },
+    });
+    assertInsideClinic(clinic, windows);
   }
 
   private async ownDoctor(actor: Actor): Promise<{ id: string; clinicId: string }> {

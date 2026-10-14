@@ -41,9 +41,18 @@ export async function withOpenSlot<T>(
 }
 
 function isSlotRace(error: unknown): boolean {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    return error.code === "P2002" || error.code === "P2034";
+  if (error instanceof Prisma.PrismaClientKnownRequestError && (error.code === "P2002" || error.code === "P2034")) {
+    return true;
   }
-  const text = error instanceof Error ? error.message : "";
+  const text = `${error instanceof Error ? error.message : ""} ${metaText(error)}`;
   return text.includes("23P01") || text.includes("Appointment_no_overlap");
+}
+
+function metaText(error: unknown): string {
+  if (!error || typeof error !== "object" || !("meta" in error)) return "";
+  try {
+    return JSON.stringify(error.meta);
+  } catch {
+    return "";
+  }
 }

@@ -61,7 +61,9 @@ async function expectRace(
   const lost = results.find((item): item is PromiseRejectedResult => item.status === "rejected");
   assert.equal(won.length, 1);
   assert.ok(lost);
-  assert.ok(lost.reason instanceof AppError);
+  if (!(lost.reason instanceof AppError)) {
+    throw new Error(raceDetail(lost.reason));
+  }
   assert.equal(lost.reason.code, "SLOT_UNAVAILABLE");
   assert.equal(lost.reason.status, 409);
   const spanEnd = firstEnd > secondEnd ? firstEnd : secondEnd;
@@ -148,6 +150,13 @@ async function wipeRaceClinics(prisma: PrismaClient): Promise<void> {
 
 function slug(value: string): string {
   return value.replace(/\s+/g, "-").toLowerCase();
+}
+
+function raceDetail(reason: unknown): string {
+  const name = reason instanceof Error ? reason.constructor.name : typeof reason;
+  const code = reason && typeof reason === "object" && "code" in reason ? String(reason.code) : "";
+  const text = reason instanceof Error ? reason.message.replace(/postgres(?:ql)?:\/\/\S+/gi, "[db]") : "";
+  return `expected AppError, got ${name} ${code} ${text.slice(0, 240)}`;
 }
 
 function readDatabaseUrl(): string {

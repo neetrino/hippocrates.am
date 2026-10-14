@@ -1,14 +1,22 @@
 import { AppError } from "../common/app-error";
 import { displayNameOf, recordOf, requiredPhoneOf } from "../common/input";
+import type { Actor } from "../identity/access";
 import type { PrismaService } from "../infrastructure/prisma.service";
 import { appointmentNotice, type NotificationsService } from "../notifications/notifications.service";
+import { appendCreated, visitActor } from "./appointment-machine";
 import { withOpenSlot } from "./book-slot";
 import { allowedStarts, clinicDate, instantOf, loadOffering } from "./visit-access";
 
 type Notices = NotificationsService;
 
 /** Books an agreed phone visit. One matching account is linked; otherwise the name and phone are kept. */
-export async function bookDeskVisit(prisma: PrismaService, notices: Notices, clinicId: string, body: unknown) {
+export async function bookDeskVisit(
+  prisma: PrismaService,
+  notices: Notices,
+  actor: Actor,
+  clinicId: string,
+  body: unknown,
+) {
   const input = recordOf(body);
   const name = displayNameOf(input.name);
   const phone = requiredPhoneOf(input.phone);
@@ -18,8 +26,8 @@ export async function bookDeskVisit(prisma: PrismaService, notices: Notices, cli
   await assertOpen(prisma, notices, offering, startsAt);
   const patientId = await onePatient(prisma, phone);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
-  const created = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, undefined, (tx) =>
-    tx.appointment.create({
+  const created = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, undefined, async (tx) => {
+    const row = await tx.appointment.create({
       data: {
         patientId,
         guestName: patientId ? null : name,
@@ -34,8 +42,10 @@ export async function bookDeskVisit(prisma: PrismaService, notices: Notices, cli
         status: "CONFIRMED",
         proposedBy: "STAFF",
       },
-    }),
-  );
+    });
+    await appendCreated(tx, row, visitActor(actor));
+    return row;
+  });
   await notices.afterAppointment(created, appointmentNotice.deskBooked);
   return { id: created.id };
 }

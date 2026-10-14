@@ -87,7 +87,7 @@ export class OperationsController {
   @Roles("ADMIN")
   bookVisit(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Body() body: unknown): Promise<{ id: string }> {
     requireClinicAdmin(actor, clinicId);
-    return bookDeskVisit(this.prisma, this.notices, clinicId, body);
+    return bookDeskVisit(this.prisma, this.notices, actor, clinicId, body);
   }
 
   @Get("clinics/:clinicId/patients/:patientId")

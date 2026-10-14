@@ -43,6 +43,23 @@ enum VerificationStatus {
   SUSPENDED
 }
 
+enum AppointmentEventType {
+  CREATED
+  CONFIRMED
+  CANCELLED
+  RESCHEDULED
+  EXPIRED
+  COMPLETED
+  NO_SHOW
+}
+
+enum AppointmentActorRole {
+  PATIENT
+  ADMIN
+  DOCTOR
+  SYSTEM
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -222,9 +239,27 @@ model Appointment {
   clinic        Clinic            @relation(fields: [clinicId], references: [id])
   offering      ServiceOffering   @relation(fields: [offeringId], references: [id])
   notifications Notification[]
+  events        AppointmentEvent[]
   review        Review?
 
   @@unique([patientId, idempotencyKey])
+}
+
+model AppointmentEvent {
+  id            String                @id @default(cuid())
+  appointmentId String
+  type          AppointmentEventType
+  fromStatus    AppointmentStatus?
+  toStatus      AppointmentStatus
+  actorUserId   String?
+  actorRole     AppointmentActorRole
+  reason        String?
+  fromStartsAt  DateTime?
+  toStartsAt    DateTime?
+  createdAt     DateTime              @default(now())
+  appointment   Appointment           @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId, createdAt])
 }
 
 model Notification {

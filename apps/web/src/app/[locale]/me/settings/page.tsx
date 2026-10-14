@@ -34,6 +34,8 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
           phone={me.phone}
           photoUrl={me.photoUrl}
           roleLabel={common("DOCTOR")}
+          photoLocked
+          photoHint={t("photoClinicOwned")}
         />
       </DoctorPortalShell>
     );

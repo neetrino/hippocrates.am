@@ -233,6 +233,7 @@
     "photoDelete": "Удалить фото",
     "photoFailed": "Фото не сохранилось",
     "photoInvalid": "Выберите JPG, PNG или WebP до 2 МБ",
+    "photoClinicOwned": "Это фото ставит клиника.",
     "save": "Сохранить",
     "saved": "Сохранено",
     "saveFailed": "Не сохранилось",

@@ -233,6 +233,7 @@
     "photoDelete": "Delete photo",
     "photoFailed": "The photo was not saved",
     "photoInvalid": "Choose a JPG, PNG, or WebP image under 2 MB",
+    "photoClinicOwned": "The clinic sets this photo.",
     "save": "Save",
     "saved": "Saved",
     "saveFailed": "Could not save",

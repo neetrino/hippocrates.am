@@ -17,8 +17,40 @@ type SettingsPhotoProps = {
   deleteAction: string;
   failed: string;
   invalid: string;
+  locked?: boolean;
+  hint?: string;
   action?: ReactNode;
 };
+
+function LockedPhoto({
+  name,
+  photoUrl,
+  roleLabel,
+  hint,
+  action,
+}: {
+  name: string;
+  photoUrl: string | null;
+  roleLabel: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="mb-6 border-b border-line pb-6">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-4">
+          <PatientAvatar name={name} photoUrl={photoUrl} className="h-20 w-20 text-2xl" />
+          <div className="min-w-0">
+            <p className="m-0 text-[0.72rem] font-bold tracking-[0.12em] text-accent uppercase">{roleLabel}</p>
+            <p className="m-0 font-display text-[1.45rem] leading-snug font-bold break-words text-ink">{name}</p>
+            {hint ? <p className="m-0 mt-1 text-sm text-muted">{hint}</p> : null}
+          </div>
+        </div>
+        {action}
+      </div>
+    </div>
+  );
+}
 
 async function sendPhoto(file: File): Promise<string | null> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -74,7 +106,22 @@ function PhotoMenu({
   );
 }
 
-export function SettingsPhoto({
+export function SettingsPhoto(props: SettingsPhotoProps) {
+  if (props.locked) {
+    return (
+      <LockedPhoto
+        name={props.name}
+        photoUrl={props.photoUrl}
+        roleLabel={props.roleLabel}
+        hint={props.hint}
+        action={props.action}
+      />
+    );
+  }
+  return <EditablePhoto {...props} />;
+}
+
+function EditablePhoto({
   name,
   photoUrl,
   roleLabel,

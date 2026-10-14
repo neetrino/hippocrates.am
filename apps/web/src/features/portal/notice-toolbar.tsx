@@ -6,8 +6,6 @@ import { cn } from "@/shared/ui/cn";
 export type NoticePending = "selected" | "read" | null;
 
 export function NoticeToolbar({
-  query,
-  placeholder,
   selecting,
   selectedCount,
   allSelected,
@@ -16,7 +14,6 @@ export function NoticeToolbar({
   filtersOpen,
   filtersActive,
   panelId,
-  onQuery,
   onStart,
   onCancel,
   onToggleAll,
@@ -24,8 +21,6 @@ export function NoticeToolbar({
   onConfirm,
   onToggleFilters,
 }: {
-  query: string;
-  placeholder: string;
   selecting: boolean;
   selectedCount: number;
   allSelected: boolean;
@@ -34,7 +29,6 @@ export function NoticeToolbar({
   filtersOpen: boolean;
   filtersActive: boolean;
   panelId: string;
-  onQuery: (value: string) => void;
   onStart: () => void;
   onCancel: () => void;
   onToggleAll: () => void;
@@ -45,15 +39,7 @@ export function NoticeToolbar({
   const t = useTranslations("me");
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <NoticeSearch
-        query={query}
-        placeholder={placeholder}
-        filtersOpen={filtersOpen}
-        filtersActive={filtersActive}
-        panelId={panelId}
-        onQuery={onQuery}
-        onToggleFilters={onToggleFilters}
-      />
+      <FilterButton open={filtersOpen} active={filtersActive} panelId={panelId} onToggle={onToggleFilters} />
       {pending ? (
         <ConfirmActions pending={pending} count={selectedCount} busy={busy} onConfirm={onConfirm} onCancel={() => onPending(null)} />
       ) : selecting ? (
@@ -75,52 +61,32 @@ export function NoticeToolbar({
   );
 }
 
-function NoticeSearch({
-  query,
-  placeholder,
-  filtersOpen,
-  filtersActive,
+function FilterButton({
+  open,
+  active,
   panelId,
-  onQuery,
-  onToggleFilters,
+  onToggle,
 }: {
-  query: string;
-  placeholder: string;
-  filtersOpen: boolean;
-  filtersActive: boolean;
+  open: boolean;
+  active: boolean;
   panelId: string;
-  onQuery: (value: string) => void;
-  onToggleFilters: () => void;
+  onToggle: () => void;
 }) {
   const catalog = useTranslations("catalog");
   return (
-    <div className="search-shell min-w-0 flex-1">
-      <span className="grid shrink-0 place-items-center pl-1 text-muted">
-        <SearchIcon />
-      </span>
-      <input
-        value={query}
-        placeholder={placeholder}
-        aria-label={placeholder}
-        autoComplete="off"
-        spellCheck={false}
-        className="min-w-0 flex-1 border-0 bg-transparent py-2 outline-none placeholder:text-[#9aa6a5]"
-        onChange={(event) => onQuery(event.target.value)}
-      />
-      <button
-        type="button"
-        className={cn(
-          "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-muted transition-[background,color] duration-160 hover:bg-sand hover:text-accent",
-          (filtersOpen || filtersActive) && "bg-accent-soft text-accent",
-        )}
-        aria-label={catalog("openFilters")}
-        aria-expanded={filtersOpen}
-        aria-controls={panelId}
-        onClick={onToggleFilters}
-      >
-        <FilterIcon />
-      </button>
-    </div>
+    <button
+      type="button"
+      className={cn(
+        "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border border-line bg-white text-muted transition-[background,color,border-color] duration-160 hover:border-accent/35 hover:text-accent",
+        (open || active) && "border-accent bg-accent-soft text-accent",
+      )}
+      aria-label={catalog("openFilters")}
+      aria-expanded={open}
+      aria-controls={panelId}
+      onClick={onToggle}
+    >
+      <FilterIcon />
+    </button>
   );
 }
 
@@ -188,15 +154,6 @@ function SelectActions({
         {common("cancel")}
       </button>
     </span>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-[18px] w-[18px]">
-      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-      <path d="M16.2 16.2L20 20" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
   );
 }
 

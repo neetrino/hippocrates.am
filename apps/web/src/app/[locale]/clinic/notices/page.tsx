@@ -3,7 +3,7 @@ import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
-import { doctorDisplayName, doctorNameSpellings } from "@/shared/clinic-label";
+import { doctorDisplayName } from "@/shared/clinic-label";
 import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
@@ -24,7 +24,7 @@ export default async function ClinicNoticesPage({ params }: { params: Promise<{ 
         {notices.length === 0 ? (
           <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
         ) : (
-          <NoticeList audience="clinic" rows={notices.map((notice) => toRow(notice, locale, t, t("noticeArrived")))} />
+          <NoticeList rows={notices.map((notice) => toRow(notice, locale, t, t("noticeArrived")))} />
         )}
       </section>
     </ClinicManagerShell>
@@ -50,6 +50,5 @@ function toRow(
     startsAt: visit?.startsAt ?? null,
     kind: noticeKind(notice.body),
     people: [patient, doctor].filter(Boolean),
-    nameSpellings: visit ? [patient, ...doctorNameSpellings(visit.doctor)].filter(Boolean) : [],
   };
 }

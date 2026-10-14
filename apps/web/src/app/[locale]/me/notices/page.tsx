@@ -4,7 +4,7 @@ import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
-import { clinicDisplayName, clinicNameSpellings, doctorDisplayName, doctorNameSpellings } from "@/shared/clinic-label";
+import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
@@ -38,7 +38,6 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
         <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
       ) : (
           <NoticeList
-            audience={me.role === "DOCTOR" ? "doctor" : "patient"}
             rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived"), me.role === "DOCTOR"))}
           />
       )}
@@ -80,8 +79,5 @@ function toRow(
     startsAt: visit?.startsAt ?? null,
     kind: noticeKind(notice.body),
     people: person ? [person] : [],
-    nameSpellings: visit
-      ? [...clinicNameSpellings(visit.clinic), ...(forDoctor ? (person ? [person] : []) : doctorNameSpellings(visit.doctor))]
-      : [],
   };
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { matchesNotice } from "@/features/portal/match-notice";
 import { deleteNotices, deleteReadNotices, markNoticesRead } from "@/features/portal/notice-api";
 import { NoticeFilterPanel } from "@/features/portal/notice-filter-panel";
 import {
@@ -17,8 +16,6 @@ import { NoticeToolbar, type NoticePending } from "@/features/portal/notice-tool
 import { noticePreviewLimit } from "@/shared/notice";
 import type { NoticeKind } from "@/shared/notice-text";
 
-export type NoticeAudience = "clinic" | "doctor" | "patient";
-
 export type NoticeRow = {
   id: string;
   text: string;
@@ -28,10 +25,9 @@ export type NoticeRow = {
   startsAt: string | null;
   kind: NoticeKind;
   people: string[];
-  nameSpellings: string[];
 };
 
-export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; audience: NoticeAudience }) {
+export function NoticeList({ rows: initial }: { rows: NoticeRow[] }) {
   const list = useNoticeList(initial);
   const view = useNoticeView(list.rows, list.unreadIds);
   const t = useTranslations("me");
@@ -42,7 +38,7 @@ export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; aud
   }
   return (
     <div className="grid gap-3">
-      <NoticeCommands audience={audience} list={list} view={view} />
+      <NoticeCommands list={list} view={view} />
       {list.failed ? <p className="m-0 text-sm text-danger">{t("deleteNoticesFailed")}</p> : null}
       {view.visible.length === 0 ? <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noticeSearchEmpty")}</p> : null}
       {shown.map((row) => (
@@ -66,16 +62,11 @@ export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; aud
 }
 
 function useNoticeView(rows: NoticeRow[], unreadIds: Set<string>) {
-  const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<NoticeFilters>(emptyNoticeFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const panelId = useId();
-  const visible = rows.filter(
-    (row) => matchesNotice(row, query) && matchesNoticeFilters(row, filters, unreadIds.has(row.id)),
-  );
+  const visible = rows.filter((row) => matchesNoticeFilters(row, filters, unreadIds.has(row.id)));
   return {
-    query,
-    setQuery,
     filters,
     setFilters,
     filtersOpen,
@@ -84,25 +75,20 @@ function useNoticeView(rows: NoticeRow[], unreadIds: Set<string>) {
     visible,
     people: noticePersonNames(rows),
     filtersActive: noticeFiltersActive(filters),
-    narrowing: query.trim().length > 0 || noticeFiltersActive(filters),
+    narrowing: noticeFiltersActive(filters),
   };
 }
 
 function NoticeCommands({
-  audience,
   list,
   view,
 }: {
-  audience: NoticeAudience;
   list: ReturnType<typeof useNoticeList>;
   view: ReturnType<typeof useNoticeView>;
 }) {
-  const t = useTranslations("me");
   return (
     <>
       <NoticeToolbar
-        query={view.query}
-        placeholder={t(searchHint(audience))}
         selecting={list.selecting}
         selectedCount={list.selected.size}
         allSelected={view.visible.length > 0 && view.visible.every((row) => list.selected.has(row.id))}
@@ -111,7 +97,6 @@ function NoticeCommands({
         filtersOpen={view.filtersOpen}
         filtersActive={view.filtersActive}
         panelId={view.panelId}
-        onQuery={view.setQuery}
         onStart={list.start}
         onCancel={list.cancel}
         onToggleAll={() => list.toggleVisible(view.visible.map((row) => row.id))}
@@ -129,12 +114,6 @@ function NoticeCommands({
       />
     </>
   );
-}
-
-function searchHint(audience: NoticeAudience): "noticeSearchClinic" | "noticeSearchDoctor" | "noticeSearchPatient" {
-  if (audience === "doctor") return "noticeSearchDoctor";
-  if (audience === "patient") return "noticeSearchPatient";
-  return "noticeSearchClinic";
 }
 
 function useNoticeList(initial: NoticeRow[]) {

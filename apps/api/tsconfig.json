@@ -18,5 +18,5 @@
     "noUncheckedIndexedAccess": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["src/**/*.spec.ts", "dist"]
+  "exclude": ["src/**/*.spec.ts", "src/**/*.concurrency.ts", "dist"]
 }

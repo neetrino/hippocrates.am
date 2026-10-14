@@ -41,5 +41,9 @@ export async function withOpenSlot<T>(
 }
 
 function isSlotRace(error: unknown): boolean {
-  return error instanceof Prisma.PrismaClientKnownRequestError && (error.code === "P2002" || error.code === "P2034");
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return error.code === "P2002" || error.code === "P2034";
+  }
+  const text = error instanceof Error ? error.message : "";
+  return text.includes("23P01") || text.includes("Appointment_no_overlap");
 }

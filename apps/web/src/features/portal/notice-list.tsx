@@ -28,6 +28,7 @@ export type NoticeRow = {
   startsAt: string | null;
   kind: NoticeKind;
   people: string[];
+  nameSpellings: string[];
 };
 
 export function NoticeList({ rows: initial, audience }: { rows: NoticeRow[]; audience: NoticeAudience }) {

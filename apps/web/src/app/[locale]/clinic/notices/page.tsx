@@ -3,7 +3,7 @@ import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
-import { doctorDisplayName } from "@/shared/clinic-label";
+import { doctorDisplayName, doctorNameSpellings } from "@/shared/clinic-label";
 import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
@@ -50,5 +50,6 @@ function toRow(
     startsAt: visit?.startsAt ?? null,
     kind: noticeKind(notice.body),
     people: [patient, doctor].filter(Boolean),
+    nameSpellings: visit ? [patient, ...doctorNameSpellings(visit.doctor)].filter(Boolean) : [],
   };
 }

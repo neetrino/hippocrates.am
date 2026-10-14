@@ -4,7 +4,7 @@ import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
-import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
+import { clinicDisplayName, clinicNameSpellings, doctorDisplayName, doctorNameSpellings } from "@/shared/clinic-label";
 import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
@@ -80,5 +80,8 @@ function toRow(
     startsAt: visit?.startsAt ?? null,
     kind: noticeKind(notice.body),
     people: person ? [person] : [],
+    nameSpellings: visit
+      ? [...clinicNameSpellings(visit.clinic), ...(forDoctor ? (person ? [person] : []) : doctorNameSpellings(visit.doctor))]
+      : [],
   };
 }

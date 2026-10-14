@@ -1,6 +1,6 @@
 # Hippocrates.am — Product brief
 
-> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. The reduced first-release pack is withdrawn. **Implementation:** not started. **Authority:** [ADR-003](architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md) and the canonical specification `docs/archive/expanded-v1/HIPPOCRATES_MASTER_SPEC (1).md`.
+> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. The reduced first-release pack is withdrawn. **Implementation:** in progress — see [PROGRESS.md](PROGRESS.md) and [NOW_VS_NEEDED_HY.md](NOW_VS_NEEDED_HY.md). **Authority:** [ADR-003](architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md). The file in `docs/archive/expanded-v1/` is the historical full spec, not the live repo map.
 
 ## Product purpose
 

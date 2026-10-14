@@ -1,6 +1,6 @@
 # Database design — Hippocrates.am
 
-> **CONCEPTUAL SCHEMA, NOT IMPLEMENTED MIGRATIONS.** Revised 2026-09-30. Early points use the tables below. Chat, Q&A, review, branch, invoice, and clinical tables are added on their points. Do not create them in the identity migration.
+> Revised 2026-10-14. The lists below are the **product target**. Prisma under `apps/api/prisma/` is the live schema. Chat, branch, invoice, and clinical tables still wait. `Question`, `Review`, `AppointmentEvent`, and `PasswordReset` already exist.
 
 ## Authoritative data groups
 
@@ -61,7 +61,9 @@ The diagram is conceptual; actual column names/types/keys require approved migra
 
 ## Appointment state and conflict integrity
 
-**Appointment states:** `REQUESTED`, `CONFIRMED`, `CANCELLED`, `COMPLETED`. `REQUESTED` and `CONFIRMED` occupy that doctor account's time. There is no cancellation cutoff and no automatic expiry. `COMPLETED` means the person attended. It is not a review and not a medical note.
+**Appointment states in the live schema:** `REQUESTED`, `CONFIRMED`, `CANCELLED`, `COMPLETED`, `EXPIRED`, `NO_SHOW`. `REQUESTED` and `CONFIRMED` occupy that doctor account's time. Unanswered `REQUESTED` rows become `EXPIRED` when the start time arrives. There is no patient cancellation cutoff. `COMPLETED` means the person attended. It is not a review and not a medical note.
+
+**AppointmentEvent** is append-only (`CREATED`, `CONFIRMED`, `CANCELLED`, `RESCHEDULED`, `EXPIRED`, `COMPLETED`, `NO_SHOW`). History starts at the event migration; older visits are not backfilled. Notifications are in-app `Notification` rows. There is no `NotificationIntent` / delivery-attempt table yet.
 
 **Required invariant:** one doctor may have **at most one overlapping active appointment** for a given interval. Option A: PostgreSQL range/exclusion constraint on doctor ID and `[start,end)` with partial active-status predicate. Combine with ordered transaction locking as appropriate, or a proved alternative with a database-backed concurrency test. If Prisma lacks direct support for the chosen constraint, use an explicitly reviewed SQL migration.
 
@@ -69,7 +71,7 @@ Appointment creation transaction:
 
 1. Authorize patient; validate clinic, approved doctor, active clinic assignment, published eligible offering, schedule/unavailability and UTC range.
 2. Authoritatively reject conflicting active occupancy in a serializable/constraint-protected transaction; enforce idempotency key/payload fingerprint.
-3. Create `REQUESTED` appointment and append minimal `AppointmentEvent`; persist basic in-app `Notification` and/or a conditional outbox delivery intent in the same transaction.
+3. Create `REQUESTED` appointment and append `AppointmentEvent` in the same occupancy transaction. Persist the in-app `Notification` after commit so a notice failure does not roll back the booking. Outbox email/SMS delivery is not built.
 4. Return safe conflict `409` without revealing another patient's/clinic's appointment details.
 
 Cancellation transaction validates actor, policy, status, and updates appointment to `CANCELLED`, releases occupancy and appends event atomically. Retain the historical appointment. Never trust cached availability as reservation proof.
@@ -90,6 +92,6 @@ Cancellation transaction validates actor, policy, status, and updates appointmen
 
 ## Tables that wait for their point
 
-Do not create `Conversation`, `Message`, `PublicQuestion`, `ClinicReview`, `Branch`, `TreatmentPlan`, `MedicalNote`, imaging, invoice, or payment tables in P0 or P1. Booking-price totals on P5 are queries, not a ledger. Invoices start on P9. Clinical tables start on P10.
+Do not create `Conversation`, `Message`, `Branch`, `TreatmentPlan`, `MedicalNote`, imaging, invoice, or payment tables until their point. `Question`, `Answer`, and `Review` already exist. Booking-price totals on P5 are queries, not a ledger. Invoices start on P9. Clinical tables start on P10.
 
 **Still open:** production data residency and the file-storage vendor. Accepted: email login, 12-hour sessions, private verification evidence, and the point order in `PROGRESS.md`. `BRIEF.md` and `ADR-003` are product authority.

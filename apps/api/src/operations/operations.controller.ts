@@ -11,6 +11,7 @@ import { bookDeskVisit } from "../appointments/desk-booking";
 import { countClinicPatients, listClinicPatients } from "../appointments/guest-visits";
 import { liveListing } from "../catalog/public-visible";
 import { financeWindow } from "./finance-range";
+import { applyVerification, countPendingReviews, decisionOf, kindOf, listAdminClinics, listVerificationQueue } from "./verification";
 
 @Controller()
 export class OperationsController {
@@ -40,12 +41,39 @@ export class OperationsController {
   @Roles("SUPER_ADMIN")
   async platformSummary(@CurrentActor() actor: Actor) {
     requireRoles(actor, ["SUPER_ADMIN"]);
-    const [clinics, pendingQuestions, publishedDoctors] = await Promise.all([
+    const [clinics, pendingQuestions, publishedDoctors, pendingReviews] = await Promise.all([
       this.prisma.clinic.count(),
       this.prisma.question.count({ where: { status: "PENDING" } }),
       this.prisma.doctorProfile.count({ where: liveListing }),
+      countPendingReviews(this.prisma),
     ]);
-    return { clinics, pendingQuestions, publishedDoctors };
+    return { clinics, pendingQuestions, publishedDoctors, pendingReviews };
+  }
+
+  @Get("admin/verification")
+  @Roles("SUPER_ADMIN")
+  listVerification(@CurrentActor() actor: Actor) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return listVerificationQueue(this.prisma);
+  }
+
+  @Post("admin/verification/:kind/:id")
+  @Roles("SUPER_ADMIN")
+  decideVerification(
+    @CurrentActor() actor: Actor,
+    @Param("kind") kind: string,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return applyVerification(this.prisma, kindOf(kind), id, decisionOf(body));
+  }
+
+  @Get("admin/clinics")
+  @Roles("SUPER_ADMIN")
+  adminClinics(@CurrentActor() actor: Actor) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return listAdminClinics(this.prisma);
   }
 
   @Get("clinics/:clinicId/patients")

@@ -49,8 +49,8 @@ export class DoctorsController {
           clinicId,
           specialty: requiredString(input.specialty, "Մասնագիտություն"),
           bio: optionalString(input.bio),
-          published: true,
-          verificationStatus: "APPROVED",
+          published: false,
+          verificationStatus: "SUBMITTED",
         },
       });
     });
@@ -70,6 +70,7 @@ export class DoctorsController {
         bio: true,
         photoKey: true,
         published: true,
+        verificationStatus: true,
         user: { select: { displayName: true, email: true } },
         locales: { select: { locale: true, name: true, specialty: true, bio: true } },
       },
@@ -79,6 +80,7 @@ export class DoctorsController {
       specialty: doctor.specialty,
       bio: doctor.bio,
       published: doctor.published,
+      verificationStatus: doctor.verificationStatus,
       photoUrl: publicAssetUrl(doctor.photoKey),
       user: doctor.user,
       locales: doctor.locales,

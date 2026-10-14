@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { DeleteClinic } from "@/features/portal/delete-clinic";
+import { VerificationActions } from "@/features/portal/verification-actions";
+import { StatusChip } from "@/features/portal/verification-board";
 import { Link } from "@/i18n/navigation";
 import { formatAmount, formatWhen } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
@@ -19,10 +21,12 @@ export type ClinicOverview = {
   id: string;
   phone: string;
   coverUrl: string | null;
+  verificationStatus: string;
+  published: boolean;
   admin: { displayName: string; email: string };
   copies: ClinicCopyView[];
   branches: { id: string; name: string; address: string }[];
-  doctors: { id: string; displayName: string; specialty: string; published: boolean }[];
+  doctors: { id: string; displayName: string; specialty: string; published: boolean; verificationStatus: string }[];
   offerings: { id: string; name: string; priceAmd: number; isEstimate: boolean; durationMinutes: number; doctorName: string }[];
   reviews: { id: string; rating: number; body: string; reply: string | null; createdAt: string }[];
   reviewCount: number;
@@ -145,9 +149,12 @@ async function DoctorSection({ doctors }: { doctors: ClinicOverview["doctors"] }
               <strong>{doctor.displayName}</strong>
               <span className="text-muted"> · {doctor.specialty}</span>
             </p>
-            {doctor.published ? null : (
-              <span className="shrink-0 rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted">{portal("hidden")}</span>
-            )}
+            <span className="flex shrink-0 items-center gap-2">
+              <StatusChip status={doctor.verificationStatus} />
+              {doctor.published ? null : (
+                <span className="rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted">{portal("hidden")}</span>
+              )}
+            </span>
           </div>
         ))}
       </div>
@@ -216,6 +223,15 @@ export async function ClinicOverviewView({ clinic, locale }: { clinic: ClinicOve
         </span>
         {portal("backToClinics")}
       </Link>
+      <section className="grid gap-4 rounded-card bg-white p-5 shadow-soft md:flex md:items-center md:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusChip status={clinic.verificationStatus} />
+          {clinic.published ? null : (
+            <span className="rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted">{portal("hidden")}</span>
+          )}
+        </div>
+        <VerificationActions kind="clinic" id={clinic.id} status={clinic.verificationStatus} />
+      </section>
       <ClinicHero clinic={clinic} source={source} />
       <LanguageSection copies={clinic.copies} />
       <AdminSection admin={clinic.admin} />

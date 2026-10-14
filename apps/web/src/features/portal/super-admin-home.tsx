@@ -8,6 +8,7 @@ export type PlatformSummary = {
   clinics: number;
   pendingQuestions: number;
   publishedDoctors: number;
+  pendingReviews: number;
 };
 
 type SuperAdminHomeProps = {
@@ -34,9 +35,12 @@ export async function SuperAdminHome({ me, summary }: SuperAdminHomeProps) {
   return (
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={me.displayName}>
       <div className="grid gap-5">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <Link href="/super-admin/clinics" className={`${statCard} transition-shadow duration-160 hover:shadow-accent`}>
             <StatValue label={portal("statClinics")} value={summary.clinics} />
+          </Link>
+          <Link href="/super-admin/verification" className={`${statCard} transition-shadow duration-160 hover:shadow-accent`}>
+            <StatValue label={portal("statPendingReviews")} value={summary.pendingReviews} />
           </Link>
           <Link href="/super-admin/questions" className={`${statCard} transition-shadow duration-160 hover:shadow-accent`}>
             <StatValue label={portal("statPendingQuestions")} value={summary.pendingQuestions} />

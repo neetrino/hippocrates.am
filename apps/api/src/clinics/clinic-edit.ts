@@ -1,4 +1,6 @@
 import { MAIN_BRANCH_NAME } from "./branch-edit";
+import { assertCanPublish } from "../catalog/publish-guard";
+import { AppError } from "../common/app-error";
 import { recordOf, requiredPhoneOf } from "../common/input";
 import type { PrismaService } from "../infrastructure/prisma.service";
 
@@ -10,6 +12,9 @@ export async function updateClinicProfile(
 ): Promise<{ id: string }> {
   const input = recordOf(body);
   const address = typeof input.address === "string" ? input.address.trim() : undefined;
+  const current = await prisma.clinic.findUnique({ where: { id: clinicId }, select: { verificationStatus: true } });
+  if (!current) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
+  assertCanPublish(current.verificationStatus, typeof input.published === "boolean" ? input.published : undefined);
   await prisma.$transaction(async (tx) => {
     await tx.clinic.update({
       where: { id: clinicId },

@@ -24,12 +24,14 @@ const overviewSelect = {
   phone: true,
   description: true,
   coverKey: true,
+  verificationStatus: true,
+  published: true,
   owner: { select: { displayName: true, email: true } },
   locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
   branches: { orderBy: { name: "asc" }, select: { id: true, name: true, address: true } },
   doctors: {
     orderBy: { user: { displayName: "asc" } },
-    select: { id: true, specialty: true, published: true, user: { select: { displayName: true } } },
+    select: { id: true, specialty: true, published: true, verificationStatus: true, user: { select: { displayName: true } } },
   },
   offerings: {
     orderBy: { name: "asc" },
@@ -63,6 +65,8 @@ function toOverview(clinic: OverviewRow) {
     id: clinic.id,
     phone: clinic.phone,
     coverUrl: publicAssetUrl(clinic.coverKey),
+    verificationStatus: clinic.verificationStatus,
+    published: clinic.published,
     admin: clinic.owner,
     copies: copyLocales.map((locale) => ({ locale, ...storedCopy(locale, clinic, clinic.locales) })),
     branches: clinic.branches,
@@ -71,6 +75,7 @@ function toOverview(clinic: OverviewRow) {
       displayName: doctor.user.displayName,
       specialty: doctor.specialty,
       published: doctor.published,
+      verificationStatus: doctor.verificationStatus,
     })),
     offerings: clinic.offerings.map((item) => ({
       id: item.id,

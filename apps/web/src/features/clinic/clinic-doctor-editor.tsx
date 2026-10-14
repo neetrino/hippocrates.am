@@ -13,6 +13,7 @@ export type DoctorRow = {
   specialty: string;
   bio: string;
   published?: boolean;
+  verificationStatus?: string;
   photoUrl: string | null;
   user: { displayName: string };
   locales: { locale: string; name: string; specialty: string; bio: string }[];
@@ -24,6 +25,7 @@ export type DoctorDraft = {
   specialty: string;
   bio: string;
   published: boolean;
+  verificationStatus?: string;
   photoUrl: string | null;
   en: Copy;
   ru: Copy;
@@ -40,6 +42,7 @@ export function toDoctorDraft(doctor: DoctorRow): DoctorDraft {
     specialty: doctor.specialty,
     bio: doctor.bio,
     published: doctor.published !== false,
+    verificationStatus: doctor.verificationStatus,
     photoUrl: doctor.photoUrl,
     en: copyOf(doctor, "en"),
     ru: copyOf(doctor, "ru"),
@@ -69,9 +72,13 @@ export function DoctorCard({
           </span>
         </span>
         <span className="flex items-center gap-3">
-          <span className={live ? "rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white" : "rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted"}>
-            {live ? t("published") : t("hidden")}
-          </span>
+          {doctor.verificationStatus && doctor.verificationStatus !== "APPROVED" ? (
+            <span className="rounded-full bg-[#2a4a47]/8 px-2.5 py-1 text-xs font-semibold text-[#2a4a47]">{t("verifyWaitHint")}</span>
+          ) : (
+            <span className={live ? "rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white" : "rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted"}>
+              {live ? t("published") : t("hidden")}
+            </span>
+          )}
           <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setOpen((value) => !value)}>
             {t("edit")}
           </button>
@@ -129,9 +136,17 @@ function DoctorForm({ clinicId, doctor }: { clinicId: string; doctor: DoctorDraf
         <textarea className={`${controlClass} min-h-[96px] resize-y`} maxLength={600} rows={4} value={copy.bio} onChange={(event) => form.setField("bio", event.target.value)} />
       </label>
       <label className="flex items-center gap-2 text-[0.92rem] font-semibold">
-        <input type="checkbox" checked={form.published} onChange={(event) => form.setPublished(event.target.checked)} />
+        <input
+          type="checkbox"
+          checked={form.published}
+          disabled={doctor.verificationStatus !== undefined && doctor.verificationStatus !== "APPROVED"}
+          onChange={(event) => form.setPublished(event.target.checked)}
+        />
         {t("published")}
       </label>
+      {doctor.verificationStatus && doctor.verificationStatus !== "APPROVED" ? (
+        <p className="m-0 text-sm text-muted">{t("publishedNeedsApproval")}</p>
+      ) : null}
       <button className="btn btn-primary w-fit" type="submit">{t("save")}</button>
       {form.message ? <p className={form.failed ? "m-0 text-danger" : "m-0 text-muted"}>{form.message}</p> : null}
     </form>

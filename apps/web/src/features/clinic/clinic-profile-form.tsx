@@ -12,6 +12,7 @@ export type ClinicProfile = {
   phone: string;
   district: string;
   published?: boolean;
+  verificationStatus?: string;
   coverUrl: string | null;
 };
 
@@ -53,9 +54,13 @@ export function ClinicIdentityCard({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <h2 className="m-0">{copy.name}</h2>
             <span className="flex items-center gap-3">
-              <span className={live ? "rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white" : "rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted"}>
-                {live ? t("published") : t("hidden")}
-              </span>
+              {clinic.verificationStatus && clinic.verificationStatus !== "APPROVED" ? (
+                <span className="rounded-full bg-[#2a4a47]/8 px-2.5 py-1 text-xs font-semibold text-[#2a4a47]">{t("verifyWaitHint")}</span>
+              ) : (
+                <span className={live ? "rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white" : "rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted"}>
+                  {live ? t("published") : t("hidden")}
+                </span>
+              )}
               <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setEditing(true)}>
                 {t("edit")}
               </button>
@@ -118,9 +123,17 @@ function ClinicProfileForm({
       <CopyFields copy={shownCopy(form.locale, form.hy, form.copies)} labels={labels} required={form.locale === "hy"} onChange={form.setField} />
       <PhoneField label={platform("phone")} phone={clinic.phone} />
       <label className="flex items-center gap-2 text-[0.92rem] font-semibold">
-        <input type="checkbox" checked={form.published} onChange={(event) => form.setPublished(event.target.checked)} />
+        <input
+          type="checkbox"
+          checked={form.published}
+          disabled={clinic.verificationStatus !== undefined && clinic.verificationStatus !== "APPROVED"}
+          onChange={(event) => form.setPublished(event.target.checked)}
+        />
         {t("published")}
       </label>
+      {clinic.verificationStatus && clinic.verificationStatus !== "APPROVED" ? (
+        <p className="m-0 text-sm text-muted">{t("publishedNeedsApproval")}</p>
+      ) : null}
       <FormActions failed={form.failed} message={form.message} onClose={onClose} />
     </form>
   );

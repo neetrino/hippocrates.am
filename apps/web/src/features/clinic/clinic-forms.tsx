@@ -77,6 +77,7 @@ export function ClinicDoctorForm({ clinicId, onClose }: { clinicId: string; onCl
         />
       </label>
       <label className={fieldClass}>{catalog("specialty")}<input name="specialty" required className={controlClass} /></label>
+      <p className="m-0 text-sm text-muted">{t("doctorNeedsApproval")}</p>
       <div className="flex flex-wrap gap-2">
         <button className="btn btn-primary w-fit" type="submit">{t("saveDoctor")}</button>
         <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>

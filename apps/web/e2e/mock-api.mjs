@@ -46,7 +46,7 @@ function roleFromCookie(cookie = "") {
 
 function json(response, status, body) {
   response.writeHead(status, {
-    "access-control-allow-origin": "http://127.0.0.1:3000",
+    "access-control-allow-origin": "http://127.0.0.1:3100",
     "content-type": "application/json",
   });
   response.end(JSON.stringify(body));

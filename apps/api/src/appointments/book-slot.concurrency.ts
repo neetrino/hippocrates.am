@@ -1,9 +1,8 @@
 import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client";
 import { AppError } from "../common/app-error";
 import { createDatabasePool } from "../infrastructure/database-pool";
+import { PrismaService } from "../infrastructure/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { withOpenSlot } from "./book-slot";
 import { bookVisit } from "./visit-commands";
@@ -11,7 +10,7 @@ import { bookVisit } from "./visit-commands";
 const fixturePrefix = "race-fixture ";
 
 type Fixture = {
-  prisma: PrismaClient;
+  prisma: PrismaService;
   clinicId: string;
   doctorId: string;
   offeringId: string;
@@ -120,7 +119,7 @@ async function expectIdempotentBooking(fixture: Fixture): Promise<void> {
 }
 
 async function openFixture(url: string): Promise<Fixture> {
-  const prisma = new PrismaClient({ adapter: new PrismaPg(createDatabasePool(url), { disposeExternalPool: true }) });
+  const prisma = new PrismaService(createDatabasePool(url));
   await wipeRaceClinics(prisma);
   const mark = `${fixturePrefix}${randomBytes(4).toString("hex")}`;
   const owner = await prisma.user.create({
@@ -181,7 +180,7 @@ async function openFixture(url: string): Promise<Fixture> {
   };
 }
 
-async function wipeRaceClinics(prisma: PrismaClient): Promise<void> {
+async function wipeRaceClinics(prisma: PrismaService): Promise<void> {
   const leftovers = await prisma.clinic.findMany({
     where: { name: { startsWith: fixturePrefix } },
     select: { id: true },

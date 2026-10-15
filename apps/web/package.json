@@ -7,7 +7,7 @@
     "start": "dotenv -e ../../.env -- next start -p 3000",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint . --max-warnings=0",
-    "test": "vitest run",
+    "test": "vitest run src",
     "test:e2e": "playwright test"
   },
   "dependencies": {

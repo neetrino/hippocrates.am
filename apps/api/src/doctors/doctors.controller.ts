@@ -42,7 +42,7 @@ export class DoctorsController {
         data: {
           email,
           passwordHash,
-          displayName: requiredString(input.displayName, "Բժշկի անուն"),
+          displayName: requiredString(input.displayName, "Բժշկի անուն", 80),
           role: "DOCTOR",
           clinicId,
         },
@@ -51,8 +51,8 @@ export class DoctorsController {
         data: {
           userId: user.id,
           clinicId,
-          specialty: requiredString(input.specialty, "Մասնագիտություն"),
-          bio: optionalString(input.bio),
+          specialty: requiredString(input.specialty, "Մասնագիտություն", 80),
+          bio: optionalString(input.bio, 600),
           published: false,
           verificationStatus: "SUBMITTED",
         },

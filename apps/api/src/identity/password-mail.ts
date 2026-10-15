@@ -34,7 +34,7 @@ export function assertResetMail(): void {
 export async function deliverResetLink(email: string, token: string, locale: ResetLocale): Promise<void> {
   const url = resetLink(token, locale);
   if (!mailReady()) {
-    logger.log(`Password reset link for ${email}: ${url}`);
+    logger.log(`Local password reset link: ${url}`);
     return;
   }
   try {

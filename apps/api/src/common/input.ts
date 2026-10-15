@@ -81,8 +81,12 @@ export function intOf(value: unknown, field: string, min: number, max: number): 
   return number;
 }
 
-export function optionalString(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
+export function optionalString(value: unknown, maxLength?: number): string {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (maxLength !== undefined && text.length > maxLength) {
+    throw new AppError("VALIDATION_FAILED", 400, "Տեքստը չափազանց երկար է");
+  }
+  return text;
 }
 
 export function recordOf(value: unknown): Record<string, unknown> {

@@ -10,7 +10,7 @@
     "lint": "pnpm -r --if-present lint",
     "codegen": "pnpm --filter @hippocrates/api db:generate",
     "typecheck": "pnpm codegen && pnpm -r --if-present typecheck",
-    "test": "pnpm codegen && pnpm --filter @hippocrates/api test",
+    "test": "pnpm codegen && pnpm -r --if-present test",
     "build": "pnpm codegen && pnpm -r --if-present build",
     "ci:guard": "node scripts/ci/repo-guard.mjs",
     "db:migrate": "pnpm --filter @hippocrates/api db:migrate",

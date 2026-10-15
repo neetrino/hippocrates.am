@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { loadClinicLocales, localeCopies, saveClinicLocale, sourceClinicText } from "../catalog/clinic-locale-store";
@@ -7,12 +8,14 @@ import { deleteBranch, MAIN_BRANCH_NAME, updateBranch } from "./branch-edit";
 import { updateClinicProfile } from "./clinic-edit";
 import { clearClinicCover, saveClinicCover } from "./clinic-cover";
 import { AppError } from "../common/app-error";
-import { emailOf, optionalString, passwordOf, recordOf, requiredPhoneOf, requiredString } from "../common/input";
+import { emailOf, optionalString, recordOf, requiredPhoneOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { assertResetMail } from "../identity/password-mail";
+import { requestPasswordReset } from "../identity/password-reset";
 import { RateLimitService } from "../identity/rate-limit.service";
 import { SessionService } from "../identity/session.service";
 
@@ -30,18 +33,19 @@ export class ClinicsController {
     requireRoles(actor, ["SUPER_ADMIN"]);
     const input = recordOf(body);
     const email = emailOf(input.adminEmail);
+    assertResetMail();
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
     const text = sourceClinicText(input);
     const copies = localeCopies(input.locales);
-    const passwordHash = await this.sessions.hashPassword(passwordOf(input.adminPassword));
+    const passwordHash = await this.sessions.hashPassword(randomBytes(32).toString("base64url"));
     const phone = requiredPhoneOf(input.phone);
     const clinic = await this.prisma.$transaction(async (tx) => {
       const admin = await tx.user.create({
         data: {
           email,
           passwordHash,
-          displayName: requiredString(input.adminName, "Ադմինի անուն"),
+          displayName: requiredString(input.adminName, "Ադմինի անուն", 80),
           role: "ADMIN",
         },
       });
@@ -57,6 +61,7 @@ export class ClinicsController {
       }
       return created;
     });
+    await requestPasswordReset(this.prisma, email, input.locale);
     return { clinicId: clinic.id };
   }
 
@@ -132,7 +137,7 @@ export class ClinicsController {
   ): Promise<{ id: string }> {
     requireClinicAdmin(actor, clinicId);
     const input = recordOf(body);
-    const name = requiredString(input.name, "Մասնաճյուղ");
+    const name = requiredString(input.name, "Մասնաճյուղ", 80);
     if (name === MAIN_BRANCH_NAME) {
       throw new AppError("VALIDATION_FAILED", 400, "Այս անունը վերապահված է գլխավոր հասցեի համար");
     }
@@ -140,7 +145,7 @@ export class ClinicsController {
       data: {
         clinicId,
         name,
-        address: optionalString(input.address),
+        address: optionalString(input.address, 160),
       },
     });
     return { id: branch.id };

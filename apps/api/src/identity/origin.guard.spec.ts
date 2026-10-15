@@ -1,4 +1,4 @@
-import { assertTrustedOrigin } from "./origin.guard";
+import { assertTrustedOrigin } from "./origin-policy";
 
 describe("OriginGuard", () => {
   const webUrl = "http://localhost:3000";

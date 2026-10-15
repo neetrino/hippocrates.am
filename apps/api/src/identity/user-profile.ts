@@ -43,7 +43,7 @@ async function assertEmailChange(
   email: string,
   currentPassword: unknown,
 ): Promise<void> {
-  const password = requiredString(currentPassword, "Ընթացիկ գաղտնաբառ");
+  const password = requiredString(currentPassword, "Ընթացիկ գաղտնաբառ", 128);
   const valid = await sessions.verifyPassword(password, passwordHash);
   if (!valid) throw new AppError("VALIDATION_FAILED", 400, "Ընթացիկ գաղտնաբառը սխալ է");
   const taken = await prisma.user.findUnique({ where: { email }, select: { id: true } });
@@ -58,9 +58,9 @@ export async function changeOwnPassword(
   body: unknown,
 ): Promise<void> {
   const input = recordOf(body);
-  const current = requiredString(input.currentPassword, "Ընթացիկ գաղտնաբառ");
+  const current = requiredString(input.currentPassword, "Ընթացիկ գաղտնաբառ", 128);
   const password = passwordOf(input.password);
-  const confirm = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը");
+  const confirm = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը", 128);
   if (password !== confirm) {
     throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
   }

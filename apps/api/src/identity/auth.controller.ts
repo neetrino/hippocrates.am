@@ -35,7 +35,7 @@ export class AuthController {
     const phone = requiredPhoneOf(input.phone);
     const email = emailOf(input.email);
     const password = passwordOf(input.password);
-    const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը");
+    const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը", 128);
     if (password !== confirmPassword) {
       throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
     }
@@ -65,9 +65,9 @@ export class AuthController {
     await this.limits.consume(`login:${request.ip ?? "unknown"}`, 10, 60 * 1000);
     const input = recordOf(body);
     const email = emailOf(input.email);
-    const password = requiredString(input.password, "Գաղտնաբառ");
+    const password = requiredString(input.password, "Գաղտնաբառ", 128);
     const user = await this.prisma.user.findUnique({ where: { email } });
-    const valid = user ? await this.sessions.verifyPassword(password, user.passwordHash) : false;
+    const valid = await this.sessions.verifyLoginPassword(password, user?.passwordHash);
     if (!user || !valid) throw new AppError("INVALID_LOGIN", 401, "Էլ. փոստը կամ գաղտնաբառը սխալ է");
     await this.sessions.open(response, user.id);
     return { id: user.id, role: user.role };

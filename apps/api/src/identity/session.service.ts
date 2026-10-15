@@ -9,6 +9,10 @@ const DEFAULT_SESSION_HOURS = 12;
 
 @Injectable()
 export class SessionService {
+  private readonly dummyPasswordHash = argon2.hash(randomBytes(32).toString("base64url"), {
+    type: argon2.argon2id,
+  });
+
   constructor(private readonly prisma: PrismaService) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -17,6 +21,11 @@ export class SessionService {
 
   async verifyPassword(password: string, passwordHash: string): Promise<boolean> {
     return argon2.verify(passwordHash, password);
+  }
+
+  async verifyLoginPassword(password: string, passwordHash: string | undefined): Promise<boolean> {
+    const valid = await argon2.verify(passwordHash ?? await this.dummyPasswordHash, password);
+    return passwordHash !== undefined && valid;
   }
 
   async open(response: Response, userId: string): Promise<void> {

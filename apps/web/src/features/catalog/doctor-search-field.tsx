@@ -71,7 +71,7 @@ function DoctorSuggestionList({
     >
       {doctors.length === 0 ? <li className="px-4 py-3 text-muted">{emptyLabel}</li> : null}
       {doctors.map((doctor) => (
-        <li key={doctor.id} role="option" aria-selected={false}>
+        <li key={doctor.id} role="option">
           <Link
             href={`/doctors/${doctor.id}`}
             className="grid gap-0.5 px-4 py-3 transition-colors duration-160 hover:bg-sand"

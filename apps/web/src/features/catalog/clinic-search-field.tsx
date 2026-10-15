@@ -71,7 +71,7 @@ function ClinicSuggestionList({
     >
       {clinics.length === 0 ? <li className="px-4 py-3 text-muted">{emptyLabel}</li> : null}
       {clinics.map((clinic) => (
-        <li key={clinic.id} role="option" aria-selected={false}>
+        <li key={clinic.id} role="option">
           <Link
             href={`/clinics/${clinic.id}`}
             className="grid gap-0.5 px-4 py-3 transition-colors duration-160 hover:bg-sand"

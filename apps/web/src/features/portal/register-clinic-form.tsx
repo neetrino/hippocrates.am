@@ -169,10 +169,7 @@ async function submitDraft(
       locales: { ...(en ? { en } : {}), ...(ru ? { ru } : {}) },
     }),
   });
-  if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
-    return body?.error?.message || failed;
-  }
+  if (!response.ok) return failed;
   return null;
 }
 

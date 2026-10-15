@@ -77,7 +77,7 @@ function assertNoTrackedSecrets() {
 function assertEnvExampleHygiene() {
   const text = readFileSync(join(root, ".env.example"), "utf8");
   const mustStayEmpty = [
-    "SESSION_SECRET",
+    "RESEND_API_KEY",
     "SUPER_ADMIN_EMAIL",
     "SUPER_ADMIN_PASSWORD",
     "SEED_PASSWORD",

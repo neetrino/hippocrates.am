@@ -36,19 +36,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # 127.0.0.1 avoids the runner resolving localhost to IPv6 while Postgres listens on IPv4.
-      DATABASE_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates
-      DIRECT_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates
+      DATABASE_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates_test
+      DIRECT_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates_test
+      TEST_DATABASE_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates_test
     services:
       postgres:
         image: postgres:17
         env:
           POSTGRES_USER: hippocrates
           POSTGRES_PASSWORD: hippocrates
-          POSTGRES_DB: hippocrates
+          POSTGRES_DB: hippocrates_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U hippocrates -d hippocrates"
+          --health-cmd "pg_isready -U hippocrates -d hippocrates_test"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -71,7 +72,6 @@ jobs:
       - name: Prepare CI environment
         run: |
           cp .env.example .env
-          sed -i 's/^SESSION_SECRET=""/SESSION_SECRET="ci-session-secret-at-least-32-chars"/' .env
           sed -i 's/@localhost:5432/@127.0.0.1:5432/' .env
 
       - name: Validate Prisma schema
@@ -114,10 +114,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Informational until Prisma transitive highs are resolved upstream.
       - name: Audit dependencies (high+)
         run: pnpm audit --audit-level=high
-        continue-on-error: true
 
       - name: Audit dependencies (critical)
         run: pnpm audit --audit-level=critical

@@ -224,6 +224,5 @@ async function saveDeskVisit(input: {
     window.location.reload();
     return;
   }
-  const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
-  input.setNote(body?.error?.message || input.failed);
+  input.setNote(input.failed);
 }

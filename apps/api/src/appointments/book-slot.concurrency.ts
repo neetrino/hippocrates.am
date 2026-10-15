@@ -1,7 +1,5 @@
-import { readFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
-import path from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
 import { AppError } from "../common/app-error";
@@ -20,7 +18,7 @@ type Fixture = {
 async function main(): Promise<void> {
   const url = readDatabaseUrl();
   if (!url) {
-    process.stdout.write("skip withOpenSlot concurrency: DATABASE_URL is not set\n");
+    process.stdout.write("skip withOpenSlot concurrency: TEST_DATABASE_URL is not set\n");
     return;
   }
   const fixture = await openFixture(url);
@@ -162,25 +160,18 @@ function raceDetail(reason: unknown): string {
 }
 
 function readDatabaseUrl(): string {
-  const existing = process.env.DATABASE_URL?.trim() ?? "";
-  if (existing) return existing;
+  const value = process.env.TEST_DATABASE_URL?.trim() ?? "";
+  if (!value) return "";
   try {
-    const text = readFileSync(path.resolve(__dirname, "../../../../.env"), "utf8");
-    for (const line of text.split(/\r?\n/)) {
-      if (!line.startsWith("DATABASE_URL=")) continue;
-      let value = line.slice("DATABASE_URL=".length).trim();
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-      return value;
+    const databaseName = decodeURIComponent(new URL(value).pathname.replace(/^\//, "")).toLowerCase();
+    if (!databaseName.includes("test")) {
+      throw new Error("TEST_DATABASE_URL must name an isolated test database");
     }
-  } catch {
-    return "";
+    return value;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("isolated test database")) throw error;
+    throw new Error("TEST_DATABASE_URL must be a valid PostgreSQL URL");
   }
-  return "";
 }
 
 void main().catch((error: unknown) => {

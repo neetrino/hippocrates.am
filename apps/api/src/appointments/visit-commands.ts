@@ -14,33 +14,41 @@ type Notices = NotificationsService;
 export async function bookVisit(prisma: PrismaService, notices: Notices, patientId: string, body: unknown) {
   const input = recordOf(body);
   const startsAt = instantOf(input.startsAt);
-  const idempotencyKey = typeof input.idempotencyKey === "string" ? input.idempotencyKey : undefined;
+  const idempotencyKey = requiredString(input.idempotencyKey, "Կրկնակի հարցման բանալի", 80);
   const existing = await existingBooking(prisma, patientId, idempotencyKey);
   if (existing) return { id: existing.id };
   const offering = await loadOffering(prisma, requiredString(input.offeringId, "Ծառայություն"));
   await assertBookable(prisma, notices, offering, startsAt);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
-  const created = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, undefined, async (tx) => {
-    const row = await tx.appointment.create({
-      data: {
-        patientId,
-        doctorId: offering.doctorId,
-        clinicId: offering.clinicId,
-        offeringId: offering.id,
-        startsAt,
-        endsAt,
-        priceAmd: offering.priceAmd,
-        isEstimate: offering.isEstimate,
-        idempotencyKey,
-        status: "REQUESTED",
-        proposedBy: "PATIENT",
-      },
+  try {
+    const created = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, undefined, async (tx) => {
+      const row = await tx.appointment.create({
+        data: {
+          patientId,
+          doctorId: offering.doctorId,
+          clinicId: offering.clinicId,
+          offeringId: offering.id,
+          startsAt,
+          endsAt,
+          priceAmd: offering.priceAmd,
+          isEstimate: offering.isEstimate,
+          idempotencyKey,
+          status: "REQUESTED",
+          proposedBy: "PATIENT",
+        },
+      });
+      await appendCreated(tx, row, { userId: patientId, role: "PATIENT" });
+      await notices.write(tx, row, appointmentNotice.requested, "created");
+      return row;
     });
-    await appendCreated(tx, row, { userId: patientId, role: "PATIENT" });
-    await notices.write(tx, row, appointmentNotice.requested, "created");
-    return row;
-  });
-  return { id: created.id };
+    return { id: created.id };
+  } catch (error) {
+    if (error instanceof AppError && error.code === "SLOT_UNAVAILABLE") {
+      const duplicate = await existingBooking(prisma, patientId, idempotencyKey);
+      if (duplicate) return { id: duplicate.id };
+    }
+    throw error;
+  }
 }
 
 export async function confirmVisit(prisma: PrismaService, notices: Notices, actor: Actor, id: string) {
@@ -134,8 +142,7 @@ export async function rescheduleVisit(prisma: PrismaService, notices: Notices, a
   return { id };
 }
 
-async function existingBooking(prisma: PrismaService, patientId: string, idempotencyKey: string | undefined) {
-  if (!idempotencyKey) return null;
+async function existingBooking(prisma: PrismaService, patientId: string, idempotencyKey: string) {
   return prisma.appointment.findUnique({ where: { patientId_idempotencyKey: { patientId, idempotencyKey } } });
 }
 

@@ -38,7 +38,7 @@ export class QuestionsController {
         category: category ? category : undefined,
         answers: { some: { published: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       skip,
       take,
       select: {

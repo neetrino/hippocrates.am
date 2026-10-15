@@ -70,7 +70,7 @@ export class DoctorsController {
     const { skip, take } = pageWindow(page);
     const rows = await this.prisma.doctorProfile.findMany({
       where: { clinicId },
-      orderBy: { specialty: "asc" },
+      orderBy: [{ specialty: "asc" }, { id: "asc" }],
       skip,
       take,
       select: {

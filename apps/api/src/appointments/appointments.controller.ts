@@ -101,7 +101,7 @@ export class AppointmentsController {
     const { skip, take } = pageWindow(page);
     const rows = await this.prisma.appointment.findMany({
       where,
-      orderBy: { startsAt: direction },
+      orderBy: [{ startsAt: direction }, { id: direction }],
       skip,
       take,
       select: appointmentCard,

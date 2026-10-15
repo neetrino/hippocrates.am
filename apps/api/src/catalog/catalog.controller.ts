@@ -45,7 +45,7 @@ export class CatalogController {
     const { skip, take } = pageWindow(page);
     return this.prisma.serviceOffering.findMany({
       where: { clinicId },
-      orderBy: { name: "asc" },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
       skip,
       take,
       select: {

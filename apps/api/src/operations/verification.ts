@@ -63,14 +63,14 @@ export async function listVerificationQueue(prisma: PrismaService, page?: string
   const [clinics, doctors] = await Promise.all([
     prisma.clinic.findMany({
       where: { ...status, archivedAt: null },
-      orderBy: { name: "asc" },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
       skip,
       take,
       select: { id: true, name: true, district: true, verificationStatus: true, published: true },
     }),
     prisma.doctorProfile.findMany({
       where: { ...status, clinic: { archivedAt: null } },
-      orderBy: { user: { displayName: "asc" } },
+      orderBy: [{ user: { displayName: "asc" } }, { id: "asc" }],
       skip,
       take,
       select: {
@@ -109,7 +109,7 @@ export async function listVerificationQueue(prisma: PrismaService, page?: string
 export async function listAdminClinics(prisma: PrismaService, page?: string) {
   const { skip, take } = pageWindow(page);
   const rows = await prisma.clinic.findMany({
-    orderBy: { name: "asc" },
+    orderBy: [{ name: "asc" }, { id: "asc" }],
     skip,
     take,
     select: {

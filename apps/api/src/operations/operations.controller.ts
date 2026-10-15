@@ -171,7 +171,7 @@ export class OperationsController {
     const { skip, take } = pageWindow(page);
     return this.prisma.review.findMany({
       where: { clinicId },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       skip,
       take,
       select: { id: true, rating: true, body: true, reply: true, createdAt: true },

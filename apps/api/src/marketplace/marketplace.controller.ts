@@ -128,7 +128,7 @@ export class MarketplaceController {
         ...liveListing,
         ...(needle ? { OR: clinicNameSearch(needle) } : {}),
       },
-      orderBy: { name: "asc" },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
       skip,
       take,
       select: {
@@ -265,6 +265,7 @@ export class MarketplaceController {
     const clinicFilter: {
       published: true;
       verificationStatus: "APPROVED";
+      archivedAt: null;
       name?: { in: string[] };
       district?: { in: string[] };
     } = { ...liveListing };
@@ -278,7 +279,7 @@ export class MarketplaceController {
         specialty: specialties.length > 0 ? { in: specialties } : undefined,
         ...(needle ? { OR: doctorNameSearch(needle) } : {}),
       },
-      orderBy: { user: { displayName: "asc" } },
+      orderBy: [{ user: { displayName: "asc" } }, { id: "asc" }],
       skip,
       take,
       select: doctorListSelect(),

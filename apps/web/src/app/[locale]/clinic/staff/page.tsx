@@ -7,20 +7,29 @@ import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
 import { formatVisitDate } from "@/shared/format";
 import { sessionGet } from "@/shared/session-api";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
 type DayOff = { id: string; doctorId: string; startsAt: string };
 type ClinicHourBook = { clinic: HourWindow[]; doctors: { id: string; windows: HourWindow[] }[]; exceptions: DayOff[] };
 
-export default async function ClinicStaffPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ClinicStaffPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale: raw } = await params;
   prepareLocale(raw);
   const locale = await getLocale();
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
+  const page = listPage((await searchParams).page);
+  const suffix = page > 1 ? `?page=${page}` : "";
   const me = await requireClinicAdmin();
   const [doctors, hours] = await Promise.all([
-    sessionGet<DoctorRow[]>(`/clinics/${me.clinicId}/doctors`),
-    sessionGet<ClinicHourBook>(`/clinics/${me.clinicId}/hours`),
+    sessionGet<DoctorRow[]>(`/clinics/${me.clinicId}/doctors${suffix}`),
+    sessionGet<ClinicHourBook>(`/clinics/${me.clinicId}/hours${suffix}`),
   ]);
 
   return (
@@ -36,6 +45,7 @@ export default async function ClinicStaffPage({ params }: { params: Promise<{ lo
           label: formatVisitDate(day.startsAt, locale),
         }))}
       />
+      <ListPagination page={page} itemCount={doctors?.length ?? 0} />
     </ClinicManagerShell>
   );
 }

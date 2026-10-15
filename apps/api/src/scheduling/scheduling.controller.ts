@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { recordOf, requiredString } from "../common/input";
+import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Public, Roles } from "../identity/auth.decorators";
@@ -44,9 +45,14 @@ export class SchedulingController {
 
   @Get("clinics/:clinicId/hours")
   @Roles("ADMIN")
-  async hours(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async hours(
+    @CurrentActor() actor: Actor,
+    @Param("clinicId") clinicId: string,
+    @Query("page") page?: string,
+  ) {
     requireClinicAdmin(actor, clinicId);
-    const [clinic, doctors, exceptions] = await Promise.all([
+    const { skip, take } = pageWindow(page);
+    const [clinic, doctors] = await Promise.all([
       this.prisma.clinicWindow.findMany({
         where: { clinicId },
         select: { weekday: true, startMinute: true, endMinute: true },
@@ -54,17 +60,20 @@ export class SchedulingController {
       }),
       this.prisma.doctorProfile.findMany({
         where: { clinicId },
+        orderBy: [{ specialty: "asc" }, { id: "asc" }],
+        skip,
+        take,
         select: {
           id: true,
           windows: { select: { weekday: true, startMinute: true, endMinute: true }, orderBy: { weekday: "asc" } },
         },
       }),
-      this.prisma.scheduleException.findMany({
-        where: { doctor: { clinicId }, endsAt: { gt: new Date() } },
-        select: { id: true, doctorId: true, startsAt: true },
-        orderBy: { startsAt: "asc" },
-      }),
     ]);
+    const exceptions = await this.prisma.scheduleException.findMany({
+      where: { doctorId: { in: doctors.map(({ id }) => id) }, endsAt: { gt: new Date() } },
+      select: { id: true, doctorId: true, startsAt: true },
+      orderBy: { startsAt: "asc" },
+    });
     return { clinic, doctors, exceptions };
   }
 

@@ -24,7 +24,7 @@ export async function listClinicPatients(
         FROM "Appointment" appointment
         JOIN "User" patient ON patient."id" = appointment."patientId"
         WHERE appointment."clinicId" = ${clinicId} AND appointment."patientId" IS NOT NULL
-        ORDER BY appointment."patientId", appointment."startsAt" DESC
+        ORDER BY appointment."patientId", appointment."startsAt" DESC, appointment."id" DESC
       ) patients
       UNION ALL
       SELECT guests.* FROM (
@@ -36,10 +36,10 @@ export async function listClinicPatients(
         WHERE appointment."clinicId" = ${clinicId}
           AND appointment."patientId" IS NULL
           AND appointment."guestPhone" IS NOT NULL
-        ORDER BY appointment."guestPhone", appointment."startsAt" DESC
+        ORDER BY appointment."guestPhone", appointment."startsAt" DESC, appointment."id" DESC
       ) guests
     ) combined
-    ORDER BY combined."lastSeenAt" DESC
+    ORDER BY combined."lastSeenAt" DESC, combined."id" ASC NULLS LAST, combined."phone" ASC NULLS LAST
     LIMIT ${take} OFFSET ${skip}
   `;
 }

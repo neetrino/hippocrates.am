@@ -157,7 +157,7 @@ export class ClinicsController {
   async listBranches(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
     requireClinicAdmin(actor, clinicId);
     const { skip, take } = pageWindow(page);
-    return this.prisma.branch.findMany({ where: { clinicId }, orderBy: { name: "asc" }, skip, take });
+    return this.prisma.branch.findMany({ where: { clinicId }, orderBy: [{ name: "asc" }, { id: "asc" }], skip, take });
   }
 
   @Patch("clinics/:clinicId/branches/:branchId")

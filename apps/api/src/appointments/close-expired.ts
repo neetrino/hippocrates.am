@@ -13,10 +13,13 @@ export async function closeExpiredRequests(
   });
   const closedIds: string[] = [];
   for (const appointment of expired) {
-    const closed = await prisma.$transaction((tx) => tryExpire(tx, appointment, now));
+    const closed = await prisma.$transaction(async (tx) => {
+      const row = await tryExpire(tx, appointment, now);
+      if (row) await notices.write(tx, row, appointmentNotice.expired, `expired:${now.getTime()}`);
+      return row;
+    });
     if (!closed) continue;
     closedIds.push(closed.id);
-    await notices.afterAppointment(appointment, appointmentNotice.expired);
   }
   return closedIds;
 }

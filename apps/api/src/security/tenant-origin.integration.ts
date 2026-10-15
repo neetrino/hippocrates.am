@@ -3,8 +3,10 @@ import assert from "node:assert/strict";
 import { NestFactory } from "@nestjs/core";
 import cookieParser from "cookie-parser";
 import { AppModule } from "../app.module";
+import { deleteClinicRecord } from "../clinics/delete-clinic";
 import { HttpExceptionFilter } from "../common/http.filter";
 import { PrismaService } from "../infrastructure/prisma.service";
+import { isolatedTestDatabaseUrl } from "../infrastructure/test-database-url";
 
 const fixturePrefix = "security-fixture ";
 const webOrigin = "http://localhost:3000";
@@ -17,7 +19,7 @@ type Fixture = {
 };
 
 async function main(): Promise<void> {
-  const url = testDatabaseUrl();
+  const url = isolatedTestDatabaseUrl();
   if (!url) {
     process.stdout.write("skip tenant/origin integration: TEST_DATABASE_URL is not set\n");
     return;
@@ -30,11 +32,24 @@ async function main(): Promise<void> {
     const fixture = await createFixture(prisma);
     await verifyTenantIsolation(await app.getUrl(), fixture);
     await verifyOriginGuard(await app.getUrl(), fixture);
+    await verifyClinicArchive(prisma, fixture);
     process.stdout.write("tenant/origin integration: ok\n");
   } finally {
     await cleanup(prisma);
     await app.close();
   }
+}
+
+async function verifyClinicArchive(prisma: PrismaService, fixture: Fixture): Promise<void> {
+  await deleteClinicRecord(prisma, fixture.clinicAId);
+  const [clinic, user, session] = await Promise.all([
+    prisma.clinic.findUnique({ where: { id: fixture.clinicAId }, select: { archivedAt: true } }),
+    prisma.user.findUnique({ where: { id: fixture.adminId }, select: { disabledAt: true } }),
+    prisma.session.findFirst({ where: { userId: fixture.adminId }, select: { revokedAt: true } }),
+  ]);
+  assert.ok(clinic?.archivedAt);
+  assert.ok(user?.disabledAt);
+  assert.ok(session?.revokedAt);
 }
 
 async function openApplication() {
@@ -112,16 +127,6 @@ async function cleanup(prisma: PrismaService): Promise<void> {
   await prisma.user.updateMany({ where: { clinicId: { in: clinicIds } }, data: { clinicId: null } });
   await prisma.clinic.deleteMany({ where: { id: { in: clinicIds } } });
   await prisma.user.deleteMany({ where: { id: { in: ownerIds } } });
-}
-
-function testDatabaseUrl(): string {
-  const value = process.env.TEST_DATABASE_URL?.trim() ?? "";
-  if (!value) return "";
-  const databaseName = decodeURIComponent(new URL(value).pathname.replace(/^\//, "")).toLowerCase();
-  if (!databaseName.includes("test")) {
-    throw new Error("TEST_DATABASE_URL must name an isolated test database");
-  }
-  return value;
 }
 
 function slug(value: string): string {

@@ -71,6 +71,10 @@
   "common": {
     "search": "Search",
     "seeAll": "See all",
+    "pagination": "Pagination",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "pageNumber": "Page {page}",
     "name": "Name",
     "price": "{amount} AMD",
     "estimate": "estimate",

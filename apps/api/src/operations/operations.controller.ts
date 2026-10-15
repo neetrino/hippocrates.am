@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
+import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
@@ -11,7 +12,7 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { bookDeskVisit } from "../appointments/desk-booking";
 import { eventSelect, namedEventsForVisits, omitEvents } from "../appointments/present-events";
 import { countClinicPatients, listClinicPatients } from "../appointments/guest-visits";
-import { liveListing } from "../catalog/public-visible";
+import { liveDoctor } from "../catalog/public-visible";
 import { financeWindow } from "./finance-range";
 import { applyVerification, countPendingReviews, decisionOf, kindOf, listAdminClinics, listVerificationQueue } from "./verification";
 
@@ -47,9 +48,9 @@ export class OperationsController {
   async platformSummary(@CurrentActor() actor: Actor) {
     requireRoles(actor, ["SUPER_ADMIN"]);
     const [clinics, pendingQuestions, publishedDoctors, pendingReviews] = await Promise.all([
-      this.prisma.clinic.count(),
+      this.prisma.clinic.count({ where: { archivedAt: null } }),
       this.prisma.question.count({ where: { status: "PENDING" } }),
-      this.prisma.doctorProfile.count({ where: liveListing }),
+      this.prisma.doctorProfile.count({ where: liveDoctor }),
       countPendingReviews(this.prisma),
     ]);
     return { clinics, pendingQuestions, publishedDoctors, pendingReviews };
@@ -57,9 +58,9 @@ export class OperationsController {
 
   @Get("admin/verification")
   @Roles("SUPER_ADMIN")
-  listVerification(@CurrentActor() actor: Actor) {
+  listVerification(@CurrentActor() actor: Actor, @Query("page") page?: string) {
     requireRoles(actor, ["SUPER_ADMIN"]);
-    return listVerificationQueue(this.prisma);
+    return listVerificationQueue(this.prisma, page);
   }
 
   @Post("admin/verification/:kind/:id")
@@ -76,16 +77,16 @@ export class OperationsController {
 
   @Get("admin/clinics")
   @Roles("SUPER_ADMIN")
-  adminClinics(@CurrentActor() actor: Actor) {
+  adminClinics(@CurrentActor() actor: Actor, @Query("page") page?: string) {
     requireRoles(actor, ["SUPER_ADMIN"]);
-    return listAdminClinics(this.prisma);
+    return listAdminClinics(this.prisma, page);
   }
 
   @Get("clinics/:clinicId/patients")
   @Roles("ADMIN")
-  async patients(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async patients(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
     requireClinicAdmin(actor, clinicId);
-    return listClinicPatients(this.prisma, clinicId);
+    return listClinicPatients(this.prisma, clinicId, page);
   }
 
   @Post("clinics/:clinicId/visits")
@@ -165,11 +166,14 @@ export class OperationsController {
 
   @Get("clinics/:clinicId/reviews")
   @Roles("ADMIN")
-  async reviews(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async reviews(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
     requireClinicAdmin(actor, clinicId);
+    const { skip, take } = pageWindow(page);
     return this.prisma.review.findMany({
       where: { clinicId },
       orderBy: { createdAt: "desc" },
+      skip,
+      take,
       select: { id: true, rating: true, body: true, reply: true, createdAt: true },
     });
   }

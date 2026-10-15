@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { recordOf, requiredString } from "../common/input";
+import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireRoles, type Actor } from "../identity/access";
 import { Public, Roles } from "../identity/auth.decorators";
@@ -29,7 +30,8 @@ export class QuestionsController {
 
   @Public()
   @Get()
-  async published(@Query("category") category?: string) {
+  async published(@Query("category") category?: string, @Query("page") page?: string) {
+    const { skip, take } = pageWindow(page);
     return this.prisma.question.findMany({
       where: {
         status: "PUBLISHED",
@@ -37,6 +39,8 @@ export class QuestionsController {
         answers: { some: { published: true } },
       },
       orderBy: { createdAt: "desc" },
+      skip,
+      take,
       select: {
         id: true,
         title: true,

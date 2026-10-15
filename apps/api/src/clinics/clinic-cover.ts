@@ -17,7 +17,16 @@ async function coverOf(prisma: PrismaService, clinicId: string): Promise<Cover> 
 export async function saveClinicCover(prisma: PrismaService, clinicId: string, request: Request): Promise<string> {
   const clinic = await coverOf(prisma, clinicId);
   const key = await storedCover(clinic.id, request);
-  await prisma.clinic.update({ where: { id: clinic.id }, data: { coverKey: key } });
+  try {
+    const changed = await prisma.clinic.updateMany({
+      where: { id: clinic.id, coverKey: clinic.coverKey },
+      data: { coverKey: key },
+    });
+    if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
+  } catch (error) {
+    await removeQuiet(key);
+    throw error;
+  }
   await removeQuiet(clinic.coverKey);
   return urlOf(key);
 }
@@ -25,8 +34,12 @@ export async function saveClinicCover(prisma: PrismaService, clinicId: string, r
 /** Clears the clinic cover. */
 export async function clearClinicCover(prisma: PrismaService, clinicId: string): Promise<void> {
   const clinic = await coverOf(prisma, clinicId);
+  const changed = await prisma.clinic.updateMany({
+    where: { id: clinic.id, coverKey: clinic.coverKey },
+    data: { coverKey: null },
+  });
+  if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
   await removeQuiet(clinic.coverKey);
-  await prisma.clinic.update({ where: { id: clinic.id }, data: { coverKey: null } });
 }
 
 async function storedCover(clinicId: string, request: Request): Promise<string> {

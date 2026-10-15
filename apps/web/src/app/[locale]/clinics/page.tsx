@@ -6,23 +6,28 @@ import { getPathname } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { publicGet } from "@/shared/public-api";
 import type { ClinicCard } from "@/shared/public-types";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
 export default async function ClinicsPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ name?: string }>;
+  searchParams: Promise<{ name?: string; page?: string }>;
 }) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
-  const { name } = await searchParams;
+  const { name, page: rawPage } = await searchParams;
+  const page = listPage(rawPage);
   const needle = name?.trim() ?? "";
   const t = await getTranslations("catalog");
   const common = await getTranslations("common");
   const suggestRequest = publicGet<ClinicCard[]>("/public/clinics", locale);
-  const listRequest = needle
-    ? publicGet<ClinicCard[]>(`/public/clinics?name=${encodeURIComponent(needle)}`, locale)
+  const listQuery = new URLSearchParams();
+  if (needle) listQuery.set("name", needle);
+  if (page > 1) listQuery.set("page", String(page));
+  const listRequest = listQuery.size > 0
+    ? publicGet<ClinicCard[]>(`/public/clinics?${listQuery}`, locale)
     : suggestRequest;
   const [suggestClinics, clinics, favorites] = await Promise.all([
     suggestRequest,
@@ -47,6 +52,7 @@ export default async function ClinicsPage({
         emptyLabel={t("emptyClinicSearch")}
         savedClinicIds={favorites?.clinicIds ?? null}
       />
+      <ListPagination page={page} itemCount={clinics.length} query={{ name: needle || undefined }} />
     </div>
   );
 }

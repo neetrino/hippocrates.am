@@ -4,29 +4,43 @@ import type { PrismaService } from "../infrastructure/prisma.service";
 
 const logger = new Logger("deleteClinic");
 
-/** Removes a clinic together with its admin, doctors, and visits. Patients stay. */
+/** Archives a clinic, disables its staff, and preserves visits and audit history. */
 export async function deleteClinicRecord(prisma: PrismaService, clinicId: string): Promise<void> {
   const clinic = await prisma.clinic.findUnique({
     where: { id: clinicId },
-    select: { ownerId: true, doctors: { select: { id: true, userId: true } } },
+    select: {
+      ownerId: true,
+      archivedAt: true,
+      staff: {
+        where: { role: { in: ["ADMIN", "DOCTOR"] } },
+        select: { id: true },
+      },
+    },
   });
   if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
-  const doctorIds = clinic.doctors.map((doctor) => doctor.id);
-  const accountIds = [...new Set([clinic.ownerId, ...clinic.doctors.map((doctor) => doctor.userId)])];
+  if (clinic.archivedAt) throw new AppError("CONFLICT", 409, "Կլինիկան արդեն արխիվացված է");
+  const accountIds = [...new Set([clinic.ownerId, ...clinic.staff.map((user) => user.id)])];
+  const now = new Date();
   try {
     await prisma.$transaction(async (tx) => {
-      await tx.notification.deleteMany({ where: { appointment: { clinicId } } });
-      await tx.review.deleteMany({ where: { clinicId } });
-      await tx.appointment.deleteMany({ where: { clinicId } });
-      if (doctorIds.length > 0) await tx.answer.deleteMany({ where: { doctorId: { in: doctorIds } } });
-      await tx.question.updateMany({ where: { clinicId }, data: { clinicId: null } });
-      await tx.user.updateMany({ where: { clinicId }, data: { clinicId: null } });
-      await tx.clinic.delete({ where: { id: clinicId } });
-      await tx.user.deleteMany({ where: { id: { in: accountIds } } });
+      const archived = await tx.clinic.updateMany({
+        where: { id: clinicId, archivedAt: null },
+        data: { archivedAt: now, published: false, verificationStatus: "SUSPENDED" },
+      });
+      if (archived.count !== 1) throw new AppError("CONFLICT", 409, "Կլինիկան արդեն արխիվացված է");
+      await tx.doctorProfile.updateMany({
+        where: { clinicId },
+        data: { published: false, verificationStatus: "SUSPENDED" },
+      });
+      await tx.user.updateMany({ where: { id: { in: accountIds } }, data: { disabledAt: now } });
+      await tx.session.updateMany({
+        where: { userId: { in: accountIds }, revokedAt: null },
+        data: { revokedAt: now },
+      });
     });
   } catch (error) {
     if (error instanceof AppError) throw error;
-    logger.error("Clinic delete failed", error instanceof Error ? error.stack : undefined);
-    throw new AppError("DELETE_FAILED", 409, "Կլինիկան չջնջվեց");
+    logger.error("Clinic archive failed", error instanceof Error ? error.stack : undefined);
+    throw new AppError("DELETE_FAILED", 409, "Կլինիկան չարխիվացվեց");
   }
 }

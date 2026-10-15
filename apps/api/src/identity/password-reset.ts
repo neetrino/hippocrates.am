@@ -8,16 +8,21 @@ import { SessionService } from "./session.service";
 const RESET_MS = 30 * 60 * 1000;
 
 export async function requestPasswordReset(prisma: PrismaService, email: string, locale: unknown): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true } });
+  const user = await prisma.user.findFirst({
+    where: { email, disabledAt: null },
+    select: { id: true, email: true },
+  });
   if (!user) return;
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + RESET_MS);
-  await prisma.passwordReset.updateMany({
-    where: { userId: user.id, usedAt: null },
-    data: { usedAt: new Date() },
-  });
-  await prisma.passwordReset.create({
-    data: { userId: user.id, tokenHash: hashToken(token), expiresAt },
+  await prisma.$transaction(async (tx) => {
+    await tx.passwordReset.updateMany({
+      where: { userId: user.id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+    await tx.passwordReset.create({
+      data: { userId: user.id, tokenHash: hashToken(token), expiresAt },
+    });
   });
   await deliverResetLink(user.email, token, resetLocale(locale));
 }
@@ -33,8 +38,11 @@ export async function applyPasswordReset(
   if (next !== passwordOf(confirmPassword)) {
     throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
   }
-  const row = await prisma.passwordReset.findUnique({ where: { tokenHash: hashToken(token) } });
-  if (!row || row.usedAt || row.expiresAt.getTime() <= Date.now()) {
+  const row = await prisma.passwordReset.findUnique({
+    where: { tokenHash: hashToken(token) },
+    include: { user: { select: { disabledAt: true } } },
+  });
+  if (!row || row.user.disabledAt || row.usedAt || row.expiresAt.getTime() <= Date.now()) {
     throw new AppError("RESET_INVALID", 400, "Հղումը սխալ է կամ ժամկետն անցել է");
   }
   const passwordHash = await sessions.hashPassword(next);

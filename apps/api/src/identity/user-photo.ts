@@ -69,7 +69,11 @@ export async function saveUserPhoto(prisma: PrismaService, userId: string, reque
     throw new AppError("VALIDATION_FAILED", 400, "Նկարը չի կարդացվում");
   }
   try {
-    await prisma.user.update({ where: { id: userId }, data: { photoKey: key } });
+    const changed = await prisma.user.updateMany({
+      where: { id: userId, photoKey: current.photoKey },
+      data: { photoKey: key },
+    });
+    if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
   } catch (error) {
     await deletePhotoObject(key, "New photo cleanup failed");
     throw error;
@@ -86,8 +90,12 @@ export async function saveUserPhoto(prisma: PrismaService, userId: string, reque
 export async function clearUserPhoto(prisma: PrismaService, userId: string): Promise<void> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { photoKey: true } });
   if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
+  const changed = await prisma.user.updateMany({
+    where: { id: userId, photoKey: user.photoKey },
+    data: { photoKey: null },
+  });
+  if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
   if (user.photoKey) await deletePhotoObject(user.photoKey, "Photo delete failed");
-  await prisma.user.update({ where: { id: userId }, data: { photoKey: null } });
 }
 
 async function deletePhotoObject(key: string, message: string): Promise<void> {

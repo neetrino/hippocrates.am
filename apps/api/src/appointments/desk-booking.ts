@@ -9,7 +9,7 @@ import { allowedStarts, clinicDate, instantOf, loadOffering } from "./visit-acce
 
 type Notices = NotificationsService;
 
-/** Books an agreed phone visit. One matching account is linked; otherwise the name and phone are kept. */
+/** Books an agreed phone visit without trusting an unverified phone-to-account match. */
 export async function bookDeskVisit(
   prisma: PrismaService,
   notices: Notices,
@@ -24,14 +24,13 @@ export async function bookDeskVisit(
   const offering = await loadOffering(prisma, requiredStringId(input.offeringId));
   if (offering.clinicId !== clinicId) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");
   await assertOpen(prisma, notices, offering, startsAt);
-  const patientId = await onePatient(prisma, phone);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
   const created = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, undefined, async (tx) => {
     const row = await tx.appointment.create({
       data: {
-        patientId,
-        guestName: patientId ? null : name,
-        guestPhone: patientId ? null : phone,
+        patientId: null,
+        guestName: name,
+        guestPhone: phone,
         doctorId: offering.doctorId,
         clinicId: offering.clinicId,
         offeringId: offering.id,
@@ -53,11 +52,6 @@ export async function bookDeskVisit(
 function requiredStringId(value: unknown): string {
   if (typeof value !== "string" || value.trim() === "") throw new AppError("VALIDATION_FAILED", 400, "Ծառայություն պարտադիր է");
   return value.trim();
-}
-
-async function onePatient(prisma: PrismaService, phone: string): Promise<string | null> {
-  const matches = await prisma.user.findMany({ where: { phone, role: "PATIENT" }, select: { id: true }, take: 2 });
-  return matches.length === 1 && matches[0] ? matches[0].id : null;
 }
 
 async function assertOpen(

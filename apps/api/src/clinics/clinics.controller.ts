@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { loadClinicLocales, localeCopies, saveClinicLocale, sourceClinicText } from "../catalog/clinic-locale-store";
 import { deleteClinicRecord } from "./delete-clinic";
@@ -9,6 +9,7 @@ import { updateClinicProfile } from "./clinic-edit";
 import { clearClinicCover, saveClinicCover } from "./clinic-cover";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, recordOf, requiredPhoneOf, requiredString } from "../common/input";
+import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
@@ -153,9 +154,10 @@ export class ClinicsController {
 
   @Get("clinics/:clinicId/branches")
   @Roles("ADMIN")
-  async listBranches(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async listBranches(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
     requireClinicAdmin(actor, clinicId);
-    return this.prisma.branch.findMany({ where: { clinicId }, orderBy: { name: "asc" } });
+    const { skip, take } = pageWindow(page);
+    return this.prisma.branch.findMany({ where: { clinicId }, orderBy: { name: "asc" }, skip, take });
   }
 
   @Patch("clinics/:clinicId/branches/:branchId")

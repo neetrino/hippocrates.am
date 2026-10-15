@@ -60,7 +60,7 @@ export class SessionService {
       where: { tokenHash },
       include: { user: true },
     });
-    if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) return null;
+    if (!session || session.revokedAt || session.user.disabledAt || session.expiresAt.getTime() <= Date.now()) return null;
     return { id: session.user.id, role: session.user.role, clinicId: session.user.clinicId };
   }
 

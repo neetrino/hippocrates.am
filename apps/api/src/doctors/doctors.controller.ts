@@ -1,8 +1,9 @@
 import { randomBytes } from "node:crypto";
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { AppError } from "../common/app-error";
 import { emailOf, optionalString, recordOf, requiredString } from "../common/input";
+import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { requireClinicAdmin, type Actor } from "../identity/access";
@@ -64,11 +65,14 @@ export class DoctorsController {
 
   @Get("clinics/:clinicId/doctors")
   @Roles("ADMIN")
-  async listDoctors(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async listDoctors(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
     requireClinicAdmin(actor, clinicId);
+    const { skip, take } = pageWindow(page);
     const rows = await this.prisma.doctorProfile.findMany({
       where: { clinicId },
       orderBy: { specialty: "asc" },
+      skip,
+      take,
       select: {
         id: true,
         specialty: true,

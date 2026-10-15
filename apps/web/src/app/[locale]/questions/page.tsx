@@ -3,13 +3,21 @@ import { prepareLocale } from "@/i18n/locale";
 import { publicGet } from "@/shared/public-api";
 import type { QuestionCard } from "@/shared/public-types";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 import { PageStack } from "@/shared/ui/page-frame";
 
-export default async function QuestionsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function QuestionsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale } = await params;
   prepareLocale(locale);
+  const page = listPage((await searchParams).page);
   const t = await getTranslations("questions");
-  const questions = await publicGet<QuestionCard[]>("/questions");
+  const questions = await publicGet<QuestionCard[]>(`/questions${page > 1 ? `?page=${page}` : ""}`);
   return (
     <PageStack>
       <div className="grid max-w-[40rem] gap-3">
@@ -34,6 +42,7 @@ export default async function QuestionsPage({ params }: { params: Promise<{ loca
           </article>
         ))}
       </div>
+      <ListPagination page={page} itemCount={questions.length} />
     </PageStack>
   );
 }

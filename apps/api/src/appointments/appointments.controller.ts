@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
+import { pageWindow } from "../common/pagination";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireRoles, type Actor } from "../identity/access";
@@ -85,19 +86,26 @@ export class AppointmentsController {
   }
 
   @Get("mine")
-  async mine(@CurrentActor() actor: Actor) {
+  async mine(@CurrentActor() actor: Actor, @Query("page") page?: string) {
     await closeExpiredRequests(this.prisma, this.notices);
-    if (actor.role === "PATIENT") return this.listed({ patientId: actor.id }, "desc");
+    if (actor.role === "PATIENT") return this.listed({ patientId: actor.id }, "desc", page);
     if (actor.role === "DOCTOR") {
       const doctor = await this.prisma.doctorProfile.findUnique({ where: { userId: actor.id } });
-      return doctor ? this.listed({ doctorId: doctor.id }, "asc") : [];
+      return doctor ? this.listed({ doctorId: doctor.id }, "asc", page) : [];
     }
-    if (actor.role === "ADMIN" && actor.clinicId) return this.listed({ clinicId: actor.clinicId }, "asc");
+    if (actor.role === "ADMIN" && actor.clinicId) return this.listed({ clinicId: actor.clinicId }, "asc", page);
     throw new AppError("FORBIDDEN", 403, "Այս գործողությունը թույլատրված չէ");
   }
 
-  private async listed(where: { patientId: string } | { doctorId: string } | { clinicId: string }, direction: "asc" | "desc") {
-    const rows = await this.prisma.appointment.findMany({ where, orderBy: { startsAt: direction }, select: appointmentCard });
+  private async listed(where: { patientId: string } | { doctorId: string } | { clinicId: string }, direction: "asc" | "desc", page?: string) {
+    const { skip, take } = pageWindow(page);
+    const rows = await this.prisma.appointment.findMany({
+      where,
+      orderBy: { startsAt: direction },
+      skip,
+      take,
+      select: appointmentCard,
+    });
     const histories = await namedEventsForVisits(this.prisma, rows);
     return rows.map((row, index) => ({
       ...presentAppointment(omitEvents(row)),

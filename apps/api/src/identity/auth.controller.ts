@@ -68,7 +68,9 @@ export class AuthController {
     const password = requiredString(input.password, "Գաղտնաբառ", 128);
     const user = await this.prisma.user.findUnique({ where: { email } });
     const valid = await this.sessions.verifyLoginPassword(password, user?.passwordHash);
-    if (!user || !valid) throw new AppError("INVALID_LOGIN", 401, "Էլ. փոստը կամ գաղտնաբառը սխալ է");
+    if (!user || user.disabledAt || !valid) {
+      throw new AppError("INVALID_LOGIN", 401, "Էլ. փոստը կամ գաղտնաբառը սխալ է");
+    }
     await this.sessions.open(response, user.id);
     return { id: user.id, role: user.role };
   }

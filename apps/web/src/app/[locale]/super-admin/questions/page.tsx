@@ -5,18 +5,22 @@ import { prepareLocale } from "@/i18n/locale";
 import { publicGet } from "@/shared/public-api";
 import type { QuestionCard } from "@/shared/public-types";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
 export default async function PortalQuestionsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale } = await params;
   prepareLocale(locale);
   await requireSuperAdmin();
   const t = await getTranslations("questions");
   const common = await getTranslations("common");
-  const questions = await publicGet<QuestionCard[]>("/questions");
+  const page = listPage((await searchParams).page);
+  const questions = await publicGet<QuestionCard[]>(`/questions${page > 1 ? `?page=${page}` : ""}`);
 
   return (
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={t("title")}>
@@ -45,6 +49,7 @@ export default async function PortalQuestionsPage({
             </article>
           ))}
         </div>
+        <ListPagination page={page} itemCount={questions.length} />
       </div>
     </AdminPortalShell>
   );

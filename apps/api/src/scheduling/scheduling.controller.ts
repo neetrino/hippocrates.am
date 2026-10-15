@@ -10,6 +10,7 @@ import { liveOffering } from "../catalog/public-visible";
 import { NotificationsService } from "../notifications/notifications.service";
 import { dayBounds } from "./day-off";
 import { clipDoctorHours } from "./clip-doctor-hours";
+import { isScheduleConflict } from "./schedule-conflict";
 import { daySlots, openWindows } from "./slots";
 import { assertInsideClinic, windowsFrom, type StoredWindow } from "./windows";
 
@@ -81,7 +82,12 @@ export class SchedulingController {
       where: { doctorId, startsAt: { lt: bounds.endsAt }, endsAt: { gt: bounds.startsAt } },
     });
     if (overlap) throw new AppError("DAY_CLOSED", 409, "Այդ օրը արդեն փակ է");
-    const created = await this.prisma.scheduleException.create({ data: { doctorId, ...bounds } });
+    const created = await this.prisma.scheduleException
+      .create({ data: { doctorId, ...bounds } })
+      .catch((error: unknown) => {
+        if (isScheduleConflict(error)) throw new AppError("DAY_CLOSED", 409, "Այդ օրը արդեն փակ է");
+        throw error;
+      });
     return { id: created.id };
   }
 

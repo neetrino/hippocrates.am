@@ -71,6 +71,10 @@
   "common": {
     "search": "Найти",
     "seeAll": "Смотреть все",
+    "pagination": "Пагинация",
+    "previousPage": "Назад",
+    "nextPage": "Далее",
+    "pageNumber": "Страница {page}",
     "name": "Имя",
     "price": "{amount} драм",
     "estimate": "оценка",

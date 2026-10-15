@@ -48,6 +48,7 @@ An unverified profile phone never transfers guest appointments into an account; 
 | `POST /clinic-applications` | Authorized clinic applicant submits basic clinic information | Evidence stays private. Clinic approval is separate from doctor approval |
 | `GET /clinics/:clinicId/profile` | Clinic admin reads own editable clinic info | Live membership + clinic scope |
 | `PATCH /clinics/:clinicId/profile` | Clinic admin edits own allowed fields | Material public changes may require reapproval |
+| `DELETE /clinics/:clinicId` | Super Admin archives a clinic | Visits, reviews, and audit history are retained; clinic staff are disabled and their sessions revoked |
 | `GET /clinics/:clinicId/doctors` | Own linked doctors | Clinic scope |
 | `POST /clinics/:clinicId/doctors` | Create a doctor account for this clinic | The doctor sets the password on a new account. Admins cannot set it. Existing email returns `EMAIL_TAKEN`. One account cannot join a second clinic (`ADR-005`) |
 | `PATCH /clinics/:clinicId/doctors/:doctorId` | Update clinic-authorized doctor info | Doctor verification may need re-review |

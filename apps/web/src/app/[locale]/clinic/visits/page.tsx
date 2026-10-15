@@ -7,16 +7,24 @@ import { prepareLocale } from "@/i18n/locale";
 import { formatWhen } from "@/shared/format";
 import type { AppointmentCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
-export default async function ClinicVisitsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ClinicVisitsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale: raw } = await params;
   prepareLocale(raw);
   const locale = await getLocale();
   const meLabel = await getTranslations("me");
   const common = await getTranslations("common");
+  const page = listPage((await searchParams).page);
   const me = await requireClinicAdmin();
   const [appointments, doctors, offerings] = await Promise.all([
-    sessionGet<AppointmentCard[]>("/appointments/mine"),
+    sessionGet<AppointmentCard[]>(`/appointments/mine${page > 1 ? `?page=${page}` : ""}`),
     sessionGet<DeskDoctor[]>(`/clinics/${me.clinicId}/doctors`),
     sessionGet<DeskService[]>(`/clinics/${me.clinicId}/offerings`),
   ]);
@@ -26,6 +34,7 @@ export default async function ClinicVisitsPage({ params }: { params: Promise<{ l
       <div className="grid gap-5">
         <DeskBooking clinicId={me.clinicId} doctors={doctors ?? []} offerings={offerings ?? []} />
         <ClinicVisitBoard visits={deskVisits(appointments ?? []).map((item) => ({ ...item, when: formatWhen(item.startsAt, locale) }))} />
+        <ListPagination page={page} itemCount={appointments?.length ?? 0} />
       </div>
     </ClinicManagerShell>
   );

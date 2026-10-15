@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { AppError } from "../common/app-error";
 import { createDatabasePool } from "../infrastructure/database-pool";
 import { PrismaService } from "../infrastructure/prisma.service";
+import { isolatedTestDatabaseUrl } from "../infrastructure/test-database-url";
 import { NotificationsService } from "../notifications/notifications.service";
 import { withOpenSlot } from "./book-slot";
 import { bookVisit } from "./visit-commands";
@@ -18,7 +19,7 @@ type Fixture = {
 };
 
 async function main(): Promise<void> {
-  const url = readDatabaseUrl();
+  const url = isolatedTestDatabaseUrl();
   if (!url) {
     process.stdout.write("skip withOpenSlot concurrency: TEST_DATABASE_URL is not set\n");
     return;
@@ -40,6 +41,7 @@ async function main(): Promise<void> {
       new Date("2035-06-16T11:15:00.000Z"),
     );
     await expectIdempotentBooking(fixture);
+    await expectImmutableHistory(fixture);
     process.stdout.write("withOpenSlot concurrency: ok\n");
   } finally {
     await wipeRaceClinics(fixture.prisma);
@@ -116,6 +118,16 @@ async function expectIdempotentBooking(fixture: Fixture): Promise<void> {
     where: { patientId: fixture.patientId, idempotencyKey: body.idempotencyKey },
   });
   assert.equal(count, 1);
+}
+
+async function expectImmutableHistory(fixture: Fixture): Promise<void> {
+  const event = await fixture.prisma.appointmentEvent.findFirst({
+    where: { appointment: { clinicId: fixture.clinicId } },
+    select: { id: true },
+  });
+  assert.ok(event);
+  await assert.rejects(fixture.prisma.appointmentEvent.delete({ where: { id: event.id } }));
+  assert.equal(await fixture.prisma.appointmentEvent.count({ where: { id: event.id } }), 1);
 }
 
 async function openFixture(url: string): Promise<Fixture> {
@@ -207,21 +219,6 @@ function raceDetail(reason: unknown): string {
   const code = reason && typeof reason === "object" && "code" in reason ? String(reason.code) : "";
   const text = reason instanceof Error ? reason.message.replace(/postgres(?:ql)?:\/\/\S+/gi, "[db]") : "";
   return `expected AppError, got ${name} ${code} ${text.slice(0, 240)}`;
-}
-
-function readDatabaseUrl(): string {
-  const value = process.env.TEST_DATABASE_URL?.trim() ?? "";
-  if (!value) return "";
-  try {
-    const databaseName = decodeURIComponent(new URL(value).pathname.replace(/^\//, "")).toLowerCase();
-    if (!databaseName.includes("test")) {
-      throw new Error("TEST_DATABASE_URL must name an isolated test database");
-    }
-    return value;
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("isolated test database")) throw error;
-    throw new Error("TEST_DATABASE_URL must be a valid PostgreSQL URL");
-  }
 }
 
 void main().catch((error: unknown) => {

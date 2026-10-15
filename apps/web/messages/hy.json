@@ -71,6 +71,10 @@
   "common": {
     "search": "Փնտրել",
     "seeAll": "Տեսնել բոլորը",
+    "pagination": "Էջավորում",
+    "previousPage": "Նախորդ",
+    "nextPage": "Հաջորդ",
+    "pageNumber": "Էջ {page}",
     "name": "Անուն",
     "price": "{amount} դրամ",
     "estimate": "գնահատում",

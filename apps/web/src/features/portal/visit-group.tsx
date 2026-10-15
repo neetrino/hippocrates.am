@@ -152,7 +152,6 @@ function VisitTools({ visit, actions }: { visit: VisitRow; actions: "patient" | 
       <PatientReschedule
         id={visit.id}
         status={visit.status}
-        startsAt={visit.startsAt}
         doctorId={visit.doctorId}
         offeringId={visit.offeringId}
       />

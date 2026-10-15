@@ -7,19 +7,13 @@ import { formatTime } from "@/shared/format";
 type PatientRescheduleProps = {
   id: string;
   status: string;
-  startsAt: string;
   doctorId: string;
   offeringId: string;
 };
 
 export function PatientReschedule(props: PatientRescheduleProps) {
-  const movable = props.status === "REQUESTED" || props.status === "CONFIRMED";
-  if (!movable || visitStarted(props.startsAt)) return null;
+  if (props.status !== "REQUESTED" && props.status !== "CONFIRMED") return null;
   return <RescheduleForm id={props.id} doctorId={props.doctorId} offeringId={props.offeringId} />;
-}
-
-function visitStarted(startsAt: string): boolean {
-  return Date.parse(startsAt) <= Date.now();
 }
 
 function RescheduleForm({ id, doctorId, offeringId }: { id: string; doctorId: string; offeringId: string }) {

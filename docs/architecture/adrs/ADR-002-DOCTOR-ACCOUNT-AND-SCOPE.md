@@ -1,6 +1,6 @@
 # ADR-002: One doctor account per clinic, no reviews
 
-**Status:** SUPERSEDED by ADR-003 on 2026-09-30 for every rule that shrinks the product (no reviews, one clinic per doctor, reduced notices). The password rule remains: the doctor sets the password, and admins cannot read or set it.  
+**Status:** SUPERSEDED by ADR-003 on 2026-09-30 for every rule that shrinks the product (no reviews, one clinic per doctor, reduced notices). **Partial restore:** [ADR-005](./ADR-005-ONE-DOCTOR-ACCOUNT-PER-CLINIC.md) (2026-10-15) restores only the one-clinic-per-doctor-account rule. Reviews and the rest of ADR-003 stay. The password rule remains: the doctor sets the password, and admins cannot read or set it.  
 **Date:** 2026-09-30  
 **Decision owner:** Product owner, this chat. Name not recorded.  
 **Supersedes for this release:** the review and rating parts of HM-007 and HM-008, and the “one active affiliation on a shared doctor account” reading of HM-003.
@@ -21,6 +21,6 @@ Withdrawn. The list below is not an instruction. `ADR-003` is the product.
 
 ## Consequences
 
-- A doctor may affiliate with more than one clinic. Each clinic sees only its own patients.
+- ADR-003 withdrew the one-clinic limit; ADR-005 restored it. Each clinic sees only its own patients.
 - Reviews are point P8. Do not add them during P0.
 - Password handling stays: the doctor sets the password, and admins cannot read or set it.

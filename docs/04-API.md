@@ -1,6 +1,6 @@
 # API contracts — Hippocrates.am
 
-> **CANDIDATE ROUTES, NOT EXISTING ENDPOINTS.** Revised 2026-09-30. Path prefix `/api/v1`. The routes below are the early points. Chat, Q&A, reviews, branches, reschedule, and reminders are added on their points in `PROGRESS.md`. They are not banned. Product authority is `ADR-003` and the canonical specification.
+> **CANDIDATE ROUTES, NOT EXISTING ENDPOINTS.** Revised 2026-10-15. Path prefix `/api/v1`. The routes below are the early points. Chat, Q&A, reviews, branches, reschedule, and reminders are added on their points in `PROGRESS.md`. They are not banned. Product authority is `ADR-003` (doctor-clinic binding: `ADR-005`) and the canonical specification.
 
 ## Shared API rules
 
@@ -48,7 +48,7 @@ Email and password is the accepted login. Do not add phone login, OAuth, or an e
 | `GET /clinics/:clinicId/profile` | Clinic admin reads own editable clinic info | Live membership + clinic scope |
 | `PATCH /clinics/:clinicId/profile` | Clinic admin edits own allowed fields | Material public changes may require reapproval |
 | `GET /clinics/:clinicId/doctors` | Own linked doctors | Clinic scope |
-| `POST /clinics/:clinicId/doctors` | Affiliate a doctor to this clinic | The doctor sets the password on a new account. Admins cannot set it. Reject a duplicate affiliation to this same clinic |
+| `POST /clinics/:clinicId/doctors` | Create a doctor account for this clinic | The doctor sets the password on a new account. Admins cannot set it. Existing email returns `EMAIL_TAKEN`. One account cannot join a second clinic (`ADR-005`) |
 | `PATCH /clinics/:clinicId/doctors/:doctorId` | Update clinic-authorized doctor info | Doctor verification may need re-review |
 | `GET /clinics/:clinicId/services` | Own offerings | Clinic scope |
 | `POST /clinics/:clinicId/services` | Create service/price offering | Approved doctor/clinic/service relationships |
@@ -93,7 +93,7 @@ Review, Q&A, branch, and reschedule routes are added on their points. Chat is pa
 - Unauthorized patient/doctor/clinic/platform role requests are denied with no cross-clinic data leaks.
 - Concurrent `POST /appointments` for an overlapping doctor slot yields at most one active booking.
 - Cancellation immediately makes legitimately freed capacity available; retries cannot duplicate changes.
-- A second clinic affiliation is allowed. That clinic still cannot read the other clinic's patients.
+- A second clinic on the same doctor email is rejected. That clinic still cannot read the other clinic's patients.
 - Patient list, client card, and finance responses contain only the caller's clinic.
 - Booking notification failure never changes final appointment state.
 

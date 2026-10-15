@@ -1,6 +1,6 @@
 # Hippocrates.am — Product brief
 
-> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. The reduced first-release pack is withdrawn. **Implementation:** in progress — see [PROGRESS.md](PROGRESS.md) and [NOW_VS_NEEDED_HY.md](NOW_VS_NEEDED_HY.md). **Authority:** [ADR-003](architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md). The file in `docs/archive/expanded-v1/` is the historical full spec, not the live repo map.
+> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. The reduced first-release pack is withdrawn. **Implementation:** in progress — see [PROGRESS.md](PROGRESS.md) and [NOW_VS_NEEDED_HY.md](NOW_VS_NEEDED_HY.md). **Authority:** [ADR-003](architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md); doctor-clinic binding [ADR-005](architecture/adrs/ADR-005-ONE-DOCTOR-ACCOUNT-PER-CLINIC.md). The file in `docs/archive/expanded-v1/` is the historical full spec, not the live repo map.
 
 ## Product purpose
 
@@ -52,11 +52,11 @@ Private chat is not in the current work.
 
 - Email and password, Argon2id, revocable server session, HttpOnly cookie. Passwords are stored as hashes and cannot be read back.
 - One web application, one API, one PostgreSQL database. Add a worker only on the point that needs reliable outbound delivery.
-- A Doctor belongs to the clinic whose Admin registered them. A Patient can book at any clinic and each clinic sees only its own bookings.
+- A Doctor belongs to the clinic whose Admin registered them (`ADR-005`: one login, one clinic). A Patient can book at any clinic and each clinic sees only its own bookings.
 - Public pages show published, approved records only. Verification files stay private.
 - Two concurrent requests cannot both take the same active slot.
 - Production host, region, backup owner, and deploy owner are still unnamed. No production deploy is authorized.
 
 ## Reading order
 
-`FUNCTIONALITY_HY.md` → this brief → canonical specification → `ADR-003` → `TECH_CARD.md` → `01-ARCHITECTURE.md` → `PROGRESS.md`.
+`FUNCTIONALITY_HY.md` → this brief → canonical specification → `ADR-003` → `ADR-005` (doctor-clinic binding) → `TECH_CARD.md` → `01-ARCHITECTURE.md` → `PROGRESS.md`.

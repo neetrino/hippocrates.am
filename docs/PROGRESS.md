@@ -4,7 +4,7 @@
 
 **In the repository:** workspace, four roles, public catalog, booking, portals, in-app notices, questions, reviews, password reset, clinic/doctor verification, and appointment event history.  
 **Not started / paused:** chat, card payments, clinical records, production release.  
-**Scope:** `ADR-003`. **Env:** one root `.env`. Web `3000`, NestJS `4000`.
+**Scope:** `ADR-003`; doctor-clinic binding `ADR-005`. **Env:** one root `.env`. Web `3000`, NestJS `4000`.
 
 **Status terms**
 

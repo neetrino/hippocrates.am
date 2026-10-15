@@ -1,6 +1,6 @@
 # Database design — Hippocrates.am
 
-> Revised 2026-10-14. The lists below are the **product target**. Prisma under `apps/api/prisma/` is the live schema. Chat, branch, invoice, and clinical tables still wait. `Question`, `Review`, `AppointmentEvent`, and `PasswordReset` already exist.
+> Revised 2026-10-15. The lists below are the **product target**. Prisma under `apps/api/prisma/` is the live schema. Chat, invoice, and clinical tables still wait. `Question`, `Review`, `AppointmentEvent`, and `PasswordReset` already exist. One doctor user = one `DoctorProfile` = one clinic (`ADR-005`).
 
 ## Authoritative data groups
 
@@ -11,7 +11,7 @@
 | Clinics | `Clinic` | Public name, description, contact, draft/published state. Branches arrive on point P2 |
 | Clinics | `ClinicMembership` | User, clinic, role (admin); active/revoked state and timestamps |
 | Verification | `VerificationCase` | **Separate target type** CLINIC or DOCTOR, reviewer, status and audit; protected evidence refs if approved |
-| Doctors | `DoctorProfile` | One user, specialization, public fields, verification. Affiliations to clinics are separate rows |
+| Doctors | `DoctorProfile` | One user, one clinic, specialization, public fields, verification |
 | Catalog | `Service` | Minimal approved service identity/name/category as needed |
 | Catalog | `ClinicOffering` | Clinic, approved doctor/service eligibility if needed, published price/currency and optional estimate flag |
 | Scheduling | `DoctorSchedule` | Doctor+clinic, weekday/date and time intervals, clinic time zone |
@@ -56,7 +56,7 @@ The diagram is conceptual; actual column names/types/keys require approved migra
 - Every clinic-owned operational row has a trustworthy clinic scope or a constrained FK path to one. Composite integrity and service checks block Clinic A references to Clinic B private objects.
 - `Clinic` and `DoctorProfile` publication are distinct; public clinic and doctor projections require independently approved verification states where applicable.
 - Clinic membership revocation is checked **on each protected request**; a stale signed-in session does not preserve revoked clinic powers.
-- A doctor user may have one affiliation row per clinic. Overlapping active appointments are rejected for that doctor across clinics.
+- A doctor user has one `DoctorProfile` and one `clinicId`. Overlapping active appointments are rejected for that profile. A second clinic for the same person is a second email and a second occupancy world (`ADR-005`).
 - Patient may have appointments with several clinics but sees only their own records; each clinic sees only its own permitted booking details.
 
 ## Appointment state and conflict integrity
@@ -94,4 +94,4 @@ Cancellation transaction validates actor, policy, status, and updates appointmen
 
 Do not create `Conversation`, `Message`, `Branch`, `TreatmentPlan`, `MedicalNote`, imaging, invoice, or payment tables until their point. `Question`, `Answer`, and `Review` already exist. Booking-price totals on P5 are queries, not a ledger. Invoices start on P9. Clinical tables start on P10.
 
-**Still open:** production data residency and the file-storage vendor. Accepted: email login, 12-hour sessions, private verification evidence, and the point order in `PROGRESS.md`. `BRIEF.md` and `ADR-003` are product authority.
+**Still open:** production data residency and the file-storage vendor. Accepted: email login, 12-hour sessions, private verification evidence, and the point order in `PROGRESS.md`. `BRIEF.md` and `ADR-003` are product authority; doctor-clinic binding is `ADR-005`.

@@ -20,6 +20,7 @@
 - `docs/PROGRESS.md` — կետերի հերթը։
 - `docs/SCOPE_CHANGE.md` — կրճատված փաթեթի հետ կանչը։
 - `docs/architecture/adrs/ADR-003-FULL-PRODUCT-SCOPE.md` — գործող շրջանակը. `ADR-001` և `ADR-002` պատմություն են, որտեղ կրճատում են պրոյեկտը։
+- `docs/architecture/adrs/ADR-005-ONE-DOCTOR-ACCOUNT-PER-CLINIC.md` — մեկ բժիշկ-account = մեկ կլինիկա (կենդանի Prisma մոդել)։
 
 ## Կարևոր պարզաբանումներ
 
@@ -27,4 +28,4 @@
 - Ֆինանսական կետը և կլինիկական կետը նույն պրոյեկտի հետագա կետերն են. դրանք չեն գրվում առաջին կետերի հետ։
 - Փաստաթուղթը չի նշանակում, որ համապատասխան ծրագիրն արդեն գրված է։
 
-**Ընթերցման հերթականություն.** `FUNCTIONALITY_HY.md` → `BRIEF.md` → canonical սպեցիֆիկացիա → `ADR-003` → `TECH_CARD.md` → `01-ARCHITECTURE.md` → `PROGRESS.md`։
+**Ընթերցման հերթականություն.** `FUNCTIONALITY_HY.md` → `BRIEF.md` → canonical սպեցիֆիկացիա → `ADR-003` → `ADR-005` → `TECH_CARD.md` → `01-ARCHITECTURE.md` → `PROGRESS.md`։

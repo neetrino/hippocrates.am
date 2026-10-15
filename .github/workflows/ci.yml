@@ -34,6 +34,24 @@ jobs:
   quality:
     name: Quality checks
     runs-on: ubuntu-latest
+    env:
+      # 127.0.0.1 avoids the runner resolving localhost to IPv6 while Postgres listens on IPv4.
+      DATABASE_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates
+      DIRECT_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: hippocrates
+          POSTGRES_PASSWORD: hippocrates
+          POSTGRES_DB: hippocrates
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hippocrates -d hippocrates"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,12 +72,16 @@ jobs:
         run: |
           cp .env.example .env
           sed -i 's/^SESSION_SECRET=""/SESSION_SECRET="ci-session-secret-at-least-32-chars"/' .env
+          sed -i 's/@localhost:5432/@127.0.0.1:5432/' .env
 
       - name: Validate Prisma schema
         run: pnpm db:validate
 
       - name: Generate Prisma client
         run: pnpm --filter @hippocrates/api db:generate
+
+      - name: Apply database migrations
+        run: pnpm db:migrate
 
       - name: Lint
         run: pnpm lint

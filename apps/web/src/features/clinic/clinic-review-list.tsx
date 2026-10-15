@@ -51,7 +51,7 @@ function ReplyForm({ id }: { id: string }) {
     <form className="grid gap-2" onSubmit={(event) => void onSubmit(event)}>
       <label className="grid gap-1.5 text-[0.92rem] font-semibold">
         {t("reply")}
-        <textarea name="reply" required rows={3} className="rounded-xl border border-line px-3.5 py-3 font-normal" />
+        <textarea name="reply" required maxLength={1200} rows={3} className="rounded-xl border border-line px-3.5 py-3 font-normal" />
       </label>
       <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-4 py-2.5 text-sm font-semibold text-white" type="submit">{t("sendReply")}</button>
       {message ? <p className="m-0 text-sm text-danger">{message}</p> : null}

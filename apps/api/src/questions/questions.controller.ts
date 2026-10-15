@@ -18,9 +18,9 @@ export class QuestionsController {
     const question = await this.prisma.question.create({
       data: {
         authorId: actor.id,
-        title: requiredString(input.title, "Վերնագիր"),
-        body: requiredString(input.body, "Հարց"),
-        category: typeof input.category === "string" ? input.category.trim() : "Ընդհանուր",
+        title: requiredString(input.title, "Վերնագիր", 160),
+        body: requiredString(input.body, "Հարց", 3000),
+        category: typeof input.category === "string" ? requiredString(input.category, "Բաժին", 80) : "Ընդհանուր",
         status: "PENDING",
       },
     });
@@ -73,7 +73,12 @@ export class QuestionsController {
     const question = await this.prisma.question.findFirst({ where: { id, status: "PUBLISHED" } });
     if (!question) throw new AppError("NOT_FOUND", 404, "Հարցը չի գտնվել");
     const answer = await this.prisma.answer.create({
-      data: { questionId: id, doctorId: doctor.id, body: requiredString(recordOf(body).body, "Պատասխան"), published: true },
+      data: {
+        questionId: id,
+        doctorId: doctor.id,
+        body: requiredString(recordOf(body).body, "Պատասխան", 3000),
+        published: true,
+      },
     });
     return { id: answer.id };
   }

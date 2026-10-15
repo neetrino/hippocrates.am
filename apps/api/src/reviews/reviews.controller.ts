@@ -29,7 +29,7 @@ export class ReviewsController {
         clinicId: appointment.clinicId,
         doctorId: appointment.doctorId,
         rating: intOf(input.rating, "Գնահատական", 1, 5),
-        body: requiredString(input.body, "Կարծիք"),
+        body: requiredString(input.body, "Կարծիք", 1200),
       },
     });
     return { id: review.id };
@@ -43,7 +43,7 @@ export class ReviewsController {
     requireClinicAdmin(actor, review.clinicId);
     await this.prisma.review.update({
       where: { id },
-      data: { reply: requiredString(recordOf(body).reply, "Պատասխան") },
+      data: { reply: requiredString(recordOf(body).reply, "Պատասխան", 1200) },
     });
     return { id };
   }

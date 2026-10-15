@@ -11,6 +11,7 @@ type PasswordFieldProps = {
   hideLabel: string;
   variant?: "auth" | "portal";
   readOnly?: boolean;
+  minLength?: number;
   onPointerDown?: (event: PointerEvent<HTMLInputElement>) => void;
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
 };
@@ -24,6 +25,7 @@ export function PasswordField({
   hideLabel,
   variant = "auth",
   readOnly,
+  minLength,
   onPointerDown,
   onKeyDown,
 }: PasswordFieldProps) {
@@ -50,6 +52,8 @@ export function PasswordField({
           type={visible ? "text" : "password"}
           placeholder={placeholder}
           required
+          minLength={minLength}
+          maxLength={128}
           readOnly={readOnly}
           autoComplete={autoComplete}
           onPointerDown={onPointerDown}
@@ -60,6 +64,7 @@ export function PasswordField({
           type="button"
           className="grid h-[30px] w-[30px] shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-muted hover:bg-white/70 hover:text-accent"
           aria-label={visible ? hideLabel : showLabel}
+          aria-pressed={visible}
           onClick={() => setVisible((value) => !value)}
         >
           {visible ? <EyeOffIcon /> : <EyeIcon />}

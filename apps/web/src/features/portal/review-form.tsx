@@ -45,7 +45,7 @@ export function ReviewForm({ appointmentId }: { appointmentId: string }) {
       </label>
       <label className={fieldClass}>
         {t("review")}
-        <textarea name="body" required className={`${controlClass} min-h-[110px] resize-y`} />
+        <textarea name="body" required maxLength={1200} className={`${controlClass} min-h-[110px] resize-y`} />
       </label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button

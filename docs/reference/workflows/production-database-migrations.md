@@ -34,8 +34,8 @@ Runtime, startup, request handlers, and `next build` must not migrate. One job o
 
 - Production command: non-interactive, idempotent, typically `db:migrate:deploy`.
 - Prisma production: `prisma migrate deploy`. Do not automate `migrate dev`, `db push`, or `migrate reset` against production.
-- `DATABASE_URL` — least-privilege runtime.
-- `DIRECT_URL` — privileged migration connection, only in the job's secret store.
+- `DATABASE_URL` — least-privilege runtime. Nest `PrismaModule` / `PrismaPg` only.
+- `DIRECT_URL` — Prisma CLI datasource in `apps/api/prisma.config.ts` (migrate / generate / validate). Privileged, non-pooled, only in the job's secret store. A `-pooler` or `pgbouncer=true` URL is rejected.
 
 The provider (Neon, Cloud SQL, self-hosted PostgreSQL) changes endpoints and network path, not this contract. Pooled runtime vs direct migration endpoints are normal.
 

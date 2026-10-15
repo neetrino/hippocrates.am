@@ -14,8 +14,12 @@ type PatientRescheduleProps = {
 
 export function PatientReschedule(props: PatientRescheduleProps) {
   const movable = props.status === "REQUESTED" || props.status === "CONFIRMED";
-  if (!movable || new Date(props.startsAt).getTime() <= Date.now()) return null;
+  if (!movable || visitStarted(props.startsAt)) return null;
   return <RescheduleForm id={props.id} doctorId={props.doctorId} offeringId={props.offeringId} />;
+}
+
+function visitStarted(startsAt: string): boolean {
+  return Date.parse(startsAt) <= Date.now();
 }
 
 function RescheduleForm({ id, doctorId, offeringId }: { id: string; doctorId: string; offeringId: string }) {

@@ -74,6 +74,26 @@ function assertNoTrackedSecrets() {
   }
 }
 
+function assertNoCredentialContent() {
+  const candidates = trackedFiles().filter((path) =>
+    /^(apps|scripts|\.github|docker)\//.test(path.replaceAll("\\", "/")),
+  );
+  const patterns = [
+    /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
+    /\bAKIA[0-9A-Z]{16}\b/,
+    /\bghp_[A-Za-z0-9]{30,}\b/,
+    /\bgithub_pat_[A-Za-z0-9_]{40,}\b/,
+    /\bsk_live_[A-Za-z0-9]{20,}\b/,
+    /\bre_[A-Za-z0-9]{20,}\b/,
+  ];
+  for (const path of candidates) {
+    const text = readFileSync(join(root, path), "utf8");
+    if (patterns.some((pattern) => pattern.test(text))) {
+      fail(`Credential-like content is tracked in: ${path}`);
+    }
+  }
+}
+
 function assertEnvExampleHygiene() {
   const text = readFileSync(join(root, ".env.example"), "utf8");
   const mustStayEmpty = [
@@ -154,6 +174,7 @@ function assertMigrationSqlPresent() {
 
 assertStructure();
 assertNoTrackedSecrets();
+assertNoCredentialContent();
 assertEnvExampleHygiene();
 assertLocaleParity();
 assertMigrationSqlPresent();

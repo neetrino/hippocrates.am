@@ -1,11 +1,11 @@
 # Hippocrates.am — Technical card
 
-> **Local stack accepted.** Production host and region are not chosen. The product is the full specification in [`BRIEF.md`](./BRIEF.md), delivered point by point (`ADR-003`). No application has been created yet.
+> **Local stack implemented.** Production host and region are not chosen. The product is the full specification in [`BRIEF.md`](./BRIEF.md), delivered point by point (`ADR-003`). Current implementation status is tracked in [`PROGRESS.md`](./PROGRESS.md).
 
 | Topic | Decision | State |
 | --- | --- | --- |
 | Product boundary | Full product, points P0–P11 in `PROGRESS.md`. No reduced first release | Accepted 2026-09-30 |
-| Repository | `apps/web` and `apps/api`. No `packages/*` until real reuse | Accepted. Folders are not created yet |
+| Repository | `apps/web` and `apps/api`. No `packages/*` until real reuse | Implemented |
 | Web | Next.js App Router. One UI for public, patient, doctor, clinic, and platform areas | Accepted |
 | Styling | Tailwind CSS 4.x via `@tailwindcss/postcss` (Next.js default) | Accepted |
 | Backend | NestJS modular-monolith REST API | Accepted |

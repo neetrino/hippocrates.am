@@ -4,6 +4,7 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { RateLimitService } from "../identity/rate-limit.service";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
@@ -14,11 +15,14 @@ import { liveListing } from "../catalog/public-visible";
 import { financeWindow } from "./finance-range";
 import { applyVerification, countPendingReviews, decisionOf, kindOf, listAdminClinics, listVerificationQueue } from "./verification";
 
+const BOOKING_WINDOW_MS = 10 * 60 * 1000;
+
 @Controller()
 export class OperationsController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notices: NotificationsService,
+    private readonly limits: RateLimitService,
   ) {}
 
   @Get("clinics/:clinicId/dashboard")
@@ -86,8 +90,9 @@ export class OperationsController {
 
   @Post("clinics/:clinicId/visits")
   @Roles("ADMIN")
-  bookVisit(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Body() body: unknown): Promise<{ id: string }> {
+  async bookVisit(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Body() body: unknown): Promise<{ id: string }> {
     requireClinicAdmin(actor, clinicId);
+    await this.limits.consume(`booking:${actor.id}`, 30, BOOKING_WINDOW_MS);
     return bookDeskVisit(this.prisma, this.notices, actor, clinicId, body);
   }
 

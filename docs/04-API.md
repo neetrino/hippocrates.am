@@ -1,15 +1,15 @@
 # API contracts — Hippocrates.am
 
-> **CANDIDATE ROUTES, NOT EXISTING ENDPOINTS.** Revised 2026-10-15. Path prefix `/api/v1`. The routes below are the early points. Chat, Q&A, reviews, branches, reschedule, and reminders are added on their points in `PROGRESS.md`. They are not banned. Product authority is `ADR-003` (doctor-clinic binding: `ADR-005`) and the canonical specification.
+> **CURRENT CONTRACT BASELINE.** Revised 2026-10-15. Path prefix `/api/v1`. Implemented scope and remaining work are tracked in `PROGRESS.md`. Product authority is `ADR-003` (doctor-clinic binding: `ADR-005`) and the canonical specification.
 
 ## Shared API rules
 
 - Public routes expose **published-only DTOs**; never serialize whole clinic/user/doctor ORM rows or private verification details.
-- Login is email and password. The session is a revocable server record. The browser receives an HttpOnly Secure SameSite=Lax cookie. Registration and login must be rate-limited; the numeric limits are not pinned yet.
+- Login is email and password. The session is a revocable server record. The browser receives an HttpOnly Secure SameSite=Lax cookie. Registration, login, and booking mutations are rate-limited in shared PostgreSQL buckets.
 - Every private operation checks current user identity, active clinic membership when relevant, action permission and resource/patient/doctor ownership.
 - Validate inputs, return generic 404 where another clinic's object must not be disclosed, and cap pagination and rate limits.
 - Timestamp storage UTC; render available times in clinic's declared IANA time zone. Server is source of truth for available slots.
-- Use an `Idempotency-Key` for creation/cancellation as agreed; deny replay with a different payload and ensure atomic consistency.
+- Appointment creation requires a bounded idempotency key in the request body and returns the existing appointment for a replay.
 
 **Response envelope (proposed):** `{ "data": ..., "meta": { "requestId": "..." } }`; errors `{ "error": { "code": "...", "message": "..." }, "requestId": "..." }`.
 
@@ -38,7 +38,8 @@ Geolocation, ratings, and external review imports arrive only on their points. D
 | `GET /me/appointments` | Patient sees **only** own requests, statuses and permitted history |
 | `GET /me/notifications` | Own basic booking-event notifications |
 
-Email and password is the accepted login. Do not add phone login, OAuth, or an email password-reset route in this release.
+Email and password is the accepted login. Password reset uses a one-time emailed link. Phone login and OAuth are not enabled.
+An unverified profile phone never transfers guest appointments into an account; a future claim flow requires proof of phone ownership.
 
 ## Clinic and doctor maintenance (P2–P3)
 
@@ -95,6 +96,6 @@ Review, Q&A, branch, and reschedule routes are added on their points. Chat is pa
 - Cancellation immediately makes legitimately freed capacity available; retries cannot duplicate changes.
 - A second clinic on the same doctor email is rejected. That clinic still cannot read the other clinic's patients.
 - Patient list, client card, and finance responses contain only the caller's clinic.
-- Booking notification failure never changes final appointment state.
+- Appointment state/event and its in-app notifications commit in one transaction.
 
-Each route is a draft candidate; generate OpenAPI/DTO and automate positive/negative tests when implementing its approved slice. Do not claim routes already exist.
+Keep this contract synchronized with implemented routes and automate positive/negative tests for every protected slice.

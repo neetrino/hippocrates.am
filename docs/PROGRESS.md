@@ -23,8 +23,8 @@ Do not add empty modules for a later point. Prefer `NOW_VS_NEEDED_HY.md` for the
 | # | Point | In the repository now | State | Remaining on this point |
 | --- | --- | --- | --- | --- |
 | 0 | Foundation | pnpm workspace, Next.js 3000, NestJS 4000, Prisma migrations, `GET /health` | VERIFIED | Production host still unnamed |
-| 1 | Registration | Four roles. Patient self-registers. Super Admin creates clinic + Admin. Admin creates doctors. Forgot/reset password | VERIFIED | Email ownership verification and MFA are later hardening |
-| 2 | Clinic profile | Clinic edit, cover, hours, staff, services. No `Branch` table | VERIFIED | Multi-branch product still later |
+| 1 | Registration | Four roles. Patient self-registers. Super Admin creates clinic + Admin. Admin invites doctors to set their own password. Forgot/reset password | VERIFIED | Email ownership verification and MFA are later hardening |
+| 2 | Clinic profile | Clinic edit, cover, hours, services, and branch CRUD | VERIFIED | Full multi-branch scheduling remains later |
 | 3 | Public catalog | Home, clinic and doctor lists and pages, name/specialty search, locales | VERIFIED | City and other BRIEF filters |
 | 4 | Booking | Slots, request, confirm, cancel, reschedule, complete, no-show, expiry, overlap exclusion, `AppointmentEvent` | VERIFIED | Hold, check-in, cancel cutoff |
 | 5 | Portals | Patient, doctor, clinic desk, in-app notices, patient card, price totals, favorites, settings | VERIFIED | Visit email delivery (Resend is only on password reset) |
@@ -42,7 +42,7 @@ Do not add empty modules for a later point. Prefer `NOW_VS_NEEDED_HY.md` for the
 3. `apps/api` — NestJS, `API_PORT` 4000, loads the same `.env`.
 4. Prisma — versioned migrations under `apps/api/prisma/migrations`.
 5. `GET /health` on the API.
-6. Format, lint, typecheck, test, and build scripts.
+6. Lint, typecheck, test, and build scripts.
 
 Point 1 is the four roles in `ADR-004`. Chat, payments, clinical tables, and production deploy stay paused.
 

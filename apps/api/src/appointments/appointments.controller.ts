@@ -5,6 +5,7 @@ import { PrismaService } from "../infrastructure/prisma.service";
 import { requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { RateLimitService } from "../identity/rate-limit.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { closeExpiredRequests } from "./close-expired";
 import { eventSelect, namedEventsForVisits, omitEvents } from "./present-events";
@@ -28,6 +29,8 @@ const appointmentCard = {
   events: { orderBy: { createdAt: "asc" as const }, select: eventSelect },
 } as const;
 
+const BOOKING_WINDOW_MS = 10 * 60 * 1000;
+
 function presentAppointment<T extends { clinic: { coverKey: string | null } }>(row: T) {
   const { coverKey, ...clinic } = row.clinic;
   return { ...row, clinic: { ...clinic, coverUrl: publicAssetUrl(coverKey) } };
@@ -38,39 +41,46 @@ export class AppointmentsController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notices: NotificationsService,
+    private readonly limits: RateLimitService,
   ) {}
 
   @Post()
   @Roles("PATIENT")
-  create(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ id: string }> {
+  async create(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ id: string }> {
     requireRoles(actor, ["PATIENT"]);
+    await this.limitBooking(actor);
     return bookVisit(this.prisma, this.notices, actor.id, body);
   }
 
   @Post(":id/confirm")
-  confirm(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+  async confirm(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+    await this.limitBooking(actor);
     return confirmVisit(this.prisma, this.notices, actor, id);
   }
 
   @Post(":id/cancel")
-  cancel(@CurrentActor() actor: Actor, @Param("id") id: string, @Body() body: unknown): Promise<{ id: string }> {
+  async cancel(@CurrentActor() actor: Actor, @Param("id") id: string, @Body() body: unknown): Promise<{ id: string }> {
+    await this.limitBooking(actor);
     return cancelVisit(this.prisma, this.notices, actor, id, body);
   }
 
   @Post(":id/complete")
   @Roles("ADMIN", "DOCTOR")
-  complete(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+  async complete(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+    await this.limitBooking(actor);
     return completeVisit(this.prisma, this.notices, actor, id);
   }
 
   @Post(":id/no-show")
   @Roles("ADMIN", "DOCTOR")
-  noShow(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+  async noShow(@CurrentActor() actor: Actor, @Param("id") id: string): Promise<{ id: string }> {
+    await this.limitBooking(actor);
     return missVisit(this.prisma, this.notices, actor, id);
   }
 
   @Post(":id/reschedule")
-  reschedule(@CurrentActor() actor: Actor, @Param("id") id: string, @Body() body: unknown): Promise<{ id: string }> {
+  async reschedule(@CurrentActor() actor: Actor, @Param("id") id: string, @Body() body: unknown): Promise<{ id: string }> {
+    await this.limitBooking(actor);
     return rescheduleVisit(this.prisma, this.notices, actor, id, body);
   }
 
@@ -93,5 +103,10 @@ export class AppointmentsController {
       ...presentAppointment(omitEvents(row)),
       events: histories[index] ?? [],
     }));
+  }
+
+  private limitBooking(actor: Actor): Promise<void> {
+    const limit = actor.role === "PATIENT" ? 10 : 30;
+    return this.limits.consume(`booking:${actor.id}`, limit, BOOKING_WINDOW_MS);
   }
 }

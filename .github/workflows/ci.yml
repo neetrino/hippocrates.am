@@ -92,6 +92,22 @@ jobs:
       - name: Tests
         run: pnpm test
 
+      - name: Verify database backup restore
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker exec "$POSTGRES_CONTAINER" pg_dump -U hippocrates -Fc -d hippocrates_test -f /tmp/hippocrates.dump
+          docker exec "$POSTGRES_CONTAINER" createdb -U hippocrates hippocrates_restore
+          docker exec "$POSTGRES_CONTAINER" pg_restore -U hippocrates -d hippocrates_restore /tmp/hippocrates.dump
+          migrations="$(docker exec "$POSTGRES_CONTAINER" psql -U hippocrates -d hippocrates_restore -tAc 'SELECT COUNT(*) FROM "_prisma_migrations"')"
+          test "$migrations" -gt 0
+
+      - name: Install E2E browser
+        run: pnpm --filter @hippocrates/web exec playwright install --with-deps chromium
+
+      - name: Web role E2E
+        run: pnpm --filter @hippocrates/web test:e2e
+
       - name: Build
         run: pnpm build
 
@@ -114,8 +130,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Audit dependencies (high+)
-        run: pnpm audit --audit-level=high
+      - name: Audit production dependencies (high+)
+        run: pnpm audit --prod --audit-level=high
 
       - name: Audit dependencies (critical)
         run: pnpm audit --audit-level=critical

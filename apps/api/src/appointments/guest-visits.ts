@@ -1,7 +1,4 @@
-import type { Prisma } from "../generated/prisma/client";
 import type { PrismaService } from "../infrastructure/prisma.service";
-
-type VisitDb = PrismaService | Prisma.TransactionClient;
 
 export type DeskPatient = {
   id: string | null;
@@ -9,17 +6,6 @@ export type DeskPatient = {
   email: string | null;
   phone: string | null;
 };
-
-/** Attaches phone bookings to a patient account that now owns that number. */
-export async function claimGuestVisits(db: VisitDb, userId: string, phone: string | null): Promise<void> {
-  if (!phone) return;
-  const user = await db.user.findUnique({ where: { id: userId }, select: { role: true } });
-  if (user?.role !== "PATIENT") return;
-  await db.appointment.updateMany({
-    where: { patientId: null, guestPhone: phone },
-    data: { patientId: userId, guestName: null, guestPhone: null },
-  });
-}
 
 export async function listClinicPatients(prisma: PrismaService, clinicId: string): Promise<DeskPatient[]> {
   const [accounts, guests] = await Promise.all([

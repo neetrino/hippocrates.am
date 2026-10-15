@@ -380,6 +380,7 @@
     "verifyWaitHint": "Ждёт подтверждения",
     "publishedNeedsApproval": "Опубликовать можно только после подтверждения Super Admin.",
     "doctorNeedsApproval": "Врач появится на сайте после подтверждения Super Admin.",
+    "doctorInviteHint": "Врач сам задаёт пароль по безопасной ссылке, отправленной на электронную почту.",
     "doctorHidden": "Врач не виден на сайте",
     "saveDoctor": "Зарегистрировать",
     "doctorFailed": "Врач не зарегистрирован",

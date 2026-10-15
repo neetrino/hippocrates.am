@@ -6,14 +6,13 @@ import { defineConfig } from "prisma/config";
  */
 function cliDatasourceUrl(): string {
   const direct = process.env.DIRECT_URL?.trim();
-  const runtime = process.env.DATABASE_URL?.trim();
-  const url = direct || runtime || "";
-  if (url && looksPooled(url)) {
-    throw new Error(
-      "Prisma CLI must use DIRECT_URL (non-pooled). DATABASE_URL with a pooler host is runtime-only.",
-    );
+  if (!direct) {
+    throw new Error("Prisma CLI requires DIRECT_URL; DATABASE_URL is runtime-only.");
   }
-  return url;
+  if (looksPooled(direct)) {
+    throw new Error("Prisma CLI requires a non-pooled DIRECT_URL.");
+  }
+  return direct;
 }
 
 function looksPooled(url: string): boolean {

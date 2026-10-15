@@ -37,8 +37,12 @@ export async function deliverResetLink(email: string, token: string, locale: Res
     logger.log(`Password reset link for ${email}: ${url}`);
     return;
   }
-  const sent = await postResend(email, copy[locale], url);
-  if (!sent) logger.error("Password reset mail was not accepted");
+  try {
+    const sent = await postResend(email, copy[locale], url);
+    if (!sent) logger.error("Password reset mail was not accepted");
+  } catch (error) {
+    logger.error("Password reset mail failed", error instanceof Error ? error.stack : undefined);
+  }
 }
 
 function mailReady(): boolean {

@@ -1,12 +1,15 @@
+import { randomBytes } from "node:crypto";
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { AppError } from "../common/app-error";
-import { emailOf, optionalString, passwordOf, recordOf, requiredString } from "../common/input";
+import { emailOf, optionalString, recordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
+import { assertResetMail } from "../identity/password-mail";
+import { requestPasswordReset } from "../identity/password-reset";
 import { RateLimitService } from "../identity/rate-limit.service";
 import { SessionService } from "../identity/session.service";
 import { saveDoctorLocale, updateDoctor } from "./doctor-edit";
@@ -30,9 +33,10 @@ export class DoctorsController {
     requireClinicAdmin(actor, clinicId);
     const input = recordOf(body);
     const email = emailOf(input.email);
+    assertResetMail();
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
-    const passwordHash = await this.sessions.hashPassword(passwordOf(input.password));
+    const passwordHash = await this.sessions.hashPassword(randomBytes(32).toString("base64url"));
     const profile = await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
@@ -54,6 +58,7 @@ export class DoctorsController {
         },
       });
     });
+    await requestPasswordReset(this.prisma, email, input.locale);
     return { id: profile.id };
   }
 
@@ -120,7 +125,7 @@ export class DoctorsController {
     @Req() request: Request,
   ): Promise<{ photoUrl: string }> {
     requireClinicAdmin(actor, clinicId);
-    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    await this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
     return { photoUrl: await saveDoctorPhoto(this.prisma, clinicId, doctorId, request) };
   }
 
@@ -132,7 +137,7 @@ export class DoctorsController {
     @Param("doctorId") doctorId: string,
   ): Promise<{ ok: true }> {
     requireClinicAdmin(actor, clinicId);
-    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    await this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
     await clearDoctorPhoto(this.prisma, clinicId, doctorId);
     return { ok: true };
   }

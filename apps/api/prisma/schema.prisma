@@ -343,6 +343,15 @@ model PasswordReset {
   @@index([userId])
 }
 
+model RateLimitBucket {
+  key         String   @id
+  windowStart DateTime
+  count       Int      @default(1)
+  expiresAt   DateTime
+
+  @@index([expiresAt])
+}
+
 model ReviewLocale {
   id       String @id @default(cuid())
   reviewId String

@@ -380,6 +380,7 @@
     "verifyWaitHint": "Waiting for approval",
     "publishedNeedsApproval": "You can publish only after Super Admin approval.",
     "doctorNeedsApproval": "The doctor appears on the site after Super Admin approval.",
+    "doctorInviteHint": "The doctor sets their own password through the secure link sent by email.",
     "doctorHidden": "This doctor is hidden on the site",
     "saveDoctor": "Register",
     "doctorFailed": "The doctor was not registered",

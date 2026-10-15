@@ -1,7 +1,6 @@
 import { AppError } from "../common/app-error";
 import { displayNameOf, emailOf, namePartOf, optionalPhoneOf, passwordOf, recordOf, requiredString } from "../common/input";
 import type { PrismaService } from "../infrastructure/prisma.service";
-import { claimGuestVisits } from "../appointments/guest-visits";
 import type { SessionService } from "./session.service";
 
 export type OwnProfile = {
@@ -34,7 +33,6 @@ export async function updateOwnProfile(
     data: { displayName, email, phone },
     select: { displayName: true, email: true, phone: true },
   });
-  await claimGuestVisits(prisma, userId, phone);
   return updated;
 }
 
@@ -70,8 +68,13 @@ export async function changeOwnPassword(
   if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
   const valid = await sessions.verifyPassword(current, user.passwordHash);
   if (!valid) throw new AppError("VALIDATION_FAILED", 400, "Ընթացիկ գաղտնաբառը սխալ է");
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash: await sessions.hashPassword(password) },
+  const passwordHash = await sessions.hashPassword(password);
+  const revokedAt = new Date();
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: userId }, data: { passwordHash } });
+    await tx.session.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt },
+    });
   });
 }

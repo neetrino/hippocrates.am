@@ -37,9 +37,9 @@ export async function bookVisit(prisma: PrismaService, notices: Notices, patient
       },
     });
     await appendCreated(tx, row, { userId: patientId, role: "PATIENT" });
+    await notices.write(tx, row, appointmentNotice.requested, "created");
     return row;
   });
-  await notices.afterAppointment(created, appointmentNotice.requested);
   return { id: created.id };
 }
 
@@ -53,10 +53,10 @@ export async function confirmVisit(prisma: PrismaService, notices: Notices, acto
     throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
   }
   if (!(await mayConfirm(prisma, actor, appointment))) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
-  const updated = await prisma.$transaction((tx) =>
-    applyTransition(tx, appointment, { type: "CONFIRMED" }, visitActor(actor), now),
-  );
-  await notices.afterAppointment(updated, appointmentNotice.confirmed);
+  await prisma.$transaction(async (tx) => {
+    const updated = await applyTransition(tx, appointment, { type: "CONFIRMED" }, visitActor(actor), now);
+    await notices.write(tx, updated, appointmentNotice.confirmed, `confirmed:${now.getTime()}`);
+  });
   return { id };
 }
 
@@ -69,10 +69,16 @@ export async function cancelVisit(prisma: PrismaService, notices: Notices, actor
   if (!(await mayCancel(prisma, actor, appointment))) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
   if (visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Այցն արդեն սկսվել է");
   const reason = reasonOf(body);
-  const updated = await prisma.$transaction((tx) =>
-    applyTransition(tx, appointment, { type: "CANCELLED", reason }, visitActor(actor), now),
-  );
-  await notices.afterAppointment(updated, cancelNotice(actor.role), reason);
+  await prisma.$transaction(async (tx) => {
+    const updated = await applyTransition(
+      tx,
+      appointment,
+      { type: "CANCELLED", reason },
+      visitActor(actor),
+      now,
+    );
+    await notices.write(tx, updated, cancelNotice(actor.role), `cancelled:${now.getTime()}`, reason);
+  });
   return { id };
 }
 
@@ -80,10 +86,10 @@ export async function completeVisit(prisma: PrismaService, notices: Notices, act
   const now = new Date();
   const appointment = await confirmedVisit(prisma, actor, id);
   if (!visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_NOT_STARTED", 409, "Այցը դեռ չի սկսվել");
-  const updated = await prisma.$transaction((tx) =>
-    applyTransition(tx, appointment, { type: "COMPLETED" }, visitActor(actor), now),
-  );
-  await notices.afterAppointment(updated, appointmentNotice.completed);
+  await prisma.$transaction(async (tx) => {
+    const updated = await applyTransition(tx, appointment, { type: "COMPLETED" }, visitActor(actor), now);
+    await notices.write(tx, updated, appointmentNotice.completed, `completed:${now.getTime()}`);
+  });
   return { id };
 }
 
@@ -91,10 +97,10 @@ export async function missVisit(prisma: PrismaService, notices: Notices, actor: 
   const now = new Date();
   const appointment = await confirmedVisit(prisma, actor, id);
   if (!visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_NOT_STARTED", 409, "Այցը դեռ չի սկսվել");
-  const updated = await prisma.$transaction((tx) =>
-    applyTransition(tx, appointment, { type: "NO_SHOW" }, visitActor(actor), now),
-  );
-  await notices.afterAppointment(updated, appointmentNotice.noShow);
+  await prisma.$transaction(async (tx) => {
+    const updated = await applyTransition(tx, appointment, { type: "NO_SHOW" }, visitActor(actor), now);
+    await notices.write(tx, updated, appointmentNotice.noShow, `no-show:${now.getTime()}`);
+  });
   return { id };
 }
 
@@ -114,16 +120,17 @@ export async function rescheduleVisit(prisma: PrismaService, notices: Notices, a
   await assertBookable(prisma, notices, offering, startsAt, appointment.id);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
   const outcome = rescheduleOutcome(isPatient, openStatus(appointment.status), appointment.patientId !== null);
-  const updated = await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, id, (tx) =>
-    applyTransition(
+  await withOpenSlot(prisma, offering.doctorId, startsAt, endsAt, id, async (tx) => {
+    const updated = await applyTransition(
       tx,
       appointment,
       { type: "RESCHEDULED", startsAt, endsAt, status: outcome.status, proposedBy: outcome.proposedBy },
       visitActor(actor),
       now,
-    ),
-  );
-  await notices.afterAppointment(updated, moveNotice(actor.role));
+    );
+    await notices.write(tx, updated, moveNotice(actor.role), `rescheduled:${now.getTime()}`);
+    return updated;
+  });
   return { id };
 }
 

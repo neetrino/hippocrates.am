@@ -184,7 +184,7 @@ export class ClinicsController {
     @Req() request: Request,
   ): Promise<{ coverUrl: string }> {
     requireClinicAdmin(actor, clinicId);
-    this.limits.consume(`cover:${actor.id}`, 10, 10 * 60 * 1000);
+    await this.limits.consume(`cover:${actor.id}`, 10, 10 * 60 * 1000);
     return { coverUrl: await saveClinicCover(this.prisma, clinicId, request) };
   }
 
@@ -192,7 +192,7 @@ export class ClinicsController {
   @Roles("ADMIN")
   async removeCover(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string): Promise<{ ok: true }> {
     requireClinicAdmin(actor, clinicId);
-    this.limits.consume(`cover:${actor.id}`, 10, 10 * 60 * 1000);
+    await this.limits.consume(`cover:${actor.id}`, 10, 10 * 60 * 1000);
     await clearClinicCover(this.prisma, clinicId);
     return { ok: true };
   }

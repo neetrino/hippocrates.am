@@ -7,9 +7,6 @@ import { EnvelopeInterceptor } from "./common/envelope.interceptor";
 import { HttpExceptionFilter } from "./common/http.filter";
 
 async function bootstrap(): Promise<void> {
-  if ((process.env.SESSION_SECRET ?? "").length < 32) {
-    throw new Error("SESSION_SECRET must be at least 32 characters");
-  }
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.enableCors({

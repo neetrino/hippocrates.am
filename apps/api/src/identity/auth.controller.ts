@@ -12,7 +12,6 @@ import { assertResetMail } from "./password-mail";
 import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
 import { accountPhotoUrl, assertAccountPhotoOwner, clearUserPhoto, saveUserPhoto } from "./user-photo";
-import { claimGuestVisits } from "../appointments/guest-visits";
 
 @Controller("auth")
 export class AuthController {
@@ -29,7 +28,7 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<{ id: string }> {
-    this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
+    await this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
     const input = recordOf(body);
     const name = personNameOf(input.name ?? input.displayName, "Անուն");
     const surname = personNameOf(input.surname, "Ազգանուն");
@@ -52,7 +51,6 @@ export class AuthController {
         role: "PATIENT",
       },
     });
-    await claimGuestVisits(this.prisma, user.id, phone);
     await this.sessions.open(response, user.id);
     return { id: user.id };
   }
@@ -64,7 +62,7 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<{ id: string; role: string }> {
-    this.limits.consume(`login:${request.ip ?? "unknown"}`, 10, 60 * 1000);
+    await this.limits.consume(`login:${request.ip ?? "unknown"}`, 10, 60 * 1000);
     const input = recordOf(body);
     const email = emailOf(input.email);
     const password = requiredString(input.password, "Գաղտնաբառ");
@@ -78,11 +76,11 @@ export class AuthController {
   @Public()
   @Post("forgot-password")
   async forgotPassword(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
-    this.limits.consume(`forgot:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
+    await this.limits.consume(`forgot:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
     assertResetMail();
     const input = recordOf(body);
     const email = emailOf(input.email);
-    this.limits.consume(`forgot-mail:${email}`, 3, 60 * 60 * 1000);
+    await this.limits.consume(`forgot-mail:${email}`, 3, 60 * 60 * 1000);
     await requestPasswordReset(this.prisma, email, input.locale);
     return { ok: true };
   }
@@ -90,7 +88,7 @@ export class AuthController {
   @Public()
   @Post("reset-password")
   async resetPassword(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
-    this.limits.consume(`reset:${request.ip ?? "unknown"}`, 8, 10 * 60 * 1000);
+    await this.limits.consume(`reset:${request.ip ?? "unknown"}`, 8, 10 * 60 * 1000);
     const input = recordOf(body);
     const token = requiredString(input.token, "Հղում");
     await applyPasswordReset(this.prisma, this.sessions, token, input.password, input.confirmPassword);
@@ -127,13 +125,13 @@ export class AuthController {
 
   @Patch("me")
   async updateProfile(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<OwnProfile> {
-    this.limits.consume(`profile:${actor.id}`, 20, 10 * 60 * 1000);
+    await this.limits.consume(`profile:${actor.id}`, 20, 10 * 60 * 1000);
     return updateOwnProfile(this.prisma, this.sessions, actor.id, body);
   }
 
   @Post("me/password")
   async updatePassword(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ ok: true }> {
-    this.limits.consume(`password:${actor.id}`, 5, 10 * 60 * 1000);
+    await this.limits.consume(`password:${actor.id}`, 5, 10 * 60 * 1000);
     await changeOwnPassword(this.prisma, this.sessions, actor.id, body);
     return { ok: true };
   }
@@ -141,7 +139,7 @@ export class AuthController {
   @Post("me/photo")
   async uploadPhoto(@CurrentActor() actor: Actor, @Req() request: Request): Promise<{ photoUrl: string }> {
     assertAccountPhotoOwner(actor.role);
-    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    await this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
     const photoUrl = await saveUserPhoto(this.prisma, actor.id, request);
     return { photoUrl };
   }
@@ -149,7 +147,7 @@ export class AuthController {
   @Delete("me/photo")
   async deletePhoto(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
     assertAccountPhotoOwner(actor.role);
-    this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
+    await this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
     await clearUserPhoto(this.prisma, actor.id);
     return { ok: true };
   }

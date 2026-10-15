@@ -380,6 +380,7 @@
     "verifyWaitHint": "Սպասում է հաստատման",
     "publishedNeedsApproval": "Հրապարակել կարելի է միայն Super Admin-ի հաստատումից հետո։",
     "doctorNeedsApproval": "Բժիշկը կայքում կերևա Super Admin-ի հաստատումից հետո։",
+    "doctorInviteHint": "Բժիշկը գաղտնաբառը ինքն է սահմանում էլ. փոստով ստացած անվտանգ հղումով։",
     "doctorHidden": "Բժիշկը կայքում չի երևում",
     "saveDoctor": "Գրանցել",
     "doctorFailed": "Բժիշկը չգրանցվեց",

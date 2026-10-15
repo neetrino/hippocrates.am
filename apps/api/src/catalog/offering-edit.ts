@@ -22,6 +22,7 @@ export async function updateOffering(
       priceAmd: intOf(input.priceAmd, "Գին", 0, 100_000_000),
       durationMinutes: intOf(input.durationMinutes, "Տևողություն", 5, 24 * 60),
       isEstimate: input.isEstimate === true,
+      ...(typeof input.published === "boolean" ? { published: input.published } : {}),
     },
   });
   return { id: existing.id };

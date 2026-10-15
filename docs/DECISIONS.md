@@ -1,12 +1,12 @@
 # Decision register — Hippocrates.am
 
-> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. `ADR-003` wins where an older row shrinks the product to a reduced first release. No person name was supplied. Production host remains open. No application code exists.
+> **Status:** FULL PRODUCT ACCEPTED, 2026-09-30. `ADR-003` wins where an older row shrinks the product to a reduced first release, except chat (`ADR-004` / HM-017) and doctor-clinic binding (`ADR-005` / HM-018). No person name was supplied. Production host remains open.
 
 | ID | Decision | Position | Status |
 | --- | --- | --- | --- |
 | HM-001 | Release boundary | 23-function reduced pack, later revised on 2026-09-30 | **SUPERSEDED by HM-016** |
 | HM-002 | Applications | `apps/web` Next.js, `apps/api` NestJS, PostgreSQL, Prisma. No `packages/*` until real reuse | **ACCEPTED** for local development |
-| HM-003 | Doctor account | One email is one account. The doctor sets the password. Admins cannot read or set it. The same account may work at more than one clinic | **ACCEPTED, revised by HM-016.** The one-clinic limit is withdrawn |
+| HM-003 | Doctor account | One email is one account. The doctor sets the password. Admins cannot read or set it. The same account may work at more than one clinic | **SUPERSEDED by HM-018.** One-clinic-per-account restored to match live schema |
 | HM-004 | Clinic locations | One location only | **SUPERSEDED by HM-016.** Branches are in the product, on point P2 |
 | HM-005 | Booking confirmation | Patient request, clinic confirmation | **ACCEPTED as the base.** Holds, reschedule, and no-show arrive on point P4 with the canonical specification |
 | HM-006 | Cancellation | Patient or clinic may cancel. Cancellation releases the slot in the same transaction | **ACCEPTED** |
@@ -21,11 +21,12 @@
 | HM-015 | Clinic operations | Dashboard, patient list, operational card, price totals | **ACCEPTED** as part of point P5. They do not replace the rest of the product |
 | HM-016 | Full product | Build the canonical specification point by point. No reduced first release. Finance and clinical work are later points of the same product | **ACCEPTED 2026-09-30.** Chat timing revised by HM-017 |
 | HM-017 | Roles and registration | Four roles: `SUPER_ADMIN`, `ADMIN`, `DOCTOR`, `PATIENT`. Super Admin registers the clinic and its owner Admin. That Admin registers doctors for their clinic only. A Patient self-registers and can book any clinic from the home page. Chat is not in the current work | **ACCEPTED 2026-09-30.** See ADR-004 |
+| HM-018 | Doctor clinic binding | One doctor login belongs to one clinic. Duplicate email on create is `EMAIL_TAKEN`. No affiliation table. A second clinic needs a second email; occupancy is not shared | **ACCEPTED 2026-10-15.** See ADR-005 |
 
 ## How to read older rows
 
-`ADR-004` is the current registration and role authority. `ADR-003` remains the product map except where HM-017 pauses chat.
+`ADR-004` is the current registration and role authority. `ADR-005` is doctor-clinic binding (one account, one clinic). `ADR-003` remains the product map except those amendments and where HM-017 pauses chat.
 
 **Approver:** Product owner, this chat session. Legal name not recorded.  
-**Approval date:** 2026-09-30.  
-**Scope status:** Full product. Production host, region, backup owner, and deploy owner stay open. No production deploy is authorized.
+**Approval date:** 2026-09-30. HM-018 / ADR-005 accepted 2026-10-15.  
+**Scope status:** Full product. One doctor login = one clinic. Production host, region, backup owner, and deploy owner stay open. No production deploy is authorized.

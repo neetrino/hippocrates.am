@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { TimeSelect } from "@/features/clinic/clinic-hour-field";
 
 export type HourWindow = { weekday: number; startMinute: number; endMinute: number };
-
-type DoctorHours = { id: string; name: string; windows: HourWindow[] };
 
 const WEEKDAYS = [
   { day: 1, key: "weekMon" },
@@ -17,56 +16,36 @@ const WEEKDAYS = [
   { day: 0, key: "weekSun" },
 ] as const;
 
-export function ClinicHours({
-  clinicId,
-  clinicWindows,
-  doctors,
-}: {
-  clinicId: string;
-  clinicWindows: HourWindow[];
-  doctors: DoctorHours[];
-}) {
+export function ClinicHours({ clinicId, clinicWindows }: { clinicId: string; clinicWindows: HourWindow[] }) {
   const t = useTranslations("desk");
-  const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? "");
-  const doctor = doctors.find((item) => item.id === doctorId);
   return (
-    <section className="grid gap-5 pt-7">
+    <section className="grid gap-3">
       <div>
-        <h2>{t("hours")}</h2>
+        <h2 className="m-0">{t("hours")}</h2>
         <p className="m-0 text-muted">{t("hoursHint")}</p>
       </div>
-      <HoursEditor title={t("clinicHours")} windows={clinicWindows} savePath={`/clinics/${clinicId}/windows`} />
-      {doctor ? (
-        <div className="grid gap-3">
-          <label className="grid max-w-sm gap-1.5 text-[0.92rem] font-semibold">
-            {t("doctor")}
-            <select
-              className="rounded-xl border border-line bg-white px-3.5 py-3 font-normal"
-              value={doctorId}
-              onChange={(event) => setDoctorId(event.target.value)}
-            >
-              {doctors.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <HoursEditor
-            key={doctor.id}
-            title={t("doctorHours")}
-            windows={doctor.windows}
-            savePath={`/clinics/${clinicId}/doctors/${doctor.id}/windows`}
-          />
-        </div>
-      ) : null}
+      <div className="rounded-card border border-line bg-white p-5 shadow-soft">
+        <HoursEditor title={t("clinicHours")} windows={clinicWindows} savePath={`/clinics/${clinicId}/windows`} />
+      </div>
     </section>
   );
 }
 
-export function HoursEditor({ title, windows, savePath }: { title: string; windows: HourWindow[]; savePath: string }) {
+export function HoursEditor({
+  title,
+  windows,
+  savePath,
+  bounds,
+  hint,
+}: {
+  title: string;
+  windows: HourWindow[];
+  savePath: string;
+  bounds?: HourWindow[];
+  hint?: string;
+}) {
   const t = useTranslations("desk");
-  const [days, setDays] = useState(() => dayFields(windows));
+  const [days, setDays] = useState(() => dayFields(clipWindows(windows, bounds)));
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
@@ -86,28 +65,16 @@ export function HoursEditor({ title, windows, savePath }: { title: string; windo
 
   return (
     <form
-      className="grid gap-3 rounded-card border border-line bg-white p-5 shadow-soft"
+      className="grid gap-3"
       onSubmit={(event) => {
         event.preventDefault();
         void save();
       }}
     >
       <h3 className="m-0">{title}</h3>
-      {WEEKDAYS.map((weekday) => (
-        <DayRow
-          key={weekday.day}
-          label={t(weekday.key)}
-          start={days[weekday.day]?.start ?? ""}
-          end={days[weekday.day]?.end ?? ""}
-          onStart={(start) => setDays((current) => ({ ...current, [weekday.day]: { start, end: current[weekday.day]?.end ?? "" } }))}
-          onEnd={(end) => setDays((current) => ({ ...current, [weekday.day]: { start: current[weekday.day]?.start ?? "", end } }))}
-        />
-      ))}
-      <button
-        className="btn btn-primary w-fit"
-        type="submit"
-        disabled={pending}
-      >
+      {hint ? <p className="m-0 text-sm text-muted">{hint}</p> : null}
+      <HoursWeek days={days} bounds={bounds} onDays={setDays} />
+      <button className="btn btn-primary mt-1 w-fit" type="submit" disabled={pending}>
         {t("saveHours")}
       </button>
       {message ? <p className={`m-0 text-sm ${failed ? "text-danger" : "text-accent"}`}>{message}</p> : null}
@@ -115,30 +82,128 @@ export function HoursEditor({ title, windows, savePath }: { title: string; windo
   );
 }
 
+function HoursWeek({
+  days,
+  bounds,
+  onDays,
+}: {
+  days: DayFields;
+  bounds?: HourWindow[];
+  onDays: (next: DayFields | ((current: DayFields) => DayFields)) => void;
+}) {
+  const t = useTranslations("desk");
+  return (
+    <div className="grid gap-2">
+      {WEEKDAYS.map((weekday) => {
+        const bound = dayBound(weekday.day, bounds);
+        return (
+          <DayRow
+            key={weekday.day}
+            label={t(weekday.key)}
+            start={days[weekday.day]?.start ?? ""}
+            end={days[weekday.day]?.end ?? ""}
+            locked={bound === null}
+            minMinute={bound?.startMinute}
+            maxMinute={bound?.endMinute}
+            onStart={(start) => onDays((current) => ({ ...current, [weekday.day]: { start, end: current[weekday.day]?.end ?? "" } }))}
+            onEnd={(end) => onDays((current) => ({ ...current, [weekday.day]: { start: current[weekday.day]?.start ?? "", end } }))}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function DayRow({
   label,
   start,
   end,
+  locked,
+  minMinute,
+  maxMinute,
   onStart,
   onEnd,
 }: {
   label: string;
   start: string;
   end: string;
+  locked?: boolean;
+  minMinute?: number;
+  maxMinute?: number;
   onStart: (value: string) => void;
   onEnd: (value: string) => void;
 }) {
-  const field = "rounded-xl border border-line bg-white px-3 py-2 font-normal";
+  const t = useTranslations("desk");
+  const open = Boolean(start && end);
   return (
-    <div className="grid items-center gap-2 sm:grid-cols-[9rem_1fr_1fr]">
-      <span className="font-semibold">{label}</span>
-      <input className={field} type="time" value={start} onChange={(event) => onStart(event.target.value)} />
-      <input className={field} type="time" value={end} onChange={(event) => onEnd(event.target.value)} />
+    <div
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-[0.875rem] border px-4 py-3 ${
+        open ? "border-line bg-accent-soft" : "border-dashed border-line bg-sand"
+      }`}
+    >
+      <span className="min-w-[7.5rem] font-semibold">{label}</span>
+      {locked ? (
+        <span className="text-sm text-muted">{t("hoursClinicClosed")}</span>
+      ) : (
+        <span className="flex shrink-0 items-center gap-2">
+          <HourField label={label} value={start} minMinute={minMinute} maxMinute={maxMinute} onChange={onStart} />
+          <span className="text-muted" aria-hidden="true">
+            –
+          </span>
+          <HourField label={label} value={end} end minMinute={minMinute} maxMinute={maxMinute} onChange={onEnd} />
+        </span>
+      )}
     </div>
   );
 }
 
+function HourField({
+  label,
+  value,
+  end,
+  minMinute,
+  maxMinute,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  end?: boolean;
+  minMinute?: number;
+  maxMinute?: number;
+  onChange: (value: string) => void;
+}) {
+  const t = useTranslations("desk");
+  return (
+    <TimeSelect
+      value={value}
+      closedLabel={t("hoursClosed")}
+      name={`${label} ${end ? t("hoursEnd") : t("hoursStart")}`}
+      listLabel={t("hoursList")}
+      placeholder={t("hoursTimePlaceholder")}
+      minMinute={minMinute}
+      maxMinute={maxMinute}
+      onChange={onChange}
+    />
+  );
+}
+
 type DayFields = Record<number, { start: string; end: string }>;
+
+function dayBound(weekday: number, bounds?: HourWindow[]): HourWindow | null | undefined {
+  if (!bounds || bounds.length === 0) return undefined;
+  return bounds.find((window) => window.weekday === weekday) ?? null;
+}
+
+function clipWindows(windows: HourWindow[], bounds?: HourWindow[]): HourWindow[] {
+  if (!bounds || bounds.length === 0) return windows;
+  return windows.flatMap((window) => {
+    const bound = bounds.find((item) => item.weekday === window.weekday);
+    if (!bound) return [];
+    const startMinute = Math.max(window.startMinute, bound.startMinute);
+    const endMinute = Math.min(window.endMinute, bound.endMinute);
+    return startMinute < endMinute ? [{ weekday: window.weekday, startMinute, endMinute }] : [];
+  });
+}
 
 function dayFields(windows: HourWindow[]): DayFields {
   const fields: DayFields = {};

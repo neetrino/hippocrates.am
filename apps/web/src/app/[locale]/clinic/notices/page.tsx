@@ -4,9 +4,9 @@ import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
 import { doctorDisplayName } from "@/shared/clinic-label";
-import { formatWhen } from "@/shared/format";
+import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
-import { noticeMessageKey, type NoticeMessageKey } from "@/shared/notice-text";
+import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import { sessionGet } from "@/shared/session-api";
 
 export default async function ClinicNoticesPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -37,16 +37,18 @@ function toRow(
   t: (key: NoticeMessageKey) => string,
   arrivedLabel: string,
 ): NoticeRow {
-  const messageKey = noticeMessageKey(notice.body);
   const visit = notice.appointment;
-  const context = visit
-    ? `${visit.patient.displayName} · ${doctorDisplayName(visit.doctor, locale)} · ${formatWhen(visit.startsAt, locale)}`
-    : "";
+  const patient = visit ? patientLabel(visit) : "";
+  const doctor = visit ? doctorDisplayName(visit.doctor, locale) : "";
+  const context = visit ? `${patient} · ${doctor} · ${formatWhen(visit.startsAt, locale)}` : "";
   return {
     id: notice.id,
-    text: messageKey ? t(messageKey) : notice.body,
+    text: noticeLine(notice.body, notice.detail, t),
     when: `${arrivedLabel} · ${formatWhen(notice.createdAt, locale)}`,
     context,
     unread: notice.readAt === null,
+    startsAt: visit?.startsAt ?? null,
+    kind: noticeKind(notice.body),
+    people: [patient, doctor].filter(Boolean),
   };
 }

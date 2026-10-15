@@ -1,13 +1,15 @@
 "use client";
 
-import { FocusEvent, FormEvent, PointerEvent, useState } from "react";
+import { FormEvent, KeyboardEvent, PointerEvent, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 
 type LoginPayload = {
   data: { id: string; role: string };
 };
+
+type FieldOpenEvent = PointerEvent<HTMLInputElement> | KeyboardEvent<HTMLInputElement>;
 
 function accountHome(role: string): "/super-admin" | "/clinic" | "/me" {
   if (role === "SUPER_ADMIN") return "/super-admin";
@@ -21,6 +23,11 @@ export function LoginForm() {
   const router = useRouter();
   const t = useTranslations("auth");
   const common = useTranslations("common");
+
+  function openFields(event: FieldOpenEvent): void {
+    event.currentTarget.readOnly = false;
+    setLocked(false);
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -44,11 +51,6 @@ export function LoginForm() {
     router.refresh();
   }
 
-  function unlock(event: PointerEvent<HTMLInputElement> | FocusEvent<HTMLInputElement>): void {
-    event.currentTarget.readOnly = false;
-    setLocked(false);
-  }
-
   return (
     <form className="grid min-w-0 gap-3" autoComplete="on" onSubmit={(event) => void onSubmit(event)}>
       <label className="field-label">
@@ -60,8 +62,8 @@ export function LoginForm() {
           required
           readOnly={locked}
           autoComplete="username"
-          onPointerDown={unlock}
-          onFocus={unlock}
+          onPointerDown={openFields}
+          onKeyDown={openFields}
           className="field-control-soft"
         />
       </label>
@@ -69,13 +71,18 @@ export function LoginForm() {
         name="password"
         label={t("password")}
         placeholder="••••••••"
+        readOnly={locked}
         autoComplete="current-password"
+        onPointerDown={openFields}
+        onKeyDown={openFields}
         showLabel={t("showPassword")}
         hideLabel={t("hidePassword")}
-        readOnly={locked}
-        onPointerDown={unlock}
-        onFocus={unlock}
       />
+      <div className="flex justify-end">
+        <Link href="/forgot-password" className="text-sm font-semibold text-accent hover:text-accent-hover">
+          {t("forgotPassword")}
+        </Link>
+      </div>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button className="btn btn-primary mt-1 w-full" type="submit">
         {t("enter")}

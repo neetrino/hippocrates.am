@@ -7,6 +7,23 @@ import type { PrismaService } from "../infrastructure/prisma.service";
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
+/** Doctor account chrome uses the clinic portrait. Other roles use the user avatar. */
+export function accountPhotoUrl(user: {
+  role: string;
+  photoKey: string | null;
+  doctorProfile?: { photoKey: string | null } | null;
+}): string | null {
+  const key = user.role === "DOCTOR" ? (user.doctorProfile?.photoKey ?? null) : user.photoKey;
+  return publicAssetUrl(key);
+}
+
+/** Doctors do not upload an account photo. The clinic sets the public portrait. */
+export function assertAccountPhotoOwner(role: string): void {
+  if (role === "DOCTOR") {
+    throw new AppError("FORBIDDEN", 403, "Բժշկի նկարը դնում է կլինիկան");
+  }
+}
+
 function assertPhotoType(request: Request): void {
   const raw = (request.header("content-type") ?? "").split(";")[0]?.trim().toLowerCase() ?? "";
   const type = raw === "image/jpg" ? "image/jpeg" : raw;

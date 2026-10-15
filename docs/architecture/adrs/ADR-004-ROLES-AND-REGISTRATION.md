@@ -3,7 +3,7 @@
 **Status:** ACCEPTED  
 **Date:** 2026-09-30  
 **Decision owner:** Product owner, this chat. Name not recorded.  
-**Supersedes for current work:** chat in the current delivery sequence (`FR-011`). The rest of ADR-003 stays. Password storage stays hashed; nobody can read a password back.
+**Supersedes for current work:** chat in the current delivery sequence (`FR-011`). The rest of ADR-003 stays except doctor-clinic binding, which is [ADR-005](./ADR-005-ONE-DOCTOR-ACCOUNT-PER-CLINIC.md). Password storage stays hashed; nobody can read a password back.
 
 ## Decision
 

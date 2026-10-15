@@ -5,4 +5,6 @@ export const visitStatusClass: Record<VisitStatus, string> = {
   CONFIRMED: "bg-accent text-white",
   COMPLETED: "bg-ink text-white",
   CANCELLED: "bg-danger/10 text-danger",
+  EXPIRED: "bg-sand text-muted",
+  NO_SHOW: "bg-danger/10 text-danger",
 };

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { VisitGroup, type VisitRow } from "@/features/portal/visit-group";
 import { groupVisits, visitPreviewLimit } from "@/features/portal/visit-order";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
-import { asVisitStatus, formatAmount, formatTime, formatVisitDate } from "@/shared/format";
+import { asVisitStatus, formatAmount, formatTime, formatVisitDate, patientLabel, type VisitStatus } from "@/shared/format";
 import { localizedServiceName, type ServiceMessageKey } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
 
@@ -29,7 +29,7 @@ export async function VisitBoard({
   const sections: { tone: Tone; title: string; items: AppointmentCard[] }[] = [
     { tone: "waiting", title: me("upcoming"), items: groups.waiting },
     { tone: "completed", title: common("COMPLETED"), items: groups.completed },
-    { tone: "cancelled", title: common("CANCELLED"), items: groups.cancelled },
+    { tone: "cancelled", title: me("closedVisits"), items: groups.cancelled },
   ];
 
   return (
@@ -56,7 +56,7 @@ function toRow(
   visit: AppointmentCard,
   locale: string,
   services: (key: ServiceMessageKey) => string,
-  common: (key: "REQUESTED" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "price", values?: { amount: string }) => string,
+  common: (key: VisitStatus | "price", values?: { amount: string }) => string,
   viewer: "patient" | "doctor",
 ): VisitRow {
   const status = asVisitStatus(visit.status);
@@ -67,10 +67,15 @@ function toRow(
     date: formatVisitDate(visit.startsAt, locale),
     time: formatTime(visit.startsAt),
     service: localizedServiceName(visit.offering.name, services),
-    place: viewer === "doctor" ? visit.patient.displayName : clinic,
+    place: viewer === "doctor" ? patientLabel(visit) : clinic,
     statusLabel: status ? common(status) : visit.status,
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
     needsReview: viewer === "patient" && visit.status === "COMPLETED" && !visit.review,
     startsAt: visit.startsAt,
+    doctorId: visit.doctor.id,
+    offeringId: visit.offering.id,
+    proposedBy: visit.proposedBy ?? "PATIENT",
+    cancelReason: visit.cancelReason ?? null,
+    events: visit.events ?? [],
   };
 }

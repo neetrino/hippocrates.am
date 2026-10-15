@@ -3,13 +3,13 @@ import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { Link } from "@/i18n/navigation";
-import { asVisitStatus, formatTime, formatVisitDate } from "@/shared/format";
+import { asVisitStatus, formatTime, formatVisitDate, patientLabel, type VisitStatus } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 
 const card = "rounded-[1.6rem] bg-white shadow-soft";
 
-type StatusKey = "REQUESTED" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+type StatusKey = VisitStatus;
 
 export async function DoctorHome({ me, appointments }: { me: Me; appointments: AppointmentCard[] }) {
   const locale = await getLocale();
@@ -46,7 +46,7 @@ export async function DoctorHome({ me, appointments }: { me: Me; appointments: A
               id: visit.id,
               service: localizedServiceName(visit.offering.name, services),
               when: `${formatVisitDate(visit.startsAt, locale)} · ${formatTime(visit.startsAt)}`,
-              patient: visit.patient.displayName,
+              patient: patientLabel(visit),
               status: statusText(visit.status, common),
               statusClass: statusClass(visit.status),
             }))}
@@ -77,7 +77,7 @@ function NextVisit({
       <p className="mt-2 mb-0 text-ink">
         {formatVisitDate(visit.startsAt, locale)} · {formatTime(visit.startsAt)}
       </p>
-      <p className="mt-1 mb-0 text-muted">{visit.patient.displayName}</p>
+      <p className="mt-1 mb-0 text-muted">{patientLabel(visit)}</p>
       {statusLabel ? (
         <span className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(visit.status)}`}>{statusLabel}</span>
       ) : null}

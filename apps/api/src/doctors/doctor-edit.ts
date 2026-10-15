@@ -1,17 +1,18 @@
 import { AppError } from "../common/app-error";
 import { displayNameOf, recordOf, requiredString } from "../common/input";
 import { catalogLocale } from "../catalog/locale-copy";
+import { assertCanPublish } from "../catalog/publish-guard";
 import type { PrismaService } from "../infrastructure/prisma.service";
 
 const specialtyMax = 80;
 const bioMax = 600;
 
-type OwnedDoctor = { id: string; userId: string };
+type OwnedDoctor = { id: string; userId: string; verificationStatus: string };
 
 export async function ownedDoctor(prisma: PrismaService, clinicId: string, doctorId: string): Promise<OwnedDoctor> {
   const doctor = await prisma.doctorProfile.findFirst({
     where: { id: doctorId, clinicId },
-    select: { id: true, userId: true },
+    select: { id: true, userId: true, verificationStatus: true },
   });
   if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
   return doctor;
@@ -26,12 +27,20 @@ export async function updateDoctor(
 ): Promise<{ id: string }> {
   const doctor = await ownedDoctor(prisma, clinicId, doctorId);
   const input = recordOf(body);
+  assertCanPublish(doctor.verificationStatus, typeof input.published === "boolean" ? input.published : undefined);
   const displayName = displayNameOf(input.displayName);
   const specialty = capped(requiredString(input.specialty, "Մասնագիտություն"), specialtyMax);
   const bio = optionalText(input.bio, bioMax);
   await prisma.$transaction([
     prisma.user.update({ where: { id: doctor.userId }, data: { displayName } }),
-    prisma.doctorProfile.update({ where: { id: doctor.id }, data: { specialty, bio } }),
+    prisma.doctorProfile.update({
+      where: { id: doctor.id },
+      data: {
+        specialty,
+        bio,
+        ...(typeof input.published === "boolean" ? { published: input.published } : {}),
+      },
+    }),
   ]);
   return { id: doctor.id };
 }

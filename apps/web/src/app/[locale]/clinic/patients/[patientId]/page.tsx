@@ -5,11 +5,21 @@ import { Link } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
+import { VisitHistory } from "@/features/portal/visit-history";
+import type { VisitEvent } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
 
 type PatientCard = {
   patient: { id: string; displayName: string; email: string; phone: string | null } | null;
-  appointments: { id: string; startsAt: string; status: string; priceAmd: number; isEstimate: boolean; offering: { name: string } }[];
+  appointments: {
+    id: string;
+    startsAt: string;
+    status: string;
+    priceAmd: number;
+    isEstimate: boolean;
+    offering: { name: string };
+    events?: VisitEvent[];
+  }[];
 };
 
 export default async function ClinicPatientPage({ params }: { params: Promise<{ locale: string; patientId: string }> }) {
@@ -51,6 +61,7 @@ export default async function ClinicPatientPage({ params }: { params: Promise<{ 
                   {formatWhen(item.startsAt, locale)} · {status ? common(status) : item.status} · {price}
                   {item.isEstimate ? ` · ${common("estimate")}` : ""}
                 </p>
+                <VisitHistory events={item.events} />
               </article>
             );
           })}

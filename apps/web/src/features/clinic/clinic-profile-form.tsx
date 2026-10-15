@@ -2,9 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { PhoneField, armeniaPhone } from "@/features/auth/phone-field";
+import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { ClinicCover } from "@/features/clinic/clinic-cover";
-import { clinicSend } from "@/features/clinic/clinic-api";
 
 export type ClinicProfile = {
   name: string;
@@ -12,6 +11,8 @@ export type ClinicProfile = {
   address: string;
   phone: string;
   district: string;
+  published?: boolean;
+  verificationStatus?: string;
   coverUrl: string | null;
 };
 
@@ -28,10 +29,8 @@ type ContentLocale = "hy" | "en" | "ru";
 type ForeignLocale = "en" | "ru";
 
 const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
-const controlClass =
-  "rounded-xl border border-line bg-white px-3.5 py-3 font-normal focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)] focus:outline-none";
 
-export function ClinicProfilePanel({
+export function ClinicIdentityCard({
   clinicId,
   clinic,
   locales,
@@ -43,26 +42,35 @@ export function ClinicProfilePanel({
   const t = useTranslations("desk");
   const [editing, setEditing] = useState(false);
   const copy = visibleCopy(useLocale(), clinic, locales);
+  const live = clinic.published !== false;
+  const place = [copy.district, copy.address, clinic.phone].filter(Boolean).join(" · ");
   return (
-    <div className="grid max-w-xl gap-8">
-      <div className="grid gap-4">
-        <button className="w-fit cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setEditing((value) => !value)}>{t("edit")}</button>
-        <ClinicCover clinicId={clinicId} coverUrl={clinic.coverUrl} name={copy.name} editing={editing} />
-        {editing ? <ClinicProfileForm clinicId={clinicId} clinic={clinic} locales={locales} /> : <ClinicProfileRead copy={copy} />}
-      </div>
-      <ClinicPhoneForm clinicId={clinicId} phone={clinic.phone} />
-    </div>
-  );
-}
-
-function ClinicProfileRead({ copy }: { copy: ClinicCopy }) {
-  return (
-    <div className="grid gap-2">
-      <h2 className="m-0">{copy.name}</h2>
-      {copy.district ? <p className="m-0 text-muted">{copy.district}</p> : null}
-      <p className="m-0">{copy.address}</p>
-      {copy.description ? <p className="m-0 max-w-[42rem] leading-relaxed text-muted">{copy.description}</p> : null}
-    </div>
+    <article className="overflow-hidden rounded-card border border-line bg-white shadow-soft">
+      <ClinicCover clinicId={clinicId} coverUrl={clinic.coverUrl} name={copy.name} editing={editing} />
+      {editing ? (
+        <ClinicProfileForm clinicId={clinicId} clinic={clinic} locales={locales} onClose={() => setEditing(false)} />
+      ) : (
+        <div className="grid gap-3 p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <h2 className="m-0">{copy.name}</h2>
+            <span className="flex items-center gap-3">
+              {clinic.verificationStatus && clinic.verificationStatus !== "APPROVED" ? (
+                <span className="rounded-full bg-[#2a4a47]/8 px-2.5 py-1 text-xs font-semibold text-[#2a4a47]">{t("verifyWaitHint")}</span>
+              ) : (
+                <span className={live ? "rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white" : "rounded-full bg-sand px-2.5 py-1 text-xs font-semibold text-muted"}>
+                  {live ? t("published") : t("hidden")}
+                </span>
+              )}
+              <button className="cursor-pointer text-sm font-semibold text-accent" type="button" onClick={() => setEditing(true)}>
+                {t("edit")}
+              </button>
+            </span>
+          </div>
+          {place ? <p className="m-0 text-muted">{place}</p> : null}
+          {copy.description ? <p className="m-0 max-w-[42rem] leading-relaxed text-muted">{copy.description}</p> : null}
+        </div>
+      )}
+    </article>
   );
 }
 
@@ -70,10 +78,12 @@ function ClinicProfileForm({
   clinicId,
   clinic,
   locales,
+  onClose,
 }: {
   clinicId: string;
   clinic: ClinicProfile;
   locales: Record<ForeignLocale, ClinicLocaleDraft>;
+  onClose: () => void;
 }) {
   const t = useTranslations("desk");
   const platform = useTranslations("platform");
@@ -92,13 +102,18 @@ function ClinicProfileForm({
       form.setResult(platform("armenianRequired"), true);
       return;
     }
-    const ok = await saveClinic(clinicId, form.hy, form.copies);
+    const phone = armeniaPhone(String(new FormData(event.currentTarget).get("phoneLocal") ?? ""));
+    if (!phone) {
+      form.setResult(t("saveFailed"), true);
+      return;
+    }
+    const ok = await saveClinic(clinicId, form.hy, form.copies, phone, form.published);
     if (ok) window.location.reload();
     else form.setResult(t("saveFailed"), true);
   }
 
   return (
-    <form className="grid gap-4 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
+    <form className="grid gap-4 p-5" onSubmit={(event) => void onSubmit(event)}>
       <LanguageTabs
         locale={form.locale}
         hint={t("localeHint")}
@@ -106,8 +121,20 @@ function ClinicProfileForm({
         onSelect={form.setLocale}
       />
       <CopyFields copy={shownCopy(form.locale, form.hy, form.copies)} labels={labels} required={form.locale === "hy"} onChange={form.setField} />
-      <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
-      {form.message ? <p className={form.failed ? "m-0 text-danger" : "m-0 text-muted"}>{form.message}</p> : null}
+      <PhoneField label={platform("phone")} phone={clinic.phone} />
+      <label className="flex items-center gap-2 text-[0.92rem] font-semibold">
+        <input
+          type="checkbox"
+          checked={form.published}
+          disabled={clinic.verificationStatus !== undefined && clinic.verificationStatus !== "APPROVED"}
+          onChange={(event) => form.setPublished(event.target.checked)}
+        />
+        {t("published")}
+      </label>
+      {clinic.verificationStatus && clinic.verificationStatus !== "APPROVED" ? (
+        <p className="m-0 text-sm text-muted">{t("publishedNeedsApproval")}</p>
+      ) : null}
+      <FormActions failed={form.failed} message={form.message} onClose={onClose} />
     </form>
   );
 }
@@ -121,6 +148,7 @@ function useClinicCopies(clinic: ClinicProfile, locales: Record<ForeignLocale, C
     description: clinic.description,
   });
   const [copies, setCopies] = useState(locales);
+  const [published, setPublished] = useState(clinic.published !== false);
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
 
@@ -137,7 +165,21 @@ function useClinicCopies(clinic: ClinicProfile, locales: Record<ForeignLocale, C
     setFailed(error);
   }
 
-  return { locale, setLocale, hy, copies, setField, message, failed, setResult };
+  return { locale, setLocale, hy, copies, published, setPublished, setField, message, failed, setResult };
+}
+
+function FormActions({ failed, message, onClose }: { failed: boolean; message: string; onClose: () => void }) {
+  const t = useTranslations("desk");
+  const common = useTranslations("common");
+  return (
+    <>
+      <div className="flex flex-wrap gap-2">
+        <button className="btn btn-primary w-fit" type="submit">{t("save")}</button>
+        <button className="btn btn-secondary w-fit" type="button" onClick={onClose}>{common("cancel")}</button>
+      </div>
+      {message ? <p className={failed ? "m-0 text-danger" : "m-0 text-muted"}>{message}</p> : null}
+    </>
+  );
 }
 
 function shownCopy(locale: ContentLocale, hy: ClinicCopy, copies: Record<ForeignLocale, ClinicLocaleDraft>): ClinicCopy {
@@ -198,40 +240,14 @@ function CopyFields({
       {fields.map(([key, max]) => (
         <label className={fieldClass} key={key}>
           {labels[key]}
-          <input className={controlClass} maxLength={max} required={required && key !== "district"} value={copy[key]} onChange={(event) => onChange(key, event.target.value)} />
+          <input className="field-control" maxLength={max} required={required && key !== "district"} value={copy[key]} onChange={(event) => onChange(key, event.target.value)} />
         </label>
       ))}
       <label className={fieldClass}>
         {labels.description}
-        <textarea className={`${controlClass} min-h-[96px] resize-y`} maxLength={600} rows={4} value={copy.description} onChange={(event) => onChange("description", event.target.value)} />
+        <textarea className="field-control min-h-[96px] resize-y" maxLength={600} rows={4} value={copy.description} onChange={(event) => onChange("description", event.target.value)} />
       </label>
     </div>
-  );
-}
-
-function ClinicPhoneForm({ clinicId, phone }: { clinicId: string; phone: string }) {
-  const t = useTranslations("desk");
-  const platform = useTranslations("platform");
-  const [failed, setFailed] = useState(false);
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-    const next = armeniaPhone(String(new FormData(event.currentTarget).get("phoneLocal") ?? ""));
-    if (!next) {
-      setFailed(true);
-      return;
-    }
-    const ok = await clinicSend(`/clinics/${clinicId}`, "PATCH", { phone: next });
-    if (ok) window.location.reload();
-    else setFailed(true);
-  }
-
-  return (
-    <form className="grid gap-4 rounded-card border border-line bg-white p-5 shadow-soft" onSubmit={(event) => void onSubmit(event)}>
-      <PhoneField label={platform("phone")} phone={phone} />
-      <button className="inline-flex w-fit cursor-pointer items-center justify-center rounded-full border-0 bg-accent px-[18px] py-3 font-semibold text-white" type="submit">{t("save")}</button>
-      {failed ? <p className="m-0 text-danger">{t("saveFailed")}</p> : null}
-    </form>
   );
 }
 
@@ -250,8 +266,14 @@ function filled(value: string | undefined, base: string): string {
   return text || base;
 }
 
-async function saveClinic(clinicId: string, hy: ClinicCopy, copies: Record<ForeignLocale, ClinicLocaleDraft>): Promise<boolean> {
-  const profile = await send(`/clinics/${clinicId}`, "PATCH", hy);
+async function saveClinic(
+  clinicId: string,
+  hy: ClinicCopy,
+  copies: Record<ForeignLocale, ClinicLocaleDraft>,
+  phone: string,
+  published: boolean,
+): Promise<boolean> {
+  const profile = await send(`/clinics/${clinicId}`, "PATCH", { ...hy, phone, published });
   const english = await send(`/clinics/${clinicId}/locales`, "PUT", { locale: "en", ...copies.en });
   const russian = await send(`/clinics/${clinicId}/locales`, "PUT", { locale: "ru", ...copies.ru });
   return profile && english && russian;

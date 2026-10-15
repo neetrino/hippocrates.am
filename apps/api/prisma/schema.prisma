@@ -19,12 +19,45 @@ enum AppointmentStatus {
   CONFIRMED
   CANCELLED
   COMPLETED
+  EXPIRED
+  NO_SHOW
+}
+
+enum ScheduleProposal {
+  PATIENT
+  STAFF
 }
 
 enum QuestionStatus {
   PENDING
   PUBLISHED
   REJECTED
+}
+
+enum VerificationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum AppointmentEventType {
+  CREATED
+  CONFIRMED
+  CANCELLED
+  RESCHEDULED
+  EXPIRED
+  COMPLETED
+  NO_SHOW
+}
+
+enum AppointmentActorRole {
+  PATIENT
+  ADMIN
+  DOCTOR
+  SYSTEM
 }
 
 model User {
@@ -46,6 +79,8 @@ model User {
   notifications Notification[]
   questions    Question[]
   reviews      Review[]
+  favorites      Favorite[]
+  passwordResets PasswordReset[]
 }
 
 model Session {
@@ -67,7 +102,8 @@ model Clinic {
   coverKey    String?
   logoKey     String?
   timeZone    String   @default("Asia/Yerevan")
-  published   Boolean  @default(true)
+  published           Boolean            @default(true)
+  verificationStatus  VerificationStatus @default(APPROVED)
   ownerId     String
   owner       User     @relation("ClinicOwner", fields: [ownerId], references: [id])
   staff       User[]   @relation("ClinicStaff")
@@ -79,6 +115,9 @@ model Clinic {
   questions   Question[]
   locales     ClinicLocale[]
   windows     ClinicWindow[]
+  favorites   Favorite[]
+
+  @@index([published, verificationStatus])
 }
 
 model ClinicLocale {
@@ -109,7 +148,8 @@ model DoctorProfile {
   specialty   String
   bio         String   @default("")
   photoKey    String?
-  published   Boolean  @default(true)
+  published           Boolean            @default(true)
+  verificationStatus  VerificationStatus @default(APPROVED)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   clinic      Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   offerings   ServiceOffering[]
@@ -119,6 +159,9 @@ model DoctorProfile {
   answers     Answer[]
   reviews     Review[]
   locales     DoctorLocale[]
+  favorites   Favorite[]
+
+  @@index([published, verificationStatus])
 }
 
 model DoctorLocale {
@@ -177,24 +220,46 @@ model ScheduleException {
 
 model Appointment {
   id            String            @id @default(cuid())
-  patientId     String
+  patientId     String?
   doctorId      String
   clinicId      String
   offeringId    String
   startsAt      DateTime
   endsAt        DateTime
   status        AppointmentStatus @default(REQUESTED)
+  proposedBy    ScheduleProposal  @default(PATIENT)
+  cancelReason  String?
   priceAmd      Int
   isEstimate    Boolean
   idempotencyKey String?
-  patient       User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  guestName     String?
+  guestPhone    String?
+  patient       User?             @relation("PatientAppointments", fields: [patientId], references: [id])
   doctor        DoctorProfile     @relation(fields: [doctorId], references: [id])
   clinic        Clinic            @relation(fields: [clinicId], references: [id])
   offering      ServiceOffering   @relation(fields: [offeringId], references: [id])
   notifications Notification[]
+  events        AppointmentEvent[]
   review        Review?
 
   @@unique([patientId, idempotencyKey])
+}
+
+model AppointmentEvent {
+  id            String                @id @default(cuid())
+  appointmentId String
+  type          AppointmentEventType
+  fromStatus    AppointmentStatus?
+  toStatus      AppointmentStatus
+  actorUserId   String?
+  actorRole     AppointmentActorRole
+  reason        String?
+  fromStartsAt  DateTime?
+  toStartsAt    DateTime?
+  createdAt     DateTime              @default(now())
+  appointment   Appointment           @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId, createdAt])
 }
 
 model Notification {
@@ -202,6 +267,7 @@ model Notification {
   userId        String
   appointmentId String?
   body          String
+  detail        String?
   dedupeKey     String?  @unique
   readAt        DateTime?
   createdAt     DateTime @default(now())
@@ -248,6 +314,33 @@ model Review {
   clinic        Clinic   @relation(fields: [clinicId], references: [id])
   doctor        DoctorProfile @relation(fields: [doctorId], references: [id])
   locales       ReviewLocale[]
+}
+
+model Favorite {
+  id        String         @id @default(cuid())
+  userId    String
+  clinicId  String?
+  doctorId  String?
+  createdAt DateTime       @default(now())
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic    Clinic?        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  doctor    DoctorProfile? @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clinicId])
+  @@unique([userId, doctorId])
+  @@index([userId])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model ReviewLocale {

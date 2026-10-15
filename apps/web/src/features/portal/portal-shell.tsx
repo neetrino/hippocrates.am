@@ -20,6 +20,7 @@ export type PortalHref =
   | "/me/settings"
   | "/super-admin"
   | "/super-admin/clinics"
+  | "/super-admin/verification"
   | "/super-admin/questions"
   | "/clinic"
   | "/clinic/profile"

@@ -50,7 +50,8 @@ export class CatalogController {
         priceAmd: true,
         durationMinutes: true,
         isEstimate: true,
-        doctor: { select: { user: { select: { displayName: true } } } },
+        doctor: { select: { id: true, published: true, user: { select: { displayName: true } } } },
+        published: true,
       },
     });
   }

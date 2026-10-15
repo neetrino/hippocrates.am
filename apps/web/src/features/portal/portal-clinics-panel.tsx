@@ -3,13 +3,16 @@
 import { useDeferredValue, useId, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { matchesClinic } from "@/features/catalog/match-clinic";
+import { StatusChip } from "@/features/portal/verification-board";
 import type { ClinicCard } from "@/shared/public-types";
 import { ClinicTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { cn } from "@/shared/ui/cn";
 
+export type AdminClinicCard = ClinicCard & { published?: boolean; verificationStatus?: string };
+
 type PortalClinicsPanelProps = {
-  clinics: ClinicCard[];
+  clinics: AdminClinicCard[];
   searchPlaceholder: string;
   searchAriaLabel: string;
   clearLabel: string;
@@ -111,12 +114,18 @@ export function PortalClinicsPanel({
           )}
         >
           {filtered.map((clinic, index) => (
-            <ClinicTile
-              key={clinic.id}
-              clinic={clinic}
-              href={`/super-admin/clinics/${clinic.id}`}
-              loading={index === 0 ? "eager" : undefined}
-            />
+            <div className="relative" key={clinic.id}>
+              {clinic.verificationStatus ? (
+                <span className="absolute top-3 left-3 z-10">
+                  <StatusChip status={clinic.verificationStatus} />
+                </span>
+              ) : null}
+              <ClinicTile
+                clinic={clinic}
+                href={`/super-admin/clinics/${clinic.id}`}
+                loading={index === 0 ? "eager" : undefined}
+              />
+            </div>
           ))}
         </div>
       )}

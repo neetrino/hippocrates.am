@@ -4,8 +4,8 @@ import { AdminPortalShell } from "@/features/portal/admin-portal-shell";
 import { PortalClinicsPanel } from "@/features/portal/portal-clinics-panel";
 import { requireSuperAdmin } from "@/features/portal/require-super-admin";
 import { prepareLocale } from "@/i18n/locale";
-import { publicGet } from "@/shared/public-api";
-import type { ClinicCard } from "@/shared/public-types";
+import { sessionGet } from "@/shared/session-api";
+import type { AdminClinicCard } from "@/features/portal/portal-clinics-panel";
 
 export default async function PortalClinicsPage({
   params,
@@ -19,7 +19,7 @@ export default async function PortalClinicsPage({
   const platform = await getTranslations("platform");
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
-  const clinics = await publicGet<ClinicCard[]>("/public/clinics", locale);
+  const clinics = (await sessionGet<AdminClinicCard[]>("/admin/clinics")) ?? [];
 
   return (
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={t("clinicsTitle")}>

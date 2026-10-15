@@ -12,12 +12,14 @@ type SettingsCardProps = {
   phone: string | null;
   photoUrl: string | null;
   roleLabel?: string;
+  photoLocked?: boolean;
+  photoHint?: string;
 };
 
 const editButton =
   "btn btn-secondary min-h-9 px-3.5 py-2 text-sm";
 
-export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel }: SettingsCardProps) {
+export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel, photoLocked, photoHint }: SettingsCardProps) {
   const t = useTranslations("me");
   const common = useTranslations("common");
   const role = roleLabel ?? common("PATIENT");
@@ -34,6 +36,8 @@ export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel }:
         deleteAction={t("photoDelete")}
         failed={t("photoFailed")}
         invalid={t("photoInvalid")}
+        locked={photoLocked}
+        hint={photoHint}
         action={
           editing ? null : (
             <button type="button" onClick={() => setEditing(true)} className={editButton}>

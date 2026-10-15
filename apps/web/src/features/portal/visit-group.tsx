@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
+import { PatientReschedule } from "@/features/portal/patient-reschedule";
 import { visitPreviewLimit } from "@/features/portal/visit-order";
 import { ReviewForm } from "@/features/portal/review-form";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
+import { VisitHistory } from "@/features/portal/visit-history";
 import { asVisitStatus } from "@/shared/format";
+import type { VisitEvent } from "@/shared/public-types";
 
 type Tone = keyof typeof visitPreviewLimit;
 
@@ -38,6 +41,11 @@ export type VisitRow = {
   price: string;
   needsReview: boolean;
   startsAt: string;
+  doctorId: string;
+  offeringId: string;
+  proposedBy: "PATIENT" | "STAFF";
+  cancelReason: string | null;
+  events: VisitEvent[];
 };
 
 export function VisitGroup({
@@ -110,18 +118,44 @@ function VisitCard({
         </p>
       </div>
       <div className="grid min-w-0 gap-2">
-        <strong className={quiet ? "text-muted" : "text-ink"}>{visit.service}</strong>
+        <div className="flex items-baseline justify-between gap-3">
+          <strong className={`min-w-0 ${quiet ? "text-muted" : "text-ink"}`}>{visit.service}</strong>
+          <span className="shrink-0 text-[0.92rem] text-muted">{visit.price}</span>
+        </div>
         <p className="m-0 text-sm text-muted">{visit.place}</p>
-        <p className="m-0 flex flex-wrap items-center gap-2">
+        <p className="m-0">
           <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${status ? visitStatusClass[status] : "bg-sand text-ink"}`}>
             {visit.statusLabel}
           </span>
-          <span className="text-xs text-muted">{visit.price}</span>
         </p>
-        <AppointmentActions id={visit.id} status={visit.status} startsAt={visit.startsAt} mode={actions} />
+        {visit.events.length > 0 ? <VisitHistory events={visit.events} /> : visit.cancelReason ? (
+          <p className="m-0 text-sm text-muted">{visit.cancelReason}</p>
+        ) : null}
+        <VisitTools visit={visit} actions={actions} />
         {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
     </article>
+  );
+}
+
+function VisitTools({ visit, actions }: { visit: VisitRow; actions: "patient" | "doctor" }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <AppointmentActions
+        id={visit.id}
+        status={visit.status}
+        startsAt={visit.startsAt}
+        mode={actions === "doctor" ? "doctor" : "patient"}
+        proposedBy={visit.proposedBy}
+        inline
+      />
+      <PatientReschedule
+        id={visit.id}
+        status={visit.status}
+        doctorId={visit.doctorId}
+        offeringId={visit.offeringId}
+      />
+    </div>
   );
 }
 

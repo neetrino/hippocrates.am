@@ -1,6 +1,7 @@
 import { AppError } from "../common/app-error";
 import { displayNameOf, emailOf, namePartOf, optionalPhoneOf, passwordOf, recordOf, requiredString } from "../common/input";
 import type { PrismaService } from "../infrastructure/prisma.service";
+import { claimGuestVisits } from "../appointments/guest-visits";
 import type { SessionService } from "./session.service";
 
 export type OwnProfile = {
@@ -28,11 +29,13 @@ export async function updateOwnProfile(
   if (email !== current.email) {
     await assertEmailChange(prisma, sessions, current.passwordHash, email, input.currentPassword);
   }
-  return prisma.user.update({
+  const updated = await prisma.user.update({
     where: { id: userId },
     data: { displayName, email, phone },
     select: { displayName: true, email: true, phone: true },
   });
+  await claimGuestVisits(prisma, userId, phone);
+  return updated;
 }
 
 async function assertEmailChange(

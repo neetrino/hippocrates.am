@@ -27,6 +27,15 @@ export function ClinicsIcon(props: IconProps) {
   );
 }
 
+export function VerifyIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M12 3.8 19.2 7v5.2c0 4.4-3 7.2-7.2 8.4-4.2-1.2-7.2-4-7.2-8.4V7z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M8.8 12.1 11 14.3l4.4-4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </BaseIcon>
+  );
+}
+
 export function QuestionsIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

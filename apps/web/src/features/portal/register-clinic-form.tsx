@@ -91,7 +91,7 @@ function useClinicDraft(armenianRequired: string) {
       setError(failure);
       return;
     }
-    router.push("/super-admin/clinics");
+    router.push("/super-admin/verification");
     router.refresh();
   }
 

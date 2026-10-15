@@ -6,6 +6,7 @@ import { ClinicsController } from "./clinics/clinics.controller";
 import { RequestIdMiddleware } from "./common/request-id.middleware";
 import { RequestLogInterceptor } from "./common/request-log.interceptor";
 import { DoctorsController } from "./doctors/doctors.controller";
+import { FavoritesController } from "./favorites/favorites.controller";
 import { HealthController } from "./health.controller";
 import { AuthController } from "./identity/auth.controller";
 import { AuthGuard } from "./identity/auth.guard";
@@ -31,6 +32,7 @@ import { SchedulingController } from "./scheduling/scheduling.controller";
     SchedulingController,
     AppointmentsController,
     MarketplaceController,
+    FavoritesController,
     QuestionsController,
     ReviewsController,
     OperationsController,

@@ -4,7 +4,9 @@ import { AppError } from "../common/app-error";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
-import { clinicCopies, clinicNameSearch } from "./clinic-search";
+import { clinicCopies, clinicNameSearch, clinicNameSpellings, filterClinicsByName } from "./clinic-search";
+import { liveDoctor, liveListing } from "../catalog/public-visible";
+import { doctorNameSearch, doctorNameSpellings, filterDoctorsByName } from "./doctor-search";
 
 const clinicFields = {
   id: true,
@@ -44,6 +46,24 @@ function doctorSelect(locale: CatalogLocale | null) {
   };
 }
 
+function doctorListSelect() {
+  return {
+    id: true,
+    specialty: true,
+    bio: true,
+    photoKey: true,
+    user: { select: { displayName: true } },
+    locales: { select: { locale: true, name: true, specialty: true, bio: true } },
+    clinic: {
+      select: {
+        id: true,
+        name: true,
+        locales: { select: { locale: true, name: true } },
+      },
+    },
+  };
+}
+
 type ClinicRow = {
   coverKey: string | null;
   logoKey: string | null;
@@ -78,13 +98,13 @@ export class MarketplaceController {
     const language = catalogLocale(locale);
     const [clinics, doctors] = await Promise.all([
       this.prisma.clinic.findMany({
-        where: { published: true },
+        where: liveListing,
         orderBy: { name: "asc" },
         take: 12,
         select: clinicSelect(language),
       }),
       this.prisma.doctorProfile.findMany({
-        where: { published: true, clinic: { published: true } },
+        where: liveDoctor,
         orderBy: { user: { displayName: "asc" } },
         take: 12,
         select: doctorSelect(language),
@@ -100,10 +120,10 @@ export class MarketplaceController {
   @Get("clinics")
   async clinics(@Query("name") name?: string, @Query("locale") locale?: string) {
     const language = catalogLocale(locale);
-    const needle = name?.trim();
+    const needle = name?.trim() ?? "";
     const rows = await this.prisma.clinic.findMany({
       where: {
-        published: true,
+        ...liveListing,
         ...(needle ? { OR: clinicNameSearch(needle) } : {}),
       },
       orderBy: { name: "asc" },
@@ -112,9 +132,10 @@ export class MarketplaceController {
         locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
       },
     });
-    return rows.map((clinic) => ({
+    return filterClinicsByName(rows, needle).map((clinic) => ({
       ...clinicView(applyClinic(clinic, language)),
       copies: clinicCopies(clinic),
+      nameSpellings: clinicNameSpellings(clinic),
     }));
   }
 
@@ -123,13 +144,13 @@ export class MarketplaceController {
   async clinic(@Param("id") id: string, @Query("locale") locale?: string) {
     const language = catalogLocale(locale);
     const clinic = await this.prisma.clinic.findFirst({
-      where: { id, published: true },
+      where: { id, ...liveListing },
       select: {
         ...clinicSelect(language),
         branches: { select: { id: true, name: true, address: true } },
-        doctors: { where: { published: true }, select: doctorSelect(language) },
+        doctors: { where: liveListing, select: doctorSelect(language) },
         offerings: {
-          where: { published: true },
+          where: { published: true, doctor: liveListing },
           select: {
             id: true,
             name: true,
@@ -175,7 +196,7 @@ export class MarketplaceController {
     const language = catalogLocale(locale);
     const [specialtyRows, clinicRows] = await Promise.all([
       this.prisma.doctorProfile.findMany({
-        where: { published: true, clinic: { published: true } },
+        where: liveDoctor,
         orderBy: { specialty: "asc" },
         select: {
           specialty: true,
@@ -183,7 +204,7 @@ export class MarketplaceController {
         },
       }),
       this.prisma.clinic.findMany({
-        where: { published: true },
+        where: liveListing,
         orderBy: { name: "asc" },
         select: {
           id: true,
@@ -230,36 +251,41 @@ export class MarketplaceController {
     @Query("clinic") clinic?: string | string[],
   ) {
     const language = catalogLocale(locale);
+    const needle = name?.trim() ?? "";
     const specialties = parseMultiQuery(specialty);
     const cities = parseMultiQuery(city);
     const clinics = parseMultiQuery(clinic);
 
     const clinicFilter: {
       published: true;
+      verificationStatus: "APPROVED";
       name?: { in: string[] };
       district?: { in: string[] };
-    } = { published: true };
+    } = { ...liveListing };
     if (clinics.length > 0) clinicFilter.name = { in: clinics };
     if (cities.length > 0) clinicFilter.district = { in: cities };
 
     const rows = await this.prisma.doctorProfile.findMany({
       where: {
-        published: true,
+        ...liveListing,
         clinic: clinicFilter,
         specialty: specialties.length > 0 ? { in: specialties } : undefined,
-        ...(name?.trim() ? { OR: doctorNameSearch(name.trim(), language) } : {}),
+        ...(needle ? { OR: doctorNameSearch(needle) } : {}),
       },
       orderBy: { user: { displayName: "asc" } },
-      select: doctorSelect(language),
+      select: doctorListSelect(),
     });
-    return rows.map((doctor) => doctorView(applyDoctor(doctor, language)));
+    return filterDoctorsByName(rows, needle).map((doctor) => ({
+      ...doctorView(applyDoctor(doctor, language)),
+      nameSpellings: doctorNameSpellings(doctor),
+    }));
   }
 
   @Public()
   @Get("doctors/:id")
   async doctor(@Param("id") id: string, @Query("locale") locale?: string) {
     const doctor = await this.prisma.doctorProfile.findFirst({
-      where: { id, published: true, clinic: { published: true } },
+      where: { id, ...liveDoctor },
       select: {
         ...doctorSelect(catalogLocale(locale)),
         offerings: {
@@ -271,11 +297,4 @@ export class MarketplaceController {
     if (!doctor) throw new AppError("NOT_FOUND", 404, "Բժիշկը չի գտնվել");
     return doctorView(applyDoctor(doctor, catalogLocale(locale)));
   }
-}
-
-function doctorNameSearch(name: string, locale: CatalogLocale | null) {
-  const contains = { contains: name, mode: "insensitive" as const };
-  const official = { user: { displayName: contains } };
-  if (!locale) return [official];
-  return [official, { locales: { some: { locale, name: contains } } }];
 }

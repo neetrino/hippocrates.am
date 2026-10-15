@@ -6,7 +6,7 @@ const localeTag: Record<string, string> = {
   ru: "ru-RU",
 };
 
-const visitStatuses = ["REQUESTED", "CONFIRMED", "CANCELLED", "COMPLETED"] as const;
+const visitStatuses = ["REQUESTED", "CONFIRMED", "CANCELLED", "COMPLETED", "EXPIRED", "NO_SHOW"] as const;
 const roles = ["PATIENT", "DOCTOR", "ADMIN", "SUPER_ADMIN"] as const;
 
 export type VisitStatus = (typeof visitStatuses)[number];
@@ -54,4 +54,8 @@ export function asRole(value: string): AccountRole | null {
     if (role === value) return role;
   }
   return null;
+}
+
+export function patientLabel(visit: { patient: { displayName: string } | null; guestName?: string | null }): string {
+  return visit.patient?.displayName || visit.guestName || "";
 }

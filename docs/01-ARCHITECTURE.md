@@ -1,10 +1,10 @@
 # Hippocrates.am — Architecture
 
-> **Status: ACTIVE BASELINE.** Revised 2026-09-30. One web application, one API, and one database. Modules for later points are added when that point starts. Technology specifics belong in `02-TECH_STACK.md`. Product scope is `ADR-003`.
+> **Status: ACTIVE BASELINE.** Revised 2026-10-15. One web application, one API, and one database. Modules for later points are added when that point starts. Technology specifics belong in `02-TECH_STACK.md`. Product scope is `ADR-003`. Doctor-clinic binding is `ADR-005`.
 
 ## Architectural goal and boundaries
 
-Provide the full product with one web application, one API, and one database. Keep each clinic's patients private. A doctor account may work at more than one clinic. Chat, Q&A, reviews, branches, and reminders are later points. Finance capture and clinical records are later points of the same product and are not built early.
+Provide the full product with one web application, one API, and one database. Keep each clinic's patients private. A doctor account belongs to one clinic (`ADR-005`). Chat, Q&A, reviews, branches, and reminders are later points. Finance capture and clinical records are later points of the same product and are not built early.
 
 ```text
 Public / Patient / Doctor / Clinic / Platform browser views
@@ -30,7 +30,7 @@ A worker exists **only when needed by an approved outbound notification channel*
 | --- | --- | --- |
 | `identity` | User, login/session, basic role identity | None |
 | `clinics` | Clinic record/publication, clinic-admin membership, clinic verification state | `identity` IDs only |
-| `doctors` | Doctor profile and one affiliation per clinic on the same login | `identity`, clinic ids |
+| `doctors` | Doctor profile for one user and one clinic | `identity`, clinic ids |
 | `catalog` | Named service and clinic offering/price | Published `clinics`, authorized `doctors` |
 | `scheduling` | Doctor working periods, basic unavailability, availability reads | Approved clinic/doctor, booking occupancy contract |
 | `appointments` | Appointment and status events; transactional occupied intervals | Doctor/schedule/offering/patient approved lookups |
@@ -48,7 +48,7 @@ A worker exists **only when needed by an approved outbound notification channel*
 3. Published projections use explicit DTO allowlists, never full ORM rows; approval status is independently checked for clinic and doctor publication.
 4. Super Admin registers clinics and their owner Admin. An Admin registers doctors for that clinic only. A Patient self-registers. There is no blanket permission to read patient notes, private contact histories, or future medical records.
 5. Revoking a clinic-admin membership prevents later operations; session alone does not grant stale clinic rights.
-6. A doctor user may hold a separate affiliation at each clinic. Each request checks the affiliation for that clinic. Accepted 2026-09-30, revised by ADR-003.
+6. A doctor user belongs to exactly one clinic (`DoctorProfile.clinicId`). Create-doctor rejects an existing email. Accepted 2026-10-15, `ADR-005`.
 
 ## Core flows
 
@@ -78,10 +78,10 @@ One web runtime, one stateless API runtime, one PostgreSQL primary, optional med
 
 ## Later points
 
-Add branch, messaging, public Q&A, review, finance, and clinical modules on their points in `PROGRESS.md`. Do not scaffold empty modules before that point. A doctor affiliation is per clinic. Slot overlap is enforced per doctor, including across that doctor's clinics.
+Add branch, messaging, public Q&A, review, finance, and clinical modules on their points in `PROGRESS.md`. Do not scaffold empty modules before that point. A doctor account is one clinic. Slot overlap is enforced per `DoctorProfile` (that account).
 
 ## Approval gates
 
-- Local topology is one web app, one API, and one PostgreSQL database. `ADR-003` is the scope authority.
+- Local topology is one web app, one API, and one PostgreSQL database. `ADR-003` is the scope authority; doctor-clinic binding is `ADR-005`.
 - Production host is still open.
 - Prove access controls, appointment concurrency, and restore before release. Record evidence in `PROGRESS.md`.

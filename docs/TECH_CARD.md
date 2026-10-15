@@ -14,7 +14,7 @@
 | ORM | Prisma. The first migration is identity, written when P1 starts | Accepted for local development |
 | Login/session | Email and password. Argon2id. 12-hour absolute server session. Login 10/minute/IP. Register 5/10 minutes/IP | Accepted. Security review required before production |
 | Booking | Request occupies the slot. Confirm, cancel, reschedule, and attendance follow point P4 | Accepted |
-| Doctor account | One login may affiliate with more than one clinic. The doctor sets the password | Accepted 2026-09-30 |
+| Doctor account | One login belongs to one clinic. Duplicate email is rejected. The doctor sets the password | Accepted 2026-10-15 (`ADR-005`) |
 | Branches | In the product on point P2 | Accepted 2026-09-30 |
 | Reviews | In the product on point P8, after a verified visit | Accepted 2026-09-30 |
 | Clinic operations | Dashboard, patient list, operational card, and price totals on point P5 | Accepted |
@@ -55,4 +55,4 @@
 - CI: reproducible install, format/lint, strict typecheck, automated tests and build; reviewed versioned migrations only.
 - Before real patient onboarding: cross-clinic authorization tests, a test that one clinic cannot read another clinic's patients, concurrent booking tests, cancellation tests, staging walkthrough, and a demonstrated backup restore.
 
-**Authority:** functional details `BRIEF.md`; architecture `01-ARCHITECTURE.md`; specific technology choices `02-TECH_STACK.md`; progress `PROGRESS.md`; approvals `DECISIONS.md`.
+**Authority:** functional details `BRIEF.md`; architecture `01-ARCHITECTURE.md`; doctor-clinic binding `ADR-005`; specific technology choices `02-TECH_STACK.md`; progress `PROGRESS.md`; approvals `DECISIONS.md`.

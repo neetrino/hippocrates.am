@@ -6,7 +6,7 @@ import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
-import { noticeMessageKey } from "@/shared/notice-text";
+import { noticeLine } from "@/shared/notice-text";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
@@ -14,6 +14,7 @@ import { sessionGet } from "@/shared/session-api";
 type Notice = {
   id: string;
   body: string;
+  detail?: string | null;
   createdAt: string;
   readAt: string | null;
   appointment: {
@@ -97,7 +98,6 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
         <h2>{t("notices")}</h2>
         {notices.length === 0 ? <p className="m-0 text-muted">{t("noNotices")}</p> : null}
         {notices.map((notice) => {
-          const messageKey = noticeMessageKey(notice.body);
           const visit = notice.appointment;
           const context = visit
             ? `${clinicDisplayName(visit.clinic, displayLocale)} · ${doctorDisplayName(visit.doctor, displayLocale)} · ${formatWhen(visit.startsAt, displayLocale)}`
@@ -105,7 +105,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           return (
             <div className="grid gap-1 rounded-[14px] border border-line bg-white px-4 py-3.5" key={notice.id}>
               <div className="flex items-center justify-between gap-3">
-                <span>{messageKey ? t(messageKey) : notice.body}</span>
+                <span>{noticeLine(notice.body, notice.detail, t)}</span>
                 <time className="shrink-0 text-sm text-muted" dateTime={notice.createdAt}>
                   {formatWhen(notice.createdAt, displayLocale)}
                 </time>

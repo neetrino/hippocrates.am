@@ -15,6 +15,8 @@ export type ClinicCard = {
   logoUrl: string | null;
   /** Official Armenian spelling plus every saved translation. Present on clinic lists. */
   copies?: ClinicCopy[];
+  /** Official name plus every saved translation. Present on clinic lists. */
+  nameSpellings?: string[];
 };
 
 export type DoctorCard = {
@@ -24,6 +26,8 @@ export type DoctorCard = {
   photoUrl: string | null;
   user: { displayName: string };
   clinic: { id: string; name: string };
+  /** Official name plus every saved translation. Present on doctor lists. */
+  nameSpellings?: string[];
 };
 
 export type OfferingCard = {
@@ -52,17 +56,33 @@ export type QuestionCard = {
   answers: { id: string; body: string; doctor: { specialty: string; user: { displayName: string } } }[];
 };
 
+export type VisitEvent = {
+  id: string;
+  type: string;
+  actorRole: string;
+  actorName: string | null;
+  reason: string | null;
+  fromStartsAt: string | null;
+  toStartsAt: string | null;
+  createdAt: string;
+};
+
 export type AppointmentCard = {
   id: string;
   startsAt: string;
   status: string;
+  proposedBy?: "PATIENT" | "STAFF";
+  cancelReason?: string | null;
   priceAmd: number;
   isEstimate: boolean;
   offering: { id: string; name: string };
-  clinic: { name: string; locales?: { locale: string; name: string }[] };
+  clinic: { name: string; coverUrl?: string | null; locales?: { locale: string; name: string }[] };
   doctor: { id: string; user: { displayName: string }; locales?: { locale: string; name: string }[] };
-  patient: { displayName: string };
+  patient: { displayName: string } | null;
+  guestName?: string | null;
+  guestPhone?: string | null;
   review: { id: string } | null;
+  events?: VisitEvent[];
 };
 
 export type Me = {

@@ -8,9 +8,11 @@ import { Public } from "./auth.decorators";
 import { CurrentActor } from "./current-actor";
 import { RateLimitService } from "./rate-limit.service";
 import { SessionService } from "./session.service";
+import { assertResetMail } from "./password-mail";
+import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
-import { clearUserPhoto, saveUserPhoto } from "./user-photo";
-import { publicAssetUrl } from "../infrastructure/r2.storage";
+import { accountPhotoUrl, assertAccountPhotoOwner, clearUserPhoto, saveUserPhoto } from "./user-photo";
+import { claimGuestVisits } from "../appointments/guest-visits";
 
 @Controller("auth")
 export class AuthController {
@@ -50,6 +52,7 @@ export class AuthController {
         role: "PATIENT",
       },
     });
+    await claimGuestVisits(this.prisma, user.id, phone);
     await this.sessions.open(response, user.id);
     return { id: user.id };
   }
@@ -73,6 +76,28 @@ export class AuthController {
   }
 
   @Public()
+  @Post("forgot-password")
+  async forgotPassword(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
+    this.limits.consume(`forgot:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
+    assertResetMail();
+    const input = recordOf(body);
+    const email = emailOf(input.email);
+    this.limits.consume(`forgot-mail:${email}`, 3, 60 * 60 * 1000);
+    await requestPasswordReset(this.prisma, email, input.locale);
+    return { ok: true };
+  }
+
+  @Public()
+  @Post("reset-password")
+  async resetPassword(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
+    this.limits.consume(`reset:${request.ip ?? "unknown"}`, 8, 10 * 60 * 1000);
+    const input = recordOf(body);
+    const token = requiredString(input.token, "Հղում");
+    await applyPasswordReset(this.prisma, this.sessions, token, input.password, input.confirmPassword);
+    return { ok: true };
+  }
+
+  @Public()
   @Post("logout")
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<{ ok: true }> {
     await this.sessions.close(request, response);
@@ -83,7 +108,10 @@ export class AuthController {
   async me(
     @CurrentActor() actor: Actor,
   ): Promise<Actor & { displayName: string; email: string; phone: string | null; photoUrl: string | null; emailVisitNotices: boolean }> {
-    const user = await this.prisma.user.findUnique({ where: { id: actor.id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: actor.id },
+      include: { doctorProfile: { select: { photoKey: true } } },
+    });
     if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
     return {
       id: user.id,
@@ -92,7 +120,7 @@ export class AuthController {
       displayName: user.displayName,
       email: user.email,
       phone: user.phone,
-      photoUrl: publicAssetUrl(user.photoKey),
+      photoUrl: accountPhotoUrl(user),
       emailVisitNotices: user.emailVisitNotices,
     };
   }
@@ -112,6 +140,7 @@ export class AuthController {
 
   @Post("me/photo")
   async uploadPhoto(@CurrentActor() actor: Actor, @Req() request: Request): Promise<{ photoUrl: string }> {
+    assertAccountPhotoOwner(actor.role);
     this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
     const photoUrl = await saveUserPhoto(this.prisma, actor.id, request);
     return { photoUrl };
@@ -119,6 +148,7 @@ export class AuthController {
 
   @Delete("me/photo")
   async deletePhoto(@CurrentActor() actor: Actor): Promise<{ ok: true }> {
+    assertAccountPhotoOwner(actor.role);
     this.limits.consume(`photo:${actor.id}`, 10, 10 * 60 * 1000);
     await clearUserPhoto(this.prisma, actor.id);
     return { ok: true };

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
-import { asVisitStatus, formatTime } from "@/shared/format";
+import { VisitHistory } from "@/features/portal/visit-history";
+import { doctorDisplayName } from "@/shared/clinic-label";
+import { asVisitStatus, formatTime, patientLabel } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
 
@@ -17,6 +19,7 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
   const t = useTranslations("desk");
   const common = useTranslations("common");
   const services = useTranslations("services");
+  const locale = useLocale();
   if (visits.length === 0) return <p className="m-0 text-muted">{t("noVisits")}</p>;
 
   return (
@@ -28,14 +31,25 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
           <article className="grid gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={item.id}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <strong>{item.patient.displayName}</strong>
+                <strong>{patientLabel(item)}</strong>
+                {item.guestPhone ? <p className="m-0 text-sm text-muted">{item.guestPhone}</p> : null}
                 <p className="m-0 text-muted">
-                  {item.when} · {localizedServiceName(item.offering.name, services)} · {status ? common(status) : item.status}
+                  {item.when} · {doctorDisplayName(item.doctor, locale)} · {localizedServiceName(item.offering.name, services)} ·{" "}
+                  {status ? common(status) : item.status}
                 </p>
               </div>
-              <AppointmentActions id={item.id} status={item.status} startsAt={item.startsAt} mode="admin" />
+              <AppointmentActions
+                id={item.id}
+                status={item.status}
+                startsAt={item.startsAt}
+                mode="admin"
+                proposedBy={item.proposedBy}
+              />
             </div>
             {open ? <RescheduleVisit visit={item} /> : null}
+            {item.events?.length ? <VisitHistory events={item.events} /> : item.cancelReason ? (
+              <p className="m-0 text-sm text-muted">{item.cancelReason}</p>
+            ) : null}
           </article>
         );
       })}

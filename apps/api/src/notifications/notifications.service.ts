@@ -7,8 +7,16 @@ export const appointmentNotice = {
   requested: "notice.requested",
   confirmed: "notice.confirmed",
   cancelled: "notice.cancelled",
+  cancelledByPatient: "notice.cancelledByPatient",
+  cancelledByDoctor: "notice.cancelledByDoctor",
+  cancelledByClinic: "notice.cancelledByClinic",
   expired: "notice.expired",
   rescheduled: "notice.rescheduled",
+  rescheduledByPatient: "notice.rescheduledByPatient",
+  rescheduledByDoctor: "notice.rescheduledByDoctor",
+  rescheduledByClinic: "notice.rescheduledByClinic",
+  noShow: "notice.noShow",
+  deskBooked: "notice.deskBooked",
   completed: "notice.completed",
   reminderDay: "notice.reminderDay",
   reminderHour: "notice.reminderHour",
@@ -20,7 +28,7 @@ export class NotificationsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async afterAppointment(appointment: Appointment, body: string): Promise<void> {
+  async afterAppointment(appointment: Appointment, body: string, detail?: string | null): Promise<void> {
     try {
       const admins = await this.prisma.user.findMany({
         where: { clinicId: appointment.clinicId, role: "ADMIN" },
@@ -30,12 +38,13 @@ export class NotificationsService {
         where: { id: appointment.doctorId },
         select: { userId: true },
       });
-      const userIds = new Set<string>([appointment.patientId, ...admins.map((admin) => admin.id)]);
+      const userIds = new Set<string>(admins.map((admin) => admin.id));
+      if (appointment.patientId) userIds.add(appointment.patientId);
       if (doctor) userIds.add(doctor.userId);
       const audience = await noticeAudience(this.prisma, [...userIds]);
       if (audience.length === 0) return;
       await this.prisma.notification.createMany({
-        data: audience.map((userId) => ({ userId, appointmentId: appointment.id, body })),
+        data: audience.map((userId) => ({ userId, appointmentId: appointment.id, body, detail: detail || null })),
       });
     } catch (error) {
       this.logger.error("Notification insert failed", error instanceof Error ? error.stack : undefined);

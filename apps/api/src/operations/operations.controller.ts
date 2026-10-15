@@ -7,7 +7,12 @@ import { CurrentActor } from "../identity/current-actor";
 import { closeExpiredRequests } from "../appointments/close-expired";
 import { readNoticeIds } from "../notifications/notice-ids";
 import { NotificationsService } from "../notifications/notifications.service";
+import { bookDeskVisit } from "../appointments/desk-booking";
+import { eventSelect, namedEventsForVisits, omitEvents } from "../appointments/present-events";
+import { countClinicPatients, listClinicPatients } from "../appointments/guest-visits";
+import { liveListing } from "../catalog/public-visible";
 import { financeWindow } from "./finance-range";
+import { applyVerification, countPendingReviews, decisionOf, kindOf, listAdminClinics, listVerificationQueue } from "./verification";
 
 @Controller()
 export class OperationsController {
@@ -28,37 +33,62 @@ export class OperationsController {
     const [pending, today, patients] = await Promise.all([
       this.prisma.appointment.count({ where: { clinicId, status: "REQUESTED", startsAt: { gt: now } } }),
       this.prisma.appointment.count({ where: { clinicId, startsAt: { gte: start, lt: end } } }),
-      this.prisma.appointment.findMany({
-        where: { clinicId },
-        distinct: ["patientId"],
-        select: { patientId: true },
-      }),
+      countClinicPatients(this.prisma, clinicId),
     ]);
-    return { pending, today, patientCount: patients.length };
+    return { pending, today, patientCount: patients };
   }
 
   @Get("platform/summary")
   @Roles("SUPER_ADMIN")
   async platformSummary(@CurrentActor() actor: Actor) {
     requireRoles(actor, ["SUPER_ADMIN"]);
-    const [clinics, pendingQuestions, publishedDoctors] = await Promise.all([
+    const [clinics, pendingQuestions, publishedDoctors, pendingReviews] = await Promise.all([
       this.prisma.clinic.count(),
       this.prisma.question.count({ where: { status: "PENDING" } }),
-      this.prisma.doctorProfile.count({ where: { published: true } }),
+      this.prisma.doctorProfile.count({ where: liveListing }),
+      countPendingReviews(this.prisma),
     ]);
-    return { clinics, pendingQuestions, publishedDoctors };
+    return { clinics, pendingQuestions, publishedDoctors, pendingReviews };
+  }
+
+  @Get("admin/verification")
+  @Roles("SUPER_ADMIN")
+  listVerification(@CurrentActor() actor: Actor) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return listVerificationQueue(this.prisma);
+  }
+
+  @Post("admin/verification/:kind/:id")
+  @Roles("SUPER_ADMIN")
+  decideVerification(
+    @CurrentActor() actor: Actor,
+    @Param("kind") kind: string,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return applyVerification(this.prisma, kindOf(kind), id, decisionOf(body));
+  }
+
+  @Get("admin/clinics")
+  @Roles("SUPER_ADMIN")
+  adminClinics(@CurrentActor() actor: Actor) {
+    requireRoles(actor, ["SUPER_ADMIN"]);
+    return listAdminClinics(this.prisma);
   }
 
   @Get("clinics/:clinicId/patients")
   @Roles("ADMIN")
   async patients(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
-    const rows = await this.prisma.appointment.findMany({
-      where: { clinicId },
-      distinct: ["patientId"],
-      select: { patient: { select: { id: true, displayName: true, email: true, phone: true } } },
-    });
-    return rows.map((row) => row.patient);
+    return listClinicPatients(this.prisma, clinicId);
+  }
+
+  @Post("clinics/:clinicId/visits")
+  @Roles("ADMIN")
+  bookVisit(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Body() body: unknown): Promise<{ id: string }> {
+    requireClinicAdmin(actor, clinicId);
+    return bookDeskVisit(this.prisma, this.notices, actor, clinicId, body);
   }
 
   @Get("clinics/:clinicId/patients/:patientId")
@@ -79,6 +109,7 @@ export class OperationsController {
         priceAmd: true,
         isEstimate: true,
         offering: { select: { name: true } },
+        events: { orderBy: { createdAt: "asc" }, select: eventSelect },
       },
     });
     if (appointments.length === 0) throw new AppError("NOT_FOUND", 404, "Պացիենտը չի գտնվել");
@@ -86,7 +117,14 @@ export class OperationsController {
       where: { id: patientId },
       select: { id: true, displayName: true, email: true, phone: true },
     });
-    return { patient, appointments };
+    const histories = await namedEventsForVisits(this.prisma, appointments);
+    return {
+      patient,
+      appointments: appointments.map((row, index) => ({
+        ...omitEvents(row),
+        events: histories[index] ?? [],
+      })),
+    };
   }
 
   @Get("clinics/:clinicId/finance")
@@ -141,11 +179,13 @@ export class OperationsController {
       select: {
         id: true,
         body: true,
+        detail: true,
         createdAt: true,
         readAt: true,
         appointment: {
           select: {
             startsAt: true,
+            guestName: true,
             patient: { select: { displayName: true } },
             clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
             doctor: {

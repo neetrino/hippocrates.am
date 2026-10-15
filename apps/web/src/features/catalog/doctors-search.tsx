@@ -2,7 +2,9 @@
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { flushSync } from "react-dom";
+import { DoctorSearchField } from "@/features/catalog/doctor-search-field";
 import { MultiSelectFilter } from "@/features/catalog/multi-select-filter";
+import type { DoctorCard } from "@/shared/public-types";
 import { cn } from "@/shared/ui/cn";
 
 export type DoctorFilterOptions = {
@@ -16,6 +18,7 @@ export type DoctorFilterOptions = {
 
 type DoctorsSearchProps = {
   action: string;
+  suggestDoctors: DoctorCard[];
   initialName: string;
   initialSpecialty: string[];
   initialCity: string[];
@@ -24,6 +27,8 @@ type DoctorsSearchProps = {
   labels: {
     namePlaceholder: string;
     nameAria: string;
+    searchLabel: string;
+    emptySuggest: string;
     specialty: string;
     city: string;
     clinic: string;
@@ -35,11 +40,11 @@ type DoctorsSearchProps = {
   };
 };
 
-function SearchIcon() {
+function SubmitSearchIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-muted">
-      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.7" />
-      <path d="M16.2 16.2L20 20" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="size-4 shrink-0">
+      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M16.2 16.2 20 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -59,6 +64,7 @@ function FilterIcon() {
 
 export function DoctorsSearch({
   action,
+  suggestDoctors,
   initialName,
   initialSpecialty,
   initialCity,
@@ -116,20 +122,19 @@ export function DoctorsSearch({
       onSubmit={onSubmit}
       className="relative grid gap-3"
     >
-      <div className="search-shell items-center gap-3 px-4 py-1.5 max-md:flex-row max-md:rounded-full">
-        <SearchIcon />
-        <input
-          name="name"
-          defaultValue={initialName}
+      <div className="search-shell" role="search">
+        <DoctorSearchField
+          doctors={suggestDoctors}
+          initialName={initialName}
           placeholder={labels.namePlaceholder}
-          aria-label={labels.nameAria}
-          className="min-w-0 flex-1 border-0 bg-transparent text-[0.95rem] text-ink outline-none placeholder:text-[#9aa6a5]"
+          ariaLabel={labels.nameAria}
+          emptyLabel={labels.emptySuggest}
         />
         <button
           type="button"
           className={cn(
-            "grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-muted transition-[background,color,box-shadow] duration-160 hover:bg-white hover:text-accent hover:shadow-[0_4px_12px_rgba(0,167,157,0.12)]",
-            (filtersOpen || hasActiveFilter) && "bg-white text-accent shadow-[0_4px_12px_rgba(0,167,157,0.12)]",
+            "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-muted transition-[background,color,box-shadow] duration-160 hover:bg-sand hover:text-accent",
+            (filtersOpen || hasActiveFilter) && "bg-sand text-accent",
           )}
           aria-label={labels.openFilters}
           aria-expanded={filtersOpen}
@@ -137,6 +142,10 @@ export function DoctorsSearch({
           onClick={() => setFiltersOpen((value) => !value)}
         >
           <FilterIcon />
+        </button>
+        <button className="btn btn-primary shrink-0 gap-1.5" type="submit">
+          <SubmitSearchIcon />
+          {labels.searchLabel}
         </button>
       </div>
 

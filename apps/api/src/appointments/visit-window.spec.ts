@@ -1,4 +1,4 @@
-import { rescheduleStatus, visitHasStarted } from "./visit-window";
+import { rescheduleOutcome, visitHasStarted } from "./visit-window";
 
 describe("visit window", () => {
   const start = new Date("2026-10-06T05:30:00.000Z");
@@ -8,10 +8,17 @@ describe("visit window", () => {
     expect(visitHasStarted(start, new Date(start.getTime() - 1))).toBe(false);
   });
 
-  it("returns a patient reschedule of a confirmed visit to requested", () => {
-    expect(rescheduleStatus(true, "CONFIRMED")).toBe("REQUESTED");
-    expect(rescheduleStatus(true, "REQUESTED")).toBe("REQUESTED");
-    expect(rescheduleStatus(false, "CONFIRMED")).toBe("CONFIRMED");
-    expect(rescheduleStatus(false, "REQUESTED")).toBe("REQUESTED");
+  it("asks the clinic to confirm a patient move", () => {
+    expect(rescheduleOutcome(true, "CONFIRMED", true)).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+    expect(rescheduleOutcome(true, "REQUESTED", true)).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+  });
+
+  it("asks the patient to accept a staff move of a confirmed visit", () => {
+    expect(rescheduleOutcome(false, "CONFIRMED", true)).toEqual({ status: "REQUESTED", proposedBy: "STAFF" });
+    expect(rescheduleOutcome(false, "REQUESTED", true)).toEqual({ status: "REQUESTED", proposedBy: "PATIENT" });
+  });
+
+  it("keeps a phone guest confirmed when the clinic moves the visit", () => {
+    expect(rescheduleOutcome(false, "CONFIRMED", false)).toEqual({ status: "CONFIRMED", proposedBy: "STAFF" });
   });
 });

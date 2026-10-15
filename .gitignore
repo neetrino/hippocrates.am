@@ -18,6 +18,8 @@ node_modules/
 dist/
 build/
 coverage/
+playwright-report/
+test-results/
 *.tsbuildinfo
 apps/api/src/generated/
 

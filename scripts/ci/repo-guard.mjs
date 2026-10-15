@@ -75,9 +75,10 @@ function assertNoTrackedSecrets() {
 }
 
 function assertNoCredentialContent() {
-  const candidates = trackedFiles().filter((path) =>
-    /^(apps|scripts|\.github|docker)\//.test(path.replaceAll("\\", "/")),
-  );
+  const candidates = trackedFiles().filter((path) => {
+    const normalized = path.replaceAll("\\", "/");
+    return /^(apps|scripts|\.github|docker)\//.test(normalized) && existsSync(join(root, path));
+  });
   const patterns = [
     /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
     /\bAKIA[0-9A-Z]{16}\b/,

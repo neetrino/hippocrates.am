@@ -7,7 +7,7 @@ settings:
 overrides:
   deepmerge-ts: 8.0.0
   handlebars: 4.7.10
-  mysql2: 3.22.0
+  mysql2: 3.23.1
   source-map-js: 1.2.2
 
 importers:
@@ -3629,8 +3629,8 @@ packages:
     resolution: {integrity: sha512-7dqa0ZcFfzbefdTuIkzOSMvZWC0J7FLqBOjJUZvDCXShIURWKxAyTT1wHhnE5q19c7jOJf43IYYKjBmZVZmvhg==}
     engines: {node: '>= 10.16.0'}
 
-  mysql2@3.22.0:
-    resolution: {integrity: sha512-4jaJYBObj7FhD3lnZhqX1yDMuZN4mQNz+IolDySDXT7fbozMBpeGQNcuWXKUqo4ahkAEfkjUHPjnwuDI0/6VKw==}
+  mysql2@3.23.1:
+    resolution: {integrity: sha512-tTuRnC7qCet2IOfSNMYZ5SwXuBnfvBPAcIA28P0gtruXyZlU1LMxA6uha32kYypoFgyYklMqhLWwt4laYwXR/Q==}
     engines: {node: '>= 8.0'}
     peerDependencies:
       '@types/node': '>= 8'
@@ -8632,7 +8632,7 @@ snapshots:
       busboy: 1.6.0
       type-is: 1.6.18
 
-  mysql2@3.22.0(@types/node@24.5.2):
+  mysql2@3.23.1(@types/node@24.5.2):
     dependencies:
       '@types/node': 24.5.2
       aws-ssl-profiles: 1.1.2
@@ -8974,7 +8974,7 @@ snapshots:
       '@prisma/dev': 0.24.17(typescript@5.9.2)
       '@prisma/engines': 7.10.0
       '@prisma/studio-core': 0.33.0(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      mysql2: 3.22.0(@types/node@24.5.2)
+      mysql2: 3.23.1(@types/node@24.5.2)
       postgres: 3.4.7
     optionalDependencies:
       typescript: 5.9.2

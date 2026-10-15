@@ -44,9 +44,9 @@ export async function bookDeskVisit(
       },
     });
     await appendCreated(tx, row, visitActor(actor));
+    await notices.write(tx, row, appointmentNotice.deskBooked, "created");
     return row;
   });
-  await notices.afterAppointment(created, appointmentNotice.deskBooked);
   return { id: created.id };
 }
 

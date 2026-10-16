@@ -14,11 +14,18 @@ node_modules/
 
 # Build output
 .next/
+.next-e2e/
 dist/
 build/
 coverage/
 *.tsbuildinfo
 apps/api/src/generated/
+
+# Playwright. Traces can contain session cookies and stay out of git.
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
 # Logs and temp
 *.log

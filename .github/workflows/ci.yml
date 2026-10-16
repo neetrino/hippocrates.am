@@ -149,10 +149,72 @@ jobs:
             echo "Treat actionable advisories before merge; do not ignore known high/critical findings."
           fi
 
+  e2e:
+    name: Critical journey
+    runs-on: ubuntu-latest
+    env:
+      # Throwaway Postgres on this runner. The suite refuses any other host.
+      DATABASE_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates
+      DIRECT_URL: postgresql://hippocrates:hippocrates@127.0.0.1:5432/hippocrates
+      E2E_DATABASE: loopback
+      SESSION_SECRET: ci-e2e-session-secret-at-least-32-chars
+      SEED_PASSWORD: Ci-E2e-Only-2026
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: hippocrates
+          POSTGRES_PASSWORD: hippocrates
+          POSTGRES_DB: hippocrates
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hippocrates -d hippocrates"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @hippocrates/api exec prisma generate
+
+      - name: Apply migrations
+        run: pnpm --filter @hippocrates/api exec prisma migrate deploy
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser journey
+        run: pnpm e2e
+
+      - name: Upload failure traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: |
+            test-results
+            playwright-report
+          retention-days: 7
+
   ci-passed:
     name: CI passed
     if: always()
-    needs: [repo-guard, quality, audit, dependency-review]
+    needs: [repo-guard, quality, audit, dependency-review, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Verify required jobs
@@ -161,6 +223,7 @@ jobs:
           echo "quality: ${{ needs.quality.result }}"
           echo "audit: ${{ needs.audit.result }}"
           echo "dependency-review: ${{ needs.dependency-review.result }}"
+          echo "e2e: ${{ needs.e2e.result }}"
 
           if [ "${{ needs.repo-guard.result }}" != "success" ]; then
             echo "Repository guard failed"
@@ -178,6 +241,10 @@ jobs:
           # dependency-review is skipped on push; soft on private plans without GHAS.
           if [ "${{ needs.dependency-review.result }}" = "failure" ]; then
             echo "Dependency review job failed unexpectedly"
+            exit 1
+          fi
+          if [ "${{ needs.e2e.result }}" != "success" ]; then
+            echo "Critical journey failed"
             exit 1
           fi
 

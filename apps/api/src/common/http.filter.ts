@@ -18,13 +18,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
     if (exception instanceof HttpException) {
       response.status(exception.getStatus()).json({
-        error: { code: "HTTP_ERROR", message: exception.message },
+        error: { code: "HTTP_ERROR", message: "Հարցումը չհաջողվեց" },
         requestId,
       });
       return;
     }
-    const detail = exception instanceof Error ? exception.message : "unknown";
-    Logger.error(detail, "Http");
+    Logger.error(JSON.stringify({
+      requestId,
+      method: request.method,
+      path: request.path,
+      errorType: exception instanceof Error ? exception.name : "UnknownError",
+    }), "Http");
     response.status(500).json({
       error: { code: "INTERNAL", message: "Ներքին սխալ" },
       requestId,

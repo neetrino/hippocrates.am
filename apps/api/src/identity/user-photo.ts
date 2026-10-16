@@ -60,13 +60,27 @@ export async function readUploadedImage(request: Request): Promise<Buffer> {
 /** Stores the current user's photo and returns its public URL. */
 export async function saveUserPhoto(prisma: PrismaService, userId: string, request: Request): Promise<string> {
   const source = await readUploadedImage(request);
+  const current = await prisma.user.findUnique({ where: { id: userId }, select: { photoKey: true } });
+  if (!current) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
   let key: string;
   try {
     key = await uploadAvatar(`users/${userId}/avatar-${Date.now()}.webp`, source);
   } catch {
     throw new AppError("VALIDATION_FAILED", 400, "Նկարը չի կարդացվում");
   }
-  await prisma.user.update({ where: { id: userId }, data: { photoKey: key } });
+  try {
+    const changed = await prisma.user.updateMany({
+      where: { id: userId, photoKey: current.photoKey },
+      data: { photoKey: key },
+    });
+    if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
+  } catch (error) {
+    await deletePhotoObject(key, "New photo cleanup failed");
+    throw error;
+  }
+  if (current.photoKey && current.photoKey !== key) {
+    await deletePhotoObject(current.photoKey, "Previous photo delete failed");
+  }
   const photoUrl = publicAssetUrl(key);
   if (!photoUrl) throw new AppError("INTERNAL", 500, "Ներքին սխալ");
   return photoUrl;
@@ -76,12 +90,18 @@ export async function saveUserPhoto(prisma: PrismaService, userId: string, reque
 export async function clearUserPhoto(prisma: PrismaService, userId: string): Promise<void> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { photoKey: true } });
   if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
-  if (user.photoKey) {
-    try {
-      await deleteObject(user.photoKey);
-    } catch (error) {
-      Logger.error("Photo delete failed", error instanceof Error ? error.stack : undefined, "UserPhoto");
-    }
+  const changed = await prisma.user.updateMany({
+    where: { id: userId, photoKey: user.photoKey },
+    data: { photoKey: null },
+  });
+  if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
+  if (user.photoKey) await deletePhotoObject(user.photoKey, "Photo delete failed");
+}
+
+async function deletePhotoObject(key: string, message: string): Promise<void> {
+  try {
+    await deleteObject(key);
+  } catch (error) {
+    Logger.error(message, error instanceof Error ? error.stack : undefined, "UserPhoto");
   }
-  await prisma.user.update({ where: { id: userId }, data: { photoKey: null } });
 }

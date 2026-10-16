@@ -1,14 +1,18 @@
 import { AppError } from "./app-error";
 
-export function requiredString(value: unknown, field: string): string {
+export function requiredString(value: unknown, field: string, maxLength?: number): string {
   if (typeof value !== "string" || value.trim() === "") {
     throw new AppError("VALIDATION_FAILED", 400, `${field} պարտադիր է`);
   }
-  return value.trim();
+  const text = value.trim();
+  if (maxLength !== undefined && text.length > maxLength) {
+    throw new AppError("VALIDATION_FAILED", 400, `${field} չափազանց երկար է`);
+  }
+  return text;
 }
 
 export function emailOf(value: unknown): string {
-  const email = requiredString(value, "Էլ. փոստ").toLowerCase();
+  const email = requiredString(value, "Էլ. փոստ", 254).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new AppError("VALIDATION_FAILED", 400, "Էլ. փոստը սխալ է");
   }
@@ -16,7 +20,7 @@ export function emailOf(value: unknown): string {
 }
 
 export function passwordOf(value: unknown): string {
-  const password = requiredString(value, "Գաղտնաբառ");
+  const password = requiredString(value, "Գաղտնաբառ", 128);
   if (password.length < 8) {
     throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառը առնվազն 8 նիշ է");
   }
@@ -77,8 +81,12 @@ export function intOf(value: unknown, field: string, min: number, max: number): 
   return number;
 }
 
-export function optionalString(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
+export function optionalString(value: unknown, maxLength?: number): string {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (maxLength !== undefined && text.length > maxLength) {
+    throw new AppError("VALIDATION_FAILED", 400, "Տեքստը չափազանց երկար է");
+  }
+  return text;
 }
 
 export function recordOf(value: unknown): Record<string, unknown> {

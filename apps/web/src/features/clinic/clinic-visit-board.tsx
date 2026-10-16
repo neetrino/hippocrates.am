@@ -8,6 +8,7 @@ import { doctorDisplayName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, patientLabel } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
+import { todayYerevan, visitStarted } from "@/shared/visit-time";
 
 type BoardVisit = AppointmentCard & { when: string };
 
@@ -26,7 +27,9 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
     <div className="grid gap-3">
       {visits.map((item) => {
         const status = asVisitStatus(item.status);
-        const open = item.status === "REQUESTED" || item.status === "CONFIRMED";
+        const open =
+          (item.status === "REQUESTED" || item.status === "CONFIRMED") &&
+          !visitStarted(item.startsAt);
         return (
           <article className="grid gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={item.id}>
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -92,16 +95,20 @@ function RescheduleVisit({ visit }: { visit: AppointmentCard }) {
       window.location.reload();
       return;
     }
-    const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
     setFailed(true);
-    setNote(body?.error?.message || common("failed"));
+    setNote(common("failed"));
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <label className="text-sm font-semibold">
         {t("reschedule")}
-        <input className="ml-2 rounded-xl border border-line bg-white px-3 py-2 font-normal" type="date" onChange={(event) => void loadSlots(event.target.value)} />
+        <input
+          className="ml-2 rounded-xl border border-line bg-white px-3 py-2 font-normal"
+          type="date"
+          min={todayYerevan()}
+          onChange={(event) => void loadSlots(event.target.value)}
+        />
       </label>
       {slots.map((slot) => (
         <button className="cursor-pointer rounded-full border border-line bg-white px-3 py-2 text-sm font-semibold" key={slot} type="button" onClick={() => void move(slot)}>

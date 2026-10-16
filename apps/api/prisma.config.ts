@@ -1,19 +1,25 @@
 import { defineConfig } from "prisma/config";
 
 /**
- * Prisma CLI (migrate / generate / validate) uses the non-pooled host.
- * Nest runtime never reads this file; it connects with DATABASE_URL via PrismaPg.
+ * Migrations use the privileged non-pooled URL. Offline commands use a local
+ * placeholder and therefore do not need runtime or migration credentials.
  */
 function cliDatasourceUrl(): string {
-  const direct = process.env.DIRECT_URL?.trim();
-  const runtime = process.env.DATABASE_URL?.trim();
-  const url = direct || runtime || "";
-  if (url && looksPooled(url)) {
-    throw new Error(
-      "Prisma CLI must use DIRECT_URL (non-pooled). DATABASE_URL with a pooler host is runtime-only.",
-    );
+  if (!isMigrationCommand()) {
+    return "postgresql://localhost:5432/hippocrates";
   }
-  return url;
+  const direct = process.env.DIRECT_URL?.trim();
+  if (!direct) {
+    throw new Error("Prisma CLI requires DIRECT_URL; DATABASE_URL is runtime-only.");
+  }
+  if (looksPooled(direct)) {
+    throw new Error("Prisma CLI requires a non-pooled DIRECT_URL.");
+  }
+  return direct;
+}
+
+function isMigrationCommand(): boolean {
+  return process.argv.some((argument) => argument === "migrate" || argument.startsWith("migrate:"));
 }
 
 function looksPooled(url: string): boolean {

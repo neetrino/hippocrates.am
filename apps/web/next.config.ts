@@ -12,7 +12,7 @@ function r2RemotePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"]
 }
 
 const nextConfig: NextConfig = {
-  distDir: process.env.E2E_NEXT_DIST === ".next-e2e" ? ".next-e2e" : ".next",
+  distDir: process.env.NEXT_DIST_DIR?.trim() || (process.env.E2E_NEXT_DIST === ".next-e2e" ? ".next-e2e" : ".next"),
   images: {
     remotePatterns: r2RemotePatterns(),
   },

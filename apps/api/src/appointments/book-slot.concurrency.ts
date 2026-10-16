@@ -1,26 +1,27 @@
-import { readFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
-import path from "node:path";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client";
 import { AppError } from "../common/app-error";
 import { createDatabasePool } from "../infrastructure/database-pool";
+import { PrismaService } from "../infrastructure/prisma.service";
+import { isolatedTestDatabaseUrl } from "../infrastructure/test-database-url";
+import { NotificationsService } from "../notifications/notifications.service";
 import { withOpenSlot } from "./book-slot";
+import { bookVisit } from "./visit-commands";
 
 const fixturePrefix = "race-fixture ";
 
 type Fixture = {
-  prisma: PrismaClient;
+  prisma: PrismaService;
   clinicId: string;
   doctorId: string;
   offeringId: string;
+  patientId: string;
 };
 
 async function main(): Promise<void> {
-  const url = readDatabaseUrl();
+  const url = isolatedTestDatabaseUrl();
   if (!url) {
-    process.stdout.write("skip withOpenSlot concurrency: DATABASE_URL is not set\n");
+    process.stdout.write("skip withOpenSlot concurrency: TEST_DATABASE_URL is not set\n");
     return;
   }
   const fixture = await openFixture(url);
@@ -39,6 +40,8 @@ async function main(): Promise<void> {
       new Date("2035-06-16T10:30:00.000Z"),
       new Date("2035-06-16T11:15:00.000Z"),
     );
+    await expectIdempotentBooking(fixture);
+    await expectImmutableHistory(fixture);
     process.stdout.write("withOpenSlot concurrency: ok\n");
   } finally {
     await wipeRaceClinics(fixture.prisma);
@@ -99,15 +102,49 @@ async function holdSlot(fixture: Fixture, startsAt: Date, endsAt: Date): Promise
   );
 }
 
+async function expectIdempotentBooking(fixture: Fixture): Promise<void> {
+  const body = {
+    offeringId: fixture.offeringId,
+    startsAt: "2035-06-18T06:00:00.000Z",
+    idempotencyKey: `race-${randomBytes(8).toString("hex")}`,
+  };
+  const notices = new NotificationsService();
+  const [first, second] = await Promise.all([
+    bookVisit(fixture.prisma, notices, fixture.patientId, body),
+    bookVisit(fixture.prisma, notices, fixture.patientId, body),
+  ]);
+  assert.equal(first.id, second.id);
+  const count = await fixture.prisma.appointment.count({
+    where: { patientId: fixture.patientId, idempotencyKey: body.idempotencyKey },
+  });
+  assert.equal(count, 1);
+}
+
+async function expectImmutableHistory(fixture: Fixture): Promise<void> {
+  const event = await fixture.prisma.appointmentEvent.findFirst({
+    where: { appointment: { clinicId: fixture.clinicId } },
+    select: { id: true },
+  });
+  assert.ok(event);
+  await assert.rejects(fixture.prisma.appointmentEvent.delete({ where: { id: event.id } }));
+  assert.equal(await fixture.prisma.appointmentEvent.count({ where: { id: event.id } }), 1);
+}
+
 async function openFixture(url: string): Promise<Fixture> {
-  const prisma = new PrismaClient({ adapter: new PrismaPg(createDatabasePool(url), { disposeExternalPool: true }) });
+  const prisma = new PrismaService(createDatabasePool(url));
   await wipeRaceClinics(prisma);
   const mark = `${fixturePrefix}${randomBytes(4).toString("hex")}`;
   const owner = await prisma.user.create({
     data: { email: `${slug(mark)}-admin@hippocrates.test`, passwordHash: "test", displayName: mark, role: "ADMIN" },
   });
   const clinic = await prisma.clinic.create({
-    data: { name: mark, ownerId: owner.id, published: false, verificationStatus: "DRAFT" },
+    data: {
+      name: mark,
+      ownerId: owner.id,
+      published: true,
+      verificationStatus: "APPROVED",
+      windows: { create: weekdays().map((weekday) => ({ weekday, startMinute: 0, endMinute: 1439 })) },
+    },
   });
   const doctorUser = await prisma.user.create({
     data: {
@@ -119,7 +156,14 @@ async function openFixture(url: string): Promise<Fixture> {
     },
   });
   const doctor = await prisma.doctorProfile.create({
-    data: { userId: doctorUser.id, clinicId: clinic.id, specialty: "Test", published: false, verificationStatus: "DRAFT" },
+    data: {
+      userId: doctorUser.id,
+      clinicId: clinic.id,
+      specialty: "Test",
+      published: true,
+      verificationStatus: "APPROVED",
+      windows: { create: weekdays().map((weekday) => ({ weekday, startMinute: 0, endMinute: 1439 })) },
+    },
   });
   const offering = await prisma.serviceOffering.create({
     data: {
@@ -128,26 +172,42 @@ async function openFixture(url: string): Promise<Fixture> {
       name: "Race slot",
       priceAmd: 5000,
       durationMinutes: 30,
-      published: false,
+      published: true,
     },
   });
-  return { prisma, clinicId: clinic.id, doctorId: doctor.id, offeringId: offering.id };
+  const patient = await prisma.user.create({
+    data: {
+      email: `${slug(mark)}-patient@hippocrates.test`,
+      passwordHash: "test",
+      displayName: mark,
+      role: "PATIENT",
+    },
+  });
+  return {
+    prisma,
+    clinicId: clinic.id,
+    doctorId: doctor.id,
+    offeringId: offering.id,
+    patientId: patient.id,
+  };
 }
 
-async function wipeRaceClinics(prisma: PrismaClient): Promise<void> {
+async function wipeRaceClinics(prisma: PrismaService): Promise<void> {
   const leftovers = await prisma.clinic.findMany({
     where: { name: { startsWith: fixturePrefix } },
-    select: { id: true, ownerId: true, doctors: { select: { userId: true } } },
+    select: { id: true },
   });
-  for (const clinic of leftovers) {
-    await prisma.notification.deleteMany({ where: { appointment: { clinicId: clinic.id } } });
-    await prisma.appointment.deleteMany({ where: { clinicId: clinic.id } });
-    await prisma.user.updateMany({ where: { clinicId: clinic.id }, data: { clinicId: null } });
-    await prisma.clinic.delete({ where: { id: clinic.id } });
-    await prisma.user.deleteMany({
-      where: { id: { in: [clinic.ownerId, ...clinic.doctors.map((doctor) => doctor.userId)] } },
-    });
-  }
+  const clinicIds = leftovers.map((clinic) => clinic.id);
+  if (clinicIds.length === 0) return;
+  await prisma.notification.deleteMany({ where: { appointment: { clinicId: { in: clinicIds } } } });
+  await prisma.appointment.deleteMany({ where: { clinicId: { in: clinicIds } } });
+  await prisma.user.updateMany({ where: { clinicId: { in: clinicIds } }, data: { clinicId: null } });
+  await prisma.clinic.deleteMany({ where: { id: { in: clinicIds } } });
+  await prisma.user.deleteMany({ where: { displayName: { startsWith: fixturePrefix } } });
+}
+
+function weekdays(): number[] {
+  return [0, 1, 2, 3, 4, 5, 6];
 }
 
 function slug(value: string): string {
@@ -159,28 +219,6 @@ function raceDetail(reason: unknown): string {
   const code = reason && typeof reason === "object" && "code" in reason ? String(reason.code) : "";
   const text = reason instanceof Error ? reason.message.replace(/postgres(?:ql)?:\/\/\S+/gi, "[db]") : "";
   return `expected AppError, got ${name} ${code} ${text.slice(0, 240)}`;
-}
-
-function readDatabaseUrl(): string {
-  const existing = process.env.DATABASE_URL?.trim() ?? "";
-  if (existing) return existing;
-  try {
-    const text = readFileSync(path.resolve(__dirname, "../../../../.env"), "utf8");
-    for (const line of text.split(/\r?\n/)) {
-      if (!line.startsWith("DATABASE_URL=")) continue;
-      let value = line.slice("DATABASE_URL=".length).trim();
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-      return value;
-    }
-  } catch {
-    return "";
-  }
-  return "";
 }
 
 void main().catch((error: unknown) => {

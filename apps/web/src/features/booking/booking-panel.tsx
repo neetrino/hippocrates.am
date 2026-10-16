@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { TimeSlot } from "@/features/booking/initial-slots";
 import { localizedServiceName } from "@/shared/service-name";
@@ -31,6 +31,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
   const [message, setMessage] = useState(initialSlots.length === 0 ? t("noSlots") : "");
   const [tone, setTone] = useState<Tone>("muted");
   const [pending, setPending] = useState(false);
+  const attempt = useRef<{ signature: string; key: string } | null>(null);
   const offering = offerings.find((item) => item.id === offeringId);
 
   async function loadSlots(nextOfferingId: string, nextDate: string): Promise<TimeSlot[]> {
@@ -54,12 +55,20 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
 
   async function book(): Promise<void> {
     if (!offering || !selected) return;
+    const signature = `${offering.id}:${selected}`;
+    if (attempt.current?.signature !== signature) {
+      attempt.current = { signature, key: crypto.randomUUID() };
+    }
     setPending(true);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/appointments`, {
       method: "POST",
       credentials: "include",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ offeringId: offering.id, startsAt: selected }),
+      body: JSON.stringify({
+        offeringId: offering.id,
+        startsAt: selected,
+        idempotencyKey: attempt.current.key,
+      }),
     });
     setPending(false);
     if (response.status === 401 || response.status === 403) {
@@ -74,6 +83,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
       return;
     }
     await loadSlots(offering.id, date);
+    attempt.current = null;
     setTone("success");
     setMessage(t("booked"));
   }

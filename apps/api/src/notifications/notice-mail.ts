@@ -30,6 +30,25 @@ const pendingSelect = {
 type PendingMail = Prisma.NoticeMailGetPayload<{ select: typeof pendingSelect }>;
 type MailDb = PrismaService | Prisma.TransactionClient;
 
+type NoticeDraft = {
+  userId: string;
+  appointmentId: string;
+  body: string;
+  detail?: string | null;
+  dedupeKey: string;
+};
+
+/** Writes in-app notices, then queues mail for accounts that still want email. */
+export async function saveNotices(prisma: MailDb, data: readonly NoticeDraft[]): Promise<void> {
+  if (data.length === 0) return;
+  await prisma.notification.createMany({ data: [...data], skipDuplicates: true });
+  const stored = await prisma.notification.findMany({
+    where: { dedupeKey: { in: data.map((row) => row.dedupeKey) } },
+    select: { id: true, userId: true },
+  });
+  await queueNoticeMails(prisma, stored);
+}
+
 /** One delivery row per in-app notice, only for accounts that still want email. */
 export async function queueNoticeMails(
   prisma: MailDb,

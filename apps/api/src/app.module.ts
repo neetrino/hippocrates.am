@@ -10,6 +10,7 @@ import { FavoritesController } from "./favorites/favorites.controller";
 import { HealthController } from "./health.controller";
 import { AuthController } from "./identity/auth.controller";
 import { AuthGuard } from "./identity/auth.guard";
+import { OriginGuard } from "./identity/origin.guard";
 import { RateLimitService } from "./identity/rate-limit.service";
 import { SessionService } from "./identity/session.service";
 import { PrismaModule } from "./infrastructure/prisma.module";
@@ -42,6 +43,7 @@ import { SchedulingController } from "./scheduling/scheduling.controller";
     RateLimitService,
     NotificationsService,
     VisitRemindersService,
+    { provide: APP_GUARD, useClass: OriginGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_INTERCEPTOR, useClass: RequestLogInterceptor },
   ],

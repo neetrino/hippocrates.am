@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
 import { intOf, recordOf, requiredString } from "../common/input";
+import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
@@ -39,11 +40,14 @@ export class CatalogController {
 
   @Get("clinics/:clinicId/offerings")
   @Roles("ADMIN")
-  async list(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
+  async list(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
     requireClinicAdmin(actor, clinicId);
+    const { skip, take } = pageWindow(page);
     return this.prisma.serviceOffering.findMany({
       where: { clinicId },
-      orderBy: { name: "asc" },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      skip,
+      take,
       select: {
         id: true,
         name: true,

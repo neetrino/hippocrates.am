@@ -1,15 +1,18 @@
 import { createHash, randomBytes } from "node:crypto";
 import { Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
-import type { Request, Response } from "express";
-import { AppError } from "../common/app-error";
+import type { CookieOptions, Request, Response } from "express";
 import { PrismaService } from "../infrastructure/prisma.service";
 import type { Actor } from "./access";
 
-const SESSION_MS = 12 * 60 * 60 * 1000;
+const DEFAULT_SESSION_HOURS = 12;
 
 @Injectable()
 export class SessionService {
+  private readonly dummyPasswordHash = argon2.hash(randomBytes(32).toString("base64url"), {
+    type: argon2.argon2id,
+  });
+
   constructor(private readonly prisma: PrismaService) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -20,17 +23,20 @@ export class SessionService {
     return argon2.verify(passwordHash, password);
   }
 
+  async verifyLoginPassword(password: string, passwordHash: string | undefined): Promise<boolean> {
+    const valid = await argon2.verify(passwordHash ?? await this.dummyPasswordHash, password);
+    return passwordHash !== undefined && valid;
+  }
+
   async open(response: Response, userId: string): Promise<void> {
     const token = randomBytes(32).toString("base64url");
     const tokenHash = createHash("sha256").update(token).digest("hex");
-    const expiresAt = new Date(Date.now() + SESSION_MS);
+    const maxAge = sessionDurationMs();
+    const expiresAt = new Date(Date.now() + maxAge);
     await this.prisma.session.create({ data: { userId, tokenHash, expiresAt } });
     response.cookie(this.cookieName(), token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: SESSION_MS,
-      path: "/",
+      ...sessionCookieOptions(),
+      maxAge,
     });
   }
 
@@ -43,7 +49,7 @@ export class SessionService {
         data: { revokedAt: new Date() },
       });
     }
-    response.clearCookie(this.cookieName(), { path: "/" });
+    response.clearCookie(this.cookieName(), sessionCookieOptions());
   }
 
   async actorFrom(request: Request): Promise<Actor | null> {
@@ -54,7 +60,7 @@ export class SessionService {
       where: { tokenHash },
       include: { user: true },
     });
-    if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) return null;
+    if (!session || session.revokedAt || session.user.disabledAt || session.expiresAt.getTime() <= Date.now()) return null;
     return { id: session.user.id, role: session.user.role, clinicId: session.user.clinicId };
   }
 
@@ -68,8 +74,19 @@ export class SessionService {
   }
 }
 
-export function assertSessionSecret(): void {
-  if ((process.env.SESSION_SECRET ?? "").length < 32) {
-    throw new AppError("CONFIG", 500, "SESSION_SECRET is missing");
+function sessionCookieOptions(): CookieOptions {
+  return {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  };
+}
+
+function sessionDurationMs(): number {
+  const hours = Number(process.env.SESSION_TTL_HOURS ?? DEFAULT_SESSION_HOURS);
+  if (!Number.isInteger(hours) || hours < 1 || hours > 168) {
+    throw new Error("SESSION_TTL_HOURS must be an integer from 1 to 168");
   }
+  return hours * 60 * 60 * 1000;
 }

@@ -18,8 +18,13 @@ export class RequestLogInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse<Response>();
     return next.handle().pipe(
       finalize(() => {
-        const path = request.originalUrl ?? request.url;
-        this.logger.log(`${request.method} ${path} ${response.statusCode} ${Date.now() - started}ms`);
+        this.logger.log(JSON.stringify({
+          requestId: request.requestId ?? "unknown",
+          method: request.method,
+          path: request.path,
+          status: response.statusCode,
+          durationMs: Date.now() - started,
+        }));
       }),
     );
   }

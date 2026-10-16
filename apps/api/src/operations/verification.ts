@@ -1,5 +1,6 @@
 import { AppError } from "../common/app-error";
 import { recordOf } from "../common/input";
+import { pageWindow } from "../common/pagination";
 import type { Prisma } from "../generated/prisma/client";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import type { PrismaService } from "../infrastructure/prisma.service";
@@ -53,20 +54,25 @@ export function kindOf(value: string): VerificationKind {
   throw new AppError("VALIDATION_FAILED", 400, "Տեսակը սխալ է");
 }
 
-export async function listVerificationQueue(prisma: PrismaService): Promise<{
+export async function listVerificationQueue(prisma: PrismaService, page?: string): Promise<{
   clinics: QueueClinic[];
   doctors: QueueDoctor[];
 }> {
-  const where = { verificationStatus: { in: [...pendingStatuses] } };
+  const status = { verificationStatus: { in: [...pendingStatuses] } };
+  const { skip, take } = pageWindow(page);
   const [clinics, doctors] = await Promise.all([
     prisma.clinic.findMany({
-      where,
-      orderBy: { name: "asc" },
+      where: { ...status, archivedAt: null },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      skip,
+      take,
       select: { id: true, name: true, district: true, verificationStatus: true, published: true },
     }),
     prisma.doctorProfile.findMany({
-      where,
-      orderBy: { user: { displayName: "asc" } },
+      where: { ...status, clinic: { archivedAt: null } },
+      orderBy: [{ user: { displayName: "asc" } }, { id: "asc" }],
+      skip,
+      take,
       select: {
         id: true,
         specialty: true,
@@ -100,9 +106,12 @@ export async function listVerificationQueue(prisma: PrismaService): Promise<{
   };
 }
 
-export async function listAdminClinics(prisma: PrismaService) {
+export async function listAdminClinics(prisma: PrismaService, page?: string) {
+  const { skip, take } = pageWindow(page);
   const rows = await prisma.clinic.findMany({
-    orderBy: { name: "asc" },
+    orderBy: [{ name: "asc" }, { id: "asc" }],
+    skip,
+    take,
     select: {
       id: true,
       name: true,
@@ -131,10 +140,10 @@ export async function listAdminClinics(prisma: PrismaService) {
 }
 
 export async function countPendingReviews(prisma: PrismaService): Promise<number> {
-  const where = { verificationStatus: { in: [...pendingStatuses] } };
+  const status = { verificationStatus: { in: [...pendingStatuses] } };
   const [clinics, doctors] = await Promise.all([
-    prisma.clinic.count({ where }),
-    prisma.doctorProfile.count({ where }),
+    prisma.clinic.count({ where: { ...status, archivedAt: null } }),
+    prisma.doctorProfile.count({ where: { ...status, clinic: { archivedAt: null } } }),
   ]);
   return clinics + doctors;
 }
@@ -147,10 +156,12 @@ export async function applyVerification(
 ): Promise<{ id: string }> {
   const data = decisionPatch(decision);
   if (kind === "clinic") {
-    await updateClinic(prisma, id, data);
-    if (decision === "SUSPEND") {
-      await prisma.doctorProfile.updateMany({ where: { clinicId: id }, data: { published: false } });
-    }
+    await prisma.$transaction(async (tx) => {
+      await updateClinic(tx, id, data);
+      if (decision === "SUSPEND") {
+        await tx.doctorProfile.updateMany({ where: { clinicId: id }, data: { published: false } });
+      }
+    });
     return { id };
   }
   await updateDoctor(prisma, id, data);
@@ -158,16 +169,16 @@ export async function applyVerification(
 }
 
 async function updateClinic(
-  prisma: PrismaService,
+  prisma: Pick<PrismaService, "clinic">,
   id: string,
   data: Prisma.ClinicUpdateInput,
 ): Promise<void> {
-  const changed = await prisma.clinic.updateMany({ where: { id }, data });
+  const changed = await prisma.clinic.updateMany({ where: { id, archivedAt: null }, data });
   if (changed.count !== 1) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
 }
 
 async function updateDoctor(
-  prisma: PrismaService,
+  prisma: Pick<PrismaService, "doctorProfile">,
   id: string,
   data: Prisma.DoctorProfileUpdateInput,
 ): Promise<void> {

@@ -14,10 +14,12 @@ node_modules/
 
 # Build output
 .next/
-.next-e2e/
+.next-e2e*/
 dist/
 build/
 coverage/
+playwright-report/
+test-results/
 *.tsbuildinfo
 apps/api/src/generated/
 

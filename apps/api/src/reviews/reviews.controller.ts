@@ -22,16 +22,21 @@ export class ReviewsController {
     if (!appointment) throw new AppError("NOT_FOUND", 404, "Ավարտված այց չի գտնվել");
     const existing = await this.prisma.review.findUnique({ where: { appointmentId } });
     if (existing) throw new AppError("REVIEW_EXISTS", 409, "Կարծիքն արդեն կա");
-    const review = await this.prisma.review.create({
-      data: {
-        appointmentId,
-        patientId: actor.id,
-        clinicId: appointment.clinicId,
-        doctorId: appointment.doctorId,
-        rating: intOf(input.rating, "Գնահատական", 1, 5),
-        body: requiredString(input.body, "Կարծիք"),
-      },
-    });
+    const review = await this.prisma.review
+      .create({
+        data: {
+          appointmentId,
+          patientId: actor.id,
+          clinicId: appointment.clinicId,
+          doctorId: appointment.doctorId,
+          rating: intOf(input.rating, "Գնահատական", 1, 5),
+          body: requiredString(input.body, "Կարծիք", 1200),
+        },
+      })
+      .catch((error: unknown) => {
+        if (isUniqueConflict(error)) throw new AppError("REVIEW_EXISTS", 409, "Կարծիքն արդեն կա");
+        throw error;
+      });
     return { id: review.id };
   }
 
@@ -43,8 +48,12 @@ export class ReviewsController {
     requireClinicAdmin(actor, review.clinicId);
     await this.prisma.review.update({
       where: { id },
-      data: { reply: requiredString(recordOf(body).reply, "Պատասխան") },
+      data: { reply: requiredString(recordOf(body).reply, "Պատասխան", 1200) },
     });
     return { id };
   }
+}
+
+function isUniqueConflict(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "code" in error && error.code === "P2002");
 }

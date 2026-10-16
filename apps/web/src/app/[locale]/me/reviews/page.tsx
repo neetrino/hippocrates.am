@@ -6,8 +6,15 @@ import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
-export default async function PatientReviewsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function PatientReviewsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
   const displayLocale = await getLocale();
@@ -15,8 +22,11 @@ export default async function PatientReviewsPage({ params }: { params: Promise<{
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
   const services = await getTranslations("services");
+  const page = listPage((await searchParams).page);
   if (!(await loadPatientAccount(locale))) return <PatientSignIn />;
-  const appointments = (await sessionGet<AppointmentCard[]>("/appointments/mine")) ?? [];
+  const appointments = (
+    (await sessionGet<AppointmentCard[]>(`/appointments/mine${page > 1 ? `?page=${page}` : ""}`)) ?? []
+  );
   const reviewed = appointments.filter((item) => item.review);
 
   return (
@@ -39,6 +49,7 @@ export default async function PatientReviewsPage({ params }: { params: Promise<{
           </div>
         )}
       </section>
+      <ListPagination page={page} itemCount={appointments.length} />
     </PatientPortalShell>
   );
 }

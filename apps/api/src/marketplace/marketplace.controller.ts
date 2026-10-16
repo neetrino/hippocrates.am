@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { applyClinic, applyDoctor, applyOfferingDoctor, applyReview, catalogLocale, type CatalogLocale } from "../catalog/locale-copy";
 import { AppError } from "../common/app-error";
+import { pageWindow } from "../common/pagination";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { Public } from "../identity/auth.decorators";
@@ -118,15 +119,18 @@ export class MarketplaceController {
 
   @Public()
   @Get("clinics")
-  async clinics(@Query("name") name?: string, @Query("locale") locale?: string) {
+  async clinics(@Query("name") name?: string, @Query("locale") locale?: string, @Query("page") page?: string) {
     const language = catalogLocale(locale);
     const needle = name?.trim() ?? "";
+    const { skip, take } = pageWindow(page);
     const rows = await this.prisma.clinic.findMany({
       where: {
         ...liveListing,
         ...(needle ? { OR: clinicNameSearch(needle) } : {}),
       },
-      orderBy: { name: "asc" },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      skip,
+      take,
       select: {
         ...clinicFields,
         locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
@@ -148,9 +152,9 @@ export class MarketplaceController {
       select: {
         ...clinicSelect(language),
         branches: { select: { id: true, name: true, address: true } },
-        doctors: { where: liveListing, select: doctorSelect(language) },
+        doctors: { where: liveDoctor, select: doctorSelect(language) },
         offerings: {
-          where: { published: true, doctor: liveListing },
+          where: { published: true, doctor: liveDoctor },
           select: {
             id: true,
             name: true,
@@ -249,16 +253,19 @@ export class MarketplaceController {
     @Query("specialty") specialty?: string | string[],
     @Query("city") city?: string | string[],
     @Query("clinic") clinic?: string | string[],
+    @Query("page") page?: string,
   ) {
     const language = catalogLocale(locale);
     const needle = name?.trim() ?? "";
     const specialties = parseMultiQuery(specialty);
     const cities = parseMultiQuery(city);
     const clinics = parseMultiQuery(clinic);
+    const { skip, take } = pageWindow(page);
 
     const clinicFilter: {
       published: true;
       verificationStatus: "APPROVED";
+      archivedAt: null;
       name?: { in: string[] };
       district?: { in: string[] };
     } = { ...liveListing };
@@ -267,12 +274,14 @@ export class MarketplaceController {
 
     const rows = await this.prisma.doctorProfile.findMany({
       where: {
-        ...liveListing,
+        ...liveDoctor,
         clinic: clinicFilter,
         specialty: specialties.length > 0 ? { in: specialties } : undefined,
         ...(needle ? { OR: doctorNameSearch(needle) } : {}),
       },
-      orderBy: { user: { displayName: "asc" } },
+      orderBy: [{ user: { displayName: "asc" } }, { id: "asc" }],
+      skip,
+      take,
       select: doctorListSelect(),
     });
     return filterDoctorsByName(rows, needle).map((doctor) => ({

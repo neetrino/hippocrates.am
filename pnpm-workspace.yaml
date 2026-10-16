@@ -1,7 +1,10 @@
 packages:
   - "apps/*"
 overrides:
+  deepmerge-ts: 8.0.0
   handlebars: 4.7.10
+  mysql2: 3.23.1
+  source-map-js: 1.2.2
 allowBuilds:
   '@parcel/watcher': true
   '@prisma/engines': true

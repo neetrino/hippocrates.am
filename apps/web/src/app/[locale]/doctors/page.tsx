@@ -7,6 +7,7 @@ import { publicGet } from "@/shared/public-api";
 import type { DoctorCard } from "@/shared/public-types";
 import { DoctorTile } from "@/shared/ui/catalog-cards";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 import { PageStack } from "@/shared/ui/page-frame";
 
 type DoctorFiltersResponse = {
@@ -37,6 +38,7 @@ export default async function DoctorsPage({
     specialty?: string | string[];
     city?: string | string[];
     clinic?: string | string[];
+    page?: string;
   }>;
 }) {
   const { locale: raw } = await params;
@@ -47,11 +49,13 @@ export default async function DoctorsPage({
   const specialties = toList(queryParams.specialty);
   const cities = toList(queryParams.city);
   const clinics = toList(queryParams.clinic);
+  const page = listPage(queryParams.page);
   const query = new URLSearchParams();
   if (queryParams.name) query.set("name", queryParams.name);
   appendAll(query, "specialty", specialties);
   appendAll(query, "city", cities);
   appendAll(query, "clinic", clinics);
+  if (page > 1) query.set("page", String(page));
   const suffix = query.size > 0 ? `?${query}` : "";
 
   const [doctors, suggestDoctors, filterOptions, favorites] = await Promise.all([
@@ -106,6 +110,16 @@ export default async function DoctorsPage({
           />
         ))}
       </div>
+      <ListPagination
+        page={page}
+        itemCount={doctors.length}
+        query={{
+          name: queryParams.name,
+          specialty: specialties,
+          city: cities,
+          clinic: clinics,
+        }}
+      />
     </PageStack>
   );
 }

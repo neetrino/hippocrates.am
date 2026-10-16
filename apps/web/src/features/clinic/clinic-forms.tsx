@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, PointerEvent, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 type DoctorOption = { id: string; name: string };
 type FieldOpenEvent = PointerEvent<HTMLInputElement> | KeyboardEvent<HTMLInputElement>;
@@ -31,6 +31,7 @@ export function ClinicDoctorForm({ clinicId, onClose }: { clinicId: string; onCl
   const auth = useTranslations("auth");
   const common = useTranslations("common");
   const catalog = useTranslations("catalog");
+  const locale = useLocale();
 
   async function onDoctor(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -38,8 +39,8 @@ export function ClinicDoctorForm({ clinicId, onClose }: { clinicId: string; onCl
     const ok = await postJson(`/clinics/${clinicId}/doctors`, {
       displayName: String(form.get("displayName") ?? ""),
       email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
       specialty: String(form.get("specialty") ?? ""),
+      locale,
     });
     if (ok) window.location.reload();
     else setMessage(t("doctorFailed"));
@@ -48,13 +49,14 @@ export function ClinicDoctorForm({ clinicId, onClose }: { clinicId: string; onCl
   return (
     <form className={panelClass} autoComplete="off" onSubmit={(event) => void onDoctor(event)}>
       <h2>{t("newDoctor")}</h2>
-      <label className={fieldClass}>{common("name")}<input name="displayName" autoComplete="off" required className={controlClass} /></label>
+      <label className={fieldClass}>{common("name")}<input name="displayName" autoComplete="off" required maxLength={80} className={controlClass} /></label>
       <label className={fieldClass}>
         {auth("email")}
         <input
           name="email"
           type="email"
           required
+          maxLength={254}
           autoComplete="off"
           readOnly
           onPointerDown={openNewAccountField}
@@ -62,21 +64,8 @@ export function ClinicDoctorForm({ clinicId, onClose }: { clinicId: string; onCl
           className={controlClass}
         />
       </label>
-      <label className={fieldClass}>
-        {auth("password")}
-        <input
-          name="password"
-          type="password"
-          required
-          minLength={8}
-          autoComplete="new-password"
-          readOnly
-          onPointerDown={openNewAccountField}
-          onKeyDown={openNewAccountField}
-          className={controlClass}
-        />
-      </label>
-      <label className={fieldClass}>{catalog("specialty")}<input name="specialty" required className={controlClass} /></label>
+      <label className={fieldClass}>{catalog("specialty")}<input name="specialty" required maxLength={80} className={controlClass} /></label>
+      <p className="m-0 text-sm text-muted">{t("doctorInviteHint")}</p>
       <p className="m-0 text-sm text-muted">{t("doctorNeedsApproval")}</p>
       <div className="flex flex-wrap gap-2">
         <button className="btn btn-primary w-fit" type="submit">{t("saveDoctor")}</button>

@@ -14,7 +14,7 @@ export type ClinicOffering = {
   durationMinutes: number;
   isEstimate: boolean;
   published?: boolean;
-  doctor: { id?: string; published?: boolean; user: { displayName: string } };
+  doctor: { id: string; published?: boolean; user: { displayName: string } };
 };
 
 export type ServiceDoctor = {

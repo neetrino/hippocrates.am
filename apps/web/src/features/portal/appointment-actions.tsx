@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { visitStarted } from "@/shared/visit-time";
 
 type AppointmentActionsProps = {
   id: string;
@@ -118,10 +119,5 @@ async function postVisit(id: string, path: string, reason: string | undefined): 
     window.location.reload();
     return null;
   }
-  const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
-  return body?.error?.message || "failed";
-}
-
-function visitStarted(startsAt: string): boolean {
-  return Date.parse(startsAt) <= Date.now();
+  return "failed";
 }

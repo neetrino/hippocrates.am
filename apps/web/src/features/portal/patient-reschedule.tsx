@@ -3,16 +3,23 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { formatTime } from "@/shared/format";
+import { todayYerevan, visitStarted } from "@/shared/visit-time";
 
 type PatientRescheduleProps = {
   id: string;
   status: string;
+  startsAt: string;
   doctorId: string;
   offeringId: string;
 };
 
 export function PatientReschedule(props: PatientRescheduleProps) {
-  if (props.status !== "REQUESTED" && props.status !== "CONFIRMED") return null;
+  if (
+    (props.status !== "REQUESTED" && props.status !== "CONFIRMED") ||
+    visitStarted(props.startsAt)
+  ) {
+    return null;
+  }
   return <RescheduleForm id={props.id} doctorId={props.doctorId} offeringId={props.offeringId} />;
 }
 
@@ -123,11 +130,6 @@ async function moveVisit(
     window.location.reload();
     return;
   }
-  const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
   setFailed(true);
-  setNote(body?.error?.message || failedLabel);
-}
-
-function todayYerevan(): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Yerevan" }).format(new Date());
+  setNote(failedLabel);
 }

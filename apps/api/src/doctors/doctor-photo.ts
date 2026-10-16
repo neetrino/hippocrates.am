@@ -25,7 +25,16 @@ export async function saveDoctorPhoto(
 ): Promise<string> {
   const doctor = await portrait(prisma, clinicId, doctorId);
   const key = await storedPortrait(doctor.id, request);
-  await prisma.doctorProfile.update({ where: { id: doctor.id }, data: { photoKey: key } });
+  try {
+    const changed = await prisma.doctorProfile.updateMany({
+      where: { id: doctor.id, photoKey: doctor.photoKey },
+      data: { photoKey: key },
+    });
+    if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
+  } catch (error) {
+    await removeQuiet(key);
+    throw error;
+  }
   await removeQuiet(doctor.photoKey);
   return urlOf(key);
 }
@@ -33,8 +42,12 @@ export async function saveDoctorPhoto(
 /** Clears the public doctor portrait. */
 export async function clearDoctorPhoto(prisma: PrismaService, clinicId: string, doctorId: string): Promise<void> {
   const doctor = await portrait(prisma, clinicId, doctorId);
+  const changed = await prisma.doctorProfile.updateMany({
+    where: { id: doctor.id, photoKey: doctor.photoKey },
+    data: { photoKey: null },
+  });
+  if (changed.count !== 1) throw new AppError("CONFLICT", 409, "Նկարը փոխվել է, կրկին փորձեք");
   await removeQuiet(doctor.photoKey);
-  await prisma.doctorProfile.update({ where: { id: doctor.id }, data: { photoKey: null } });
 }
 
 async function storedPortrait(doctorId: string, request: Request): Promise<string> {

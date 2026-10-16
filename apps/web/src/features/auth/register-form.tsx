@@ -92,6 +92,7 @@ export function RegisterForm() {
           autoComplete="new-password"
           showLabel={t("showPassword")}
           hideLabel={t("hidePassword")}
+          minLength={8}
         />
         <PasswordField
           name="confirmPassword"
@@ -100,6 +101,7 @@ export function RegisterForm() {
           autoComplete="new-password"
           showLabel={t("showPassword")}
           hideLabel={t("hidePassword")}
+          minLength={8}
         />
       </div>
       {error ? <p className="m-0 text-danger">{error}</p> : null}

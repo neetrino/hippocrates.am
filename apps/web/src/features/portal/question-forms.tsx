@@ -29,8 +29,8 @@ export function AskQuestionForm() {
 
   return (
     <form className="grid gap-3.5" onSubmit={(event) => void onSubmit(event)}>
-      <label className={fieldClass}>{t("askTitle")}<input name="title" required className={controlClass} /></label>
-      <label className={fieldClass}>{t("askBody")}<textarea name="body" required className={`${controlClass} min-h-[110px] resize-y`} /></label>
+      <label className={fieldClass}>{t("askTitle")}<input name="title" required maxLength={160} className={controlClass} /></label>
+      <label className={fieldClass}>{t("askBody")}<textarea name="body" required maxLength={3000} className={`${controlClass} min-h-[110px] resize-y`} /></label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button className="btn btn-primary w-fit" type="submit">
         {common("send")}
@@ -66,7 +66,8 @@ export function AnswerForm({ questionId }: { questionId: string }) {
         <textarea
           name="body"
           required
-        className="field-control min-h-[110px] resize-y"
+          maxLength={3000}
+          className="field-control min-h-[110px] resize-y"
         />
       </label>
       {error ? <p className="m-0 text-danger">{error}</p> : null}

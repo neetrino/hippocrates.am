@@ -1,6 +1,6 @@
-import { Injectable, Logger } from "@nestjs/common";
-import type { Appointment } from "../generated/prisma/client";
-import { PrismaService } from "../infrastructure/prisma.service";
+import { Injectable } from "@nestjs/common";
+import type { Appointment, Prisma } from "../generated/prisma/client";
+import type { PrismaService } from "../infrastructure/prisma.service";
 import { dropSuperAdmins } from "./notice-audience";
 
 export const appointmentNotice = {
@@ -22,40 +22,53 @@ export const appointmentNotice = {
   reminderHour: "notice.reminderHour",
 } as const;
 
+type NotificationDb = PrismaService | Prisma.TransactionClient;
+
 @Injectable()
 export class NotificationsService {
-  private readonly logger = new Logger(NotificationsService.name);
-
-  constructor(private readonly prisma: PrismaService) {}
-
-  async afterAppointment(appointment: Appointment, body: string, detail?: string | null): Promise<void> {
-    try {
-      const admins = await this.prisma.user.findMany({
-        where: { clinicId: appointment.clinicId, role: "ADMIN" },
-        select: { id: true },
-      });
-      const doctor = await this.prisma.doctorProfile.findUnique({
-        where: { id: appointment.doctorId },
-        select: { userId: true },
-      });
-      const userIds = new Set<string>(admins.map((admin) => admin.id));
-      if (appointment.patientId) userIds.add(appointment.patientId);
-      if (doctor) userIds.add(doctor.userId);
-      const audience = await noticeAudience(this.prisma, [...userIds]);
-      if (audience.length === 0) return;
-      await this.prisma.notification.createMany({
-        data: audience.map((userId) => ({ userId, appointmentId: appointment.id, body, detail: detail || null })),
-      });
-    } catch (error) {
-      this.logger.error("Notification insert failed", error instanceof Error ? error.stack : undefined);
-    }
+  async write(
+    db: NotificationDb,
+    appointment: Appointment,
+    body: string,
+    eventKey: string,
+    detail?: string | null,
+  ): Promise<void> {
+    const userIds = await appointmentAudience(db, appointment);
+    if (userIds.length === 0) return;
+    await db.notification.createMany({
+      data: userIds.map((userId) => ({
+        userId,
+        appointmentId: appointment.id,
+        body,
+        detail: detail || null,
+        dedupeKey: `${appointment.id}:${eventKey}:${userId}`,
+      })),
+      skipDuplicates: true,
+    });
   }
 }
 
-export async function noticeAudience(prisma: PrismaService, userIds: readonly string[]): Promise<string[]> {
+async function appointmentAudience(db: NotificationDb, appointment: Appointment): Promise<string[]> {
+  const [admins, doctor] = await Promise.all([
+    db.user.findMany({
+      where: { clinicId: appointment.clinicId, role: "ADMIN" },
+      select: { id: true },
+    }),
+    db.doctorProfile.findUnique({
+      where: { id: appointment.doctorId },
+      select: { userId: true },
+    }),
+  ]);
+  const userIds = new Set<string>(admins.map((admin) => admin.id));
+  if (appointment.patientId) userIds.add(appointment.patientId);
+  if (doctor) userIds.add(doctor.userId);
+  return noticeAudience(db, [...userIds]);
+}
+
+export async function noticeAudience(db: NotificationDb, userIds: readonly string[]): Promise<string[]> {
   const unique = [...new Set(userIds)];
   if (unique.length === 0) return [];
-  const blocked = await prisma.user.findMany({
+  const blocked = await db.user.findMany({
     where: { id: { in: unique }, role: "SUPER_ADMIN" },
     select: { id: true },
   });

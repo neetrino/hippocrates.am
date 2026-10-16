@@ -8,9 +8,10 @@
   "scripts": {
     "dev": "pnpm --parallel --filter @hippocrates/web --filter @hippocrates/api dev",
     "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm --filter @hippocrates/api test",
-    "build": "pnpm -r --if-present build",
+    "codegen": "pnpm --filter @hippocrates/api db:generate",
+    "typecheck": "pnpm codegen && pnpm -r --if-present typecheck",
+    "test": "pnpm codegen && pnpm -r --if-present test",
+    "build": "pnpm codegen && pnpm -r --if-present build",
     "ci:guard": "node scripts/ci/repo-guard.mjs",
     "db:migrate": "pnpm --filter @hippocrates/api db:migrate",
     "db:seed": "pnpm --filter @hippocrates/api db:seed",
@@ -18,7 +19,7 @@
   },
   "devDependencies": {
     "eslint": "9.39.4",
-    "eslint-config-next": "16.3.7",
-    "typescript-eslint": "8.71.0"
+    "eslint-config-next": "16.3.8",
+    "typescript-eslint": "8.71.2"
   }
 }

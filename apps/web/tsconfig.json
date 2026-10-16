@@ -35,7 +35,11 @@
     "src/**/*.tsx",
     "src/global.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next-e2e/types/**/*.ts",
+    ".next-e2e/dev/types/**/*.ts",
+    ".next-e2e-single/types/**/*.ts",
+    ".next-e2e-single/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

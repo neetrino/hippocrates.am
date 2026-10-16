@@ -5,21 +5,25 @@ import { PortalClinicsPanel } from "@/features/portal/portal-clinics-panel";
 import { requireSuperAdmin } from "@/features/portal/require-super-admin";
 import { prepareLocale } from "@/i18n/locale";
 import { sessionGet } from "@/shared/session-api";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 import type { AdminClinicCard } from "@/features/portal/portal-clinics-panel";
 
 export default async function PortalClinicsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale } = await params;
   prepareLocale(locale);
+  const page = listPage((await searchParams).page);
   await requireSuperAdmin();
   const t = await getTranslations("catalog");
   const platform = await getTranslations("platform");
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
-  const clinics = (await sessionGet<AdminClinicCard[]>("/admin/clinics")) ?? [];
+  const clinics = (await sessionGet<AdminClinicCard[]>(`/admin/clinics${page > 1 ? `?page=${page}` : ""}`)) ?? [];
 
   return (
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={t("clinicsTitle")}>
@@ -39,6 +43,7 @@ export default async function PortalClinicsPage({
           />
         }
       />
+      <ListPagination page={page} itemCount={clinics.length} />
     </AdminPortalShell>
   );
 }

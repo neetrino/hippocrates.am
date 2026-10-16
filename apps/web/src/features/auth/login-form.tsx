@@ -4,18 +4,13 @@ import { FormEvent, KeyboardEvent, PointerEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
+import { accountHome } from "@/shared/role-home";
 
 type LoginPayload = {
   data: { id: string; role: string };
 };
 
 type FieldOpenEvent = PointerEvent<HTMLInputElement> | KeyboardEvent<HTMLInputElement>;
-
-function accountHome(role: string): "/super-admin" | "/clinic" | "/me" {
-  if (role === "SUPER_ADMIN") return "/super-admin";
-  if (role === "ADMIN") return "/clinic";
-  return "/me";
-}
 
 export function LoginForm() {
   const [error, setError] = useState("");

@@ -133,7 +133,7 @@ export class FavoritesController {
 
   @Post("clinics/:id")
   async saveClinic(@CurrentActor() actor: Actor, @Param("id") id: string) {
-    this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
+    await this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
     await this.requireClinic(id);
     await this.remember({ userId: actor.id, clinicId: id });
     return { saved: true };
@@ -141,14 +141,14 @@ export class FavoritesController {
 
   @Delete("clinics/:id")
   async dropClinic(@CurrentActor() actor: Actor, @Param("id") id: string) {
-    this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
+    await this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
     await this.prisma.favorite.deleteMany({ where: { userId: actor.id, clinicId: id } });
     return { saved: false };
   }
 
   @Post("doctors/:id")
   async saveDoctor(@CurrentActor() actor: Actor, @Param("id") id: string) {
-    this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
+    await this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
     await this.requireDoctor(id);
     await this.remember({ userId: actor.id, doctorId: id });
     return { saved: true };
@@ -156,7 +156,7 @@ export class FavoritesController {
 
   @Delete("doctors/:id")
   async dropDoctor(@CurrentActor() actor: Actor, @Param("id") id: string) {
-    this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
+    await this.limits.consume(`favorite:${actor.id}`, 40, windowMs);
     await this.prisma.favorite.deleteMany({ where: { userId: actor.id, doctorId: id } });
     return { saved: false };
   }

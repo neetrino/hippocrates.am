@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState, type KeyboardEvent, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { useRouter } from "@/i18n/navigation";
 import { sanitizeNameInput } from "@/shared/input-constraints";
@@ -48,8 +48,7 @@ export function RegisterClinicForm({ submitLabel }: { submitLabel: string }) {
         adminNamePlaceholder={platform("adminNamePlaceholder")}
         adminEmail={platform("adminEmail")}
         adminEmailPlaceholder={platform("adminEmailPlaceholder")}
-        adminPassword={platform("adminPassword")}
-        adminPasswordPlaceholder={platform("adminPasswordPlaceholder")}
+        adminInviteHint={platform("adminInviteHint")}
       />
       {form.error ? <p className="m-0 text-danger">{form.error}</p> : null}
       <button
@@ -67,6 +66,7 @@ function useClinicDraft(armenianRequired: string) {
   const auth = useTranslations("auth");
   const platform = useTranslations("platform");
   const router = useRouter();
+  const localeCode = useLocale();
   const [locale, setLocale] = useState<ContentLocale>("hy");
   const [copies, setCopies] = useState<Record<ContentLocale, Copy>>({
     hy: { ...EMPTY },
@@ -81,7 +81,13 @@ function useClinicDraft(armenianRequired: string) {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    const failure = await submitDraft(event.currentTarget, copies, auth("phoneInvalid"), common("failed"));
+    const failure = await submitDraft(
+      event.currentTarget,
+      copies,
+      localeCode,
+      auth("phoneInvalid"),
+      common("failed"),
+    );
     if (failure === "armenian") {
       setLocale("hy");
       setError(armenianRequired);
@@ -130,15 +136,14 @@ function AccountFields(props: {
   adminNamePlaceholder: string;
   adminEmail: string;
   adminEmailPlaceholder: string;
-  adminPassword: string;
-  adminPasswordPlaceholder: string;
+  adminInviteHint: string;
 }) {
   return (
     <div className="grid gap-3.5 border-t border-line pt-4">
       <PhoneField label={props.phone} />
-      <TextField label={props.adminName} name="adminName" placeholder={props.adminNamePlaceholder} nameInput />
-      <TextField label={props.adminEmail} name="adminEmail" type="email" placeholder={props.adminEmailPlaceholder} />
-      <TextField label={props.adminPassword} name="adminPassword" type="password" placeholder={props.adminPasswordPlaceholder} minLength={8} />
+      <TextField label={props.adminName} name="adminName" placeholder={props.adminNamePlaceholder} maxLength={80} nameInput />
+      <TextField label={props.adminEmail} name="adminEmail" type="email" placeholder={props.adminEmailPlaceholder} maxLength={254} />
+      <p className="m-0 text-sm text-muted">{props.adminInviteHint}</p>
     </div>
   );
 }
@@ -146,6 +151,7 @@ function AccountFields(props: {
 async function submitDraft(
   form: HTMLFormElement,
   copies: Record<ContentLocale, Copy>,
+  locale: string,
   phoneInvalid: string,
   failed: string,
 ): Promise<string | null> {
@@ -165,14 +171,11 @@ async function submitDraft(
       phone,
       adminName: String(data.get("adminName") ?? ""),
       adminEmail: String(data.get("adminEmail") ?? ""),
-      adminPassword: String(data.get("adminPassword") ?? ""),
+      locale,
       locales: { ...(en ? { en } : {}), ...(ru ? { ru } : {}) },
     }),
   });
-  if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
-    return body?.error?.message || failed;
-  }
+  if (!response.ok) return failed;
   return null;
 }
 
@@ -234,7 +237,7 @@ function TextField(props: {
   name: string;
   type?: string;
   placeholder?: string;
-  minLength?: number;
+  maxLength?: number;
   nameInput?: boolean;
 }) {
   return (
@@ -244,7 +247,7 @@ function TextField(props: {
         name={props.name}
         type={props.type ?? "text"}
         placeholder={props.placeholder}
-        minLength={props.minLength}
+        maxLength={props.maxLength}
         required
         onInput={
           props.nameInput

@@ -113,7 +113,7 @@ async function verifyOriginGuard(baseUrl: string, fixture: Fixture): Promise<voi
     method: "POST",
     headers: { cookie: fixture.cookie, origin: webOrigin },
   });
-  assert.equal(allowed.status, 200);
+  assert.equal(allowed.status, 201);
 }
 
 async function cleanup(prisma: PrismaService): Promise<void> {

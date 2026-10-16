@@ -6,6 +6,7 @@ import { appointmentNotice, noticeAudience } from "./notifications.service";
 import { dueReminder, reminderKey } from "./reminder-window";
 
 const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const REMINDER_LOCK_KEY = 1_094_821;
 
@@ -49,8 +50,21 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async writeBatch(db: Prisma.TransactionClient, now: Date): Promise<void> {
+    const hourBoundary = new Date(now.getTime() + HOUR_MS);
     const visits = await db.appointment.findMany({
-      where: { status: "CONFIRMED", startsAt: { gt: now, lte: new Date(now.getTime() + DAY_MS) } },
+      where: {
+        status: "CONFIRMED",
+        OR: [
+          {
+            startsAt: { gt: now, lte: hourBoundary },
+            notifications: { none: { body: appointmentNotice.reminderHour } },
+          },
+          {
+            startsAt: { gt: hourBoundary, lte: new Date(now.getTime() + DAY_MS) },
+            notifications: { none: { body: appointmentNotice.reminderDay } },
+          },
+        ],
+      },
       orderBy: [{ startsAt: "asc" }, { id: "asc" }],
       take: LIST_PAGE_SIZE,
       select: { id: true, patientId: true, startsAt: true, doctor: { select: { userId: true } } },

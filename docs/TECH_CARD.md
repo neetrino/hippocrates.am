@@ -49,6 +49,7 @@
 
 ## Security and operational release gates
 
+- Project-specific deployment, health, secret, and restore gates are recorded in [`06-OPERATIONS.md`](./06-OPERATIONS.md).
 - Separate development, staging and production credentials/data; dev/staging use synthetic test patients.
 - HTTPS, safe cookies/CSRF/Origin as applicable, input validation, login and booking rate limits, least-privileged DB credentials and secret storage.
 - Audit clinic/doctor approval, membership changes, and booking transitions. Redact patient contact data from technical logs.

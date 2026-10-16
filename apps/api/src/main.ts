@@ -5,8 +5,10 @@ import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
 import { EnvelopeInterceptor } from "./common/envelope.interceptor";
 import { HttpExceptionFilter } from "./common/http.filter";
+import { validateRuntimeEnvironment } from "./infrastructure/runtime-environment";
 
 async function bootstrap(): Promise<void> {
+  validateRuntimeEnvironment();
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.enableCors({

@@ -7,7 +7,7 @@
 - Public routes expose **published-only DTOs**; never serialize whole clinic/user/doctor ORM rows or private verification details.
 - Login is email and password. The session is a revocable server record. The browser receives an HttpOnly Secure SameSite=Lax cookie. Registration, login, and booking mutations are rate-limited in shared PostgreSQL buckets.
 - Every private operation checks current user identity, active clinic membership when relevant, action permission and resource/patient/doctor ownership.
-- Validate inputs, return generic 404 where another clinic's object must not be disclosed, and cap pagination and rate limits.
+- Validate inputs, return generic 404 where another clinic's object must not be disclosed, and cap pagination and rate limits. Growing list routes use `?page=N` with 50 stable-order records per page.
 - Timestamp storage UTC; render available times in clinic's declared IANA time zone. Server is source of truth for available slots.
 - Appointment creation requires a bounded idempotency key in the request body and returns the existing appointment for a replay.
 
@@ -36,7 +36,7 @@ Geolocation, ratings, and external review imports arrive only on their points. D
 | `POST /auth/logout` | Revoke the current session so the cookie no longer authorizes requests |
 | `GET /me` | Own minimum profile / role context |
 | `GET /me/appointments` | Patient sees **only** own requests, statuses and permitted history |
-| `GET /me/notifications` | Own basic booking-event notifications |
+| `GET /me/notifications?page=` | Own basic booking-event notifications |
 
 Email and password is the accepted login. Password reset uses a one-time emailed link. Phone login and OAuth are not enabled.
 An unverified profile phone never transfers guest appointments into an account; a future claim flow requires proof of phone ownership.

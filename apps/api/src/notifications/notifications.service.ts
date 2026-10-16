@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import type { Appointment, Prisma } from "../generated/prisma/client";
 import type { PrismaService } from "../infrastructure/prisma.service";
 import { dropSuperAdmins } from "./notice-audience";
+import { saveNotices } from "./notice-mail";
 
 export const appointmentNotice = {
   requested: "notice.requested",
@@ -35,16 +36,16 @@ export class NotificationsService {
   ): Promise<void> {
     const userIds = await appointmentAudience(db, appointment);
     if (userIds.length === 0) return;
-    await db.notification.createMany({
-      data: userIds.map((userId) => ({
+    await saveNotices(
+      db,
+      userIds.map((userId) => ({
         userId,
         appointmentId: appointment.id,
         body,
         detail: detail || null,
         dedupeKey: `${appointment.id}:${eventKey}:${userId}`,
       })),
-      skipDuplicates: true,
-    });
+    );
   }
 }
 

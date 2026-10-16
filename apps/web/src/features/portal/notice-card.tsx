@@ -36,29 +36,23 @@ export function NoticeCard({
   );
 }
 
-export function NoticeMore({
-  open,
-  hidden,
-  lessLabel,
-  moreLabel,
-  onToggle,
+export function NoticeLoadMore({
+  label,
+  pending,
+  onLoad,
 }: {
-  open: boolean;
-  hidden: number;
-  lessLabel: string;
-  moreLabel: string;
-  onToggle: () => void;
+  label: string;
+  pending: boolean;
+  onLoad: () => void;
 }) {
-  if (hidden <= 0) return null;
   return (
     <button
       type="button"
-      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent"
-      aria-expanded={open}
-      onClick={onToggle}
+      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors duration-160 hover:border-accent/35 hover:text-accent disabled:cursor-default disabled:opacity-60"
+      disabled={pending}
+      onClick={onLoad}
     >
-      {open ? lessLabel : moreLabel}
-      <Chevron open={open} />
+      {label}
     </button>
   );
 }
@@ -68,12 +62,4 @@ function cardTone(unread: boolean, checked: boolean): string {
   if (checked) return `border-accent bg-accent-soft/70 ${edge}`;
   if (unread) return `border-line bg-accent-soft/70 ${edge}`;
   return "border-line bg-sand/70";
-}
-
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg viewBox="0 0 20 20" className={`h-4 w-4 ${open ? "rotate-180" : ""}`} aria-hidden="true">
-      <path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
 }

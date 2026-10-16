@@ -10,9 +10,9 @@ export function useUnreadNotices(): number {
     let ignore = false;
     void fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/me/notifications`, { credentials: "include" })
       .then((response) => (response.ok ? response.json() : null))
-      .then((body: { data?: { readAt: string | null }[] } | null) => {
-        if (ignore || !body?.data) return;
-        setCount(body.data.filter((item) => item.readAt === null).length);
+      .then((body: { data?: { unreadCount?: number } } | null) => {
+        if (ignore || typeof body?.data?.unreadCount !== "number") return;
+        setCount(body.data.unreadCount);
       })
       .catch(() => undefined);
     function onRead(): void {

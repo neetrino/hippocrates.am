@@ -1,31 +1,19 @@
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
-import { NoticeList, type NoticeRow } from "@/features/portal/notice-list";
+import { NoticeList } from "@/features/portal/notice-list";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
-import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
-import { formatWhen, patientLabel } from "@/shared/format";
-import { type NoticeItem } from "@/shared/notice";
-import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
+import { emptyNoticePage, noticePageLimit, type NoticePage } from "@/shared/notice";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
-import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
-export default async function PatientNoticesPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ page?: string }>;
-}) {
+export default async function PatientNoticesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
-  const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const nav = await getTranslations("nav");
-  const page = listPage((await searchParams).page);
   const me = await sessionGet<Me>("/auth/me");
   if (!me) {
     return (
@@ -39,19 +27,10 @@ export default async function PatientNoticesPage({
   if (me.role === "SUPER_ADMIN") redirect({ href: "/super-admin", locale });
   if (me.role === "ADMIN") redirect({ href: "/clinic/notices", locale });
   if (me.role !== "PATIENT" && me.role !== "DOCTOR") redirect({ href: "/me", locale });
-  const notices = (
-    (await sessionGet<NoticeItem[]>(`/me/notifications${page > 1 ? `?page=${page}` : ""}`)) ?? []
-  );
+  const page = (await sessionGet<NoticePage>(`/me/notifications?limit=${noticePageLimit}`)) ?? emptyNoticePage;
   const list = (
     <section className="rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
-      {notices.length === 0 ? (
-        <p className="m-0 rounded-[1.1rem] bg-sand px-4 py-5 text-muted">{t("noNotices")}</p>
-      ) : (
-          <NoticeList
-            rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived"), me.role === "DOCTOR"))}
-          />
-      )}
-      <ListPagination page={page} itemCount={notices.length} />
+      <NoticeList page={page} audience={me.role === "DOCTOR" ? "doctor" : "patient"} />
     </section>
   );
   if (me.role === "DOCTOR") {
@@ -67,28 +46,4 @@ export default async function PatientNoticesPage({
       {list}
     </PatientPortalShell>
   );
-}
-
-function toRow(
-  notice: NoticeItem,
-  locale: string,
-  t: (key: NoticeMessageKey) => string,
-  arrivedLabel: string,
-  forDoctor: boolean,
-): NoticeRow {
-  const visit = notice.appointment;
-  const person = visit ? (forDoctor ? patientLabel(visit) : doctorDisplayName(visit.doctor, locale)) : "";
-  const context = visit
-    ? `${clinicDisplayName(visit.clinic, locale)} · ${person} · ${formatWhen(visit.startsAt, locale)}`
-    : "";
-  return {
-    id: notice.id,
-    text: noticeLine(notice.body, notice.detail, t),
-    when: `${arrivedLabel} · ${formatWhen(notice.createdAt, locale)}`,
-    context,
-    unread: notice.readAt === null,
-    startsAt: visit?.startsAt ?? null,
-    kind: noticeKind(notice.body),
-    people: person ? [person] : [],
-  };
 }

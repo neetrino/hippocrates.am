@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/commo
 import { LIST_PAGE_SIZE } from "../common/pagination";
 import type { Prisma } from "../generated/prisma/client";
 import { PrismaService } from "../infrastructure/prisma.service";
+import { deliverPendingNoticeMails, saveNotices } from "./notice-mail";
 import { appointmentNotice, noticeAudience } from "./notifications.service";
 import { dueReminder, reminderKey } from "./reminder-window";
 
@@ -36,6 +37,11 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
       this.logger.error("Visit reminder failed", error instanceof Error ? error.stack : undefined);
     } finally {
       this.running = false;
+    }
+    try {
+      await deliverPendingNoticeMails(this.prisma);
+    } catch (error) {
+      this.logger.error("Visit mail failed", error instanceof Error ? error.stack : undefined);
     }
   }
 
@@ -75,7 +81,7 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
     const allowed = new Set(await noticeAudience(db, drafted.map((row) => row.userId)));
     const data = drafted.filter((row) => allowed.has(row.userId));
     if (data.length === 0) return;
-    await db.notification.createMany({ data, skipDuplicates: true });
+    await saveNotices(db, data);
   }
 
   private rowsFor(

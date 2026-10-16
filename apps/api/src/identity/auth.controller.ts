@@ -10,6 +10,7 @@ import { RateLimitService } from "./rate-limit.service";
 import { SessionService } from "./session.service";
 import { assertResetMail } from "./password-mail";
 import { applyPasswordReset, requestPasswordReset } from "./password-reset";
+import { saveNoticeMailPreference } from "./notice-preference";
 import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
 import { accountPhotoUrl, assertAccountPhotoOwner, clearUserPhoto, saveUserPhoto } from "./user-photo";
 
@@ -123,6 +124,12 @@ export class AuthController {
       photoUrl: accountPhotoUrl(user),
       emailVisitNotices: user.emailVisitNotices,
     };
+  }
+
+  @Patch("me/notice-mail")
+  async updateNoticeMail(@CurrentActor() actor: Actor, @Body() body: unknown): Promise<{ emailVisitNotices: boolean }> {
+    this.limits.consume(`notice-mail:${actor.id}`, 20, 10 * 60 * 1000);
+    return saveNoticeMailPreference(this.prisma, actor.id, body);
   }
 
   @Patch("me")

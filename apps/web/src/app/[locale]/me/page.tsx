@@ -6,23 +6,11 @@ import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
+import { type NoticePage } from "@/shared/notice";
 import { noticeLine } from "@/shared/notice-text";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
-
-type Notice = {
-  id: string;
-  body: string;
-  detail?: string | null;
-  createdAt: string;
-  readAt: string | null;
-  appointment: {
-    startsAt: string;
-    clinic: { name: string; locales?: { locale: string; name: string }[] };
-    doctor: { user: { displayName: string }; locales?: { locale: string; name: string }[] };
-  } | null;
-};
 
 export default async function MePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -60,7 +48,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
     return <DoctorHome me={me} appointments={appointments} />;
   }
 
-  const notices = (await sessionGet<Notice[]>("/me/notifications")) ?? [];
+  const notices = (await sessionGet<NoticePage>("/me/notifications"))?.items ?? [];
 
   const role = asRole(me.role);
   return (

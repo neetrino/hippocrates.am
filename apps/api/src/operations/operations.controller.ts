@@ -7,7 +7,9 @@ import { Roles } from "../identity/auth.decorators";
 import { CurrentActor } from "../identity/current-actor";
 import { RateLimitService } from "../identity/rate-limit.service";
 import { closeExpiredRequests } from "../appointments/close-expired";
+import { listUserNotices } from "../notifications/list-notices";
 import { readNoticeIds } from "../notifications/notice-ids";
+import { emptyNoticePage, readNoticeCursor, readNoticeLimit } from "../notifications/notice-page";
 import { NotificationsService } from "../notifications/notifications.service";
 import { bookDeskVisit } from "../appointments/desk-booking";
 import { eventSelect, namedEventsForVisits, omitEvents } from "../appointments/present-events";
@@ -179,36 +181,11 @@ export class OperationsController {
   }
 
   @Get("me/notifications")
-  async notifications(@CurrentActor() actor: Actor, @Query("page") page?: string) {
-    if (actor.role === "SUPER_ADMIN") return [];
-    const { skip, take } = pageWindow(page);
-    return this.prisma.notification.findMany({
-      where: { userId: actor.id },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      skip,
-      take,
-      select: {
-        id: true,
-        body: true,
-        detail: true,
-        createdAt: true,
-        readAt: true,
-        appointment: {
-          select: {
-            startsAt: true,
-            guestName: true,
-            patient: { select: { displayName: true } },
-            clinic: { select: { name: true, locales: { select: { locale: true, name: true } } } },
-            doctor: {
-              select: {
-                user: { select: { displayName: true } },
-                locales: { select: { locale: true, name: true } },
-              },
-            },
-          },
-        },
-      },
-    });
+  async notifications(@CurrentActor() actor: Actor, @Query("limit") limit?: string, @Query("cursor") cursor?: string) {
+    const pageLimit = readNoticeLimit(limit);
+    const pageCursor = readNoticeCursor(cursor);
+    if (actor.role === "SUPER_ADMIN") return emptyNoticePage();
+    return listUserNotices(this.prisma, actor.id, pageLimit, pageCursor);
   }
 
   @Post("me/notifications/read")

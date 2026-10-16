@@ -11,6 +11,7 @@
     "codegen": "pnpm --filter @hippocrates/api db:generate",
     "typecheck": "pnpm codegen && pnpm -r --if-present typecheck",
     "test": "pnpm codegen && pnpm -r --if-present test",
+    "e2e": "playwright test",
     "build": "pnpm codegen && pnpm -r --if-present build",
     "ci:guard": "node scripts/ci/repo-guard.mjs",
     "db:migrate": "pnpm --filter @hippocrates/api db:migrate",
@@ -18,6 +19,7 @@
     "db:validate": "pnpm --filter @hippocrates/api db:validate"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.8",
     "typescript-eslint": "8.71.2"

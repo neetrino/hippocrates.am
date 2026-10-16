@@ -53,7 +53,7 @@ export async function bookVisit(prisma: PrismaService, notices: Notices, patient
 
 export async function confirmVisit(prisma: PrismaService, notices: Notices, actor: Actor, id: string) {
   const now = new Date();
-  if ((await closeExpiredRequests(prisma, notices, now)).includes(id)) {
+  if ((await closeExpiredRequests(prisma, notices, now, { appointmentId: id })).includes(id)) {
     throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
   }
   const appointment = await openVisit(prisma, id);
@@ -70,7 +70,7 @@ export async function confirmVisit(prisma: PrismaService, notices: Notices, acto
 
 export async function cancelVisit(prisma: PrismaService, notices: Notices, actor: Actor, id: string, body: unknown) {
   const now = new Date();
-  if ((await closeExpiredRequests(prisma, notices, now)).includes(id)) {
+  if ((await closeExpiredRequests(prisma, notices, now, { appointmentId: id })).includes(id)) {
     throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
   }
   const appointment = await openVisit(prisma, id);
@@ -114,7 +114,7 @@ export async function missVisit(prisma: PrismaService, notices: Notices, actor: 
 
 export async function rescheduleVisit(prisma: PrismaService, notices: Notices, actor: Actor, id: string, body: unknown) {
   const now = new Date();
-  if ((await closeExpiredRequests(prisma, notices, now)).includes(id)) {
+  if ((await closeExpiredRequests(prisma, notices, now, { appointmentId: id })).includes(id)) {
     throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
   }
   const appointment = await openVisit(prisma, id);

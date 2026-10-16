@@ -1,15 +1,28 @@
+import { LIST_PAGE_SIZE } from "../common/pagination";
 import type { PrismaService } from "../infrastructure/prisma.service";
 import { appointmentNotice, type NotificationsService } from "../notifications/notifications.service";
 import { tryExpire } from "./appointment-machine";
+
+type ExpiredScope = { appointmentId?: string; clinicId?: string; doctorId?: string; patientId?: string };
 
 /** Closes unanswered requests whose start time has arrived. Returns the closed ids. */
 export async function closeExpiredRequests(
   prisma: PrismaService,
   notices: NotificationsService,
   now = new Date(),
+  scope: ExpiredScope = {},
 ): Promise<string[]> {
   const expired = await prisma.appointment.findMany({
-    where: { status: "REQUESTED", startsAt: { lte: now } },
+    where: {
+      id: scope.appointmentId,
+      clinicId: scope.clinicId,
+      doctorId: scope.doctorId,
+      patientId: scope.patientId,
+      status: "REQUESTED",
+      startsAt: { lte: now },
+    },
+    orderBy: [{ startsAt: "asc" }, { id: "asc" }],
+    take: scope.appointmentId ? 1 : LIST_PAGE_SIZE,
   });
   const closedIds: string[] = [];
   for (const appointment of expired) {

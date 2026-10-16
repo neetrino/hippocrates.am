@@ -10,14 +10,17 @@ export function ClinicServiceBoard({
   clinicId,
   doctors,
   offerings,
+  showEmptyDoctors = true,
 }: {
   clinicId: string;
   doctors: ServiceDoctor[];
   offerings: ClinicOffering[];
+  showEmptyDoctors?: boolean;
 }) {
   const t = useTranslations("desk");
   const [open, setOpen] = useState(false);
   const [doctorId, setDoctorId] = useState("");
+  const listedDoctors = servicePageDoctors(doctors, offerings, showEmptyDoctors);
 
   function closeForm(): void {
     setOpen(false);
@@ -49,8 +52,8 @@ export function ClinicServiceBoard({
           onClose={closeForm}
         />
       ) : null}
-      {doctors.length === 0 ? <EmptyState>{t("emptyServices")}</EmptyState> : null}
-      {doctors.map((doctor) => (
+      {listedDoctors.length === 0 ? <EmptyState>{t("emptyServices")}</EmptyState> : null}
+      {listedDoctors.map((doctor) => (
         <DoctorServiceGroup
           key={doctor.id}
           clinicId={clinicId}
@@ -61,4 +64,25 @@ export function ClinicServiceBoard({
       ))}
     </div>
   );
+}
+
+function servicePageDoctors(
+  doctors: ServiceDoctor[],
+  offerings: ClinicOffering[],
+  includeEmpty: boolean,
+): ServiceDoctor[] {
+  const byId = new Map(doctors.map((doctor) => [doctor.id, doctor]));
+  for (const { doctor } of offerings) {
+    if (byId.has(doctor.id)) continue;
+    byId.set(doctor.id, {
+      id: doctor.id,
+      specialty: "",
+      published: doctor.published,
+      photoUrl: null,
+      user: doctor.user,
+    });
+  }
+  if (includeEmpty) return [...byId.values()];
+  const offeringDoctorIds = new Set(offerings.map(({ doctor }) => doctor.id));
+  return [...byId.values()].filter(({ id }) => offeringDoctorIds.has(id));
 }

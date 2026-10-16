@@ -183,7 +183,7 @@ export class SchedulingController {
       include: { clinic: { include: { windows: true } }, doctor: { include: { windows: true } } },
     });
     if (!offering) throw new AppError("NOT_FOUND", 404, "Ծառայությունը չի գտնվել");
-    await closeExpiredRequests(this.prisma, this.notices);
+    await closeExpiredRequests(this.prisma, this.notices, new Date(), { doctorId });
     const dayStart = new Date(`${date}T00:00:00.000Z`);
     const dayEnd = new Date(dayStart.getTime() + 48 * 60 * 60_000);
     const [appointments, exceptions] = await Promise.all([

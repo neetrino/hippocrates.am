@@ -31,7 +31,7 @@ export class OperationsController {
   async dashboard(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string) {
     requireClinicAdmin(actor, clinicId);
     const now = new Date();
-    await closeExpiredRequests(this.prisma, this.notices, now);
+    await closeExpiredRequests(this.prisma, this.notices, now, { clinicId });
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     const end = new Date(start.getTime() + 24 * 60 * 60_000);
@@ -179,12 +179,14 @@ export class OperationsController {
   }
 
   @Get("me/notifications")
-  async notifications(@CurrentActor() actor: Actor) {
+  async notifications(@CurrentActor() actor: Actor, @Query("page") page?: string) {
     if (actor.role === "SUPER_ADMIN") return [];
+    const { skip, take } = pageWindow(page);
     return this.prisma.notification.findMany({
       where: { userId: actor.id },
-      orderBy: { createdAt: "desc" },
-      take: 50,
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      skip,
+      take,
       select: {
         id: true,
         body: true,

@@ -10,14 +10,22 @@ import { type NoticeItem } from "@/shared/notice";
 import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import type { Me } from "@/shared/public-types";
 import { sessionGet } from "@/shared/session-api";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
-export default async function PatientNoticesPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function PatientNoticesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
   const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const nav = await getTranslations("nav");
+  const page = listPage((await searchParams).page);
   const me = await sessionGet<Me>("/auth/me");
   if (!me) {
     return (
@@ -31,7 +39,9 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
   if (me.role === "SUPER_ADMIN") redirect({ href: "/super-admin", locale });
   if (me.role === "ADMIN") redirect({ href: "/clinic/notices", locale });
   if (me.role !== "PATIENT" && me.role !== "DOCTOR") redirect({ href: "/me", locale });
-  const notices = (await sessionGet<NoticeItem[]>("/me/notifications")) ?? [];
+  const notices = (
+    (await sessionGet<NoticeItem[]>(`/me/notifications${page > 1 ? `?page=${page}` : ""}`)) ?? []
+  );
   const list = (
     <section className="rounded-[1.6rem] bg-white p-5 shadow-soft md:p-6">
       {notices.length === 0 ? (
@@ -41,6 +51,7 @@ export default async function PatientNoticesPage({ params }: { params: Promise<{
             rows={notices.map((notice) => toRow(notice, displayLocale, t, t("noticeArrived"), me.role === "DOCTOR"))}
           />
       )}
+      <ListPagination page={page} itemCount={notices.length} />
     </section>
   );
   if (me.role === "DOCTOR") {

@@ -1,15 +1,19 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { LIST_PAGE_SIZE } from "../common/pagination";
+import type { Prisma } from "../generated/prisma/client";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { appointmentNotice, noticeAudience } from "./notifications.service";
 import { dueReminder, reminderKey } from "./reminder-window";
 
 const MINUTE_MS = 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const REMINDER_LOCK_KEY = 1_094_821;
 
 @Injectable()
 export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(VisitRemindersService.name);
   private timer: ReturnType<typeof setInterval> | null = null;
+  private running = false;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -23,25 +27,41 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
   }
 
   async sendDue(now = new Date()): Promise<void> {
+    if (this.running) return;
+    this.running = true;
     try {
       await this.writeDue(now);
     } catch (error) {
       this.logger.error("Visit reminder failed", error instanceof Error ? error.stack : undefined);
+    } finally {
+      this.running = false;
     }
   }
 
   private async writeDue(now: Date): Promise<void> {
-    const visits = await this.prisma.appointment.findMany({
+    await this.prisma.$transaction(async (tx) => {
+      const [lock] = await tx.$queryRaw<{ acquired: boolean }[]>`
+        SELECT pg_try_advisory_xact_lock(${REMINDER_LOCK_KEY}) AS acquired
+      `;
+      if (!lock?.acquired) return;
+      await this.writeBatch(tx, now);
+    });
+  }
+
+  private async writeBatch(db: Prisma.TransactionClient, now: Date): Promise<void> {
+    const visits = await db.appointment.findMany({
       where: { status: "CONFIRMED", startsAt: { gt: now, lte: new Date(now.getTime() + DAY_MS) } },
+      orderBy: [{ startsAt: "asc" }, { id: "asc" }],
+      take: LIST_PAGE_SIZE,
       select: { id: true, patientId: true, startsAt: true, doctor: { select: { userId: true } } },
     });
     if (visits.length === 0) return;
-    const bookedAt = await this.bookedAt(visits.map((visit) => visit.id));
+    const bookedAt = await this.bookedAt(db, visits.map((visit) => visit.id));
     const drafted = visits.flatMap((visit) => this.rowsFor(visit, now, bookedAt.get(visit.id) ?? null));
-    const allowed = new Set(await noticeAudience(this.prisma, drafted.map((row) => row.userId)));
+    const allowed = new Set(await noticeAudience(db, drafted.map((row) => row.userId)));
     const data = drafted.filter((row) => allowed.has(row.userId));
     if (data.length === 0) return;
-    await this.prisma.notification.createMany({ data, skipDuplicates: true });
+    await db.notification.createMany({ data, skipDuplicates: true });
   }
 
   private rowsFor(
@@ -61,8 +81,8 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
     }));
   }
 
-  private async bookedAt(appointmentIds: string[]): Promise<Map<string, Date>> {
-    const notices = await this.prisma.notification.findMany({
+  private async bookedAt(db: Prisma.TransactionClient, appointmentIds: string[]): Promise<Map<string, Date>> {
+    const notices = await db.notification.findMany({
       where: {
         appointmentId: { in: appointmentIds },
         body: { in: [appointmentNotice.requested, "Նոր ամրագրման հայտ"] },

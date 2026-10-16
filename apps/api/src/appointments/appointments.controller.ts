@@ -87,13 +87,19 @@ export class AppointmentsController {
 
   @Get("mine")
   async mine(@CurrentActor() actor: Actor, @Query("page") page?: string) {
-    await closeExpiredRequests(this.prisma, this.notices);
-    if (actor.role === "PATIENT") return this.listed({ patientId: actor.id }, "desc", page);
+    if (actor.role === "PATIENT") {
+      await closeExpiredRequests(this.prisma, this.notices, new Date(), { patientId: actor.id });
+      return this.listed({ patientId: actor.id }, "desc", page);
+    }
     if (actor.role === "DOCTOR") {
       const doctor = await this.prisma.doctorProfile.findUnique({ where: { userId: actor.id } });
+      if (doctor) await closeExpiredRequests(this.prisma, this.notices, new Date(), { doctorId: doctor.id });
       return doctor ? this.listed({ doctorId: doctor.id }, "asc", page) : [];
     }
-    if (actor.role === "ADMIN" && actor.clinicId) return this.listed({ clinicId: actor.clinicId }, "asc", page);
+    if (actor.role === "ADMIN" && actor.clinicId) {
+      await closeExpiredRequests(this.prisma, this.notices, new Date(), { clinicId: actor.clinicId });
+      return this.listed({ clinicId: actor.clinicId }, "asc", page);
+    }
     throw new AppError("FORBIDDEN", 403, "Այս գործողությունը թույլատրված չէ");
   }
 

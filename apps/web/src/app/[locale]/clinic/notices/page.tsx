@@ -8,15 +8,25 @@ import { formatWhen, patientLabel } from "@/shared/format";
 import { type NoticeItem } from "@/shared/notice";
 import { noticeKind, noticeLine, type NoticeMessageKey } from "@/shared/notice-text";
 import { sessionGet } from "@/shared/session-api";
+import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
-export default async function ClinicNoticesPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ClinicNoticesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale: raw } = await params;
   prepareLocale(raw);
   const locale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
+  const page = listPage((await searchParams).page);
   await requireClinicAdmin();
-  const notices = (await sessionGet<NoticeItem[]>("/me/notifications")) ?? [];
+  const notices = (
+    (await sessionGet<NoticeItem[]>(`/me/notifications${page > 1 ? `?page=${page}` : ""}`)) ?? []
+  );
 
   return (
     <ClinicManagerShell eyebrow={common("ADMIN")} title={t("notices")}>
@@ -26,6 +36,7 @@ export default async function ClinicNoticesPage({ params }: { params: Promise<{ 
         ) : (
           <NoticeList rows={notices.map((notice) => toRow(notice, locale, t, t("noticeArrived")))} />
         )}
+        <ListPagination page={page} itemCount={notices.length} />
       </section>
     </ClinicManagerShell>
   );

@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { PrismaService } from "../infrastructure/prisma.service";
+import { deliverPendingNoticeMails, queueNoticeMails } from "./notice-mail";
 import { appointmentNotice, noticeAudience } from "./notifications.service";
 import { dueReminder, reminderKey } from "./reminder-window";
 
@@ -28,6 +29,11 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
     } catch (error) {
       this.logger.error("Visit reminder failed", error instanceof Error ? error.stack : undefined);
     }
+    try {
+      await deliverPendingNoticeMails(this.prisma);
+    } catch (error) {
+      this.logger.error("Visit mail failed", error instanceof Error ? error.stack : undefined);
+    }
   }
 
   private async writeDue(now: Date): Promise<void> {
@@ -42,6 +48,11 @@ export class VisitRemindersService implements OnModuleInit, OnModuleDestroy {
     const data = drafted.filter((row) => allowed.has(row.userId));
     if (data.length === 0) return;
     await this.prisma.notification.createMany({ data, skipDuplicates: true });
+    const stored = await this.prisma.notification.findMany({
+      where: { dedupeKey: { in: data.map((row) => row.dedupeKey) } },
+      select: { id: true, userId: true },
+    });
+    await queueNoticeMails(this.prisma, stored);
   }
 
   private rowsFor(

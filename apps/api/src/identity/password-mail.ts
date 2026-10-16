@@ -1,5 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { AppError } from "../common/app-error";
+import { mailConfigured, sendMail } from "../infrastructure/send-mail";
 import { resetLink, type ResetLocale } from "./password-link";
 
 const RESET_MINUTES = 30;
@@ -27,41 +28,21 @@ export { resetLocale } from "./password-link";
 
 /** Letters leave only when Resend is configured. Local development records the link in the API log. */
 export function assertResetMail(): void {
-  if (mailReady() || process.env.NODE_ENV !== "production") return;
+  if (mailConfigured() || process.env.NODE_ENV !== "production") return;
   throw new AppError("MAIL_UNAVAILABLE", 503, "Նամակ ուղարկելը այս պահին հնարավոր չէ");
 }
 
 export async function deliverResetLink(email: string, token: string, locale: ResetLocale): Promise<void> {
   const url = resetLink(token, locale);
-  if (!mailReady()) {
+  const letter = copy[locale];
+  if (!mailConfigured()) {
     logger.log(`Password reset link for ${email}: ${url}`);
     return;
   }
-  const sent = await postResend(email, copy[locale], url);
+  const sent = await sendMail({ to: email, subject: letter.subject, text: resetText(letter, url) });
   if (!sent) logger.error("Password reset mail was not accepted");
 }
 
-function mailReady(): boolean {
-  return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.MAIL_FROM?.trim());
-}
-
-async function postResend(
-  email: string,
-  letter: { subject: string; intro: string; expiry: string },
-  url: string,
-): Promise<boolean> {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${process.env.RESEND_API_KEY?.trim() ?? ""}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      from: process.env.MAIL_FROM?.trim(),
-      to: [email],
-      subject: letter.subject,
-      text: `${letter.intro}\n\n${url}\n\n${letter.expiry}`,
-    }),
-  });
-  return response.ok;
+function resetText(letter: { intro: string; expiry: string }, url: string): string {
+  return `${letter.intro}\n\n${url}\n\n${letter.expiry}`;
 }

@@ -1,5 +1,5 @@
-/** Newest notices kept open before "More". */
-export const noticePreviewLimit = 6;
+/** Page size for the signed-in notice list. The API caps this at 50. */
+export const noticePageLimit = 20;
 
 /** Fired after the notices page marks the current list as read. */
 export const noticesReadEvent = "hippocrates:notices-read";
@@ -18,6 +18,15 @@ export type NoticeItem = {
     doctor: { user: { displayName: string }; locales?: { locale: string; name: string }[] };
   } | null;
 };
+
+export type NoticePage = {
+  items: NoticeItem[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  unreadCount: number;
+};
+
+export const emptyNoticePage: NoticePage = { items: [], nextCursor: null, hasMore: false, unreadCount: 0 };
 
 export function unreadNoticeCount(notices: { readAt: string | null }[]): number {
   return notices.filter((notice) => notice.readAt === null).length;

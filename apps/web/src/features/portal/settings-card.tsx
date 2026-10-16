@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { SettingsNotices } from "@/features/portal/settings-notices";
 import { SettingsPassword } from "@/features/portal/settings-password";
 import { SettingsPhoto } from "@/features/portal/settings-photo";
 import { SettingsProfile } from "@/features/portal/settings-profile";
@@ -11,6 +12,7 @@ type SettingsCardProps = {
   email: string;
   phone: string | null;
   photoUrl: string | null;
+  emailVisitNotices: boolean;
   roleLabel?: string;
   photoLocked?: boolean;
   photoHint?: string;
@@ -19,7 +21,16 @@ type SettingsCardProps = {
 const editButton =
   "btn btn-secondary min-h-9 px-3.5 py-2 text-sm";
 
-export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel, photoLocked, photoHint }: SettingsCardProps) {
+export function SettingsCard({
+  displayName,
+  email,
+  phone,
+  photoUrl,
+  emailVisitNotices,
+  roleLabel,
+  photoLocked,
+  photoHint,
+}: SettingsCardProps) {
   const t = useTranslations("me");
   const common = useTranslations("common");
   const role = roleLabel ?? common("PATIENT");
@@ -54,6 +65,7 @@ export function SettingsCard({ displayName, email, phone, photoUrl, roleLabel, p
         onCancel={() => setEditing(false)}
         onSaved={() => setEditing(false)}
       />
+      <SettingsNotices enabled={emailVisitNotices} />
       <SettingsPassword />
     </section>
   );

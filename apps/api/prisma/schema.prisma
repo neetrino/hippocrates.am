@@ -273,6 +273,28 @@ model Notification {
   createdAt     DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  mail          NoticeMail?
+
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
+}
+
+enum NoticeMailStatus {
+  PENDING
+  SENT
+  SKIPPED
+  FAILED
+}
+
+model NoticeMail {
+  id             String           @id @default(cuid())
+  notificationId String           @unique
+  status         NoticeMailStatus @default(PENDING)
+  attempts       Int              @default(0)
+  sentAt         DateTime?
+  createdAt      DateTime         @default(now())
+  notification   Notification     @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
 }
 
 model Question {

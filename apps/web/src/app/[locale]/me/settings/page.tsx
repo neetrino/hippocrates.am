@@ -33,6 +33,7 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
           email={me.email}
           phone={me.phone}
           photoUrl={me.photoUrl}
+          emailVisitNotices={me.emailVisitNotices}
           roleLabel={common("DOCTOR")}
           photoLocked
           photoHint={t("photoClinicOwned")}
@@ -44,7 +45,13 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
 
   return (
     <PatientPortalShell eyebrow={common("PATIENT")} title={t("settings")}>
-      <SettingsCard displayName={me.displayName} email={me.email} phone={me.phone} photoUrl={me.photoUrl} />
+      <SettingsCard
+        displayName={me.displayName}
+        email={me.email}
+        phone={me.phone}
+        photoUrl={me.photoUrl}
+        emailVisitNotices={me.emailVisitNotices}
+      />
     </PatientPortalShell>
   );
 }

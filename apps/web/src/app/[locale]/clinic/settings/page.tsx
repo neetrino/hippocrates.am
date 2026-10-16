@@ -18,6 +18,7 @@ export default async function ClinicSettingsPage({ params }: { params: Promise<{
         email={me.email}
         phone={me.phone}
         photoUrl={me.photoUrl}
+        emailVisitNotices={me.emailVisitNotices}
         roleLabel={common("ADMIN")}
       />
     </ClinicManagerShell>

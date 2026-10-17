@@ -83,7 +83,7 @@ Cancellation transaction validates actor, policy, status, and updates appointmen
 
 ## Basic indexes and migrations
 
-- Published clinic/doctor lookup by status/name/specialty; foreign keys for clinic offerings and doctor assignments.
+- Published clinic/doctor lookup by status/name/specialty; foreign keys for clinic offerings and doctor assignments. Clinic and doctor list indexes include that sort or specialty column. Name contains-search uses `pg_trgm` GIN indexes. Unread notice counts use a partial index on `Notification` where `readAt` is null.
 - Clinic/day, doctor/time and patient/time indexes for booking and portal lists.
 - Unique user email. Overlap exclusion per doctor and idempotency unique key.
 - Clinic plus patient unique on `ClinicPatient`. Review indexes arrive on point P8.

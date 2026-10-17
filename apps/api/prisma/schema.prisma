@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -84,6 +85,7 @@ model User {
   passwordResets PasswordReset[]
 
   @@index([clinicId])
+  @@index([displayName(ops: raw("gin_trgm_ops"))], type: Gin, map: "User_displayName_trgm_idx")
 }
 
 model Session {
@@ -124,7 +126,8 @@ model Clinic {
   windows     ClinicWindow[]
   favorites   Favorite[]
 
-  @@index([published, verificationStatus])
+  @@index([published, verificationStatus, name, id])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Clinic_name_trgm_idx")
 }
 
 model ClinicLocale {
@@ -138,6 +141,7 @@ model ClinicLocale {
   clinic      Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
 
   @@unique([clinicId, locale])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "ClinicLocale_name_trgm_idx")
 }
 
 model Branch {
@@ -170,7 +174,7 @@ model DoctorProfile {
   locales     DoctorLocale[]
   favorites   Favorite[]
 
-  @@index([published, verificationStatus])
+  @@index([published, verificationStatus, specialty])
   @@index([clinicId])
 }
 
@@ -184,6 +188,7 @@ model DoctorLocale {
   doctor    DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@unique([doctorId, locale])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "DoctorLocale_name_trgm_idx")
 }
 
 model ServiceOffering {
@@ -300,6 +305,7 @@ model Notification {
   @@index([userId, createdAt])
   @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
   @@index([appointmentId])
+  @@index([userId], map: "Notification_unread_idx", where: raw("(\"readAt\" IS NULL)"))
 }
 
 enum NoticeMailStatus {

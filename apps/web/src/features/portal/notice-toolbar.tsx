@@ -90,6 +90,10 @@ function FilterButton({
   );
 }
 
+const actionBar =
+  "flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2 rounded-[1.1rem] border border-line bg-white px-4 py-2";
+const quietButton = "cursor-pointer px-1 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-55";
+
 function ConfirmActions({
   pending,
   count,
@@ -107,8 +111,8 @@ function ConfirmActions({
   const common = useTranslations("common");
   const question = pending === "selected" ? t("confirmDeleteNotices", { count }) : t("confirmDeleteReadNotices");
   return (
-    <span className="flex min-w-0 flex-wrap items-center gap-2">
-      <p className="m-0 text-sm font-semibold">{question}</p>
+    <span className={actionBar}>
+      <p className="m-0 mr-auto text-sm font-semibold">{question}</p>
       <button className="btn btn-danger min-h-10 w-fit px-4" type="button" disabled={busy} onClick={onConfirm}>
         {t("deleteNotice")}
       </button>
@@ -139,16 +143,16 @@ function SelectActions({
   const t = useTranslations("me");
   const common = useTranslations("common");
   return (
-    <span className="flex min-w-0 flex-wrap items-center gap-2">
-      <p className="m-0 text-sm font-semibold">{t("noticeSelectedCount", { count: selectedCount })}</p>
-      <button className="btn btn-secondary min-h-10 w-fit px-4" type="button" disabled={busy} onClick={onToggleAll}>
+    <span className={actionBar}>
+      <p className="m-0 mr-auto text-sm font-semibold">{t("noticeSelectedCount", { count: selectedCount })}</p>
+      <button className={`${quietButton} text-muted hover:text-ink`} type="button" disabled={busy} onClick={onToggleAll}>
         {allSelected ? t("clearNoticeSelection") : t("selectAllNotices")}
+      </button>
+      <button className={`${quietButton} text-accent`} type="button" disabled={busy} onClick={onDeleteRead}>
+        {t("deleteReadNotices")}
       </button>
       <button className="btn btn-danger min-h-10 w-fit px-4" type="button" disabled={busy || selectedCount === 0} onClick={onDelete}>
         {t("deleteNotice")}
-      </button>
-      <button className="btn btn-ghost min-h-10 w-fit px-2" type="button" disabled={busy} onClick={onDeleteRead}>
-        {t("deleteReadNotices")}
       </button>
       <button className="btn btn-secondary min-h-10 w-fit px-4" type="button" disabled={busy} onClick={onCancel}>
         {common("cancel")}

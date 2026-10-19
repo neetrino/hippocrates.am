@@ -70,7 +70,6 @@ function toRow(
     place: viewer === "doctor" ? patientLabel(visit) : clinic,
     statusLabel: status ? common(status) : visit.status,
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
-    needsReview: viewer === "patient" && visit.status === "COMPLETED" && !visit.review,
     startsAt: visit.startsAt,
     doctorId: visit.doctor.id,
     offeringId: visit.offering.id,

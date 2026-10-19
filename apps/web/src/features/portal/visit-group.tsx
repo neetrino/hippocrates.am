@@ -4,7 +4,6 @@ import { useState } from "react";
 import { AppointmentActions } from "@/features/portal/appointment-actions";
 import { PatientReschedule } from "@/features/portal/patient-reschedule";
 import { visitPreviewLimit } from "@/features/portal/visit-order";
-import { ReviewForm } from "@/features/portal/review-form";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { VisitHistory } from "@/features/portal/visit-history";
 import { asVisitStatus } from "@/shared/format";
@@ -39,7 +38,6 @@ export type VisitRow = {
   place: string;
   statusLabel: string;
   price: string;
-  needsReview: boolean;
   startsAt: string;
   doctorId: string;
   offeringId: string;
@@ -132,7 +130,6 @@ function VisitCard({
           <p className="m-0 text-sm text-muted">{visit.cancelReason}</p>
         ) : null}
         <VisitTools visit={visit} actions={actions} />
-        {actions === "patient" && visit.needsReview ? <ReviewForm appointmentId={visit.id} /> : null}
       </div>
     </article>
   );

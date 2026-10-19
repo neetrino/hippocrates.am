@@ -21,7 +21,7 @@ export default async function SuperAdminClinicPage({
 
   return (
     <AdminPortalShell eyebrow={common("SUPER_ADMIN")} title={title}>
-      <ClinicOverviewView clinic={clinic} locale={locale} />
+      <ClinicOverviewView clinic={clinic} />
     </AdminPortalShell>
   );
 }

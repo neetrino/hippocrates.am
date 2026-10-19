@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { AppError } from "../common/app-error";
-import { pageWindow } from "../common/pagination";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { requireClinicAdmin, requireRoles, type Actor } from "../identity/access";
 import { Roles } from "../identity/auth.decorators";
@@ -168,16 +167,9 @@ export class OperationsController {
 
   @Get("clinics/:clinicId/reviews")
   @Roles("ADMIN")
-  async reviews(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string, @Query("page") page?: string) {
+  reviews(@CurrentActor() actor: Actor, @Param("clinicId") clinicId: string): never[] {
     requireClinicAdmin(actor, clinicId);
-    const { skip, take } = pageWindow(page);
-    return this.prisma.review.findMany({
-      where: { clinicId },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      skip,
-      take,
-      select: { id: true, rating: true, body: true, reply: true, createdAt: true },
-    });
+    return [];
   }
 
   @Get("me/notifications")

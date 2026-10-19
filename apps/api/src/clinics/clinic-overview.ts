@@ -44,12 +44,6 @@ const overviewSelect = {
       doctor: { select: { user: { select: { displayName: true } } } },
     },
   },
-  reviews: {
-    orderBy: { createdAt: "desc" },
-    take: 20,
-    select: { id: true, rating: true, body: true, reply: true, createdAt: true },
-  },
-  _count: { select: { reviews: true } },
 } as const;
 
 type OverviewRow = Prisma.ClinicGetPayload<{ select: typeof overviewSelect }>;
@@ -85,8 +79,8 @@ function toOverview(clinic: OverviewRow) {
       durationMinutes: item.durationMinutes,
       doctorName: item.doctor.user.displayName,
     })),
-    reviews: clinic.reviews.map((review) => ({ ...review, createdAt: review.createdAt.toISOString() })),
-    reviewCount: clinic._count.reviews,
+    reviews: [],
+    reviewCount: 0,
   };
 }
 

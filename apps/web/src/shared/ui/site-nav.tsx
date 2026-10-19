@@ -14,7 +14,6 @@ import { cn } from "@/shared/ui/cn";
 type SiteNavProps = {
   clinics: string;
   doctors: string;
-  questions: string;
   accountHref: AccountHref;
   accountLabel: string;
   openMenu: string;
@@ -22,7 +21,7 @@ type SiteNavProps = {
 };
 
 type NavLink = {
-  href: "/clinics" | "/doctors" | "/questions";
+  href: "/clinics" | "/doctors";
   label: string;
 };
 
@@ -142,7 +141,6 @@ function DesktopPrimaryNav({ links, pathname }: { links: NavLink[]; pathname: st
 export function SiteNav({
   clinics,
   doctors,
-  questions,
   accountHref,
   accountLabel,
   openMenu,
@@ -178,7 +176,6 @@ export function SiteNav({
   const links: NavLink[] = [
     { href: "/clinics", label: clinics },
     { href: "/doctors", label: doctors },
-    { href: "/questions", label: questions },
   ];
 
   return (

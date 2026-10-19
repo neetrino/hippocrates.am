@@ -4,7 +4,7 @@ import { e2eAdminEmail, e2eDoctorEmail, e2eDoctorName } from "../apps/api/src/e2
 import { upcomingWeekdays } from "../apps/api/src/e2e/open-day";
 import { runApiScript } from "./run-api";
 
-test("patient books, clinic confirms, patient reschedules, doctor completes, patient reviews", async ({ browser }) => {
+test("patient books, clinic confirms, patient reschedules, doctor completes", async ({ browser }) => {
   const password = requiredSeedPassword();
   const patient = newPatient();
   const [bookDay, moveDay] = upcomingWeekdays(2);
@@ -27,7 +27,6 @@ test("patient books, clinic confirms, patient reschedules, doctor completes, pat
     const completed = await clickUntilAccepted(doctorPage, complete, "/complete");
     if (!completed.ok()) throw new Error(`E2E refused: complete returned ${completed.status()}.`);
     await expect(doctorPage.getByText("Completed", { exact: true }).first()).toBeVisible();
-    await expectReview(patientPage);
   } finally {
     await closeQuietly(patientContext);
     await closeQuietly(adminContext);
@@ -165,14 +164,4 @@ async function reschedule(page: Page, day: string): Promise<void> {
   await expect(slot).toBeVisible();
   await slot.click();
   await expect(page.getByText("Waiting", { exact: true })).toBeVisible();
-}
-
-async function expectReview(page: Page): Promise<void> {
-  await page.goto("/en/me/visits");
-  const review = page.getByRole("textbox", { name: "Review", exact: true });
-  await review.fill("The visit was clear and on time.");
-  await page.getByRole("button", { name: "Send review" }).click();
-  await expect(review).toHaveCount(0);
-  await page.goto("/en/me/reviews");
-  await expect(page.getByText("Review sent", { exact: true })).toBeVisible();
 }

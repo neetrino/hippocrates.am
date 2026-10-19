@@ -8,7 +8,6 @@ import { formatAmount } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { ClinicCard, DoctorCard, OfferingCard, ReviewCard } from "@/shared/public-types";
 import { Photo } from "@/shared/ui/photo";
-import { Rating } from "@/shared/ui/rating";
 
 export type ClinicPageData = ClinicCard & {
   branches: { id: string; name: string; address: string }[];
@@ -39,7 +38,6 @@ export async function ClinicProfile({
           <BranchList branches={clinic.branches} />
           <DoctorList doctors={clinic.doctors} doctorHref={doctorHref} />
           <PriceList offerings={clinic.offerings} />
-          <ReviewList reviews={clinic.reviews} />
         </div>
         <div className="sticky-panel">
           <BookingPanel offerings={clinic.offerings} initialSlots={slots} />
@@ -147,23 +145,6 @@ async function PriceList({ offerings }: { offerings: OfferingCard[] }) {
           </div>
         ))}
       </div>
-    </section>
-  );
-}
-
-async function ReviewList({ reviews }: { reviews: ReviewCard[] }) {
-  const t = await getTranslations("clinicPage");
-  return (
-    <section className="grid gap-4">
-      <h2>{t("reviews")}</h2>
-      {reviews.length === 0 ? <p className="m-0 text-muted">{t("noReviews")}</p> : null}
-      {reviews.map((review) => (
-        <article key={review.id} className="grid gap-3 rounded-card bg-surface px-5 py-5">
-          <Rating value={review.rating} />
-          <p className="m-0">{review.body}</p>
-          {review.reply ? <p className="m-0 text-muted">{t("reply", { reply: review.reply })}</p> : null}
-        </article>
-      ))}
     </section>
   );
 }

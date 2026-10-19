@@ -4,10 +4,9 @@ import { DeleteClinic } from "@/features/portal/delete-clinic";
 import { VerificationActions } from "@/features/portal/verification-actions";
 import { StatusChip } from "@/features/portal/verification-board";
 import { Link } from "@/i18n/navigation";
-import { formatAmount, formatWhen } from "@/shared/format";
+import { formatAmount } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import { Photo } from "@/shared/ui/photo";
-import { Rating } from "@/shared/ui/rating";
 
 export type ClinicCopyView = {
   locale: "hy" | "en" | "ru";
@@ -188,28 +187,7 @@ async function ServiceSection({ offerings }: { offerings: ClinicOverview["offeri
   );
 }
 
-async function ReviewSection({ reviews, reviewCount, locale }: { reviews: ClinicOverview["reviews"]; reviewCount: number; locale: string }) {
-  const clinicPage = await getTranslations("clinicPage");
-  const portal = await getTranslations("portal");
-  const extra = reviewCount > reviews.length ? portal("latestReviews") : String(reviewCount);
-  return (
-    <Section title={clinicPage("reviews")} extra={extra}>
-      {reviews.length === 0 ? <EmptyNote>{clinicPage("noReviews")}</EmptyNote> : null}
-      <div className="grid gap-3">
-        {reviews.map((review) => (
-          <article className="grid gap-2 rounded-[1.15rem] border border-line px-4 py-4" key={review.id}>
-            <Rating value={review.rating} />
-            <p className="m-0">{review.body}</p>
-            {review.reply ? <p className="m-0 text-muted">{clinicPage("reply", { reply: review.reply })}</p> : null}
-            <time className="text-sm text-muted" dateTime={review.createdAt}>{formatWhen(review.createdAt, locale)}</time>
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-export async function ClinicOverviewView({ clinic, locale }: { clinic: ClinicOverview; locale: string }) {
+export async function ClinicOverviewView({ clinic }: { clinic: ClinicOverview }) {
   const portal = await getTranslations("portal");
   const source = clinic.copies.find((copy) => copy.locale === "hy");
   return (
@@ -238,7 +216,6 @@ export async function ClinicOverviewView({ clinic, locale }: { clinic: ClinicOve
       <BranchSection branches={clinic.branches} />
       <DoctorSection doctors={clinic.doctors} />
       <ServiceSection offerings={clinic.offerings} />
-      <ReviewSection reviews={clinic.reviews} reviewCount={clinic.reviewCount} locale={locale} />
       <DeleteClinic clinicId={clinic.id} clinicName={source?.name || ""} />
     </div>
   );

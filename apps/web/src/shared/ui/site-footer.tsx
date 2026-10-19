@@ -23,9 +23,6 @@ export async function SiteFooter() {
           <Link href="/doctors" className="w-fit text-ink transition-colors duration-160 hover:text-accent">
             {nav("doctors")}
           </Link>
-          <Link href="/questions" className="w-fit text-ink transition-colors duration-160 hover:text-accent">
-            {nav("questions")}
-          </Link>
         </nav>
         <div className="grid gap-2.5 content-start">
           <p className="kicker">{t("account")}</p>

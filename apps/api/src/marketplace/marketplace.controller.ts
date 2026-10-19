@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { applyClinic, applyDoctor, applyOfferingDoctor, applyReview, catalogLocale, type CatalogLocale } from "../catalog/locale-copy";
+import { applyClinic, applyDoctor, applyOfferingDoctor, catalogLocale, type CatalogLocale } from "../catalog/locale-copy";
 import { AppError } from "../common/app-error";
 import { pageWindow } from "../common/pagination";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
@@ -170,18 +170,6 @@ export class MarketplaceController {
             },
           },
         },
-        reviews: {
-          orderBy: { createdAt: "desc" },
-          take: 20,
-          select: {
-            id: true,
-            rating: true,
-            body: true,
-            reply: true,
-            createdAt: true,
-            ...(language ? { locales: { where: { locale: language }, select: { body: true, reply: true } } } : {}),
-          },
-        },
       },
     });
     if (!clinic) throw new AppError("NOT_FOUND", 404, "Կլինիկան չի գտնվել");
@@ -190,7 +178,7 @@ export class MarketplaceController {
       ...view,
       doctors: clinic.doctors.map((doctor) => doctorView(applyDoctor(doctor, language))),
       offerings: clinic.offerings.map((offering) => applyOfferingDoctor(offering)),
-      reviews: clinic.reviews.map((review) => applyReview(review)),
+      reviews: [],
     };
   }
 

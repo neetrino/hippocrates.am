@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import {
   DashboardIcon,
   NoticesIcon,
-  QuestionsIcon,
   ScheduleIcon,
   SettingsIcon,
   VisitsIcon,
@@ -22,7 +21,6 @@ type DoctorPortalShellProps = {
 
 export function DoctorPortalShell({ children, title, eyebrow, portrait }: DoctorPortalShellProps) {
   const t = useTranslations("portal");
-  const nav = useTranslations("nav");
   const me = useTranslations("me");
   const unreadNotices = useUnreadNotices();
   const items: PortalNavItem[] = [
@@ -30,7 +28,6 @@ export function DoctorPortalShell({ children, title, eyebrow, portrait }: Doctor
     { href: "/me/schedule", label: t("schedule"), icon: <ScheduleIcon />, match: "exact" },
     { href: "/me/visits", label: me("visits"), icon: <VisitsIcon />, match: "exact" },
     { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact", badge: unreadNotices },
-    { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "exact" },
     { href: "/me/settings", label: me("settings"), icon: <SettingsIcon />, match: "exact" },
   ];
 

@@ -6,8 +6,6 @@ import {
   DashboardIcon,
   FavoritesIcon,
   NoticesIcon,
-  QuestionsIcon,
-  ReviewsIcon,
   SettingsIcon,
   VisitsIcon,
 } from "@/features/portal/admin-sidebar-icons";
@@ -24,7 +22,6 @@ type PatientPortalShellProps = {
 
 export function PatientPortalShell({ children, title, eyebrow, action, portrait }: PatientPortalShellProps) {
   const t = useTranslations("portal");
-  const nav = useTranslations("nav");
   const me = useTranslations("me");
   const unreadNotices = useUnreadNotices();
   const items: PortalNavItem[] = [
@@ -32,8 +29,6 @@ export function PatientPortalShell({ children, title, eyebrow, action, portrait 
     { href: "/me/visits", label: me("visits"), icon: <VisitsIcon />, match: "exact" },
     { href: "/me/favorites", label: me("favorites"), icon: <FavoritesIcon />, match: "prefix" },
     { href: "/me/notices", label: me("notices"), icon: <NoticesIcon />, match: "exact", badge: unreadNotices },
-    { href: "/me/questions", label: nav("questions"), icon: <QuestionsIcon />, match: "exact" },
-    { href: "/me/reviews", label: me("reviews"), icon: <ReviewsIcon />, match: "exact" },
   ];
   const footerItems: PortalNavItem[] = [
     { href: "/me/settings", label: me("settings"), icon: <SettingsIcon />, match: "exact" },

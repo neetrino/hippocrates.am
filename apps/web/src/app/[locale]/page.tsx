@@ -6,12 +6,11 @@ import { HomeCatalog } from "@/features/home/home-catalog";
 import { HomeCta } from "@/features/home/home-cta";
 import { HomeHero } from "@/features/home/home-hero";
 import { HomeHow } from "@/features/home/home-how";
-import { HomeQuestions } from "@/features/home/home-questions";
 import { HomeServices } from "@/features/home/home-services";
 import { HomeTrust } from "@/features/home/home-trust";
 import { loadFavoriteSet } from "@/features/portal/patient-favorites";
 import { publicGet } from "@/shared/public-api";
-import type { ClinicCard, DoctorCard, QuestionCard } from "@/shared/public-types";
+import type { ClinicCard, DoctorCard } from "@/shared/public-types";
 type HomeData = { clinics: ClinicCard[]; doctors: DoctorCard[] };
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -21,10 +20,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const nav = await getTranslations("nav");
   const common = await getTranslations("common");
   const catalog = await getTranslations("catalog");
-  const questionsCopy = await getTranslations("questions");
-  const [data, questions, clinics, favorites] = await Promise.all([
+  const [data, clinics, favorites] = await Promise.all([
     publicGet<HomeData>("/public/home", locale),
-    publicGet<QuestionCard[]>("/questions").catch(() => [] as QuestionCard[]),
     publicGet<ClinicCard[]>("/public/clinics", locale).catch(() => [] as ClinicCard[]),
     loadFavoriteSet(locale),
   ]);
@@ -95,12 +92,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           { title: t("how2Title"), body: t("how2Body") },
           { title: t("how3Title"), body: t("how3Body") },
         ]}
-      />
-      <HomeQuestions
-        title={t("questionsTitle")}
-        lede={t("questionsLede")}
-        actionLabel={questionsCopy("title")}
-        questions={questions}
       />
       <HomeCta
         title={t("ctaTitle")}

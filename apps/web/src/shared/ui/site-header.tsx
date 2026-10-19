@@ -26,7 +26,6 @@ export async function SiteHeader() {
         <SiteNav
           clinics={t("clinics")}
           doctors={t("doctors")}
-          questions={t("questions")}
           accountHref={href}
           accountLabel={href === "/login" ? t("login") : t("me")}
           openMenu={t("openMenu")}

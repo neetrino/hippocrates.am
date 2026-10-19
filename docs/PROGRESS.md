@@ -2,7 +2,7 @@
 
 > Revised 2026-10-14. Full product, one point at a time. This file tracks **what is in the repository**, not the September start plan.
 
-**In the repository:** workspace, four roles, public catalog, booking, portals, in-app notices, questions, reviews, password reset, clinic/doctor verification, and appointment event history.  
+**In the repository:** workspace, four roles, public catalog, booking, portals, in-app notices, password reset, clinic/doctor verification, and appointment event history. Questions and reviews stay in the database, but V1 hides them and refuses new ones.  
 **Not started / paused:** chat, card payments, clinical records, production release.  
 **Scope:** `ADR-003`; doctor-clinic binding `ADR-005`. **Env:** one root `.env`. Web `3000`, NestJS `4000`.
 
@@ -29,8 +29,8 @@ Do not add empty modules for a later point. Prefer `NOW_VS_NEEDED_HY.md` for the
 | 4 | Booking | Slots, request, confirm, cancel, reschedule, complete, no-show, expiry, overlap exclusion, `AppointmentEvent` | VERIFIED | Hold, check-in, cancel cutoff |
 | 5 | Portals | Patient, doctor, clinic desk, in-app notices, patient card, price totals, favorites, settings | VERIFIED | Visit email delivery (Resend is only on password reset) |
 | 6 | Chat | — | PAUSED | No chat routes |
-| 7 | Questions | Public ask/list, doctor answers, Super Admin page, author hidden on public DTO | VERIFIED | Searchable archive and stronger moderation |
-| 8 | Reviews | After `COMPLETED` only. Clinic reply. Public clinic page shows them | VERIFIED | Dispute path |
+| 7 | Questions | Tables remain. Public pages redirect home and new questions are refused | PAUSED | Not in V1 |
+| 8 | Reviews | Tables remain. Opinion form, lists, and public reviews are hidden. New reviews are refused | PAUSED | Not in V1 |
 | 9 | Finance | Price totals only | PAUSED | Card payments need a separate approval |
 | 10 | Clinical | — | PAUSED | Needs its own acceptance spec |
 | 11 | Release | — | PAUSED | Host, backup owner, and deploy owner are unnamed |

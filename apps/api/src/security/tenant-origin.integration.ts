@@ -65,10 +65,22 @@ async function createFixture(prisma: PrismaService): Promise<Fixture> {
   await cleanup(prisma);
   const mark = `${fixturePrefix}${randomBytes(4).toString("hex")}`;
   const first = await prisma.user.create({
-    data: { email: `${slug(mark)}-a@test.local`, passwordHash: "test", displayName: mark, role: "ADMIN" },
+    data: {
+      email: `${slug(mark)}-a@test.local`,
+      passwordHash: "test",
+      displayName: mark,
+      role: "ADMIN",
+      emailVerifiedAt: new Date(),
+    },
   });
   const second = await prisma.user.create({
-    data: { email: `${slug(mark)}-b@test.local`, passwordHash: "test", displayName: mark, role: "ADMIN" },
+    data: {
+      email: `${slug(mark)}-b@test.local`,
+      passwordHash: "test",
+      displayName: mark,
+      role: "ADMIN",
+      emailVerifiedAt: new Date(),
+    },
   });
   const clinicA = await prisma.clinic.create({
     data: { name: `${mark} A`, ownerId: first.id, published: false, verificationStatus: "DRAFT" },

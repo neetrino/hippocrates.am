@@ -2,13 +2,16 @@
 
 import { FormEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { getPathname } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
 import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
+import { resendVerification } from "@/features/auth/resend-verification";
 import { sanitizeNameInput } from "@/shared/input-constraints";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
+  const [sentEmail, setSentEmail] = useState("");
+  const [resent, setResent] = useState(false);
+  const [pending, setPending] = useState(false);
   const locale = useLocale();
   const t = useTranslations("auth");
   const common = useTranslations("common");
@@ -35,17 +38,42 @@ export function RegisterForm() {
       method: "POST",
       credentials: "include",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, surname, phone, email, password, confirmPassword }),
+      body: JSON.stringify({ name, surname, phone, email, password, confirmPassword, locale }),
     });
     if (!response.ok) {
       setError(common("failed"));
       return;
     }
-    window.location.assign(getPathname({ locale, href: "/me" }));
+    setSentEmail(email);
+  }
+
+  async function resend(): Promise<void> {
+    setError("");
+    setPending(true);
+    const accepted = await resendVerification(sentEmail, locale);
+    setPending(false);
+    if (!accepted) {
+      setError(t("resetUnavailable"));
+      return;
+    }
+    setResent(true);
   }
 
   const fieldClass = "field-label";
   const inputClass = "field-control-soft";
+
+  if (sentEmail) {
+    return (
+      <div className="grid gap-3">
+        <p className="m-0 text-[0.95rem] leading-relaxed text-ink">{t("registerSent")}</p>
+        {resent ? <p className="m-0 text-sm text-muted">{t("resendVerificationSent")}</p> : null}
+        {error ? <p className="m-0 text-danger">{error}</p> : null}
+        <button className="btn btn-primary mt-1 w-full" type="button" disabled={pending} onClick={() => void resend()}>
+          {t("resendVerification")}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form className="grid min-w-0 gap-3" onSubmit={(event) => void onSubmit(event)}>

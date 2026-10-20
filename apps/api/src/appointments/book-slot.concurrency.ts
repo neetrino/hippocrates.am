@@ -135,7 +135,13 @@ async function openFixture(url: string): Promise<Fixture> {
   await wipeRaceClinics(prisma);
   const mark = `${fixturePrefix}${randomBytes(4).toString("hex")}`;
   const owner = await prisma.user.create({
-    data: { email: `${slug(mark)}-admin@hippocrates.test`, passwordHash: "test", displayName: mark, role: "ADMIN" },
+    data: {
+      email: `${slug(mark)}-admin@hippocrates.test`,
+      passwordHash: "test",
+      displayName: mark,
+      role: "ADMIN",
+      emailVerifiedAt: new Date(),
+    },
   });
   const clinic = await prisma.clinic.create({
     data: {
@@ -153,6 +159,7 @@ async function openFixture(url: string): Promise<Fixture> {
       displayName: mark,
       role: "DOCTOR",
       clinicId: clinic.id,
+      emailVerifiedAt: new Date(),
     },
   });
   const doctor = await prisma.doctorProfile.create({
@@ -181,6 +188,7 @@ async function openFixture(url: string): Promise<Fixture> {
       passwordHash: "test",
       displayName: mark,
       role: "PATIENT",
+      emailVerifiedAt: new Date(),
     },
   });
   return {

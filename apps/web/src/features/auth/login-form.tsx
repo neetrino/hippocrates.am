@@ -1,9 +1,10 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, PointerEvent, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { PasswordField } from "@/features/auth/password-field";
+import { resendVerification } from "@/features/auth/resend-verification";
 import { accountHome } from "@/shared/role-home";
 
 type LoginPayload = {
@@ -15,7 +16,11 @@ type FieldOpenEvent = PointerEvent<HTMLInputElement> | KeyboardEvent<HTMLInputEl
 export function LoginForm() {
   const [error, setError] = useState("");
   const [locked, setLocked] = useState(true);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [resent, setResent] = useState(false);
+  const [pending, setPending] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("auth");
   const common = useTranslations("common");
 
@@ -37,6 +42,14 @@ export function LoginForm() {
       body: JSON.stringify({ email, password }),
     });
     if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { error?: { code?: string } } | null;
+      if (body?.error?.code === "EMAIL_UNVERIFIED") {
+        setUnverifiedEmail(email);
+        setResent(false);
+        setError(t("emailUnverified"));
+        return;
+      }
+      setUnverifiedEmail("");
       setError(common("failed"));
       return;
     }
@@ -44,6 +57,17 @@ export function LoginForm() {
     const next = accountHome(body.data.role);
     router.push(next);
     router.refresh();
+  }
+
+  async function resend(): Promise<void> {
+    setPending(true);
+    const accepted = await resendVerification(unverifiedEmail, locale);
+    setPending(false);
+    if (!accepted) {
+      setError(t("resetUnavailable"));
+      return;
+    }
+    setResent(true);
   }
 
   return (
@@ -79,6 +103,12 @@ export function LoginForm() {
         </Link>
       </div>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
+      {resent ? <p className="m-0 text-sm text-muted">{t("resendVerificationSent")}</p> : null}
+      {unverifiedEmail ? (
+        <button className="text-sm font-semibold text-accent hover:text-accent-hover" type="button" disabled={pending} onClick={() => void resend()}>
+          {t("resendVerification")}
+        </button>
+      ) : null}
       <button className="btn btn-primary mt-1 w-full" type="submit">
         {t("enter")}
       </button>

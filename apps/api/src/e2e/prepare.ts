@@ -74,13 +74,26 @@ async function ensureUser(
   const existing = await prisma.user.findUnique({ where: { email } });
   if (!existing) {
     const created = await prisma.user.create({
-      data: { email, passwordHash, displayName: input.displayName, role: input.role, clinicId: input.clinicId },
+      data: {
+        email,
+        passwordHash,
+        displayName: input.displayName,
+        role: input.role,
+        clinicId: input.clinicId,
+        emailVerifiedAt: new Date(),
+      },
     });
     return created.id;
   }
   await prisma.user.update({
     where: { id: existing.id },
-    data: { passwordHash, displayName: input.displayName, role: input.role, clinicId: input.clinicId ?? existing.clinicId },
+    data: {
+      passwordHash,
+      displayName: input.displayName,
+      role: input.role,
+      clinicId: input.clinicId ?? existing.clinicId,
+      emailVerifiedAt: existing.emailVerifiedAt ?? new Date(),
+    },
   });
   return existing.id;
 }

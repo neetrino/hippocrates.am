@@ -46,6 +46,7 @@ export class DoctorsController {
           displayName: requiredString(input.displayName, "Բժշկի անուն", 80),
           role: "DOCTOR",
           clinicId,
+          emailVerifiedAt: new Date(),
         },
       });
       return tx.doctorProfile.create({

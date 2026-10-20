@@ -8,6 +8,7 @@ import { Public } from "./auth.decorators";
 import { CurrentActor } from "./current-actor";
 import { RateLimitService } from "./rate-limit.service";
 import { SessionService } from "./session.service";
+import { confirmEmailAddress, issueEmailVerification } from "./email-verify";
 import { assertResetMail } from "./password-mail";
 import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { saveNoticeMailPreference } from "./notice-preference";
@@ -25,11 +26,7 @@ export class AuthController {
 
   @Public()
   @Post("register")
-  async register(
-    @Body() body: unknown,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<{ id: string }> {
+  async register(@Body() body: unknown, @Req() request: Request): Promise<{ id: string }> {
     await this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
     const rules = await loadPlatformSettings(this.prisma);
     if (!rules.patientRegistrationEnabled) {
@@ -45,6 +42,7 @@ export class AuthController {
     if (password !== confirmPassword) {
       throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
     }
+    assertResetMail();
     const displayName = `${name} ${surname}`.replace(/\s+/g, " ").trim();
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
@@ -57,7 +55,7 @@ export class AuthController {
         role: "PATIENT",
       },
     });
-    await this.sessions.open(response, user.id);
+    await issueEmailVerification(this.prisma, user.email, input.locale);
     return { id: user.id };
   }
 
@@ -76,6 +74,9 @@ export class AuthController {
     const valid = await this.sessions.verifyLoginPassword(password, user?.passwordHash);
     if (!user || user.disabledAt || !valid) {
       throw new AppError("INVALID_LOGIN", 401, "Էլ. փոստը կամ գաղտնաբառը սխալ է");
+    }
+    if (!user.emailVerifiedAt) {
+      throw new AppError("EMAIL_UNVERIFIED", 403, "Հաստատեք էլ. փոստը");
     }
     await this.sessions.open(response, user.id);
     return { id: user.id, role: user.role };
@@ -100,6 +101,32 @@ export class AuthController {
     const input = recordOf(body);
     const token = requiredString(input.token, "Հղում");
     await applyPasswordReset(this.prisma, this.sessions, token, input.password, input.confirmPassword);
+    return { ok: true };
+  }
+
+  @Public()
+  @Post("verify-email")
+  async verifyEmail(
+    @Body() body: unknown,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ id: string }> {
+    await this.limits.consume(`verify:${request.ip ?? "unknown"}`, 8, 10 * 60 * 1000);
+    const token = requiredString(recordOf(body).token, "Հղում");
+    const userId = await confirmEmailAddress(this.prisma, token);
+    await this.sessions.open(response, userId);
+    return { id: userId };
+  }
+
+  @Public()
+  @Post("resend-verification")
+  async resendVerification(@Body() body: unknown, @Req() request: Request): Promise<{ ok: true }> {
+    await this.limits.consume(`verify-resend:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
+    assertResetMail();
+    const input = recordOf(body);
+    const email = emailOf(input.email);
+    await this.limits.consume(`verify-mail:${email}`, 3, 60 * 60 * 1000);
+    await issueEmailVerification(this.prisma, email, input.locale);
     return { ok: true };
   }
 

@@ -70,7 +70,8 @@ model User {
   clinicId     String?
   phone             String?
   photoKey          String?
-  emailVisitNotices Boolean  @default(true)
+  emailVisitNotices Boolean   @default(true)
+  emailVerifiedAt   DateTime?
   disabledAt        DateTime?
   createdAt         DateTime @default(now())
   clinic       Clinic?  @relation("ClinicStaff", fields: [clinicId], references: [id])
@@ -82,7 +83,8 @@ model User {
   questions    Question[]
   reviews      Review[]
   favorites      Favorite[]
-  passwordResets PasswordReset[]
+  passwordResets     PasswordReset[]
+  emailVerifications EmailVerification[]
 
   @@index([clinicId])
   @@index([displayName(ops: raw("gin_trgm_ops"))], type: Gin, map: "User_displayName_trgm_idx")
@@ -389,6 +391,18 @@ model Favorite {
 
   @@unique([userId, clinicId])
   @@unique([userId, doctorId])
+  @@index([userId])
+}
+
+model EmailVerification {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 

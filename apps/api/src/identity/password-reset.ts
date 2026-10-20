@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { AppError } from "../common/app-error";
-import { passwordOf } from "../common/input";
+import { passwordOf, requiredString } from "../common/input";
 import { PrismaService } from "../infrastructure/prisma.service";
 import { deliverResetLink, resetLocale } from "./password-mail";
 import { SessionService } from "./session.service";
@@ -34,16 +34,17 @@ export async function applyPasswordReset(
   password: unknown,
   confirmPassword: unknown,
 ): Promise<void> {
-  const next = passwordOf(password);
-  if (next !== passwordOf(confirmPassword)) {
-    throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
-  }
   const row = await prisma.passwordReset.findUnique({
     where: { tokenHash: hashToken(token) },
-    include: { user: { select: { disabledAt: true } } },
+    include: { user: { select: { disabledAt: true, email: true } } },
   });
   if (!row || row.user.disabledAt || row.usedAt || row.expiresAt.getTime() <= Date.now()) {
     throw new AppError("RESET_INVALID", 400, "Հղումը սխալ է կամ ժամկետն անցել է");
+  }
+  const next = passwordOf(password, row.user.email);
+  const confirm = requiredString(confirmPassword, "Կրկնել գաղտնաբառը", 128);
+  if (next !== confirm) {
+    throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
   }
   const passwordHash = await sessions.hashPassword(next);
   await replacePassword(prisma, row.id, row.userId, passwordHash);

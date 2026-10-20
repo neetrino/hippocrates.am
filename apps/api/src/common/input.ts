@@ -19,12 +19,27 @@ export function emailOf(value: unknown): string {
   return email;
 }
 
-export function passwordOf(value: unknown): string {
+const COMMON_PASSWORDS = new Set(["password", "12345678", "qwerty123"]);
+
+/** New passwords need 8–128 characters, a letter, and a digit. Login does not use this. */
+export function passwordOf(value: unknown, email?: string): string {
   const password = requiredString(value, "Գաղտնաբառ", 128);
-  if (password.length < 8) {
-    throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառը առնվազն 8 նիշ է");
+  if (!acceptablePassword(password)) {
+    throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառը առնվազն 8 նիշ է, մեկ տառով և մեկ թվով");
+  }
+  if (email && password.toLowerCase() === email.trim().toLowerCase()) {
+    throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառը չի կարող համընկնել էլ. փոստի հետ");
   }
   return password;
+}
+
+function acceptablePassword(password: string): boolean {
+  return (
+    password.length >= 8 &&
+    /[\p{L}]/u.test(password) &&
+    /\d/.test(password) &&
+    !COMMON_PASSWORDS.has(password.toLowerCase())
+  );
 }
 
 /** Display name: letters, spaces, apostrophes, and hyphens. */

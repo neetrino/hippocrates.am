@@ -59,13 +59,13 @@ export async function changeOwnPassword(
 ): Promise<void> {
   const input = recordOf(body);
   const current = requiredString(input.currentPassword, "Ընթացիկ գաղտնաբառ", 128);
-  const password = passwordOf(input.password);
   const confirm = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը", 128);
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true, email: true } });
+  if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
+  const password = passwordOf(input.password, user.email);
   if (password !== confirm) {
     throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");
   }
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true } });
-  if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
   const valid = await sessions.verifyPassword(current, user.passwordHash);
   if (!valid) throw new AppError("VALIDATION_FAILED", 400, "Ընթացիկ գաղտնաբառը սխալ է");
   const passwordHash = await sessions.hashPassword(password);

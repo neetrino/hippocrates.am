@@ -212,7 +212,8 @@
     "resetDone": "The password has changed.",
     "resetInvalid": "This link is invalid or expired. Request a new one.",
     "resetUnavailable": "The message could not be sent right now. Try again shortly.",
-    "passwordShort": "Use at least 8 characters"
+    "passwordShort": "At least 8 characters, with one letter and one number",
+    "passwordIsEmail": "The password cannot match the email"
   },
   "me": {
     "signIn": "Sign in to see your page.",
@@ -263,7 +264,8 @@
     "currentPassword": "Current password",
     "newPassword": "New password",
     "confirmPassword": "Confirm password",
-    "passwordShort": "Password must be at least 8 characters",
+    "passwordShort": "At least 8 characters, with one letter and one number",
+    "passwordIsEmail": "The password cannot match the email",
     "passwordMismatch": "Passwords do not match",
     "passwordSaved": "Password changed",
     "changePassword": "Change password",

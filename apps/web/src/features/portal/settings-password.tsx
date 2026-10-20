@@ -3,12 +3,13 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PasswordField } from "@/features/auth/password-field";
+import { passwordIssue } from "@/features/auth/password-rule";
 import { accountRequest } from "@/features/portal/settings-request";
 
 const submitClass =
   "btn btn-primary min-h-9 px-3.5 py-2 text-sm";
 
-export function SettingsPassword() {
+export function SettingsPassword({ email }: { email: string }) {
   const t = useTranslations("me");
   const auth = useTranslations("auth");
   const common = useTranslations("common");
@@ -34,7 +35,12 @@ export function SettingsPassword() {
     const data = new FormData(form);
     const password = String(data.get("password") ?? "");
     const confirm = String(data.get("confirmPassword") ?? "");
-    if (password.length < 8) {
+    const issue = passwordIssue(password, email);
+    if (issue === "email") {
+      setError(t("passwordIsEmail"));
+      return;
+    }
+    if (issue === "weak") {
       setError(t("passwordShort"));
       return;
     }
@@ -96,6 +102,7 @@ export function SettingsPassword() {
             hideLabel={auth("hidePassword")}
             variant="portal"
           />
+          <p className="m-0 text-sm font-normal normal-case tracking-normal text-muted">{t("passwordShort")}</p>
           {error ? <p className="m-0 text-sm text-danger">{error}</p> : null}
           <div className="flex flex-wrap gap-2">
             <button type="submit" disabled={busy} className={submitClass}>

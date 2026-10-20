@@ -37,7 +37,7 @@ export class AuthController {
     const surname = personNameOf(input.surname, "Ազգանուն");
     const phone = requiredPhoneOf(input.phone);
     const email = emailOf(input.email);
-    const password = passwordOf(input.password);
+    const password = passwordOf(input.password, email);
     const confirmPassword = requiredString(input.confirmPassword, "Կրկնել գաղտնաբառը", 128);
     if (password !== confirmPassword) {
       throw new AppError("VALIDATION_FAILED", 400, "Գաղտնաբառերը չեն համընկնում");

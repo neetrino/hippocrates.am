@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { PasswordField } from "@/features/auth/password-field";
+import { passwordIssue } from "@/features/auth/password-rule";
 import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { resendVerification } from "@/features/auth/resend-verification";
 import { sanitizeNameInput } from "@/shared/input-constraints";
@@ -32,6 +33,15 @@ export function RegisterForm() {
     }
     if (password !== confirmPassword) {
       setError(t("passwordMismatch"));
+      return;
+    }
+    const issue = passwordIssue(password, email);
+    if (issue === "email") {
+      setError(t("passwordIsEmail"));
+      return;
+    }
+    if (issue === "weak") {
+      setError(t("passwordShort"));
       return;
     }
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
@@ -132,6 +142,7 @@ export function RegisterForm() {
           minLength={8}
         />
       </div>
+      <p className="m-0 text-sm text-muted">{t("passwordShort")}</p>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button className="btn btn-primary mt-1 w-full" type="submit">
         {t("registerAction")}

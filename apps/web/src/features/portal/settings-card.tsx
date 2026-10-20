@@ -66,7 +66,7 @@ export function SettingsCard({
         onSaved={() => setEditing(false)}
       />
       <SettingsNotices enabled={emailVisitNotices} />
-      <SettingsPassword />
+      <SettingsPassword email={email} />
     </section>
   );
 }

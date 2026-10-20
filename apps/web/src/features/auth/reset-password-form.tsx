@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PasswordField } from "@/features/auth/password-field";
+import { passwordIssue } from "@/features/auth/password-rule";
 import { Link } from "@/i18n/navigation";
 
 export function ResetPasswordForm({ token }: { token: string }) {
@@ -17,7 +18,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     const form = new FormData(event.currentTarget);
     const password = String(form.get("password") ?? "");
     const confirmPassword = String(form.get("confirmPassword") ?? "");
-    if (password.length < 8) {
+    if (passwordIssue(password) === "weak") {
       setError(t("passwordShort"));
       return;
     }
@@ -73,6 +74,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         showLabel={t("showPassword")}
         hideLabel={t("hidePassword")}
       />
+      <p className="m-0 text-sm text-muted">{t("passwordShort")}</p>
       {error ? <p className="m-0 text-danger">{error}</p> : null}
       <button className="btn btn-primary mt-1 w-full" type="submit" disabled={pending}>
         {t("resetAction")}

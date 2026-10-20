@@ -50,7 +50,6 @@ async function upsertUser(
       role: input.role,
       clinicId: input.clinicId,
       passwordHash: await hashPassword(input.password),
-      emailVerifiedAt: new Date(),
     },
   });
   return created.id;

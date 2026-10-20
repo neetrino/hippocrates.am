@@ -1,8 +1,4 @@
--- Existing accounts stay signed-in. Only later public registrations leave this null.
-ALTER TABLE "User" ADD COLUMN "emailVerifiedAt" TIMESTAMP(3);
-
-UPDATE "User" SET "emailVerifiedAt" = "createdAt" WHERE "emailVerifiedAt" IS NULL;
-
+-- New empty table. Existing account rows are not changed.
 CREATE TABLE "EmailVerification" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,

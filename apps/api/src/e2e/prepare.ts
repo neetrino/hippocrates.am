@@ -80,7 +80,6 @@ async function ensureUser(
         displayName: input.displayName,
         role: input.role,
         clinicId: input.clinicId,
-        emailVerifiedAt: new Date(),
       },
     });
     return created.id;
@@ -92,7 +91,6 @@ async function ensureUser(
       displayName: input.displayName,
       role: input.role,
       clinicId: input.clinicId ?? existing.clinicId,
-      emailVerifiedAt: existing.emailVerifiedAt ?? new Date(),
     },
   });
   return existing.id;

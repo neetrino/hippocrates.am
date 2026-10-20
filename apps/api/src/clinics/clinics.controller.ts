@@ -48,7 +48,6 @@ export class ClinicsController {
           passwordHash,
           displayName: requiredString(input.adminName, "Ադմինի անուն", 80),
           role: "ADMIN",
-          emailVerifiedAt: new Date(),
         },
       });
       const created = await tx.clinic.create({

@@ -70,7 +70,6 @@ async function createFixture(prisma: PrismaService): Promise<Fixture> {
       passwordHash: "test",
       displayName: mark,
       role: "ADMIN",
-      emailVerifiedAt: new Date(),
     },
   });
   const second = await prisma.user.create({
@@ -79,7 +78,6 @@ async function createFixture(prisma: PrismaService): Promise<Fixture> {
       passwordHash: "test",
       displayName: mark,
       role: "ADMIN",
-      emailVerifiedAt: new Date(),
     },
   });
   const clinicA = await prisma.clinic.create({

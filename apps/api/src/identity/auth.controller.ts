@@ -8,7 +8,7 @@ import { Public } from "./auth.decorators";
 import { CurrentActor } from "./current-actor";
 import { RateLimitService } from "./rate-limit.service";
 import { SessionService } from "./session.service";
-import { confirmEmailAddress, issueEmailVerification } from "./email-verify";
+import { confirmEmailAddress, emailConfirmationPending, issueEmailVerification, openUnconfirmedPatient } from "./email-verify";
 import { assertResetMail } from "./password-mail";
 import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { saveNoticeMailPreference } from "./notice-preference";
@@ -46,16 +46,16 @@ export class AuthController {
     const displayName = `${name} ${surname}`.replace(/\s+/g, " ").trim();
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new AppError("EMAIL_TAKEN", 409, "Այս էլ. փոստը արդեն գրանցված է");
-    const user = await this.prisma.user.create({
-      data: {
+    const user = await openUnconfirmedPatient(
+      this.prisma,
+      {
         email,
         phone,
         displayName,
         passwordHash: await this.sessions.hashPassword(password),
-        role: "PATIENT",
       },
-    });
-    await issueEmailVerification(this.prisma, user.email, input.locale);
+      input.locale,
+    );
     return { id: user.id };
   }
 
@@ -75,7 +75,7 @@ export class AuthController {
     if (!user || user.disabledAt || !valid) {
       throw new AppError("INVALID_LOGIN", 401, "Էլ. փոստը կամ գաղտնաբառը սխալ է");
     }
-    if (!user.emailVerifiedAt) {
+    if (await emailConfirmationPending(this.prisma, user.id)) {
       throw new AppError("EMAIL_UNVERIFIED", 403, "Հաստատեք էլ. փոստը");
     }
     await this.sessions.open(response, user.id);

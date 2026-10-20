@@ -70,8 +70,7 @@ model User {
   clinicId     String?
   phone             String?
   photoKey          String?
-  emailVisitNotices Boolean   @default(true)
-  emailVerifiedAt   DateTime?
+  emailVisitNotices Boolean  @default(true)
   disabledAt        DateTime?
   createdAt         DateTime @default(now())
   clinic       Clinic?  @relation("ClinicStaff", fields: [clinicId], references: [id])

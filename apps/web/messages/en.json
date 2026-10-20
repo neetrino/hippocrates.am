@@ -177,6 +177,7 @@
     "password": "Password",
     "registerTitle": "Register",
     "registerHint": "A patient account starts here.",
+    "registerClosed": "Patient registration is closed for now.",
     "registerAction": "Continue",
     "displayName": "Name",
     "noAccount": "No account?",
@@ -311,6 +312,19 @@
     "sendReview": "Send review",
     "reviewFailed": "The review was not saved"
   },
+  "platformRules": {
+    "title": "Platform rules",
+    "lede": "These numbers apply to patient registration and booking. Clinic desk booking is unchanged.",
+    "registration": "Patient registration",
+    "booking": "Patient booking",
+    "maxDays": "Maximum days ahead",
+    "minNotice": "Minimum notice (hours)",
+    "cancelDeadline": "Cancellation deadline (hours)",
+    "rescheduleDeadline": "Reschedule deadline (hours)",
+    "save": "Save",
+    "saved": "Saved.",
+    "failed": "The rules could not be saved."
+  },
   "portal": {
     "subtitle": "Management portal",
     "patientSubtitle": "My account",
@@ -328,6 +342,7 @@
     "statPublishedDoctors": "Published doctors",
     "statPendingReviews": "Pending reviews",
     "verification": "Review",
+    "rules": "Rules",
     "verifyLede": "A new clinic or doctor appears in public only after you approve them here.",
     "verifyEmpty": "Nothing is waiting.",
     "verifyClinics": "Clinics",

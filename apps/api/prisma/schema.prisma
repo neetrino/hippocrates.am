@@ -413,6 +413,18 @@ model RateLimitBucket {
   @@index([expiresAt])
 }
 
+/// One row. Super Admin changes the platform booking and registration rules.
+model PlatformSetting {
+  id                          String   @id
+  patientRegistrationEnabled  Boolean  @default(true)
+  bookingEnabled              Boolean  @default(true)
+  maxBookingDays              Int      @default(60)
+  minNoticeMinutes            Int      @default(120)
+  cancelDeadlineMinutes       Int      @default(1440)
+  rescheduleDeadlineMinutes   Int      @default(1440)
+  updatedAt                   DateTime @updatedAt
+}
+
 model ReviewLocale {
   id       String @id @default(cuid())
   reviewId String

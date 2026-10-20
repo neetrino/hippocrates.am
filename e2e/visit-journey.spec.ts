@@ -7,7 +7,7 @@ import { runApiScript } from "./run-api";
 test("patient books, clinic confirms, patient reschedules, doctor completes", async ({ browser }) => {
   const password = requiredSeedPassword();
   const patient = newPatient();
-  const [bookDay, moveDay] = upcomingWeekdays(2);
+  const [bookDay, moveDay] = upcomingWeekdays(2, new Date(), 2);
   if (!bookDay || !moveDay) throw new Error("E2E refused: no open weekday.");
   const patientContext = await browser.newContext();
   const adminContext = await browser.newContext();

@@ -13,6 +13,7 @@ import { applyPasswordReset, requestPasswordReset } from "./password-reset";
 import { saveNoticeMailPreference } from "./notice-preference";
 import { changeOwnPassword, updateOwnProfile, type OwnProfile } from "./user-profile";
 import { accountPhotoUrl, assertAccountPhotoOwner, clearUserPhoto, saveUserPhoto } from "./user-photo";
+import { loadPlatformSettings } from "../settings/platform-settings";
 
 @Controller("auth")
 export class AuthController {
@@ -30,6 +31,10 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<{ id: string }> {
     await this.limits.consume(`register:${request.ip ?? "unknown"}`, 5, 10 * 60 * 1000);
+    const rules = await loadPlatformSettings(this.prisma);
+    if (!rules.patientRegistrationEnabled) {
+      throw new AppError("REGISTRATION_CLOSED", 403, "Հիվանդի գրանցումը ժամանակավորապես փակ է");
+    }
     const input = recordOf(body);
     const name = personNameOf(input.name ?? input.displayName, "Անուն");
     const surname = personNameOf(input.surname, "Ազգանուն");

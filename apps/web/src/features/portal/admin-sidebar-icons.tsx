@@ -36,6 +36,14 @@ export function VerifyIcon(props: IconProps) {
   );
 }
 
+export function RulesIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M5 7.5h14M5 12h14M5 16.5h9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </BaseIcon>
+  );
+}
+
 export function QuestionsIcon(props: IconProps) {
   return (
     <BaseIcon {...props}>

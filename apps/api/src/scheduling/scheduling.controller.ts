@@ -13,6 +13,8 @@ import { dayBounds } from "./day-off";
 import { clipDoctorHours } from "./clip-doctor-hours";
 import { isScheduleConflict } from "./schedule-conflict";
 import { daySlots, openWindows } from "./slots";
+import { applyPatientSlots } from "../settings/platform-rules";
+import { loadPlatformSettings } from "../settings/platform-settings";
 import { assertInsideClinic, windowsFrom, type StoredWindow } from "./windows";
 
 @Controller()
@@ -199,15 +201,23 @@ export class SchedulingController {
         where: { doctorId, startsAt: { lt: dayEnd }, endsAt: { gt: dayStart } },
       }),
     ]);
-    const slots = daySlots({
-      isoDate: date,
-      timeZone: offering.clinic.timeZone,
-      windows: openWindows(offering.clinic.windows, offering.doctor.windows),
-      durationMinutes: offering.durationMinutes,
-      busy: appointments.map((item) => ({ start: item.startsAt, end: item.endsAt })),
-      blocked: exceptions.map((item) => ({ start: item.startsAt, end: item.endsAt })),
-      now: new Date(),
-    }).map((slot) => ({ startsAt: slot.start.toISOString(), busy: slot.busy }));
+    const now = new Date();
+    const rules = await loadPlatformSettings(this.prisma);
+    const slots = applyPatientSlots(
+      daySlots({
+        isoDate: date,
+        timeZone: offering.clinic.timeZone,
+        windows: openWindows(offering.clinic.windows, offering.doctor.windows),
+        durationMinutes: offering.durationMinutes,
+        busy: appointments.map((item) => ({ start: item.startsAt, end: item.endsAt })),
+        blocked: exceptions.map((item) => ({ start: item.startsAt, end: item.endsAt })),
+        now,
+      }).map((slot) => ({ startsAt: slot.start.toISOString(), busy: slot.busy })),
+      rules,
+      date,
+      offering.clinic.timeZone,
+      now,
+    );
     return { startsAt: slots.filter((slot) => !slot.busy).map((slot) => slot.startsAt), slots };
   }
 

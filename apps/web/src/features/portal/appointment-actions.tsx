@@ -119,5 +119,6 @@ async function postVisit(id: string, path: string, reason: string | undefined): 
     window.location.reload();
     return null;
   }
-  return "failed";
+  const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
+  return body?.error?.message || "failed";
 }

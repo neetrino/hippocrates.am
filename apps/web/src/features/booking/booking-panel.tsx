@@ -71,9 +71,15 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
       }),
     });
     setPending(false);
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
       setTone("danger");
       setMessage(t("signIn"));
+      return;
+    }
+    if (response.status === 403) {
+      const body = (await response.json().catch(() => null)) as { error?: { code?: string; message?: string } } | null;
+      setTone("danger");
+      setMessage(body?.error?.code === "BOOKING_CLOSED" ? (body.error.message ?? t("taken")) : t("signIn"));
       return;
     }
     if (!response.ok) {

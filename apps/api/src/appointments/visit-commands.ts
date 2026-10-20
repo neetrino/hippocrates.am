@@ -8,6 +8,8 @@ import { withOpenSlot } from "./book-slot";
 import { closeExpiredRequests } from "./close-expired";
 import { allowedStarts, clinicDate, instantOf, loadOffering, managesVisit, reasonOf } from "./visit-access";
 import { patientMayAccept, rescheduleOutcome, staffMayConfirm, visitHasStarted } from "./visit-window";
+import { assertPatientDeadline, assertPatientMayBook } from "../settings/platform-guard";
+import { loadPlatformSettings } from "../settings/platform-settings";
 
 type Notices = NotificationsService;
 
@@ -18,6 +20,8 @@ export async function bookVisit(prisma: PrismaService, notices: Notices, patient
   const existing = await existingBooking(prisma, patientId, idempotencyKey);
   if (existing) return { id: existing.id };
   const offering = await loadOffering(prisma, requiredString(input.offeringId, "Ծառայություն"));
+  const rules = await loadPlatformSettings(prisma);
+  assertPatientMayBook(rules, startsAt, offering.clinic.timeZone, new Date());
   await assertBookable(prisma, notices, offering, startsAt);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
   try {
@@ -76,6 +80,9 @@ export async function cancelVisit(prisma: PrismaService, notices: Notices, actor
   const appointment = await openVisit(prisma, id);
   if (!(await mayCancel(prisma, actor, appointment))) throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
   if (visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Այցն արդեն սկսվել է");
+  if (isPatientActor(actor, appointment)) {
+    assertPatientDeadline(await loadPlatformSettings(prisma), appointment.startsAt, "cancel", now);
+  }
   const reason = reasonOf(body);
   await prisma.$transaction(async (tx) => {
     const updated = await applyTransition(
@@ -118,13 +125,16 @@ export async function rescheduleVisit(prisma: PrismaService, notices: Notices, a
     throw new AppError("VISIT_STARTED", 409, "Ժամն արդեն անցել է");
   }
   const appointment = await openVisit(prisma, id);
-  const isPatient = appointment.patientId !== null && actor.role === "PATIENT" && actor.id === appointment.patientId;
+  const isPatient = isPatientActor(actor, appointment);
   if (!isPatient && !(await managesVisit(prisma, actor, appointment))) {
     throw new AppError("NOT_FOUND", 404, "Ամրագրումը չի գտնվել");
   }
   if (visitHasStarted(appointment.startsAt, now)) throw new AppError("VISIT_STARTED", 409, "Այցն արդեն սկսվել է");
+  const rules = isPatient ? await loadPlatformSettings(prisma) : null;
+  if (rules) assertPatientDeadline(rules, appointment.startsAt, "reschedule", now);
   const startsAt = instantOf(recordOf(body).startsAt);
   const offering = await loadOffering(prisma, appointment.offeringId);
+  if (rules) assertPatientMayBook(rules, startsAt, offering.clinic.timeZone, now);
   await assertBookable(prisma, notices, offering, startsAt, appointment.id);
   const endsAt = new Date(startsAt.getTime() + offering.durationMinutes * 60_000);
   const outcome = rescheduleOutcome(isPatient, openStatus(appointment.status), appointment.patientId !== null);
@@ -181,9 +191,12 @@ async function mayConfirm(prisma: PrismaService, actor: Actor, appointment: { pa
   return patientAccepts || staffConfirms;
 }
 
+function isPatientActor(actor: Actor, appointment: { patientId: string | null }): boolean {
+  return appointment.patientId !== null && actor.role === "PATIENT" && actor.id === appointment.patientId;
+}
+
 async function mayCancel(prisma: PrismaService, actor: Actor, appointment: { patientId: string | null; clinicId: string; doctorId: string }) {
-  const isPatient = appointment.patientId !== null && actor.role === "PATIENT" && actor.id === appointment.patientId;
-  return isPatient || managesVisit(prisma, actor, appointment);
+  return isPatientActor(actor, appointment) || managesVisit(prisma, actor, appointment);
 }
 
 function openStatus(status: string): "REQUESTED" | "CONFIRMED" {

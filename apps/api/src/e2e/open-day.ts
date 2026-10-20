@@ -1,9 +1,9 @@
 const ZONE = "Asia/Yerevan";
 
-/** Later weekdays in Yerevan. Today is excluded so a slot has not already passed. */
-export function upcomingWeekdays(count: number, now = new Date()): string[] {
+/** Later weekdays in Yerevan. Offset 1 skips today. Offset 2 also skips tomorrow. */
+export function upcomingWeekdays(count: number, now = new Date(), firstOffset = 1): string[] {
   const days: string[] = [];
-  for (let offset = 1; days.length < count && offset < 21; offset += 1) {
+  for (let offset = firstOffset; days.length < count && offset < 21; offset += 1) {
     const instant = new Date(now.getTime() + offset * 24 * 60 * 60 * 1000);
     const weekday = new Intl.DateTimeFormat("en-US", { timeZone: ZONE, weekday: "short" }).format(instant);
     if (weekday === "Sat" || weekday === "Sun") continue;

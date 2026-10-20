@@ -21,6 +21,7 @@ export type PortalHref =
   | "/super-admin"
   | "/super-admin/clinics"
   | "/super-admin/verification"
+  | "/super-admin/settings"
   | "/super-admin/questions"
   | "/clinic"
   | "/clinic/profile"

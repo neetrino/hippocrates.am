@@ -26,7 +26,7 @@ Do not add empty modules for a later point. Prefer `NOW_VS_NEEDED_HY.md` for the
 | 1 | Registration | Four roles. Patient self-registers. Super Admin creates clinic + Admin. Admin invites doctors to set their own password. Forgot/reset password | VERIFIED | Email ownership verification and MFA are later hardening |
 | 2 | Clinic profile | Clinic edit, cover, hours, services, and branch CRUD | VERIFIED | Full multi-branch scheduling remains later |
 | 3 | Public catalog | Home, clinic and doctor lists and pages, name/specialty search, locales | VERIFIED | City and other BRIEF filters |
-| 4 | Booking | Slots, request, confirm, cancel, reschedule, complete, no-show, expiry, overlap exclusion, `AppointmentEvent` | VERIFIED | Hold, check-in, cancel cutoff |
+| 4 | Booking | Slots, request, confirm, cancel, reschedule, complete, no-show, expiry, overlap exclusion, `AppointmentEvent`. Patient cancel, reschedule, horizon, and notice read one `PlatformSetting` row | VERIFIED | Hold, check-in |
 | 5 | Portals | Patient, doctor, clinic desk, in-app notices, patient card, price totals, favorites, settings | VERIFIED | Visit email delivery (Resend is only on password reset) |
 | 6 | Chat | — | PAUSED | No chat routes |
 | 7 | Questions | Tables remain. Public pages redirect home and new questions are refused | PAUSED | Not in V1 |

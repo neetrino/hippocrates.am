@@ -130,6 +130,7 @@ async function moveVisit(
     window.location.reload();
     return;
   }
+  const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
   setFailed(true);
-  setNote(failedLabel);
+  setNote(body?.error?.message || failedLabel);
 }

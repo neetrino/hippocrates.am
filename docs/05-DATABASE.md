@@ -61,7 +61,7 @@ The diagram is conceptual; actual column names/types/keys require approved migra
 
 ## Appointment state and conflict integrity
 
-**Appointment states in the live schema:** `REQUESTED`, `CONFIRMED`, `CANCELLED`, `COMPLETED`, `EXPIRED`, `NO_SHOW`. `REQUESTED` and `CONFIRMED` occupy that doctor account's time. Unanswered `REQUESTED` rows become `EXPIRED` when the start time arrives. There is no patient cancellation cutoff. `COMPLETED` means the person attended. It is not a review and not a medical note.
+**Appointment states in the live schema:** `REQUESTED`, `CONFIRMED`, `CANCELLED`, `COMPLETED`, `EXPIRED`, `NO_SHOW`. `REQUESTED` and `CONFIRMED` occupy that doctor account's time. Unanswered `REQUESTED` rows become `EXPIRED` when the start time arrives. Patient cancellation and reschedule close when the platform deadline remains (default 24 hours), stored on the single `PlatformSetting` row with the booking horizon and minimum notice. There is no per-visit cutoff column. `COMPLETED` means the person attended. It is not a review and not a medical note.
 
 **AppointmentEvent** is append-only (`CREATED`, `CONFIRMED`, `CANCELLED`, `RESCHEDULED`, `EXPIRED`, `COMPLETED`, `NO_SHOW`). History starts at the event migration; older visits are not backfilled. Notifications are in-app `Notification` rows. There is no `NotificationIntent` / delivery-attempt table yet.
 

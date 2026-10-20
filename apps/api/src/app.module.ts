@@ -21,6 +21,7 @@ import { OperationsController } from "./operations/operations.controller";
 import { QuestionsController } from "./questions/questions.controller";
 import { ReviewsController } from "./reviews/reviews.controller";
 import { SchedulingController } from "./scheduling/scheduling.controller";
+import { PlatformSettingsController, PublicPlatformController } from "./settings/platform-settings.controller";
 
 @Module({
   imports: [PrismaModule],
@@ -37,6 +38,8 @@ import { SchedulingController } from "./scheduling/scheduling.controller";
     QuestionsController,
     ReviewsController,
     OperationsController,
+    PlatformSettingsController,
+    PublicPlatformController,
   ],
   providers: [
     SessionService,

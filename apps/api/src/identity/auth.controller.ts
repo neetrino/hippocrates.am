@@ -90,7 +90,9 @@ export class AuthController {
     const input = recordOf(body);
     const email = emailOf(input.email);
     await this.limits.consume(`forgot-mail:${email}`, 3, 60 * 60 * 1000);
-    await requestPasswordReset(this.prisma, email, input.locale);
+    const result = await requestPasswordReset(this.prisma, email, input.locale);
+    if (result === "unverified") throw new AppError("EMAIL_UNVERIFIED", 403, "Հաստատեք էլ. փոստը");
+    if (result === "unsent") throw new AppError("MAIL_UNAVAILABLE", 503, "Նամակ ուղարկելը այս պահին հնարավոր չէ");
     return { ok: true };
   }
 

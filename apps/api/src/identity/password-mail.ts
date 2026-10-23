@@ -32,18 +32,20 @@ export function assertResetMail(): void {
   throw new AppError("MAIL_UNAVAILABLE", 503, "Նամակ ուղարկելը այս պահին հնարավոր չէ");
 }
 
-export async function deliverResetLink(email: string, token: string, locale: ResetLocale): Promise<void> {
+export async function deliverResetLink(email: string, token: string, locale: ResetLocale): Promise<boolean> {
   const url = resetLink(token, locale);
   const letter = copy[locale];
   if (!mailConfigured()) {
     logger.log(`Password reset link for ${email}: ${url}`);
-    return;
+    return true;
   }
   try {
     const sent = await sendMail({ to: email, subject: letter.subject, text: resetText(letter, url) });
     if (!sent) logger.error("Password reset mail was not accepted");
+    return sent;
   } catch (error) {
     logger.error("Password reset mail failed", error instanceof Error ? error.stack : undefined);
+    return false;
   }
 }
 

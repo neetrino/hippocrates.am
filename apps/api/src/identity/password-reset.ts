@@ -7,24 +7,37 @@ import { SessionService } from "./session.service";
 
 const RESET_MS = 30 * 60 * 1000;
 
-export async function requestPasswordReset(prisma: PrismaService, email: string, locale: unknown): Promise<void> {
+export type ResetRequest = "missing" | "unverified" | "sent" | "unsent";
+
+/** Unknown addresses stay missing. An unconfirmed account does not receive a reset link. */
+export async function requestPasswordReset(prisma: PrismaService, email: string, locale: unknown): Promise<ResetRequest> {
   const user = await prisma.user.findFirst({
     where: { email, disabledAt: null },
-    select: { id: true, email: true },
+    select: {
+      id: true,
+      email: true,
+      emailVerifications: { where: { usedAt: null }, select: { id: true }, take: 1 },
+    },
   });
-  if (!user) return;
+  if (!user) return "missing";
+  if (user.emailVerifications.length > 0) return "unverified";
   const token = randomBytes(32).toString("base64url");
+  await storeResetToken(prisma, user.id, token);
+  const sent = await deliverResetLink(user.email, token, resetLocale(locale));
+  return sent ? "sent" : "unsent";
+}
+
+async function storeResetToken(prisma: PrismaService, userId: string, token: string): Promise<void> {
   const expiresAt = new Date(Date.now() + RESET_MS);
   await prisma.$transaction(async (tx) => {
     await tx.passwordReset.updateMany({
-      where: { userId: user.id, usedAt: null },
+      where: { userId, usedAt: null },
       data: { usedAt: new Date() },
     });
     await tx.passwordReset.create({
-      data: { userId: user.id, tokenHash: hashToken(token), expiresAt },
+      data: { userId, tokenHash: hashToken(token), expiresAt },
     });
   });
-  await deliverResetLink(user.email, token, resetLocale(locale));
 }
 
 export async function applyPasswordReset(

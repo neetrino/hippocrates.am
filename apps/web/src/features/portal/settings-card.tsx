@@ -9,6 +9,7 @@ import { SettingsProfile } from "@/features/portal/settings-profile";
 
 type SettingsCardProps = {
   displayName: string;
+  visibleName?: string;
   email: string;
   phone: string | null;
   photoUrl: string | null;
@@ -23,6 +24,7 @@ const editButton =
 
 export function SettingsCard({
   displayName,
+  visibleName,
   email,
   phone,
   photoUrl,
@@ -34,12 +36,13 @@ export function SettingsCard({
   const t = useTranslations("me");
   const common = useTranslations("common");
   const role = roleLabel ?? common("PATIENT");
+  const shownName = visibleName ?? displayName;
   const [editing, setEditing] = useState(false);
 
   return (
     <section className="rounded-card bg-surface p-5 shadow-soft md:p-6">
       <SettingsPhoto
-        name={displayName}
+        name={shownName}
         photoUrl={photoUrl}
         roleLabel={role}
         changeLabel={t("changePhoto")}
@@ -59,6 +62,7 @@ export function SettingsCard({
       />
       <SettingsProfile
         displayName={displayName}
+        visibleName={shownName}
         email={email}
         phone={phone}
         editing={editing}

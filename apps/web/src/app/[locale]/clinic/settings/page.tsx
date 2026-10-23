@@ -1,12 +1,14 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { SettingsCard } from "@/features/portal/settings-card";
 import { prepareLocale } from "@/i18n/locale";
+import { portalName } from "@/shared/clinic-label";
 
 export default async function ClinicSettingsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   prepareLocale(raw);
+  const locale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const me = await requireClinicAdmin();
@@ -15,6 +17,7 @@ export default async function ClinicSettingsPage({ params }: { params: Promise<{
     <ClinicManagerShell eyebrow={common("ADMIN")} title={t("settings")}>
       <SettingsCard
         displayName={me.displayName}
+        visibleName={portalName(me.displayName, locale, me.nameLocales)}
         email={me.email}
         phone={me.phone}
         photoUrl={me.photoUrl}

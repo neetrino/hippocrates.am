@@ -4,6 +4,7 @@ const closed = new Set(["CANCELLED", "EXPIRED", "NO_SHOW"]);
 /** How many visits stay visible before "More" in each section. */
 export const visitPreviewLimit = {
   waiting: 4,
+  passed: 4,
   completed: 3,
   cancelled: 2,
 } as const;
@@ -17,22 +18,29 @@ function group(status: string): number {
 
 export type VisitGroups<T extends { status: string }> = {
   waiting: T[];
+  passed: T[];
   completed: T[];
   cancelled: T[];
 };
 
-/** Waiting and confirmed stay together. Completed, then cancelled. */
-export function groupVisits<T extends { status: string; startsAt: string }>(visits: T[]): VisitGroups<T> {
+/** Future active visits stay upcoming. Started ones are listed apart. Completed, then cancelled. */
+export function groupVisits<T extends { status: string; startsAt: string }>(
+  visits: T[],
+  now = Date.now(),
+): VisitGroups<T> {
   const sorted = [...visits].sort(compareVisitsByPriority);
   const waiting: T[] = [];
+  const passed: T[] = [];
   const completed: T[] = [];
   const cancelled: T[] = [];
   for (const visit of sorted) {
     if (visit.status === "COMPLETED") completed.push(visit);
     else if (closed.has(visit.status)) cancelled.push(visit);
+    else if (Date.parse(visit.startsAt) <= now) passed.push(visit);
     else waiting.push(visit);
   }
-  return { waiting, completed, cancelled };
+  passed.sort((left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt));
+  return { waiting, passed, completed, cancelled };
 }
 
 /** Active visits first, soonest at the top. Completed, then cancelled, newest first. */

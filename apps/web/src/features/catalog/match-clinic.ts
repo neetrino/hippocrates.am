@@ -14,9 +14,10 @@ export function matchesClinic(clinic: ClinicCard, query: string): boolean {
   if (!raw) return true;
 
   const tokens = normalizeText(raw).split(/\s+/).filter(Boolean);
-  const copies = clinic.copies?.length
-    ? clinic.copies
-    : [{ name: clinic.name, district: clinic.district, address: clinic.address }];
+  const copies = [
+    { name: clinic.name, district: clinic.district, address: clinic.address },
+    ...(clinic.copies ?? []),
+  ];
   const textHaystack = normalizeText(
     [...copies.flatMap((copy) => [copy.name, copy.district, copy.address]), clinic.phone].join(" "),
   );

@@ -59,9 +59,9 @@ export class OperationsController {
 
   @Get("admin/verification")
   @Roles("SUPER_ADMIN")
-  listVerification(@CurrentActor() actor: Actor, @Query("page") page?: string) {
+  listVerification(@CurrentActor() actor: Actor, @Query("page") page?: string, @Query("locale") locale?: string) {
     requireRoles(actor, ["SUPER_ADMIN"]);
-    return listVerificationQueue(this.prisma, page);
+    return listVerificationQueue(this.prisma, page, locale);
   }
 
   @Post("admin/verification/:kind/:id")
@@ -78,9 +78,9 @@ export class OperationsController {
 
   @Get("admin/clinics")
   @Roles("SUPER_ADMIN")
-  adminClinics(@CurrentActor() actor: Actor, @Query("page") page?: string) {
+  adminClinics(@CurrentActor() actor: Actor, @Query("page") page?: string, @Query("locale") locale?: string) {
     requireRoles(actor, ["SUPER_ADMIN"]);
-    return listAdminClinics(this.prisma, page);
+    return listAdminClinics(this.prisma, page, locale);
   }
 
   @Get("clinics/:clinicId/patients")

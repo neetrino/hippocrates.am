@@ -4,7 +4,7 @@ import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { Link } from "@/i18n/navigation";
 import { Photo } from "@/shared/ui/photo";
-import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
+import { clinicDisplayName, doctorDisplayName, portalName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, formatVisitDate, type VisitStatus } from "@/shared/format";
 import { localizedServiceName, type ServiceMessageKey } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
@@ -34,12 +34,13 @@ export async function PatientHome({ me, appointments }: PatientHomeProps) {
   const { hero, listed, now } = splitOpen(appointments);
   const review = reviewWaiting(appointments);
   const rows = listed.map((visit) => toListed(visit, locale, now, services, common, t("visitPassed")));
+  const name = portalName(me.displayName, locale, me.nameLocales);
 
   return (
     <PatientPortalShell
       eyebrow=""
-      title={me.displayName}
-      portrait={<PatientAvatar name={me.displayName} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
+      title={name}
+      portrait={<PatientAvatar name={name} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
     >
       <div className="grid gap-3">
         {hero ? (

@@ -22,6 +22,11 @@ const toneClass: Record<Tone, { band: string; count: string; rail: string }> = {
     count: "bg-white/15 text-white",
     rail: "border-l-[#2a4a47]",
   },
+  passed: {
+    band: "bg-sand text-ink",
+    count: "bg-white text-muted",
+    rail: "border-l-line",
+  },
   cancelled: {
     band: "bg-danger/10 text-danger",
     count: "bg-danger/10 text-danger",
@@ -65,7 +70,7 @@ export function VisitGroup({
   const toneStyle = toneClass[tone];
   const hidden = visits.length - visitPreviewLimit[tone];
   const shown = open || hidden <= 0 ? visits : visits.slice(0, visitPreviewLimit[tone]);
-  const quiet = tone === "cancelled";
+  const quiet = tone === "cancelled" || tone === "passed";
 
   return (
     <section className={`overflow-hidden rounded-card bg-surface shadow-soft ${tone === "cancelled" ? "ring-1 ring-danger/15" : ""}`}>

@@ -24,7 +24,7 @@ export function VisitHistory({ events }: { events?: VisitEvent[] | null }) {
         <li key={event.id} className="m-0 text-sm text-muted">
           {formatVisitEvent(event, locale, {
             action: actionLabel(event.type, t),
-            actor: eventActorLabel(event, (role) => actorFallback(role, t)),
+            actor: eventActorLabel(event, locale, (role) => actorFallback(role, t)),
           })}
         </li>
       ))}

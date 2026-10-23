@@ -4,7 +4,7 @@ import { LogoutButton } from "@/features/portal/logout-button";
 import { PatientHome } from "@/features/portal/patient-home";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
-import { clinicDisplayName, doctorDisplayName } from "@/shared/clinic-label";
+import { clinicDisplayName, doctorDisplayName, portalName } from "@/shared/clinic-label";
 import { asRole, asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
 import { type NoticePage } from "@/shared/notice";
 import { noticeLine } from "@/shared/notice-text";
@@ -58,7 +58,7 @@ export default async function MePage({ params }: { params: Promise<{ locale: str
           <p className="mb-3 text-[0.78rem] font-semibold tracking-[0.08em] text-accent uppercase">
             {role ? common(role) : me.role}
           </p>
-          <h1>{me.displayName}</h1>
+          <h1>{portalName(me.displayName, displayLocale, me.nameLocales)}</h1>
         </div>
         <LogoutButton />
       </div>

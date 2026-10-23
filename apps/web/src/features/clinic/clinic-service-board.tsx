@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ClinicServiceForm } from "@/features/clinic/clinic-forms";
 import { DoctorServiceGroup, type ClinicOffering, type ServiceDoctor } from "@/features/clinic/clinic-service-list";
+import { portalName } from "@/shared/clinic-label";
 import { EmptyState } from "@/shared/ui/empty-state";
 
 export function ClinicServiceBoard({
@@ -17,6 +18,7 @@ export function ClinicServiceBoard({
   offerings: ClinicOffering[];
   showEmptyDoctors?: boolean;
 }) {
+  const locale = useLocale();
   const t = useTranslations("desk");
   const [open, setOpen] = useState(false);
   const [doctorId, setDoctorId] = useState("");
@@ -47,7 +49,7 @@ export function ClinicServiceBoard({
         <ClinicServiceForm
           key={doctorId || "new"}
           clinicId={clinicId}
-          doctors={doctors.map((doctor) => ({ id: doctor.id, name: doctor.user.displayName }))}
+          doctors={doctors.map((doctor) => ({ id: doctor.id, name: portalName(doctor.user.displayName, locale, doctor.locales) }))}
           initialDoctorId={doctorId}
           onClose={closeForm}
         />

@@ -8,7 +8,7 @@ export function DoctorSchedule({ clinic, doctor }: { clinic: HourWindow[]; docto
   const t = useTranslations("desk");
   return (
     <div className="grid gap-5">
-      <p className="m-0 text-muted">{t("hoursHint")}</p>
+      <p className="m-0 text-muted">{t("doctorScheduleHint")}</p>
       <ClinicWeekRead windows={clinic} />
       <HoursEditor
         title={t("doctorHours")}

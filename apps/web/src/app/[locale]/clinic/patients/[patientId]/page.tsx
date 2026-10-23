@@ -3,6 +3,7 @@ import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { Link } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
+import { portalName } from "@/shared/clinic-label";
 import { asVisitStatus, formatAmount, formatWhen } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import { VisitHistory } from "@/features/portal/visit-history";
@@ -40,7 +41,7 @@ export default async function ClinicPatientPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <ClinicManagerShell eyebrow={common("ADMIN")} title={card.patient.displayName}>
+    <ClinicManagerShell eyebrow={common("ADMIN")} title={portalName(card.patient.displayName, locale)}>
       <div className="grid gap-4">
         <Link href="/clinic/patients" className="w-fit text-sm font-semibold text-accent">
           {t("patientList")}

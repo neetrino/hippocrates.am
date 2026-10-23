@@ -28,6 +28,7 @@ export async function VisitBoard({
   const groups = groupVisits(visits);
   const sections: { tone: Tone; title: string; items: AppointmentCard[] }[] = [
     { tone: "waiting", title: me("upcoming"), items: groups.waiting },
+    { tone: "passed", title: me("visitPassed"), items: groups.passed },
     { tone: "completed", title: common("COMPLETED"), items: groups.completed },
     { tone: "cancelled", title: me("closedVisits"), items: groups.cancelled },
   ];
@@ -67,7 +68,7 @@ function toRow(
     date: formatVisitDate(visit.startsAt, locale),
     time: formatTime(visit.startsAt),
     service: localizedServiceName(visit.offering.name, services),
-    place: viewer === "doctor" ? patientLabel(visit) : clinic,
+    place: viewer === "doctor" ? patientLabel(visit, locale) : clinic,
     statusLabel: status ? common(status) : visit.status,
     price: common("price", { amount: formatAmount(visit.priceAmd) }),
     startsAt: visit.startsAt,

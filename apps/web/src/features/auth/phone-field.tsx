@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { cn } from "@/shared/ui/cn";
 
 const ARMENIA_DIAL = "374";
@@ -29,6 +29,7 @@ export function armeniaPhone(localDigits: string): string | null {
 }
 
 export function PhoneField({ label, variant = "form", phone = null, required = true, onChange }: PhoneFieldProps) {
+  const inputId = useId();
   const [local, setLocal] = useState(localArmeniaDigits(phone));
   const [source, setSource] = useState(phone);
   if (phone !== source) {
@@ -49,7 +50,7 @@ export function PhoneField({ label, variant = "form", phone = null, required = t
             : "text-[0.92rem] font-semibold",
       )}
     >
-      <span>{label}</span>
+      <label htmlFor={inputId}>{label}</label>
       <div className="grid min-w-0 grid-cols-[minmax(96px,118px)_minmax(0,1fr)] gap-2">
         <span
           className={cn(
@@ -69,6 +70,7 @@ export function PhoneField({ label, variant = "form", phone = null, required = t
               ? "rounded-[14px] border border-[#d7e3e1] bg-white px-3 py-[11px] focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.18)]"
               : "rounded-xl border border-line bg-white px-3.5 py-3 focus:border-accent focus:shadow-[0_0_0_3px_rgba(0,167,157,0.16)]",
           )}
+          id={inputId}
           name="phoneLocal"
           type="tel"
           inputMode="numeric"

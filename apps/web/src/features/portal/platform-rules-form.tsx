@@ -90,7 +90,7 @@ function hoursOf(minutes: number): number {
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
   return (
-    <div className="flex items-center gap-2 text-sm font-semibold">
+    <label className="flex items-center gap-2 text-sm font-semibold">
       <input
         type="checkbox"
         className="size-4 accent-accent"
@@ -98,7 +98,7 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
         onChange={(event) => onChange(event.target.checked)}
       />
       <span>{label}</span>
-    </div>
+    </label>
   );
 }
 

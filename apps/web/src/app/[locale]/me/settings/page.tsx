@@ -1,15 +1,17 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
 import { PatientPortalShell } from "@/features/portal/patient-portal-shell";
 import { SettingsCard } from "@/features/portal/settings-card";
 import { Link, redirect } from "@/i18n/navigation";
 import { prepareLocale } from "@/i18n/locale";
 import type { Me } from "@/shared/public-types";
+import { portalName } from "@/shared/clinic-label";
 import { sessionGet } from "@/shared/session-api";
 
 export default async function PatientSettingsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale = prepareLocale(raw);
+  const displayLocale = await getLocale();
   const t = await getTranslations("me");
   const common = await getTranslations("common");
   const nav = await getTranslations("nav");
@@ -30,6 +32,7 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
       <DoctorPortalShell eyebrow={common("DOCTOR")} title={t("settings")}>
         <SettingsCard
           displayName={me.displayName}
+          visibleName={portalName(me.displayName, displayLocale, me.nameLocales)}
           email={me.email}
           phone={me.phone}
           photoUrl={me.photoUrl}
@@ -47,6 +50,7 @@ export default async function PatientSettingsPage({ params }: { params: Promise<
     <PatientPortalShell eyebrow={common("PATIENT")} title={t("settings")}>
       <SettingsCard
         displayName={me.displayName}
+        visibleName={portalName(me.displayName, displayLocale, me.nameLocales)}
         email={me.email}
         phone={me.phone}
         photoUrl={me.photoUrl}

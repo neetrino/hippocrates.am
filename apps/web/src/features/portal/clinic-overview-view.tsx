@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { DeleteClinic } from "@/features/portal/delete-clinic";
 import { VerificationActions } from "@/features/portal/verification-actions";
 import { StatusChip } from "@/features/portal/verification-board";
 import { Link } from "@/i18n/navigation";
+import { portalName, shownClinicCopy, specialtyLabel } from "@/shared/clinic-label";
 import { formatAmount } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import { Photo } from "@/shared/ui/photo";
@@ -25,8 +26,23 @@ export type ClinicOverview = {
   admin: { displayName: string; email: string };
   copies: ClinicCopyView[];
   branches: { id: string; name: string; address: string }[];
-  doctors: { id: string; displayName: string; specialty: string; published: boolean; verificationStatus: string }[];
-  offerings: { id: string; name: string; priceAmd: number; isEstimate: boolean; durationMinutes: number; doctorName: string }[];
+  doctors: {
+    id: string;
+    displayName: string;
+    specialty: string;
+    published: boolean;
+    verificationStatus: string;
+    locales?: { locale: string; name: string; specialty: string }[];
+  }[];
+  offerings: {
+    id: string;
+    name: string;
+    priceAmd: number;
+    isEstimate: boolean;
+    durationMinutes: number;
+    doctorName: string;
+    doctorLocales?: { locale: string; name: string }[];
+  }[];
   reviews: { id: string; rating: number; body: string; reply: string | null; createdAt: string }[];
   reviewCount: number;
 };
@@ -105,19 +121,29 @@ async function LanguageSection({ copies }: { copies: ClinicCopyView[] }) {
 }
 
 async function AdminSection({ admin }: { admin: ClinicOverview["admin"] }) {
+  const locale = await getLocale();
   const common = await getTranslations("common");
   const auth = await getTranslations("auth");
   return (
     <Section title={common("ADMIN")}>
       <div className="grid gap-3 rounded-[1.15rem] border border-line px-4 py-4 sm:grid-cols-2">
-        <Field label={common("name")} value={admin.displayName} />
+        <Field label={common("name")} value={portalName(admin.displayName, locale)} />
         <Field label={auth("email")} value={admin.email} />
       </div>
     </Section>
   );
 }
 
-async function BranchSection({ branches }: { branches: ClinicOverview["branches"] }) {
+async function BranchSection({
+  branches,
+  sourceAddress,
+  storedAddress,
+}: {
+  branches: ClinicOverview["branches"];
+  sourceAddress: string;
+  storedAddress: string;
+}) {
+  const locale = await getLocale();
   const clinicPage = await getTranslations("clinicPage");
   const portal = await getTranslations("portal");
   return (
@@ -126,8 +152,10 @@ async function BranchSection({ branches }: { branches: ClinicOverview["branches"
       <div className="grid gap-3">
         {branches.map((branch) => (
           <p className="m-0 rounded-[1.1rem] border border-line px-4 py-3.5" key={branch.id}>
-            {branch.name === "Հիմնական" ? clinicPage("mainBranch") : branch.name}
-            {branch.address ? <span className="text-muted"> · {branch.address}</span> : null}
+            {branch.name === "Հիմնական" ? clinicPage("mainBranch") : portalName(branch.name, locale)}
+            {branch.address ? (
+              <span className="text-muted"> · {branch.address === storedAddress ? sourceAddress : portalName(branch.address, locale)}</span>
+            ) : null}
           </p>
         ))}
       </div>
@@ -136,6 +164,7 @@ async function BranchSection({ branches }: { branches: ClinicOverview["branches"
 }
 
 async function DoctorSection({ doctors }: { doctors: ClinicOverview["doctors"] }) {
+  const locale = await getLocale();
   const clinicPage = await getTranslations("clinicPage");
   const portal = await getTranslations("portal");
   return (
@@ -145,8 +174,8 @@ async function DoctorSection({ doctors }: { doctors: ClinicOverview["doctors"] }
         {doctors.map((doctor) => (
           <div className="flex items-center justify-between gap-3 rounded-[1.1rem] border border-line px-4 py-3.5" key={doctor.id}>
             <p className="m-0">
-              <strong>{doctor.displayName}</strong>
-              <span className="text-muted"> · {doctor.specialty}</span>
+              <strong>{portalName(doctor.displayName, locale, doctor.locales)}</strong>
+              <span className="text-muted"> · {specialtyLabel(doctor.specialty, locale, doctor.locales)}</span>
             </p>
             <span className="flex shrink-0 items-center gap-2">
               <StatusChip status={doctor.verificationStatus} />
@@ -162,6 +191,7 @@ async function DoctorSection({ doctors }: { doctors: ClinicOverview["doctors"] }
 }
 
 async function ServiceSection({ offerings }: { offerings: ClinicOverview["offerings"] }) {
+  const locale = await getLocale();
   const clinicPage = await getTranslations("clinicPage");
   const common = await getTranslations("common");
   const services = await getTranslations("services");
@@ -173,7 +203,7 @@ async function ServiceSection({ offerings }: { offerings: ClinicOverview["offeri
         {offerings.map((item) => (
           <div className="flex items-center justify-between gap-3 rounded-[1.1rem] border border-line px-4 py-3.5" key={item.id}>
             <span>
-              {item.doctorName} · {localizedServiceName(item.name, services)}
+              {portalName(item.doctorName, locale, item.doctorLocales)} · {localizedServiceName(item.name, services)}
             </span>
             <span className="shrink-0 text-right">
               {common("price", { amount: formatAmount(item.priceAmd) })}
@@ -188,8 +218,10 @@ async function ServiceSection({ offerings }: { offerings: ClinicOverview["offeri
 }
 
 export async function ClinicOverviewView({ clinic }: { clinic: ClinicOverview }) {
+  const locale = await getLocale();
   const portal = await getTranslations("portal");
-  const source = clinic.copies.find((copy) => copy.locale === "hy");
+  const source = shownClinicCopy(clinic.copies, locale);
+  const stored = clinic.copies.find((copy) => copy.locale === "hy");
   return (
     <div className="grid gap-5">
       <Link
@@ -213,7 +245,7 @@ export async function ClinicOverviewView({ clinic }: { clinic: ClinicOverview })
       <ClinicHero clinic={clinic} source={source} />
       <LanguageSection copies={clinic.copies} />
       <AdminSection admin={clinic.admin} />
-      <BranchSection branches={clinic.branches} />
+      <BranchSection branches={clinic.branches} sourceAddress={source.address} storedAddress={stored?.address ?? ""} />
       <DoctorSection doctors={clinic.doctors} />
       <ServiceSection offerings={clinic.offerings} />
       <DeleteClinic clinicId={clinic.id} clinicName={source?.name || ""} />

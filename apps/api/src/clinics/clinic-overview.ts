@@ -31,7 +31,14 @@ const overviewSelect = {
   branches: { orderBy: { name: "asc" }, select: { id: true, name: true, address: true } },
   doctors: {
     orderBy: { user: { displayName: "asc" } },
-    select: { id: true, specialty: true, published: true, verificationStatus: true, user: { select: { displayName: true } } },
+    select: {
+      id: true,
+      specialty: true,
+      published: true,
+      verificationStatus: true,
+      user: { select: { displayName: true } },
+      locales: { select: { locale: true, name: true, specialty: true } },
+    },
   },
   offerings: {
     orderBy: { name: "asc" },
@@ -41,7 +48,12 @@ const overviewSelect = {
       priceAmd: true,
       isEstimate: true,
       durationMinutes: true,
-      doctor: { select: { user: { select: { displayName: true } } } },
+      doctor: {
+        select: {
+          user: { select: { displayName: true } },
+          locales: { select: { locale: true, name: true } },
+        },
+      },
     },
   },
 } as const;
@@ -70,6 +82,7 @@ function toOverview(clinic: OverviewRow) {
       specialty: doctor.specialty,
       published: doctor.published,
       verificationStatus: doctor.verificationStatus,
+      locales: doctor.locales,
     })),
     offerings: clinic.offerings.map((item) => ({
       id: item.id,
@@ -78,6 +91,7 @@ function toOverview(clinic: OverviewRow) {
       isEstimate: item.isEstimate,
       durationMinutes: item.durationMinutes,
       doctorName: item.doctor.user.displayName,
+      doctorLocales: item.doctor.locales,
     })),
     reviews: [],
     reviewCount: 0,

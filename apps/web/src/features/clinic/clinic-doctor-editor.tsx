@@ -1,8 +1,9 @@
 "use client";
 
 import { FormEvent, useRef, useState, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { PatientAvatar } from "@/features/portal/patient-avatar";
+import { portalName, specialtyLabel } from "@/shared/clinic-label";
 import { acceptedImage, clinicImage, clinicSend } from "@/features/clinic/clinic-api";
 
 type Copy = { displayName: string; specialty: string; bio: string };
@@ -58,17 +59,19 @@ export function DoctorCard({
   doctor: DoctorDraft;
   extra?: ReactNode;
 }) {
+  const locale = useLocale();
   const t = useTranslations("desk");
   const [open, setOpen] = useState(false);
   const live = doctor.published;
+  const shown = shownDoctor(doctor, locale);
   return (
     <article className="rounded-card border border-line bg-white shadow-soft">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
         <span className="flex min-w-0 items-center gap-3">
-          <PatientAvatar name={doctor.displayName} photoUrl={doctor.photoUrl} />
+          <PatientAvatar name={shown.name} photoUrl={doctor.photoUrl} />
           <span className="grid min-w-0">
-            <span className="font-semibold">{doctor.displayName}</span>
-            <span className="text-sm text-muted">{doctor.specialty}</span>
+            <span className="font-semibold">{shown.name}</span>
+            <span className="text-sm text-muted">{shown.specialty}</span>
           </span>
         </span>
         <span className="flex items-center gap-3">
@@ -92,6 +95,19 @@ export function DoctorCard({
       ) : null}
     </article>
   );
+}
+
+function shownDoctor(doctor: DoctorDraft, locale: string): { name: string; specialty: string } {
+  return {
+    name: portalName(doctor.displayName, locale, [
+      { locale: "en", name: doctor.en.displayName },
+      { locale: "ru", name: doctor.ru.displayName },
+    ]),
+    specialty: specialtyLabel(doctor.specialty, locale, [
+      { locale: "en", specialty: doctor.en.specialty },
+      { locale: "ru", specialty: doctor.ru.specialty },
+    ]),
+  };
 }
 
 function DoctorForm({ clinicId, doctor }: { clinicId: string; doctor: DoctorDraft }) {

@@ -18,6 +18,7 @@ const confirmButton =
 
 type SettingsProfileProps = {
   displayName: string;
+  visibleName?: string;
   email: string;
   phone: string | null;
   editing: boolean;
@@ -25,12 +26,13 @@ type SettingsProfileProps = {
   onSaved: () => void;
 };
 
-export function SettingsProfile({ displayName, email, phone, editing, onCancel, onSaved }: SettingsProfileProps) {
+export function SettingsProfile({ displayName, visibleName, email, phone, editing, onCancel, onSaved }: SettingsProfileProps) {
   const t = useTranslations("me");
   const auth = useTranslations("auth");
   const common = useTranslations("common");
   const router = useRouter();
   const parts = splitDisplayName(displayName);
+  const shown = splitDisplayName(visibleName ?? displayName);
   const [emailValue, setEmailValue] = useState(email);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -87,8 +89,8 @@ export function SettingsProfile({ displayName, email, phone, editing, onCancel, 
     return (
       <div className="max-w-xl border-b border-line pb-6">
         <ProfileFacts
-          name={parts.name}
-          surname={parts.surname}
+          name={shown.name}
+          surname={shown.surname}
           email={email}
           phone={formatArmeniaPhone(phone)}
           labels={{ name: t("name"), surname: t("surname"), email: t("email"), phone: t("phone") }}

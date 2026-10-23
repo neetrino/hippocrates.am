@@ -4,6 +4,7 @@ import { requireSuperAdmin } from "@/features/portal/require-super-admin";
 import { VerificationBoard } from "@/features/portal/verification-board";
 import type { VerificationQueue } from "@/features/portal/verification-status";
 import { prepareLocale } from "@/i18n/locale";
+import { withLocale } from "@/shared/locale-query";
 import { sessionGet } from "@/shared/session-api";
 import { ListPagination, listPage } from "@/shared/ui/list-pagination";
 
@@ -16,14 +17,14 @@ export default async function VerificationPage({
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const { locale } = await params;
-  prepareLocale(locale);
+  const { locale: raw } = await params;
+  const locale = prepareLocale(raw);
   await requireSuperAdmin();
   const portal = await getTranslations("portal");
   const common = await getTranslations("common");
   const page = listPage((await searchParams).page);
   const queue = (
-    (await sessionGet<VerificationQueue>(`/admin/verification${page > 1 ? `?page=${page}` : ""}`)) ?? emptyQueue
+    (await sessionGet<VerificationQueue>(withLocale("/admin/verification", page, locale))) ?? emptyQueue
   );
 
   return (

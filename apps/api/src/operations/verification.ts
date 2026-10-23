@@ -1,9 +1,11 @@
+import { applyClinic, applyDoctor, catalogLocale } from "../catalog/locale-copy";
 import { AppError } from "../common/app-error";
 import { recordOf } from "../common/input";
 import { pageWindow } from "../common/pagination";
 import type { Prisma } from "../generated/prisma/client";
 import { publicAssetUrl } from "../infrastructure/r2.storage";
 import type { PrismaService } from "../infrastructure/prisma.service";
+import { clinicCopies } from "../marketplace/clinic-search";
 
 const pendingStatuses = ["DRAFT", "SUBMITTED", "UNDER_REVIEW", "REJECTED", "SUSPENDED"] as const;
 const decisions = ["APPROVE", "REJECT", "SUSPEND"] as const;
@@ -54,10 +56,11 @@ export function kindOf(value: string): VerificationKind {
   throw new AppError("VALIDATION_FAILED", 400, "Տեսակը սխալ է");
 }
 
-export async function listVerificationQueue(prisma: PrismaService, page?: string): Promise<{
+export async function listVerificationQueue(prisma: PrismaService, page?: string, locale?: string): Promise<{
   clinics: QueueClinic[];
   doctors: QueueDoctor[];
 }> {
+  const language = catalogLocale(locale);
   const status = { verificationStatus: { in: [...pendingStatuses] } };
   const { skip, take } = pageWindow(page);
   const [clinics, doctors] = await Promise.all([
@@ -66,7 +69,16 @@ export async function listVerificationQueue(prisma: PrismaService, page?: string
       orderBy: [{ name: "asc" }, { id: "asc" }],
       skip,
       take,
-      select: { id: true, name: true, district: true, verificationStatus: true, published: true },
+      select: {
+        id: true,
+        name: true,
+        district: true,
+        address: true,
+        description: true,
+        verificationStatus: true,
+        published: true,
+        locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
+      },
     }),
     prisma.doctorProfile.findMany({
       where: { ...status, clinic: { archivedAt: null } },
@@ -76,37 +88,51 @@ export async function listVerificationQueue(prisma: PrismaService, page?: string
       select: {
         id: true,
         specialty: true,
+        bio: true,
         verificationStatus: true,
         published: true,
         clinicId: true,
         user: { select: { displayName: true } },
-        clinic: { select: { name: true } },
+        locales: { select: { locale: true, name: true, specialty: true, bio: true } },
+        clinic: {
+          select: {
+            name: true,
+            locales: { select: { locale: true, name: true } },
+          },
+        },
       },
     }),
   ]);
   return {
-    clinics: clinics.map((clinic) => ({
-      id: clinic.id,
-      kind: "clinic",
-      name: clinic.name,
-      detail: clinic.district,
-      status: clinic.verificationStatus,
-      published: clinic.published,
-    })),
-    doctors: doctors.map((doctor) => ({
-      id: doctor.id,
-      kind: "doctor",
-      name: doctor.user.displayName,
-      detail: doctor.specialty,
-      clinicName: doctor.clinic.name,
-      clinicId: doctor.clinicId,
-      status: doctor.verificationStatus,
-      published: doctor.published,
-    })),
+    clinics: clinics.map((clinic) => {
+      const shown = applyClinic(clinic, language);
+      return {
+        id: clinic.id,
+        kind: "clinic",
+        name: shown.name,
+        detail: shown.district,
+        status: clinic.verificationStatus,
+        published: clinic.published,
+      };
+    }),
+    doctors: doctors.map((doctor) => {
+      const shown = applyDoctor(doctor, language);
+      return {
+        id: doctor.id,
+        kind: "doctor",
+        name: shown.user?.displayName ?? doctor.user.displayName,
+        detail: shown.specialty,
+        clinicName: shown.clinic.name,
+        clinicId: doctor.clinicId,
+        status: doctor.verificationStatus,
+        published: doctor.published,
+      };
+    }),
   };
 }
 
-export async function listAdminClinics(prisma: PrismaService, page?: string) {
+export async function listAdminClinics(prisma: PrismaService, page?: string, locale?: string) {
+  const language = catalogLocale(locale);
   const { skip, take } = pageWindow(page);
   const rows = await prisma.clinic.findMany({
     orderBy: [{ name: "asc" }, { id: "asc" }],
@@ -123,20 +149,25 @@ export async function listAdminClinics(prisma: PrismaService, page?: string) {
       logoKey: true,
       published: true,
       verificationStatus: true,
+      locales: { select: { locale: true, name: true, district: true, address: true, description: true } },
     },
   });
-  return rows.map((clinic) => ({
-    id: clinic.id,
-    name: clinic.name,
-    address: clinic.address,
-    district: clinic.district,
-    phone: clinic.phone,
-    description: clinic.description,
-    coverUrl: publicAssetUrl(clinic.coverKey),
-    logoUrl: publicAssetUrl(clinic.logoKey),
-    published: clinic.published,
-    verificationStatus: clinic.verificationStatus,
-  }));
+  return rows.map((clinic) => {
+    const shown = applyClinic(clinic, language);
+    return {
+      id: clinic.id,
+      name: shown.name,
+      address: shown.address,
+      district: shown.district,
+      phone: clinic.phone,
+      description: shown.description,
+      coverUrl: publicAssetUrl(clinic.coverKey),
+      logoUrl: publicAssetUrl(clinic.logoKey),
+      published: clinic.published,
+      verificationStatus: clinic.verificationStatus,
+      copies: clinicCopies(clinic),
+    };
+  });
 }
 
 export async function countPendingReviews(prisma: PrismaService): Promise<number> {

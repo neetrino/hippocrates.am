@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { PhoneField } from "@/features/auth/phone-field";
+import { portalName } from "@/shared/clinic-label";
 import { formatTime } from "@/shared/format";
 import { sanitizeNameInput } from "@/shared/input-constraints";
 import { localizedServiceName, type ServiceMessageKey } from "@/shared/service-name";
 
-export type DeskDoctor = { id: string; published?: boolean; user: { displayName: string } };
+export type DeskDoctor = {
+  id: string;
+  published?: boolean;
+  user: { displayName: string };
+  locales?: { locale: string; name: string }[];
+};
 export type DeskService = {
   id: string;
   name: string;
@@ -132,6 +138,7 @@ type VisitChoiceProps = {
 };
 
 function VisitChoices({ doctors, doctorId, choices, offeringId, services, onDoctor, onOffering, onDate, resetKey }: VisitChoiceProps) {
+  const locale = useLocale();
   const t = useTranslations("desk");
   return (
     <>
@@ -140,7 +147,7 @@ function VisitChoices({ doctors, doctorId, choices, offeringId, services, onDoct
         <select className={control} value={doctorId} onChange={(event) => onDoctor(event.target.value)}>
           {doctors.map((doctor) => (
             <option key={doctor.id} value={doctor.id}>
-              {doctor.user.displayName}
+              {portalName(doctor.user.displayName, locale, doctor.locales)}
             </option>
           ))}
         </select>

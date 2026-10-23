@@ -142,10 +142,10 @@ export class AuthController {
   @Get("me")
   async me(
     @CurrentActor() actor: Actor,
-  ): Promise<Actor & { displayName: string; email: string; phone: string | null; photoUrl: string | null; emailVisitNotices: boolean }> {
+  ): Promise<Actor & { displayName: string; email: string; phone: string | null; photoUrl: string | null; emailVisitNotices: boolean; nameLocales: { locale: string; name: string }[] }> {
     const user = await this.prisma.user.findUnique({
       where: { id: actor.id },
-      include: { doctorProfile: { select: { photoKey: true } } },
+      include: { doctorProfile: { select: { photoKey: true, locales: { select: { locale: true, name: true } } } } },
     });
     if (!user) throw new AppError("UNAUTHENTICATED", 401, "Մուտք գործեք");
     return {
@@ -157,6 +157,7 @@ export class AuthController {
       phone: user.phone,
       photoUrl: accountPhotoUrl(user),
       emailVisitNotices: user.emailVisitNotices,
+      nameLocales: user.doctorProfile?.locales ?? [],
     };
   }
 

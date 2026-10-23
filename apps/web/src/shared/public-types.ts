@@ -94,4 +94,6 @@ export type Me = {
   phone: string | null;
   photoUrl: string | null;
   emailVisitNotices: boolean;
+  /** Saved doctor-name translations. Empty for every other role. */
+  nameLocales?: { locale: string; name: string }[];
 };

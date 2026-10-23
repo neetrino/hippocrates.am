@@ -1,9 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { clinicSend } from "@/features/clinic/clinic-api";
 import { PatientAvatar } from "@/features/portal/patient-avatar";
+import { portalName, specialtyLabel } from "@/shared/clinic-label";
 import { formatAmount } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 
@@ -23,6 +24,7 @@ export type ServiceDoctor = {
   published?: boolean;
   photoUrl: string | null;
   user: { displayName: string };
+  locales?: { locale: string; name: string; specialty: string }[];
 };
 
 const fieldClass = "grid gap-1.5 text-[0.92rem] font-semibold";
@@ -40,15 +42,18 @@ export function DoctorServiceGroup({
   offerings: ClinicOffering[];
   onAdd: () => void;
 }) {
+  const locale = useLocale();
   const t = useTranslations("desk");
+  const name = portalName(doctor.user.displayName, locale, doctor.locales);
+  const specialty = specialtyLabel(doctor.specialty, locale, doctor.locales);
   return (
     <article className="rounded-card border border-line bg-white shadow-soft">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
         <span className="flex min-w-0 items-center gap-3">
-          <PatientAvatar name={doctor.user.displayName} photoUrl={doctor.photoUrl} />
+          <PatientAvatar name={name} photoUrl={doctor.photoUrl} />
           <span className="grid min-w-0">
-            <span className="font-semibold">{doctor.user.displayName}</span>
-            <span className="text-sm text-muted">{doctor.specialty}</span>
+            <span className="font-semibold">{name}</span>
+            <span className="text-sm text-muted">{specialty}</span>
             {doctor.published === false ? <span className="text-sm text-muted">{t("doctorHidden")}</span> : null}
           </span>
         </span>

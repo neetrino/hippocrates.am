@@ -1,3 +1,4 @@
+import { portalName } from "@/shared/clinic-label";
 import { formatWhen } from "@/shared/format";
 import type { VisitEvent } from "@/shared/public-types";
 
@@ -20,9 +21,10 @@ export function asVisitEventAction(value: string): VisitEventAction | null {
   return null;
 }
 
-export function eventActorLabel(event: VisitEvent, roleLabel: (role: string) => string): string {
+export function eventActorLabel(event: VisitEvent, locale: string, roleLabel: (role: string) => string): string {
   if (event.actorRole === "SYSTEM") return roleLabel("eventActorSystem");
-  return event.actorName || roleLabel(event.actorRole);
+  if (!event.actorName) return roleLabel(event.actorRole);
+  return portalName(event.actorName, locale);
 }
 
 /** One history line: when, action, optional new time, who, optional reason. */

@@ -35,7 +35,7 @@ function toNoticeRow(
   audience: NoticeAudience,
 ): NoticeRow {
   const visit = notice.appointment;
-  const patient = visit ? patientLabel(visit) : "";
+  const patient = visit ? patientLabel(visit, locale) : "";
   const doctor = visit ? doctorDisplayName(visit.doctor, locale) : "";
   const person = audience === "doctor" ? patient : doctor;
   const people = audience === "clinic" ? [patient, doctor].filter(Boolean) : person ? [person] : [];

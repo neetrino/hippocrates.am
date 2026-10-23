@@ -1,7 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ClinicManagerShell } from "@/features/portal/clinic-manager-shell";
 import { requireClinicAdmin } from "@/features/portal/require-clinic-admin";
 import { prepareLocale } from "@/i18n/locale";
+import { portalName } from "@/shared/clinic-label";
 import { formatAmount } from "@/shared/format";
 import { Link } from "@/i18n/navigation";
 import { sessionGet } from "@/shared/session-api";
@@ -13,6 +14,7 @@ const statCard = "grid gap-1 rounded-[1.4rem] bg-white px-5 py-5 shadow-soft tra
 export default async function ClinicDeskPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   prepareLocale(raw);
+  const locale = await getLocale();
   const desk = await getTranslations("desk");
   const common = await getTranslations("common");
   const me = await requireClinicAdmin();
@@ -23,7 +25,7 @@ export default async function ClinicDeskPage({ params }: { params: Promise<{ loc
   };
 
   return (
-    <ClinicManagerShell eyebrow={common("ADMIN")} title={me.displayName}>
+    <ClinicManagerShell eyebrow={common("ADMIN")} title={portalName(me.displayName, locale, me.nameLocales)}>
       <div className="grid gap-3 sm:grid-cols-3">
         <Link href="/clinic/visits" className={statCard}>
           <span className="text-[1.7rem] leading-none font-semibold">{formatAmount(dashboard.pending)}</span>

@@ -34,7 +34,7 @@ export function ClinicVisitBoard({ visits }: VisitBoardProps) {
           <article className="grid gap-3 rounded-[14px] border border-line bg-white px-4 py-3.5" key={item.id}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <strong>{patientLabel(item)}</strong>
+                <strong>{patientLabel(item, locale)}</strong>
                 {item.guestPhone ? <p className="m-0 text-sm text-muted">{item.guestPhone}</p> : null}
                 <p className="m-0 text-muted">
                   {item.when} · {doctorDisplayName(item.doctor, locale)} · {localizedServiceName(item.offering.name, services)} ·{" "}

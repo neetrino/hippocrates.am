@@ -3,6 +3,7 @@ import { PatientAvatar } from "@/features/portal/patient-avatar";
 import { DoctorPortalShell } from "@/features/portal/doctor-portal-shell";
 import { visitStatusClass } from "@/features/portal/visit-status-style";
 import { Link } from "@/i18n/navigation";
+import { portalName } from "@/shared/clinic-label";
 import { asVisitStatus, formatTime, formatVisitDate, patientLabel, type VisitStatus } from "@/shared/format";
 import { localizedServiceName } from "@/shared/service-name";
 import type { AppointmentCard, Me } from "@/shared/public-types";
@@ -17,12 +18,13 @@ export async function DoctorHome({ me, appointments }: { me: Me; appointments: A
   const common = await getTranslations("common");
   const services = await getTranslations("services");
   const { hero, listed } = openVisits(appointments);
+  const name = portalName(me.displayName, locale, me.nameLocales);
 
   return (
     <DoctorPortalShell
       eyebrow=""
-      title={me.displayName}
-      portrait={<PatientAvatar name={me.displayName} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
+      title={name}
+      portrait={<PatientAvatar name={name} photoUrl={me.photoUrl} className="h-12 w-12 text-lg" />}
     >
       <div className="grid gap-3">
         {hero ? (
@@ -46,7 +48,7 @@ export async function DoctorHome({ me, appointments }: { me: Me; appointments: A
               id: visit.id,
               service: localizedServiceName(visit.offering.name, services),
               when: `${formatVisitDate(visit.startsAt, locale)} · ${formatTime(visit.startsAt)}`,
-              patient: patientLabel(visit),
+              patient: patientLabel(visit, locale),
               status: statusText(visit.status, common),
               statusClass: statusClass(visit.status),
             }))}
@@ -77,7 +79,7 @@ function NextVisit({
       <p className="mt-2 mb-0 text-ink">
         {formatVisitDate(visit.startsAt, locale)} · {formatTime(visit.startsAt)}
       </p>
-      <p className="mt-1 mb-0 text-muted">{patientLabel(visit)}</p>
+      <p className="mt-1 mb-0 text-muted">{patientLabel(visit, locale)}</p>
       {statusLabel ? (
         <span className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(visit.status)}`}>{statusLabel}</span>
       ) : null}

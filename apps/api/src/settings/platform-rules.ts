@@ -14,6 +14,8 @@ export type PlatformRules = {
 
 export type BookingVerdict = "ok" | "closed" | "too-far" | "too-soon";
 
+export type PublicSlotClose = "open" | "booked" | "passed" | "soon" | "closed";
+
 export const platformDefaults: PlatformRules = {
   patientRegistrationEnabled: true,
   bookingEnabled: true,
@@ -56,17 +58,31 @@ export function patientBookingOpen(
   return "ok";
 }
 
-export function applyPatientSlots<T extends { startsAt: string; busy: boolean }>(
+export function applyPatientSlots<T extends { startsAt: string; busy: boolean; close?: PublicSlotClose }>(
   slots: T[],
   rules: PlatformRules,
   isoDate: string,
   timeZone: string,
   now: Date,
-): T[] {
+): Array<T & { busy: boolean; close: PublicSlotClose }> {
   const open = rules.bookingEnabled && withinHorizon(isoDate, clinicDay(now, timeZone), rules.maxBookingDays);
   const earliest = now.getTime() + rules.minNoticeMinutes * 60_000;
-  return slots.map((slot) => ({
-    ...slot,
-    busy: slot.busy || !open || new Date(slot.startsAt).getTime() < earliest,
-  }));
+  return slots.map((slot) => {
+    const close = patientClose(slot, open, earliest, now.getTime());
+    return { ...slot, close, busy: close !== "open" };
+  });
+}
+
+function patientClose(
+  slot: { startsAt: string; busy: boolean; close?: PublicSlotClose },
+  open: boolean,
+  earliest: number,
+  now: number,
+): PublicSlotClose {
+  const start = new Date(slot.startsAt).getTime();
+  if (slot.close === "passed" || start <= now) return "passed";
+  if (slot.close === "booked" || slot.busy) return "booked";
+  if (!open) return "closed";
+  if (start < earliest) return "soon";
+  return "open";
 }

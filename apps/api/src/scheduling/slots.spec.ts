@@ -30,8 +30,8 @@ describe("bookableStarts", () => {
       blocked: [],
     });
     expect(shown).toHaveLength(2);
-    expect(shown[0]?.busy).toBe(true);
-    expect(shown[1]?.busy).toBe(false);
+    expect(shown[0]?.close).toBe("booked");
+    expect(shown[1]?.close).toBe("open");
   });
 
   it("closes a slot that has already started and keeps a later one open", () => {
@@ -44,7 +44,7 @@ describe("bookableStarts", () => {
       blocked: [],
       now: new Date("2026-10-05T05:30:00.000Z"),
     });
-    expect(shown.map((slot) => slot.busy)).toEqual([true, false]);
+    expect(shown.map((slot) => slot.close)).toEqual(["passed", "open"]);
     const open = bookableStarts({
       isoDate: "2026-10-05",
       timeZone: "Asia/Yerevan",

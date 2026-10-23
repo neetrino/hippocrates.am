@@ -1,4 +1,6 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
+import { latinizeArmenian } from "../catalog/armenian-latin";
+import { knownSpecialty } from "../catalog/known-specialty";
 import { applyClinic, applyDoctor, applyOfferingDoctor, catalogLocale, type CatalogLocale } from "../catalog/locale-copy";
 import { AppError } from "../common/app-error";
 import { pageWindow } from "../common/pagination";
@@ -177,7 +179,7 @@ export class MarketplaceController {
     return {
       ...view,
       doctors: clinic.doctors.map((doctor) => doctorView(applyDoctor(doctor, language))),
-      offerings: clinic.offerings.map((offering) => applyOfferingDoctor(offering)),
+      offerings: clinic.offerings.map((offering) => applyOfferingDoctor(offering, language)),
       reviews: [],
     };
   }
@@ -206,16 +208,17 @@ export class MarketplaceController {
         },
       }),
     ]);
+    const pageLocale = language ?? "hy";
     const specialtyLabels: Record<string, string> = {};
     for (const row of specialtyRows) {
-      const label = row.locales?.[0]?.specialty.trim() ?? "";
-      if (row.specialty && label && !specialtyLabels[row.specialty]) specialtyLabels[row.specialty] = label;
+      const label = row.locales?.[0]?.specialty.trim() || knownSpecialty(row.specialty, pageLocale);
+      if (row.specialty && label !== row.specialty && !specialtyLabels[row.specialty]) specialtyLabels[row.specialty] = label;
     }
     const cityLabels: Record<string, string> = {};
     for (const clinic of clinicRows) {
-      const label = clinic.locales?.[0]?.district.trim() ?? "";
       const district = clinic.district.trim();
-      if (district && label && !cityLabels[district]) cityLabels[district] = label;
+      const label = clinic.locales?.[0]?.district.trim() || (language === "en" ? latinizeArmenian(district) : district);
+      if (district && label !== district && !cityLabels[district]) cityLabels[district] = label;
     }
     const cities = [...new Set(clinicRows.map((clinic) => clinic.district.trim()).filter(Boolean))].sort((a, b) =>
       a.localeCompare(b, "hy"),
@@ -228,7 +231,7 @@ export class MarketplaceController {
       clinics: clinicRows.map((clinic) => ({
         id: clinic.id,
         name: clinic.name,
-        label: clinic.locales?.[0]?.name.trim() || clinic.name,
+        label: clinic.locales?.[0]?.name.trim() || (language === "en" ? latinizeArmenian(clinic.name) : clinic.name),
       })),
     };
   }

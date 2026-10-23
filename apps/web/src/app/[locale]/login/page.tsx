@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { prepareLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
@@ -20,7 +21,9 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
           <h1 className="text-[clamp(1.55rem,3.2vw,1.85rem)]">{t("loginTitle")}</h1>
           <p className="m-0 max-w-[38ch] text-[0.95rem] leading-relaxed text-muted">{t("loginHint")}</p>
         </div>
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
         <p className="m-0 border-t border-line pt-4 text-center text-[0.9rem] text-muted">
           {t("noAccount")}{" "}
           <Link href="/register" className="font-semibold text-ink underline underline-offset-4 hover:text-accent">

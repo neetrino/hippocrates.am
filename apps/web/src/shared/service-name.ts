@@ -27,10 +27,32 @@ const serviceMessages = {
 
 export type ServiceMessageKey = (typeof serviceMessages)[keyof typeof serviceMessages];
 
+const englishAliases: Record<string, ServiceMessageKey> = {
+  consultation: "consult",
+  consult: "consult",
+  cleaning: "cleaning",
+  "tooth extraction": "extraction",
+  extraction: "extraction",
+  "surgical consultation": "surgicalConsult",
+  "orthodontic consultation": "orthodonticConsult",
+  "brace check": "braceCheck",
+  "implant consultation": "implantConsult",
+  "follow-up": "followUp",
+  "follow-up visit": "followUp",
+  "children's exam": "childExam",
+  "preventive care": "preventive",
+  "prosthodontic consultation": "prostheticConsult",
+  "crown preparation": "crownPrep",
+};
+
+const serviceByName = new Map<string, ServiceMessageKey>(
+  Object.entries(serviceMessages).map(([name, key]) => [name.toLowerCase(), key]),
+);
+
+for (const [name, key] of Object.entries(englishAliases)) serviceByName.set(name, key);
+
 /** Known services follow the UI language. A clinic-written name stays as stored. */
 export function localizedServiceName(name: string, label: (key: ServiceMessageKey) => string): string {
-  if (Object.prototype.hasOwnProperty.call(serviceMessages, name)) {
-    return label(serviceMessages[name as keyof typeof serviceMessages]);
-  }
-  return name;
+  const key = serviceByName.get(name.trim().toLowerCase());
+  return key ? label(key) : name;
 }

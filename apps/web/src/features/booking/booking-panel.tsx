@@ -139,7 +139,7 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
             key={slot.startsAt}
             slot={slot}
             selected={selected === slot.startsAt}
-            busyLabel={t("busy")}
+            busyLabel={slotWord(slot, t)}
             onSelect={(startsAt) => {
               setSelected(startsAt);
               setTone("muted");
@@ -165,6 +165,13 @@ export function BookingPanel({ offerings, initialSlots }: { offerings: OfferingC
   );
 }
 
+function slotWord(slot: TimeSlot, t: (key: "busy" | "passed" | "soon" | "closed") => string): string {
+  if (slot.close === "passed") return t("passed");
+  if (slot.close === "soon") return t("soon");
+  if (slot.close === "closed") return t("closed");
+  return t("busy");
+}
+
 function TimeButton({
   slot,
   selected,
@@ -177,6 +184,8 @@ function TimeButton({
   onSelect: (startsAt: string) => void;
 }) {
   const time = formatTime(slot.startsAt);
+  const booked = slot.busy && slot.close !== "passed" && slot.close !== "soon" && slot.close !== "closed";
+  const unavailable = slot.busy && !booked;
   return (
     <button
       type="button"
@@ -185,7 +194,8 @@ function TimeButton({
       aria-label={slot.busy ? `${time}, ${busyLabel}` : time}
       className={cn(
         "inline-flex h-10 w-[4.75rem] shrink-0 items-center justify-center rounded-full border text-sm tabular-nums disabled:opacity-100",
-        slot.busy && "cursor-not-allowed border-danger/35 bg-danger/10 text-danger line-through",
+        booked && "cursor-not-allowed border-danger/35 bg-danger/10 text-danger line-through",
+        unavailable && "cursor-not-allowed border-line bg-sand text-muted line-through",
         !slot.busy && selected && "border-accent bg-accent text-white",
         !slot.busy && !selected && "cursor-pointer border-line bg-surface text-ink hover:border-accent/40",
       )}

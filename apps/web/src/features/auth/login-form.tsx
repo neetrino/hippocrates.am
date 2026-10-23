@@ -2,9 +2,12 @@
 
 import { FormEvent, KeyboardEvent, PointerEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
+import { authFailure } from "@/features/auth/auth-failure";
 import { PasswordField } from "@/features/auth/password-field";
 import { resendVerification } from "@/features/auth/resend-verification";
+import { favoriteTarget, returnPath } from "@/features/auth/return-path";
 import { accountHome } from "@/shared/role-home";
 
 type LoginPayload = {
@@ -21,6 +24,7 @@ export function LoginForm() {
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const locale = useLocale();
+  const params = useSearchParams();
   const t = useTranslations("auth");
   const common = useTranslations("common");
 
@@ -50,11 +54,12 @@ export function LoginForm() {
         return;
       }
       setUnverifiedEmail("");
-      setError(common("failed"));
+      setError(authFailure(body?.error?.code, t, common("failed")));
       return;
     }
     const body = (await response.json()) as LoginPayload;
-    const next = accountHome(body.data.role);
+    await keepFavorite(params.get("favorite"));
+    const next = returnPath(params.get("next")) ?? accountHome(body.data.role);
     router.push(next);
     router.refresh();
   }
@@ -114,4 +119,13 @@ export function LoginForm() {
       </button>
     </form>
   );
+}
+
+async function keepFavorite(value: string | null): Promise<void> {
+  const path = favoriteTarget(value);
+  if (!path) return;
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1${path}`, {
+    method: "POST",
+    credentials: "include",
+  }).catch(() => undefined);
 }

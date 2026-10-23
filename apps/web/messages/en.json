@@ -154,6 +154,9 @@
     "signIn": "Sign in as a patient to book",
     "taken": "That time is not open",
     "busy": "Taken",
+    "passed": "Passed",
+    "soon": "Too soon",
+    "closed": "Closed",
     "booked": "Visit booked"
   },
   "questions": {
@@ -213,7 +216,10 @@
     "resetInvalid": "This link is invalid or expired. Request a new one.",
     "resetUnavailable": "The message could not be sent right now. Try again shortly.",
     "passwordShort": "At least 8 characters, with one letter and one number",
-    "passwordIsEmail": "The password cannot match the email"
+    "passwordIsEmail": "The password cannot match the email",
+    "invalidLogin": "Email or password is wrong",
+    "emailTaken": "This email is already registered",
+    "rateLimited": "Too many attempts. Try again shortly."
   },
   "me": {
     "signIn": "Sign in to see your page.",

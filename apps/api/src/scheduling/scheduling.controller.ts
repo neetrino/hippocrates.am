@@ -13,7 +13,7 @@ import { dayBounds } from "./day-off";
 import { clipDoctorHours } from "./clip-doctor-hours";
 import { isScheduleConflict } from "./schedule-conflict";
 import { daySlots, openWindows } from "./slots";
-import { applyPatientSlots } from "../settings/platform-rules";
+import { applyPatientSlots, type PublicSlotClose } from "../settings/platform-rules";
 import { loadPlatformSettings } from "../settings/platform-settings";
 import { assertInsideClinic, windowsFrom, type StoredWindow } from "./windows";
 
@@ -176,7 +176,7 @@ export class SchedulingController {
     @Query("doctorId") doctorId: string,
     @Query("offeringId") offeringId: string,
     @Query("date") date: string,
-  ): Promise<{ startsAt: string[]; slots: { startsAt: string; busy: boolean }[] }> {
+  ): Promise<{ startsAt: string[]; slots: { startsAt: string; busy: boolean; close: PublicSlotClose }[] }> {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "")) {
       throw new AppError("VALIDATION_FAILED", 400, "Ամսաթիվը սխալ է");
     }
@@ -212,7 +212,7 @@ export class SchedulingController {
         busy: appointments.map((item) => ({ start: item.startsAt, end: item.endsAt })),
         blocked: exceptions.map((item) => ({ start: item.startsAt, end: item.endsAt })),
         now,
-      }).map((slot) => ({ startsAt: slot.start.toISOString(), busy: slot.busy })),
+      }).map((slot) => ({ startsAt: slot.start.toISOString(), busy: slot.busy, close: slot.close })),
       rules,
       date,
       offering.clinic.timeZone,

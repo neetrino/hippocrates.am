@@ -35,6 +35,6 @@ describe("platform booking rules", () => {
       zone,
       now,
     );
-    expect(slots.map((slot) => slot.busy)).toEqual([true, false]);
+    expect(slots.map((slot) => slot.close)).toEqual(["soon", "open"]);
   });
 });

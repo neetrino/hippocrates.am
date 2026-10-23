@@ -44,11 +44,19 @@ export function zonedWeekday(instant: Date, timeZone: string): number {
   return index < 0 ? 0 : index;
 }
 
+function slotClose(started: boolean, booked: boolean): SlotClose {
+  if (started) return "passed";
+  if (booked) return "booked";
+  return "open";
+}
+
 function overlaps(start: Date, end: Date, ranges: TimeRange[]): boolean {
   return ranges.some((range) => start < range.end && end > range.start);
 }
 
-export type DaySlot = { start: Date; busy: boolean };
+export type SlotClose = "open" | "booked" | "passed";
+
+export type DaySlot = { start: Date; busy: boolean; close: SlotClose };
 
 /** Hours where the clinic and the doctor are both open. No clinic hours means the doctor hours stand. */
 export function openWindows(clinic: MinuteWindow[], doctor: MinuteWindow[]): MinuteWindow[] {
@@ -115,7 +123,8 @@ export function daySlots(input: {
       const end = new Date(start.getTime() + input.durationMinutes * 60_000);
       if (overlaps(start, end, input.blocked)) continue;
       const started = input.now !== undefined && start.getTime() <= input.now.getTime();
-      slots.push({ start, busy: started || overlaps(start, end, input.busy) });
+      const close = slotClose(started, overlaps(start, end, input.busy));
+      slots.push({ start, busy: close !== "open", close });
     }
   }
   return slots;

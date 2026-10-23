@@ -1,7 +1,9 @@
 import { publicGet } from "@/shared/public-api";
 import type { OfferingCard } from "@/shared/public-types";
 
-export type TimeSlot = { startsAt: string; busy: boolean };
+export type SlotClose = "open" | "booked" | "passed" | "soon" | "closed";
+
+export type TimeSlot = { startsAt: string; busy: boolean; close?: SlotClose };
 
 export function todayInYerevan(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Yerevan" }).format(new Date());

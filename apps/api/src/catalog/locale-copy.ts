@@ -1,3 +1,6 @@
+import { latinizeArmenian } from "./armenian-latin";
+import { knownSpecialty } from "./known-specialty";
+
 export type CatalogLocale = "en" | "ru";
 
 export type ClinicLocaleRow = {
@@ -41,16 +44,16 @@ export function applyClinic<T extends {
 }>(clinic: T, locale: CatalogLocale | null): Omit<T, "locales"> {
   const { locales, ...rest } = clinic;
   const copy = rowFor(locales, locale);
-  const address = filled(rest.address, copy?.address);
+  const address = englishField(rest.address, copy?.address, locale);
   return {
     ...rest,
-    name: filled(rest.name, copy?.name),
-    district: filled(rest.district, copy?.district),
+    name: englishField(rest.name, copy?.name, locale),
+    district: englishField(rest.district, copy?.district, locale),
     address,
     description: filled(rest.description, copy?.description),
     branches: rest.branches?.map((branch) => ({
       ...branch,
-      address: branch.address === rest.address ? address : branch.address,
+      address: branch.address === rest.address ? address : englishField(branch.address, undefined, locale),
     })),
   };
 }
@@ -66,12 +69,13 @@ export function applyDoctor<T extends {
   const copy = rowFor(locales, locale);
   const { locales: clinicLocales, ...clinicRest } = clinic;
   const clinicCopy = rowFor(clinicLocales, locale);
+  const specialty = knownSpecialty(filled(rest.specialty, copy?.specialty), locale ?? "hy");
   return {
     ...rest,
-    ...(user ? { user: { ...user, displayName: filled(user.displayName, copy?.name) } } : {}),
-    specialty: filled(rest.specialty, copy?.specialty),
+    ...(user ? { user: { ...user, displayName: englishField(user.displayName, copy?.name, locale) } } : {}),
+    specialty,
     bio: filled(rest.bio, copy?.bio),
-    clinic: { ...clinicRest, name: filled(clinicRest.name, clinicCopy?.name) },
+    clinic: { ...clinicRest, name: englishField(clinicRest.name, clinicCopy?.name, locale) },
   };
 }
 
@@ -88,7 +92,7 @@ export function applyReview<T extends {
 
 export function applyOfferingDoctor<T extends {
   doctor: { user: { displayName: string }; locales?: { name: string }[] } | null;
-}>(offering: T) {
+}>(offering: T, locale: CatalogLocale | null = null) {
   const doctor = offering.doctor;
   if (!doctor) return offering;
   const { locales, ...doctorRest } = doctor;
@@ -96,9 +100,16 @@ export function applyOfferingDoctor<T extends {
     ...offering,
     doctor: {
       ...doctorRest,
-      user: { displayName: filled(doctor.user.displayName, locales?.[0]?.name) },
+      user: { displayName: englishField(doctor.user.displayName, locales?.[0]?.name, locale) },
     },
   };
+}
+
+/** Saved English copy wins. Without one, Armenian text is shown in Latin on the English page. */
+function englishField(base: string, copy: string | undefined, locale: CatalogLocale | null): string {
+  const written = copy?.trim() ?? "";
+  if (written) return written;
+  return locale === "en" ? latinizeArmenian(base) : base;
 }
 
 export function labelFor(value: string, labels: Record<string, string>): string {

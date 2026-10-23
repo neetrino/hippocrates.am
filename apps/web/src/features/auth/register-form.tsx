@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { PasswordField } from "@/features/auth/password-field";
+import { authFailure } from "@/features/auth/auth-failure";
 import { passwordIssue } from "@/features/auth/password-rule";
 import { armeniaPhone, PhoneField } from "@/features/auth/phone-field";
 import { resendVerification } from "@/features/auth/resend-verification";
@@ -51,7 +52,8 @@ export function RegisterForm() {
       body: JSON.stringify({ name, surname, phone, email, password, confirmPassword, locale }),
     });
     if (!response.ok) {
-      setError(common("failed"));
+      const body = (await response.json().catch(() => null)) as { error?: { code?: string } } | null;
+      setError(authFailure(body?.error?.code, t, common("failed")));
       return;
     }
     setSentEmail(email);

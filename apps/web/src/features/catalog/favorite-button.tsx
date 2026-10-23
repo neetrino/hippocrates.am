@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 type FavoriteButtonProps = {
   kind: "clinic" | "doctor";
@@ -15,6 +15,7 @@ type FavoriteButtonProps = {
 export function FavoriteButton({ kind, id, saved, tone = "overlay", className = "" }: FavoriteButtonProps) {
   const t = useTranslations("me");
   const router = useRouter();
+  const pathname = usePathname();
   const [pending, setPending] = useState(false);
   const path = kind === "clinic" ? "clinics" : "doctors";
 
@@ -27,7 +28,8 @@ export function FavoriteButton({ kind, id, saved, tone = "overlay", className = 
     });
     setPending(false);
     if (response.status === 401) {
-      router.push("/login");
+      const next = encodeURIComponent(pathname);
+      router.push(`/login?next=${next}&favorite=${kind}:${id}`);
       return;
     }
     if (response.ok) router.refresh();

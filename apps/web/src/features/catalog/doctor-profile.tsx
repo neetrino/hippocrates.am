@@ -55,8 +55,13 @@ function DoctorIntro({
 }) {
   return (
     <article className="overflow-hidden rounded-card bg-surface shadow-soft">
-      <div className="relative aspect-4/5 max-h-[32rem] bg-sand md:aspect-16/10 md:max-h-none">
-        <Photo src={doctor.photoUrl} alt={doctor.user.displayName} sizes="(max-width: 768px) 100vw, 70vw" />
+      <div className="flex items-center justify-center bg-sand">
+        <Photo
+          src={doctor.photoUrl}
+          alt={doctor.user.displayName}
+          sizes="(max-width: 768px) 100vw, 70vw"
+          fit="contain"
+        />
       </div>
       <div className="grid gap-3 px-6 py-6 max-md:px-5 max-md:py-5">
         <p className="kicker">{doctor.specialty}</p>
